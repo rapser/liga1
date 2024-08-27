@@ -12,11 +12,87 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     var equipos: [Equipo] = []
     let tableView = UITableView()
+    let segmentedControl = UISegmentedControl(items: ["Clausura", "Acumulado"])
     
-    func cargarEquipos() {
-        let db = Firestore.firestore()
-        let equiposRef = db.collection("apertura")
+    // MARK: - LifeCycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureSegmentedControl()
+        configureTableView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
+        segmentedControl.selectedSegmentIndex = 0
+        cargarEquiposClausura()
+    }
+    
+    // MARK: - Private methods
+    
+    private func configureSegmentedControl() {
+        // Añadir el UISegmentedControl a la vista
+        view.addSubview(segmentedControl)
+        
+        // Configurar auto-layout para el UISegmentedControl
+        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            segmentedControl.heightAnchor.constraint(equalToConstant: 30)
+        ])
+        
+        // Configurar el color rojo para el UISegmentedControl
+        let liga1RedColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
+        segmentedControl.selectedSegmentTintColor = liga1RedColor
+        
+        segmentedControl.backgroundColor = .white
+        
+        // Configurar los atributos de texto
+        let textAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 14, weight: .bold)
+        ]
+        
+        segmentedControl.setTitleTextAttributes(textAttributes, for: .selected)
+        segmentedControl.setTitleTextAttributes(textAttributes, for: .normal)
+        
+        // Añadir un target para detectar cambios en el UISegmentedControl
+        segmentedControl.addTarget(self, action: #selector(segmentedControlChanged(_:)), for: .valueChanged)
+    }
+    
+    private func configureTableView() {
+        // Añadir el UITableView a la vista del controlador
+        view.addSubview(tableView)
+        
+        // Configurar auto-layout para el UITableView
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 16),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor) // Anclado al safeAreaLayoutGuide para evitar el TabBar
+        ])
+        
+        // Registrar la celda personalizada
+        tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
+        
+        tableView.allowsSelection = false
+        // Asignar delegados
+        tableView.delegate = self
+        tableView.dataSource = self
+        
+        // Configurar el encabezado de la tabla
+        let headerView = HeaderView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 50))
+        tableView.tableHeaderView = headerView
+    }
+    
+    func cargarEquiposClausura() {
+        let db = Firestore.firestore()
+        let equiposRef = db.collection("teams")
+                
         equiposRef.order(by: "points", descending: true)
             .order(by: "goalDifference", descending: true)
             .getDocuments { (querySnapshot, error) in
@@ -52,40 +128,17 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
             }
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    @objc private func segmentedControlChanged(_ sender: UISegmentedControl) {
         
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        self.equipos = []
         
-        //        cargarEquipos()
-        configureTableView()
-        cargarEquiposAcumulados()
-        
-        
-    }
-    
-    private func configureTableView() {
-        // Añadir el UITableView a la vista del controlador
-        view.addSubview(tableView)
-        
-        // Configurar auto-layout para el UITableView
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addConstraints(to: tableView, leading: 0, top: 0, trailing: 0, bottom: 0)
-        
-        // Registrar la celda personalizada
-        tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
-        
-        tableView.allowsSelection = false
-        // Asignar delegados
-        tableView.delegate = self
-        tableView.dataSource = self
-        
-        // Configura el encabezado de la tabla
-        let headerView = HeaderView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 50))
-        tableView.tableHeaderView = headerView
+        if sender.selectedSegmentIndex == 0 {
+            // Cargar los datos de "Clausura"
+            cargarEquiposClausura()
+        } else {
+            // Cargar los datos acumulados
+            cargarEquiposAcumulados()
+        }
     }
     
     func cargarEquiposAcumulados() {
@@ -194,7 +247,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }
     }
     
-        
+    
     // MARK: - UITableViewDataSource
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -207,25 +260,31 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         cell.configure(with: equipo)
         
-        // Cambiar el color de fondo para las celdas basado en la posición
-        switch indexPath.row {
-        case 0,1:
-            cell.backgroundColor = .lightMustardYellow // Primer lugar
-        case 2:
-            cell.backgroundColor = .lighterMustardYellow // Tercer lugar
-        case 3:
-            cell.backgroundColor = .lightestMustardYellow // Cuarto lugar
-        case 4...7:
-            cell.backgroundColor = .lightPastelSkyBlue // Del quinto al octavo lugar
-        case (equipos.count-3)...(equipos.count-1):
-            cell.backgroundColor = .lightRed // Últimas 3 posiciones
-        default:
-            cell.backgroundColor = .white // Resto de las posiciones
+        // Verificar la selección del UISegmentedControl
+        if segmentedControl.selectedSegmentIndex == 1 { // Acumulado
+            // Cambiar el color de fondo para las celdas basado en la posición
+            switch indexPath.row {
+            case 0, 1:
+                cell.backgroundColor = .lightMustardYellow // Primer lugar
+            case 2:
+                cell.backgroundColor = .lighterMustardYellow // Tercer lugar
+            case 3:
+                cell.backgroundColor = .lightestMustardYellow // Cuarto lugar
+            case 4...7:
+                cell.backgroundColor = .lightPastelSkyBlue // Del quinto al octavo lugar
+            case (equipos.count-3)...(equipos.count-1):
+                cell.backgroundColor = .lightRed // Últimas 3 posiciones
+            default:
+                cell.backgroundColor = .white // Resto de las posiciones
+            }
+        } else { // Clausura
+            // No aplicar colores, dejar fondo blanco
+            cell.backgroundColor = .white
         }
         
         return cell
     }
-
+    
 }
 
 
