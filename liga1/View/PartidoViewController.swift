@@ -53,79 +53,33 @@ class PartidoViewController: UIViewController {
     func registerMatch(){
         
         // Array de partidos a registrar
-//        let partidosARegistrar: [Partido] = [
-//            Partido(teamAId: "com", teamBId: "cha", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "adt", teamBId: "cri", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "gar", teamBId: "utc", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cou", teamBId: "cie", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "val", teamBId: "ali", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "uni", teamBId: "man", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "atl", teamBId: "gra", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "sba", teamBId: "hua", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cus", teamBId: "mel", fecha: "01", golesTeamA: 0, golesTeamB: 0),
-//            
-//            Partido(teamAId: "utc", teamBId: "cus", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "hua", teamBId: "gar", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cha", teamBId: "cou", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "mel", teamBId: "val", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "ali", teamBId: "atl", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "gra", teamBId: "uni", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "man", teamBId: "com", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cri", teamBId: "sba", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cie", teamBId: "adt", fecha: "02", golesTeamA: 0, golesTeamB: 0),
-//            
-//            Partido(teamAId: "atl", teamBId: "mel", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cus", teamBId: "hua", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "val", teamBId: "utc", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cou", teamBId: "man", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "gar", teamBId: "sba", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "uni", teamBId: "ali", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cri", teamBId: "cie", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "adt", teamBId: "cha", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-//            
-//            Partido(teamAId: "gar", teamBId: "cus", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "hua", teamBId: "val", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "sba", teamBId: "cie", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "ali", teamBId: "com", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "gra", teamBId: "cou", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cha", teamBId: "cri", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "man", teamBId: "adt", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "mel", teamBId: "uni", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "utc", teamBId: "atl", fecha: "04", golesTeamA: 0, golesTeamB: 0),
-//            
-//            Partido(teamAId: "cou", teamBId: "ali", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cie", teamBId: "cha", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "val", teamBId: "gar", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cri", teamBId: "man", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "com", teamBId: "mel", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "adt", teamBId: "gra", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "uni", teamBId: "utc", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "atl", teamBId: "hua", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cus", teamBId: "sba", fecha: "05", golesTeamA: 0, golesTeamB: 0),
-//            
-//            Partido(teamAId: "utc", teamBId: "com", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "gar", teamBId: "atl", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "sba", teamBId: "cha", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "ali", teamBId: "adt", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "gra", teamBId: "cri", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "man", teamBId: "cie", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "hua", teamBId: "uni", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cus", teamBId: "val", fecha: "06", golesTeamA: 0, golesTeamB: 0),
-//            
-//            Partido(teamAId: "atl", teamBId: "cus", fecha: "07", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cou", teamBId: "utc", fecha: "07", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "adt", teamBId: "mel", fecha: "07", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "val", teamBId: "sba", fecha: "07", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "uni", teamBId: "gar", fecha: "07", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "com", teamBId: "hua", fecha: "07", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cie", teamBId: "gra", fecha: "07", golesTeamA: 0, golesTeamB: 0),
-//            Partido(teamAId: "cri", teamBId: "ali", fecha: "07", golesTeamA: 0, golesTeamB: 0)
-//        ]
+        let partidosARegistrar: [Partido] = [
+            Partido(teamAId: "val", teamBId: "atl", fecha: "08", golesTeamA: 0, golesTeamB: 0),
+            Partido(teamAId: "utc", teamBId: "adt", fecha: "08", golesTeamA: 1, golesTeamB: 1),
+            Partido(teamAId: "hua", teamBId: "cou", fecha: "08", golesTeamA: 2, golesTeamB: 2),
+            Partido(teamAId: "cus", teamBId: "uni", fecha: "08", golesTeamA: 1, golesTeamB: 1),
+            Partido(teamAId: "ali", teamBId: "cie", fecha: "08", golesTeamA: 3, golesTeamB: 0),
+            Partido(teamAId: "gra", teamBId: "cha", fecha: "08", golesTeamA: 1, golesTeamB: 1),
+            Partido(teamAId: "sba", teamBId: "man", fecha: "08", golesTeamA: 2, golesTeamB: 6),
+            Partido(teamAId: "gar", teamBId: "com", fecha: "08", golesTeamA: 3, golesTeamB: 1),
+            Partido(teamAId: "mel", teamBId: "cri", fecha: "08", golesTeamA: 2, golesTeamB: 0),
+            
+            Partido(teamAId: "atl", teamBId: "sba", fecha: "09", golesTeamA: 2, golesTeamB: 0),
+            Partido(teamAId: "cha", teamBId: "ali", fecha: "09", golesTeamA: 0, golesTeamB: 1),
+            Partido(teamAId: "uni", teamBId: "val", fecha: "09", golesTeamA: 1, golesTeamB: 0),
+            Partido(teamAId: "cri", teamBId: "utc", fecha: "09", golesTeamA: 4, golesTeamB: 0),
+            Partido(teamAId: "adt", teamBId: "hua", fecha: "09", golesTeamA: 2, golesTeamB: 1),
+            Partido(teamAId: "cou", teamBId: "gar", fecha: "09", golesTeamA: 2, golesTeamB: 1),
+            Partido(teamAId: "cie", teamBId: "mel", fecha: "09", golesTeamA: 3, golesTeamB: 1),
+            Partido(teamAId: "com", teamBId: "cus", fecha: "09", golesTeamA: 3, golesTeamB: 3),
+            Partido(teamAId: "man", teamBId: "gra", fecha: "09", golesTeamA: 1, golesTeamB: 1)
+        ]
 
-//        registerMultipleMatches(partidos: partidosARegistrar)
+        registerMultipleMatches(partidos: partidosARegistrar)
         
-        let partido = Partido(teamAId: "cha", teamBId: "man", fecha: "07", golesTeamA: 0, golesTeamB: 0)
-        registerMatch(partido: partido)
+        
+//        let partido = Partido(teamAId: "cha", teamBId: "man", fecha: "07", golesTeamA: 0, golesTeamB: 0)
+//        registerMatch(partido: partido)
         
     }
     
@@ -230,22 +184,35 @@ class PartidoViewController: UIViewController {
     @objc func aceptarTapped() {
         print("Botón Aceptar presionado")
 
-//        initializeTeams()
 //        registerMatch()
 //        iniciarPartido()
+//        finalizarTodosLosPartidos()
 
+        
 //        saveInitialStatsToUserDefaults(teamId: "cha")
 //        saveInitialStatsToUserDefaults(teamId: "man")
-        actualizarPartidoVivo(golA: 1, golB: 1)
-        
+//        actualizarPartidoVivo(golA: 1, golB: 1)
+//        finalizarPartido(teamAId: "cha", teamBId: "man", fecha: "07")
+
 //        actualizarTablaPosiciones()
-//        finalizarTodosLosPartidos()
+        
     }
-    
     
     // MARK: - Metodos
     
     // En vivo
+    
+    func clearInitialStats(for teamId: String) {
+        let userDefaults = UserDefaults.standard
+        let key = "teamStats_\(teamId)"
+        
+        if userDefaults.object(forKey: key) != nil {
+            userDefaults.removeObject(forKey: key)
+            print("Estadísticas iniciales eliminadas correctamente para el equipo con ID \(teamId).")
+        } else {
+            print("No se encontraron estadísticas iniciales para el equipo con ID \(teamId).")
+        }
+    }
     
     func saveInitialStatsToUserDefaults(teamId: String) {
         let db = Firestore.firestore()
@@ -394,7 +361,6 @@ class PartidoViewController: UIViewController {
             }
         }
     }
-
 
     // Registrar Partido
     
@@ -561,6 +527,26 @@ class PartidoViewController: UIViewController {
                 print("Error updating match: \(error)")
             } else {
                 print("Match updated successfully")
+            }
+        }
+    }
+    
+    func finalizarPartido(teamAId: String, teamBId: String, fecha: String) {
+        let db = Firestore.firestore()
+        
+        let torneo = "clausura"
+        let matchId = "\(torneo)_\(fecha)_\(teamAId)_\(teamBId)"
+        
+        clearInitialStats(for: teamAId)
+        clearInitialStats(for: teamBId)
+        
+        db.collection("matches").document(matchId).updateData([
+            "estado": "finalizado"
+        ]) { error in
+            if let error = error {
+                print("Error al finalizar el partido \(matchId): \(error.localizedDescription)")
+            } else {
+                print("Partido \(matchId) finalizado con éxito")
             }
         }
     }
