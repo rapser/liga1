@@ -23,7 +23,7 @@
 		46D995B02C6E930A00D4951C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 46D995AF2C6E930A00D4951C /* GoogleService-Info.plist */; };
 		46D995B22C6EA69A00D4951C /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B12C6EA69A00D4951C /* View+Extension.swift */; };
 		46D995B42C6EA6C100D4951C /* EquipoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */; };
-		46D995B62C6EA6E600D4951C /* Equipo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B52C6EA6E600D4951C /* Equipo.swift */; };
+		46D995B62C6EA6E600D4951C /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B52C6EA6E600D4951C /* Match.swift */; };
 		46D995B82C6EB18E00D4951C /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B72C6EB18E00D4951C /* Color+Extension.swift */; };
 		46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B92C6EB46300D4951C /* HeaderView.swift */; };
 		46D995BC2C6EC00A00D4951C /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995BB2C6EC00A00D4951C /* HomeViewController.swift */; };
@@ -31,6 +31,8 @@
 		46D995C02C6EC02300D4951C /* PerfilViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995BF2C6EC02300D4951C /* PerfilViewController.swift */; };
 		46D995C22C6EC7FF00D4951C /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995C12C6EC7FF00D4951C /* MainTabBarController.swift */; };
 		46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995C92C6EDC1900D4951C /* TextField+Extension.swift */; };
+		46FC0DFA2C81995500440D2A /* MatchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FC0DF92C81995500440D2A /* MatchTableViewCell.swift */; };
+		46FC0DFC2C821B8300440D2A /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FC0DFB2C821B8300440D2A /* Team.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,7 +47,7 @@
 		46D995AF2C6E930A00D4951C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		46D995B12C6EA69A00D4951C /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoTableViewCell.swift; sourceTree = "<group>"; };
-		46D995B52C6EA6E600D4951C /* Equipo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipo.swift; sourceTree = "<group>"; };
+		46D995B52C6EA6E600D4951C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		46D995B72C6EB18E00D4951C /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
 		46D995B92C6EB46300D4951C /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		46D995BB2C6EC00A00D4951C /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
@@ -53,6 +55,8 @@
 		46D995BF2C6EC02300D4951C /* PerfilViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerfilViewController.swift; sourceTree = "<group>"; };
 		46D995C12C6EC7FF00D4951C /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		46D995C92C6EDC1900D4951C /* TextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Extension.swift"; sourceTree = "<group>"; };
+		46FC0DF92C81995500440D2A /* MatchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchTableViewCell.swift; sourceTree = "<group>"; };
+		46FC0DFB2C821B8300440D2A /* Team.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,8 +121,9 @@
 		46D995C42C6EC8F100D4951C /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				46D995B52C6EA6E600D4951C /* Equipo.swift */,
+				46D995B52C6EA6E600D4951C /* Match.swift */,
 				46222A502C7129A9001678DF /* Partido.swift */,
+				46FC0DFB2C821B8300440D2A /* Team.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -158,6 +163,7 @@
 			children = (
 				46D995B92C6EB46300D4951C /* HeaderView.swift */,
 				46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */,
+				46FC0DF92C81995500440D2A /* MatchTableViewCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -250,12 +256,14 @@
 				46D995C22C6EC7FF00D4951C /* MainTabBarController.swift in Sources */,
 				46222A512C7129A9001678DF /* Partido.swift in Sources */,
 				46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */,
-				46D995B62C6EA6E600D4951C /* Equipo.swift in Sources */,
+				46D995B62C6EA6E600D4951C /* Match.swift in Sources */,
 				46D995B22C6EA69A00D4951C /* View+Extension.swift in Sources */,
+				46FC0DFA2C81995500440D2A /* MatchTableViewCell.swift in Sources */,
 				46D995BC2C6EC00A00D4951C /* HomeViewController.swift in Sources */,
 				46D995C02C6EC02300D4951C /* PerfilViewController.swift in Sources */,
 				46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */,
 				46D995B42C6EA6C100D4951C /* EquipoTableViewCell.swift in Sources */,
+				46FC0DFC2C821B8300440D2A /* Team.swift in Sources */,
 				46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */,
 				46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */,
 				46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */,
@@ -408,8 +416,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -436,8 +444,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

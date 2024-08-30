@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var equipos: [Equipo] = []
+    var equipos: [Match] = []
     let tableView = UITableView()
     let segmentedControl = UISegmentedControl(items: ["Clausura", "Acumulado"])
     
@@ -91,7 +91,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func cargarEquiposClausura() {
         let db = Firestore.firestore()
-        let equiposRef = db.collection("teams")
+        let equiposRef = db.collection("clausura")
                 
         equiposRef.order(by: "points", descending: true)
             .order(by: "goalDifference", descending: true)
@@ -106,7 +106,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
                     
                     self.equipos = documents.map { doc in
                         let data = doc.data()
-                        return Equipo(
+                        return Match(
                             nombre: data["name"] as? String ?? "Sin nombre",
                             ciudad: data["city"] as? String ?? "Sin ciudad",
                             estadio: data["stadium"] as? String ?? "Sin estadio",
@@ -160,12 +160,12 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }
     }
     
-    func obtenerDatosAcumulados(completion: @escaping ([Equipo]) -> Void) {
+    func obtenerDatosAcumulados(completion: @escaping ([Match]) -> Void) {
         let db = Firestore.firestore()
         
-        var equiposApertura: [String: Equipo] = [:]
-        var equiposClausura: [String: Equipo] = [:]
-        var equiposAcumulados: [Equipo] = []
+        var equiposApertura: [String: Match] = [:]
+        var equiposClausura: [String: Match] = [:]
+        var equiposAcumulados: [Match] = []
         
         let dispatchGroup = DispatchGroup()
         
@@ -175,7 +175,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
             if let documents = snapshot?.documents {
                 for document in documents {
                     let data = document.data()
-                    let equipo = Equipo(
+                    let equipo = Match(
                         nombre: data["name"] as? String ?? "Sin nombre",
                         ciudad: data["city"] as? String ?? "Sin ciudad",
                         estadio: data["stadium"] as? String ?? "Sin estadio",
@@ -197,11 +197,11 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         // Cargar datos de la colección "Clausura"
         dispatchGroup.enter()
-        db.collection("teams").getDocuments { (snapshot, error) in
+        db.collection("clausura").getDocuments { (snapshot, error) in
             if let documents = snapshot?.documents {
                 for document in documents {
                     let data = document.data()
-                    let equipo = Equipo(
+                    let equipo = Match(
                         nombre: data["name"] as? String ?? "Sin nombre",
                         ciudad: data["city"] as? String ?? "Sin ciudad",
                         estadio: data["stadium"] as? String ?? "Sin estadio",
@@ -226,7 +226,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
             for (documentID, equipoApertura) in equiposApertura {
                 if let equipoClausura = equiposClausura[documentID] {
                     // Sumar los valores de ambos torneos
-                    let equipoAcumulado = Equipo(
+                    let equipoAcumulado = Match(
                         nombre: equipoApertura.nombre,
                         ciudad: equipoApertura.ciudad,
                         estadio: equipoApertura.estadio,

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Equipo {
+struct Match {
     let nombre: String
     let ciudad: String
     let estadio: String

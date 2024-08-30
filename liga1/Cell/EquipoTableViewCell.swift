@@ -88,7 +88,7 @@ class EquipoTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with model: Equipo) {
+    func configure(with model: Match) {
         nombreLabel.text = model.nombre
         partidosJugadosLabel.text = "\(model.partidosJugados)"
         partidosGanadosLabel.text = "\(model.partidosGanados)"
@@ -177,7 +177,7 @@ class EquipoTableViewCell2: UITableViewCell {
     }
 
     // Método para configurar la celda con los datos del equipo
-    func configurarCon(equipo: Equipo) {
+    func configurarCon(equipo: Match) {
         nombreLabel.text = equipo.nombre
         partidosJugadosLabel.text = "\(equipo.partidosJugados)"
         partidosGanadosLabel.text = "\(equipo.partidosGanados)"
