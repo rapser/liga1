@@ -54,25 +54,18 @@ class PartidoViewController: UIViewController {
         
         // Array de partidos a registrar
         let partidosARegistrar: [Partido] = [
-            Partido(teamAId: "val", teamBId: "atl", fecha: "08", golesTeamA: 0, golesTeamB: 0),
-            Partido(teamAId: "utc", teamBId: "adt", fecha: "08", golesTeamA: 1, golesTeamB: 1),
-            Partido(teamAId: "hua", teamBId: "cou", fecha: "08", golesTeamA: 2, golesTeamB: 2),
-            Partido(teamAId: "cus", teamBId: "uni", fecha: "08", golesTeamA: 1, golesTeamB: 1),
-            Partido(teamAId: "ali", teamBId: "cie", fecha: "08", golesTeamA: 3, golesTeamB: 0),
-            Partido(teamAId: "gra", teamBId: "cha", fecha: "08", golesTeamA: 1, golesTeamB: 1),
-            Partido(teamAId: "sba", teamBId: "man", fecha: "08", golesTeamA: 2, golesTeamB: 6),
-            Partido(teamAId: "gar", teamBId: "com", fecha: "08", golesTeamA: 3, golesTeamB: 1),
-            Partido(teamAId: "mel", teamBId: "cri", fecha: "08", golesTeamA: 2, golesTeamB: 0),
+            Partido(teamAId: "com", teamBId: "gra", fecha: "03", golesTeamA: 0, golesTeamB: 0),
+            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", golesTeamA: 0, golesTeamB: 0),
             
-            Partido(teamAId: "atl", teamBId: "sba", fecha: "09", golesTeamA: 2, golesTeamB: 0),
-            Partido(teamAId: "cha", teamBId: "ali", fecha: "09", golesTeamA: 0, golesTeamB: 1),
-            Partido(teamAId: "uni", teamBId: "val", fecha: "09", golesTeamA: 1, golesTeamB: 0),
-            Partido(teamAId: "cri", teamBId: "utc", fecha: "09", golesTeamA: 4, golesTeamB: 0),
-            Partido(teamAId: "adt", teamBId: "hua", fecha: "09", golesTeamA: 2, golesTeamB: 1),
-            Partido(teamAId: "cou", teamBId: "gar", fecha: "09", golesTeamA: 2, golesTeamB: 1),
-            Partido(teamAId: "cie", teamBId: "mel", fecha: "09", golesTeamA: 3, golesTeamB: 1),
-            Partido(teamAId: "com", teamBId: "cus", fecha: "09", golesTeamA: 3, golesTeamB: 3),
-            Partido(teamAId: "man", teamBId: "gra", fecha: "09", golesTeamA: 1, golesTeamB: 1)
+            Partido(teamAId: "utc", teamBId: "cie", fecha: "10", golesTeamA: 2, golesTeamB: 0),
+            Partido(teamAId: "gar", teamBId: "adt", fecha: "10", golesTeamA: 0, golesTeamB: 1),
+            Partido(teamAId: "val", teamBId: "com", fecha: "10", golesTeamA: 1, golesTeamB: 0),
+            Partido(teamAId: "cus", teamBId: "cou", fecha: "10", golesTeamA: 4, golesTeamB: 0),
+            Partido(teamAId: "sba", teamBId: "gra", fecha: "10", golesTeamA: 2, golesTeamB: 1),
+            Partido(teamAId: "hua", teamBId: "cri", fecha: "10", golesTeamA: 2, golesTeamB: 1),
+            Partido(teamAId: "ali", teamBId: "man", fecha: "10", golesTeamA: 3, golesTeamB: 1),
+            Partido(teamAId: "atl", teamBId: "uni", fecha: "10", golesTeamA: 3, golesTeamB: 3),
+            Partido(teamAId: "mel", teamBId: "cha", fecha: "10", golesTeamA: 1, golesTeamB: 1)
         ]
 
         registerMultipleMatches(partidos: partidosARegistrar)
@@ -183,6 +176,8 @@ class PartidoViewController: UIViewController {
     
     @objc func aceptarTapped() {
         print("Botón Aceptar presionado")
+        
+//        initializeTeams()
 
 //        registerMatch()
 //        iniciarPartido()
@@ -216,7 +211,7 @@ class PartidoViewController: UIViewController {
     
     func saveInitialStatsToUserDefaults(teamId: String) {
         let db = Firestore.firestore()
-        let teamRef = db.collection("teams").document(teamId)
+        let teamRef = db.collection("clausura").document(teamId)
         
         teamRef.getDocument { (document, error) in
             if let error = error {
@@ -293,7 +288,7 @@ class PartidoViewController: UIViewController {
 
     func updateTeamStats(teamId: String, golesScored: Int, golesAgainst: Int) {
         let db = Firestore.firestore()
-        let teamRef = db.collection("teams").document(teamId)
+        let teamRef = db.collection("clausura").document(teamId)
         
         // Recuperar estadísticas iniciales desde UserDefaults
         guard let initialStats = UserDefaults.standard.dictionary(forKey: "teamStats_\(teamId)") as? [String: Int] else {
@@ -496,7 +491,7 @@ class PartidoViewController: UIViewController {
             let batch = db.batch()
 
             for (teamId, stats) in equipos {
-                let equipoRef = db.collection("teams").document(teamId)
+                let equipoRef = db.collection("clausura").document(teamId)
                 batch.updateData(stats, forDocument: equipoRef)
             }
 
@@ -579,52 +574,42 @@ class PartidoViewController: UIViewController {
     // Función para inicializar los equipos
     func initializeTeams() {
         
-        let teams = [
-            ("ali", "Alianza Lima", "Lima", "URL del logo", "Estadio Alejandro Villanueva"),
-            ("uni", "Universitario", "Lima", "URL del logo", "Estadio Monumental"),
-            ("cri", "Sporting Cristal", "Lima", "URL del logo", "Estadio Alberto Gallardo"),
-            ("cie", "Cienciano", "Cuzco", "URL del logo", "Estadio Inca Garcilazo de la Vega"),
-            ("cus", "Cusco FC", "Cuzco", "URL del logo", "Estadio Inca Garcilazo de la Vega"),
-            ("adt", "ADT", "Tarma", "URL del logo", "Estadio Unión Tarma"),
-            ("atl", "Alianza Atlético", "Sullana", "URL del logo", "Estadio Campeones del 36"),
-            ("mel", "Melgar", "Arequipa", "URL del logo", "Estadio Monumental de la UNSA"),
-            ("gra", "Atlético Grau", "Piura", "URL del logo", "Estadio Campeones del 36"),
-            ("gar", "Deportivo Garcilaso", "Cuzco", "URL del logo", "Estadio Inca Garcilazo de la Vega"),
-            ("sba", "Sport Boys", "Callao", "URL del logo", "Estadio Miguel Grau"),
-            ("cha", "Chancas CYC", "Andahuaylas", "URL del logo", "Estadio Los Chancas"),
-            ("utc", "UTC Cajamarca", "Cajamarca", "URL del logo", "Estadio Municipal Germán Contreras Jara"),
-            ("hua", "Sport Huancayo", "Huancayo", "URL del logo", "Estadio Huancayo"),
-            ("com", "Unión Comercio", "Tarapoto", "URL del logo", "Estadio Carlos Vidaurre Garcia"),
-            ("man", "Carlos Mannucci", "Trujillo", "URL del logo", "Estadio Mansiche"),
-            ("val", "César Vallejo", "Trujillo", "URL del logo", "Estadio Mansiche"),
-            ("cou", "Comerciantes Unidos", "Cutervo", "URL del logo", "Estadio Municipal Germán Contreras Jara"),
-            
+        let teams: [(String, String, String, String)] = [
+            ("ali", "Alianza Lima", "Lima", "Alejandro Villanueva"),
+            ("uni", "Universitario", "Lima", "Monumental"),
+            ("cri", "Sporting Cristal", "Lima", "Alberto Gallardo"),
+            ("cie", "Cienciano", "Cuzco", "Inca Garcilazo de la Vega"),
+            ("cus", "Cusco FC", "Cuzco", "Inca Garcilazo de la Vega"),
+            ("adt", "ADT", "Tarma", "Unión Tarma"),
+            ("atl", "Alianza Atlético", "Sullana", "Campeones del 36"),
+            ("mel", "Melgar", "Arequipa", "Monumental de la UNSA"),
+            ("gra", "Atlético Grau", "Piura", "Campeones del 36"),
+            ("gar", "Deportivo Garcilaso", "Cusco", "Inca Garcilazo de la Vega"),
+            ("sba", "Sport Boys", "Callao", "Miguel Grau"),
+            ("cha", "Chankas CYC", "Andahuaylas", "Los Chankas"),
+            ("utc", "UTC Cajamarca", "Cajamarca", "Municipal Germán Contreras Jara"),
+            ("hua", "Sport Huancayo", "Huancayo", "IPD Huancayo"),
+            ("com", "Unión Comercio", "Tarapoto", "Carlos Vidaurre Garcia"),
+            ("man", "Carlos Mannucci", "Trujillo", "Mansiche"),
+            ("val", "César Vallejo", "Trujillo", "Mansiche"),
+            ("cou", "Comerciantes Unidos", "Cutervo", "Municipal Germán Contreras Jara")
         ]
         
         for team in teams {
-            let (id, name, city, logoURL, stadium) = team
-            addTeamDetails(id: id, name: name, city: city, logoURL: logoURL, stadium: stadium)
+            let (id, name, city, stadium) = team
+            addTeamDetails(id: id, name: name, city: city, stadium: stadium)
         }
     }
     
-    private func addTeamDetails(id: String, name: String, city: String, logoURL: String, stadium: String) {
+    private func addTeamDetails(id: String, name: String, city: String, stadium: String) {
         
         let db = Firestore.firestore()
-        let aperturaRef = db.collection("apertura")
+        let aperturaRef = db.collection("equipos")
         
         aperturaRef.document(id).setData([
             "name": name,
             "city": city,
-            "logo": logoURL,
-            "stadium": stadium,
-            "matchesPlayed": 0,
-            "matchesWon": 0,
-            "matchesDrawn": 0,
-            "matchesLost": 0,
-            "goalsScored": 0,
-            "goalsAgainst": 0,
-            "goalDifference": 0,
-            "points": 0
+            "stadium": stadium
         ]) { error in
             if let error = error {
                 print("Error registrando detalles del equipo: \(error)")
@@ -634,5 +619,29 @@ class PartidoViewController: UIViewController {
         }
     }
 
+    func cloneCollection(from originalCollection: CollectionReference, to newCollection: CollectionReference) {
+        
+//        let db = Firestore.firestore()
+//        let originalCollection = db.collection("originalData")
+//        let newCollection = db.collection("clonedData")
+//        cloneCollection(from: originalCollection, to: newCollection)
+        
+        originalCollection.getDocuments { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let data = document.data()
+                    newCollection.document(document.documentID).setData(data) { err in
+                        if let err = err {
+                            print("Error adding document: \(err)")
+                        } else {
+                            print("Document added with ID: \(document.documentID)")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
