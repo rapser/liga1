@@ -6,19 +6,35 @@
 //
 
 import UIKit
+import FirebaseAuth
+import GoogleSignIn
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
+    fileprivate func showHome() {
+        //        let mainTabBarController = MainTabBarController()
+        //        window?.rootViewController = mainTabBarController
+        //        window?.makeKeyAndVisible()
+        
+        // Verificar si el usuario está autenticado
+        if Auth.auth().currentUser != nil {
+            // Usuario autenticado, mostrar TabBar
+            let mainTabBarController = MainTabBarController()
+            window?.rootViewController = mainTabBarController
+        } else {
+            // No autenticado, mostrar pantalla de login
+            let loginViewController = LoginViewController()
+            window?.rootViewController = loginViewController
+        }
+    }
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         window = UIWindow(windowScene: windowScene)
-
-        let mainTabBarController = MainTabBarController()
-        window?.rootViewController = mainTabBarController
+        showHome()
         window?.makeKeyAndVisible()
     }
 
@@ -50,6 +66,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let url = URLContexts.first?.url {
+            GIDSignIn.sharedInstance.handle(url)
+        }
+    }
 
 }
 

@@ -54,18 +54,19 @@ class PartidoViewController: UIViewController {
         
         // Array de partidos a registrar
         let partidosARegistrar: [Partido] = [
-            Partido(teamAId: "com", teamBId: "gra", fecha: "03", golesTeamA: 0, golesTeamB: 0),
-            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", golesTeamA: 0, golesTeamB: 0),
             
-            Partido(teamAId: "utc", teamBId: "cie", fecha: "10", golesTeamA: 2, golesTeamB: 0),
-            Partido(teamAId: "gar", teamBId: "adt", fecha: "10", golesTeamA: 0, golesTeamB: 1),
+            Partido(teamAId: "com", teamBId: "gra", fecha: "03", golesTeamA: 1, golesTeamB: 2),
+            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", golesTeamA: 3, golesTeamB: 0),
+            
+            Partido(teamAId: "utc", teamBId: "cie", fecha: "10", golesTeamA: 1, golesTeamB: 2),
+            Partido(teamAId: "gar", teamBId: "adt", fecha: "10", golesTeamA: 1, golesTeamB: 0),
             Partido(teamAId: "val", teamBId: "com", fecha: "10", golesTeamA: 1, golesTeamB: 0),
-            Partido(teamAId: "cus", teamBId: "cou", fecha: "10", golesTeamA: 4, golesTeamB: 0),
-            Partido(teamAId: "sba", teamBId: "gra", fecha: "10", golesTeamA: 2, golesTeamB: 1),
-            Partido(teamAId: "hua", teamBId: "cri", fecha: "10", golesTeamA: 2, golesTeamB: 1),
-            Partido(teamAId: "ali", teamBId: "man", fecha: "10", golesTeamA: 3, golesTeamB: 1),
-            Partido(teamAId: "atl", teamBId: "uni", fecha: "10", golesTeamA: 3, golesTeamB: 3),
-            Partido(teamAId: "mel", teamBId: "cha", fecha: "10", golesTeamA: 1, golesTeamB: 1)
+            Partido(teamAId: "cus", teamBId: "cou", fecha: "10", golesTeamA: 2, golesTeamB: 1),
+            Partido(teamAId: "sba", teamBId: "gra", fecha: "10", golesTeamA: 0, golesTeamB: 0),
+            Partido(teamAId: "hua", teamBId: "cri", fecha: "10", golesTeamA: 1, golesTeamB: 2),
+            Partido(teamAId: "ali", teamBId: "man", fecha: "10", golesTeamA: 1, golesTeamB: 0),
+            Partido(teamAId: "atl", teamBId: "uni", fecha: "10", golesTeamA: 0, golesTeamB: 3),
+            Partido(teamAId: "mel", teamBId: "cha", fecha: "10", golesTeamA: 2, golesTeamB: 0)
         ]
 
         registerMultipleMatches(partidos: partidosARegistrar)
@@ -174,22 +175,26 @@ class PartidoViewController: UIViewController {
         updateMatch(teamAId: match.teamAId, teamBId: match.teamBId, fecha: match.fecha, teamAScore: match.teamAScore, teamBScore: match.teamBScore)
     }
     
+    func partidoEnVivo() {
+        saveInitialStatsToUserDefaults(teamId: "cha")
+        saveInitialStatsToUserDefaults(teamId: "man")
+        actualizarPartidoVivo(golA: 1, golB: 1)
+        finalizarPartido(teamAId: "cha", teamBId: "man", fecha: "07")
+    }
+    
     @objc func aceptarTapped() {
         print("Botón Aceptar presionado")
         
 //        initializeTeams()
+//        iniciarPartido()
 
 //        registerMatch()
-//        iniciarPartido()
-//        finalizarTodosLosPartidos()
-
         
-//        saveInitialStatsToUserDefaults(teamId: "cha")
-//        saveInitialStatsToUserDefaults(teamId: "man")
-//        actualizarPartidoVivo(golA: 1, golB: 1)
-//        finalizarPartido(teamAId: "cha", teamBId: "man", fecha: "07")
-
+//        finalizarTodosLosPartidos()
+        
+        
 //        actualizarTablaPosiciones()
+        actualizarTablaClausura()
         
     }
     
@@ -401,6 +406,147 @@ class PartidoViewController: UIViewController {
         for match in matches {
             updateLiveMatch(teamAId: match.teamAId, teamBId: match.teamBId, fecha: match.fecha, teamAScore: match.teamAScore, teamBScore: match.teamBScore)
         }
+    }
+    
+    func actualizarTablaClausura() {
+        let db = Firestore.firestore()
+
+        // Primero, obtener todos los documentos de la colección "clausura" y reiniciar sus valores.
+        db.collection("clausura").getDocuments { (querySnapshot, error) in
+            guard let documents = querySnapshot?.documents else {
+                print("Error al obtener documentos de 'clausura': \(error?.localizedDescription ?? "Unknown error")")
+                return
+            }
+            
+            let batch = db.batch()
+            
+            for document in documents {
+                let docRef = db.collection("clausura").document(document.documentID)
+                // Reiniciar todos los campos a cero
+                batch.setData([
+                    "matchesPlayed": 0,
+                    "matchesWon": 0,
+                    "matchesDrawn": 0,
+                    "matchesLost": 0,
+                    "goalsScored": 0,
+                    "goalsAgainst": 0,
+                    "goalDifference": 0,
+                    "points": 0
+                ], forDocument: docRef, merge: false)
+            }
+            
+            // Commit del batch para reiniciar los documentos
+            batch.commit { error in
+                if let error = error {
+                    print("Error al reiniciar los documentos en 'clausura': \(error.localizedDescription)")
+                } else {
+                    print("Documentos en 'clausura' reiniciados correctamente.")
+                    
+                    // Una vez reiniciado, proceder con la actualización según los documentos en "matches"
+                    db.collection("matches").getDocuments { (querySnapshot, error) in
+                        guard let documents = querySnapshot?.documents else {
+                            print("Error al obtener los documentos de 'matches': \(error?.localizedDescription ?? "Unknown error")")
+                            return
+                        }
+
+                        var equipos = [String: [String: Any]]()
+
+                        for document in documents {
+                            let data = document.data()
+                            let teamAId = data["teamAId"] as? String ?? ""
+                            let teamBId = data["teamBId"] as? String ?? ""
+                            let golesTeamA = data["golesTeamA"] as? Int ?? 0
+                            let golesTeamB = data["golesTeamB"] as? Int ?? 0
+                            let estado = data["estado"] as? String ?? ""
+
+                            // Verificar si el partido está finalizado antes de procesar
+                            if estado == "finalizado" {
+                                if equipos[teamAId] == nil {
+                                    equipos[teamAId] = [
+                                        "matchesPlayed": 0,
+                                        "matchesWon": 0,
+                                        "matchesDrawn": 0,
+                                        "matchesLost": 0,
+                                        "goalsScored": 0,
+                                        "goalsAgainst": 0,
+                                        "goalDifference": 0,
+                                        "points": 0
+                                    ]
+                                }
+                                if equipos[teamBId] == nil {
+                                    equipos[teamBId] = [
+                                        "matchesPlayed": 0,
+                                        "matchesWon": 0,
+                                        "matchesDrawn": 0,
+                                        "matchesLost": 0,
+                                        "goalsScored": 0,
+                                        "goalsAgainst": 0,
+                                        "goalDifference": 0,
+                                        "points": 0
+                                    ]
+                                }
+
+                                var teamAStats = equipos[teamAId]!
+                                var teamBStats = equipos[teamBId]!
+
+                                // Actualizar partidos jugados
+                                teamAStats["matchesPlayed"] = (teamAStats["matchesPlayed"] as? Int ?? 0) + 1
+                                teamBStats["matchesPlayed"] = (teamBStats["matchesPlayed"] as? Int ?? 0) + 1
+
+                                if golesTeamA > golesTeamB {
+                                    // Victoria de teamA
+                                    teamAStats["matchesWon"] = (teamAStats["matchesWon"] as? Int ?? 0) + 1
+                                    teamAStats["points"] = (teamAStats["points"] as? Int ?? 0) + 3
+                                    teamBStats["matchesLost"] = (teamBStats["matchesLost"] as? Int ?? 0) + 1
+                                } else if golesTeamA < golesTeamB {
+                                    // Victoria de teamB
+                                    teamBStats["matchesWon"] = (teamBStats["matchesWon"] as? Int ?? 0) + 1
+                                    teamBStats["points"] = (teamBStats["points"] as? Int ?? 0) + 3
+                                    teamAStats["matchesLost"] = (teamAStats["matchesLost"] as? Int ?? 0) + 1
+                                } else {
+                                    // Empate
+                                    teamAStats["matchesDrawn"] = (teamAStats["matchesDrawn"] as? Int ?? 0) + 1
+                                    teamBStats["matchesDrawn"] = (teamBStats["matchesDrawn"] as? Int ?? 0) + 1
+                                    teamAStats["points"] = (teamAStats["points"] as? Int ?? 0) + 1
+                                    teamBStats["points"] = (teamBStats["points"] as? Int ?? 0) + 1
+                                }
+                                
+                                // Actualizar goles y diferencia de goles
+                                teamAStats["goalsScored"] = (teamAStats["goalsScored"] as? Int ?? 0) + golesTeamA
+                                teamAStats["goalsAgainst"] = (teamAStats["goalsAgainst"] as? Int ?? 0) + golesTeamB
+                                teamBStats["goalsScored"] = (teamBStats["goalsScored"] as? Int ?? 0) + golesTeamB
+                                teamBStats["goalsAgainst"] = (teamBStats["goalsAgainst"] as? Int ?? 0) + golesTeamA
+
+                                // Calcular la diferencia de goles
+                                teamAStats["goalDifference"] = (teamAStats["goalsScored"] as? Int ?? 0) - (teamAStats["goalsAgainst"] as? Int ?? 0)
+                                teamBStats["goalDifference"] = (teamBStats["goalsScored"] as? Int ?? 0) - (teamBStats["goalsAgainst"] as? Int ?? 0)
+
+                                // Guardar las actualizaciones en el diccionario principal
+                                equipos[teamAId] = teamAStats
+                                equipos[teamBId] = teamBStats
+                            }
+                        }
+
+                        // Crear un nuevo batch para actualizar los documentos de "clausura" con los valores calculados
+                        let updateBatch = db.batch()
+
+                        for (teamId, stats) in equipos {
+                            let equipoRef = db.collection("clausura").document(teamId)
+                            updateBatch.setData(stats, forDocument: equipoRef, merge: true)
+                        }
+
+                        updateBatch.commit { error in
+                            if let error = error {
+                                print("Error al actualizar los equipos en 'clausura': \(error.localizedDescription)")
+                            } else {
+                                print("Equipos actualizados correctamente en 'clausura'.")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
         
     func actualizarTablaPosiciones() {
