@@ -79,9 +79,8 @@ class LoginViewController: UIViewController {
         ])
     }
 
-    // Método para iniciar sesión con correo electrónico y contraseña
     @objc private func handleLogin() {
-        guard let email = emailTextField.text, let password = passwordTextField.text else {
+        guard let email = emailTextField.text, let password = passwordTextField.text, !email.isEmpty, !password.isEmpty else {
             showErrorAlert(message: "Please enter email and password.")
             return
         }
@@ -91,6 +90,46 @@ class LoginViewController: UIViewController {
                 self?.showErrorAlert(message: error.localizedDescription)
             } else {
                 self?.navigateToMainTabBar()
+            }
+        }
+    }
+
+    private func navigateToMainTabBar2() {
+        // Verificar que estamos dentro de un UINavigationController
+        guard let navigationController = self.navigationController else {
+            return
+        }
+        
+        // Crear una instancia del MainTabBarController
+        let mainTabBarController = MainTabBarController()
+        navigationController.setNavigationBarHidden(true, animated: true)
+        // Realizar un push
+        navigationController.pushViewController(mainTabBarController, animated: true)
+    }
+    
+    private func navigateToMainTabBar() {
+        // Crear una instancia del MainTabBarController
+        let mainTabBarController = MainTabBarController()
+        
+        // Verificar que estamos dentro de un UINavigationController
+        if let navigationController = self.navigationController {
+            // Esconder la barra de navegación
+            navigationController.setNavigationBarHidden(true, animated: true)
+            
+            // Realizar un push con animación
+            UIView.transition(with: navigationController.view, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                navigationController.pushViewController(mainTabBarController, animated: false)
+            }, completion: nil)
+        } else {
+            // Obtener la escena activa
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                if let window = windowScene.windows.first {
+                    // Establecer el MainTabBarController como la raíz con animación
+                    UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: {
+                        window.rootViewController = mainTabBarController
+                        window.makeKeyAndVisible()
+                    }, completion: nil)
+                }
             }
         }
     }
@@ -148,14 +187,6 @@ class LoginViewController: UIViewController {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
-    }
-
-    // Navega al TabBar después de iniciar sesión
-    private func navigateToMainTabBar() {
-        let mainTabBarController = MainTabBarController()
-        let sceneDelegate = UIApplication.shared.connectedScenes
-            .first?.delegate as? SceneDelegate
-        sceneDelegate?.window?.rootViewController = mainTabBarController
     }
 }
 
