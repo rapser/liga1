@@ -89,6 +89,49 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.tableHeaderView = headerView
     }
     
+    func obtenerNombreCompleto(paraId id: String) -> String {
+        switch id {
+        case "ali":
+            return "Alianza Lima"
+        case "uni":
+            return "Universitario"
+        case "cri":
+            return "Sporting Cristal"
+        case "cie":
+            return "Cienciano"
+        case "cus":
+            return "Cusco FC"
+        case "adt":
+            return "ADT"
+        case "atl":
+            return "Alianza Atlético"
+        case "mel":
+            return "Melgar"
+        case "gra":
+            return "Atlético Grau"
+        case "gar":
+            return "Deportivo Garcilaso"
+        case "sba":
+            return "Sport Boys"
+        case "cha":
+            return "Chancas CYC"
+        case "utc":
+            return "UTC Cajamarca"
+        case "hua":
+            return "Sport Huancayo"
+        case "com":
+            return "Unión Comercio"
+        case "cou":
+            return "Comerciantes Unidos"
+        case "man":
+            return "Carlos Mannucci"
+        case "val":
+            return "César Vallejo"
+        default:
+            return "Equipo Desconocido"
+        }
+    }
+    
     func cargarEquiposClausura() {
         let db = Firestore.firestore()
         let equiposRef = db.collection("clausura")
@@ -107,7 +150,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
                     self.equipos = documents.map { doc in
                         let data = doc.data()
                         return Match(
-                            nombre: data["name"] as? String ?? "Sin nombre",
+                            nombre: self.obtenerNombreCompleto(paraId: doc.documentID),
                             ciudad: data["city"] as? String ?? "Sin ciudad",
                             estadio: data["stadium"] as? String ?? "Sin estadio",
                             logo: data["logo"] as? String ?? "Sin logo",
