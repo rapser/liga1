@@ -29,11 +29,13 @@ class MainTabBarController: UITabBarController {
         let homeVC = HomeViewController()
         let torneoVC = TorneoViewController()
         let partidoVC = PartidoViewController()
-        let perfilVC = PerfilViewController()
+        let perfilVC = ProfileViewController()
         homeVC.view.backgroundColor = .white
         torneoVC.view.backgroundColor = .white
+        perfilVC.view.backgroundColor = .white
         homeVC.title = "Home"
         torneoVC.title = "Torneo"
+        perfilVC.title = "Mi Perfil"
         
         // Configurar los navigation controllers
         let homeNavController = UINavigationController(rootViewController: homeVC)
