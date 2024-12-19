@@ -141,7 +141,7 @@ class LoginViewController: UIViewController {
         guard let clientID = FirebaseApp.app()?.options.clientID else { return }
         
         // Crear la configuración de Google Sign-In
-        let config = GIDConfiguration(clientID: clientID)
+        let _ = GIDConfiguration(clientID: clientID)
         
         // Usar el nuevo método `signIn(withPresenting:)`
         GIDSignIn.sharedInstance.signIn(withPresenting: self) { [weak self] result, error in
