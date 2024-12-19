@@ -92,8 +92,8 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         do {
             try Auth.auth().signOut()
 
-            // Obtener la ventana principal
-            if let window = UIApplication.shared.windows.first {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
                 // Crear una nueva instancia de LoginViewController
                 let loginViewController = LoginViewController()
                 
