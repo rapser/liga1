@@ -58,16 +58,12 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         switch indexPath.row {
         case 0:
-            // Acciones para "Nombre"
             print("Seleccionado: Nombre")
         case 1:
-            // Acciones para "Marcadores"
             print("Seleccionado: Marcadores")
         case 2:
-            // Acciones para "Contacto"
             print("Seleccionado: Contacto")
         case 3:
-            // Muestra alerta de confirmación para "Cerrar Sesión"
             showLogoutConfirmation()
         default:
             break
@@ -87,21 +83,17 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         present(alert, animated: true, completion: nil)
     }
 
-    // Método de cierre de sesión
     private func logout() {
         do {
             try Auth.auth().signOut()
 
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let window = windowScene.windows.first {
-                // Crear una nueva instancia de LoginViewController
                 let loginViewController = LoginViewController()
                 
-                // Establecer el controlador raíz como el LoginViewController
                 window.rootViewController = loginViewController
                 window.makeKeyAndVisible()
                 
-                // Transición suave (opcional)
                 UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
             }
 

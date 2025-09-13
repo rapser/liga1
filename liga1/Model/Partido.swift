@@ -15,7 +15,7 @@ struct Partido: Codable {
     let torneo: String
     var golesTeamA: Int
     var golesTeamB: Int
-    var estado: EstadoPartido // Enum para representar los estados posibles
+    var estado: EstadoPartido
     
     init(teamAId: String, teamBId: String, fecha: String, golesTeamA: Int, golesTeamB: Int) {
         self.teamAId = teamAId

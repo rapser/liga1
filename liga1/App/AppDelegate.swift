@@ -32,16 +32,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     fileprivate func showHome() {
-        // Crear un UINavigationController
         let navigationController = UINavigationController()
         
-        // Verificar si el usuario está autenticado
         if Auth.auth().currentUser != nil {
-            // Usuario autenticado, mostrar TabBar
             let mainTabBarController = MainTabBarController()
             navigationController.viewControllers = [mainTabBarController]
         } else {
-            // No autenticado, mostrar pantalla de login
             let loginViewController = LoginViewController()
             navigationController.viewControllers = [loginViewController]
         }
@@ -53,13 +49,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func changeRootViewController(to viewController: UIViewController) {
         guard let window = window else { return }
         
-        // Crear una nueva instancia del NavigationController con el nuevo root
         let navigationController = UINavigationController(rootViewController: viewController)
         
-        // Cambiar el root view controller
         window.rootViewController = navigationController
         
-        // Agregar una animación de transición
         UIView.transition(with: window, duration: 0.5, options: .transitionFlipFromLeft, animations: nil, completion: nil)
     }
     
@@ -82,7 +75,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     var inactivityTimer: Timer?
-    let inactivityTimeLimit: TimeInterval = 600 // 10 minutos en segundos
+    let inactivityTimeLimit: TimeInterval = 600
     
     // MARK: - UIApplicationDelegate Methods
     
@@ -91,33 +84,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func resetTimer() {
-        inactivityTimer?.invalidate() // Invalida el temporizador anterior
+        inactivityTimer?.invalidate()
         inactivityTimer = Timer.scheduledTimer(timeInterval: inactivityTimeLimit, target: self, selector: #selector(showSessionExpiredAlert), userInfo: nil, repeats: false)
     }
     
     @objc private func showSessionExpiredAlert() {
-        logout() // Cierra sesión
-        showAlertForSessionExpiration() // Muestra la alerta de sesión expirada
+        logout()
+        showAlertForSessionExpiration()
     }
     
     private func showAlertForSessionExpiration() {
-        // Asegúrate de que tienes el rootViewController accesible
         guard let rootViewController = window?.rootViewController else { return }
         
-        // Crear alerta de sesión expirada
         let alertController = UIAlertController(title: "Sesión Expirada",
                                                 message: "Tu sesión ha terminado debido a inactividad.",
                                                 preferredStyle: .alert)
         
         alertController.addAction(UIAlertAction(title: "Aceptar", style: .default, handler: { _ in
-            // Aquí puedes redirigir al LoginViewController
             if let navController = rootViewController as? UINavigationController {
                 let loginViewController = LoginViewController()
                 navController.setViewControllers([loginViewController], animated: true)
             }
         }))
         
-        // Presentar la alerta
         rootViewController.present(alertController, animated: true, completion: nil)
     }
     

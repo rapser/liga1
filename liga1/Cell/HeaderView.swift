@@ -36,7 +36,6 @@ class HeaderView: UIView {
     }
 
     private func setupUI() {
-        // Configura las etiquetas
         nombreLabel.text = "Equipos"
         partidosJugadosLabel.text = "J"
         partidosGanadosLabel.text = "G"
@@ -46,21 +45,18 @@ class HeaderView: UIView {
         golesContraLabel.text = "GC"
         puntosLabel.text = "Ptos"
 
-        // Configura la apariencia de las etiquetas
         let labels = [nombreLabel, partidosJugadosLabel, partidosGanadosLabel, partidosEmpatadosLabel, partidosPerdidosLabel, golesFavorLabel, golesContraLabel, puntosLabel]
         for label in labels {
             label.font = UIFont.boldSystemFont(ofSize: 12)
             label.textAlignment = .center
         }
         
-        // Configura el stack view
         stackView.axis = .horizontal
         stackView.distribution = .fill
         stackView.alignment = .center
         stackView.spacing = 2
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
-        // Añade las etiquetas al stack view
         stackView.addArrangedSubview(nombreLabel)
         stackView.addArrangedSubview(partidosJugadosLabel)
         stackView.addArrangedSubview(partidosGanadosLabel)
@@ -70,10 +66,8 @@ class HeaderView: UIView {
         stackView.addArrangedSubview(golesContraLabel)
         stackView.addArrangedSubview(puntosLabel)
         
-        // Añade el stack view a la vista
         addSubview(stackView)
         
-        // Configura las constraints del stack view
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
             stackView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
@@ -81,7 +75,6 @@ class HeaderView: UIView {
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
             stackView.heightAnchor.constraint(equalToConstant: 35),
             
-            // Ajusta los constraints de cada etiqueta
             nombreLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: 0.35),
             partidosJugadosLabel.widthAnchor.constraint(equalTo: partidosGanadosLabel.widthAnchor),
             partidosGanadosLabel.widthAnchor.constraint(equalTo: partidosEmpatadosLabel.widthAnchor),

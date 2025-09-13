@@ -11,7 +11,6 @@ import FirebaseFirestore
 
 class HomeViewController: UIViewController {
     
-    // Propiedades
     private let equipo1Label: UILabel = {
         let label = UILabel()
         label.text = "Equipo 1:"
@@ -56,7 +55,7 @@ class HomeViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Registrar", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(red: 4/255.0, green: 191/255.0, blue: 81/255.0, alpha: 1.0) // Color verde Interbank
+        button.backgroundColor = UIColor(red: 4/255.0, green: 191/255.0, blue: 81/255.0, alpha: 1.0)
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -70,7 +69,6 @@ class HomeViewController: UIViewController {
         setupConstraints()
         setupTapGesture()
         
-        // Add Done button to keyboard for text fields
         golesEquipo1TextField.addDoneButtonOnKeyboard()
         golesEquipo2TextField.addDoneButtonOnKeyboard()
     }
@@ -85,7 +83,6 @@ class HomeViewController: UIViewController {
     }
     
     private func setupViews() {
-        // Add subviews
         view.addSubview(equipo1Label)
         view.addSubview(golesEquipo1TextField)
         view.addSubview(equipo2Label)
@@ -94,7 +91,6 @@ class HomeViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        // Constraints for equipo1Label
         NSLayoutConstraint.activate([
             equipo1Label.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             equipo1Label.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
@@ -103,7 +99,6 @@ class HomeViewController: UIViewController {
             equipo1Label.heightAnchor.constraint(equalToConstant: 40)
         ])
         
-        // Constraints for golesEquipo1TextField
         NSLayoutConstraint.activate([
             golesEquipo1TextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             golesEquipo1TextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
@@ -111,7 +106,6 @@ class HomeViewController: UIViewController {
             golesEquipo1TextField.heightAnchor.constraint(equalToConstant: 40)
         ])
         
-        // Constraints for equipo2Label
         NSLayoutConstraint.activate([
             equipo2Label.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             equipo2Label.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
@@ -119,7 +113,6 @@ class HomeViewController: UIViewController {
             equipo2Label.heightAnchor.constraint(equalToConstant: 40)
         ])
         
-        // Constraints for golesEquipo2TextField
         NSLayoutConstraint.activate([
             golesEquipo2TextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             golesEquipo2TextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
@@ -127,13 +120,11 @@ class HomeViewController: UIViewController {
             golesEquipo2TextField.heightAnchor.constraint(equalToConstant: 40)
         ])
         
-        // Constraints for registrarButton
         NSLayoutConstraint.activate([
             registrarButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             registrarButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             registrarButton.topAnchor.constraint(equalTo: golesEquipo2TextField.bottomAnchor, constant: 10),
             registrarButton.heightAnchor.constraint(equalToConstant: 40)
-            // No bottom constraint for registrarButton
         ])
     }
     

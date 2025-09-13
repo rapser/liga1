@@ -16,6 +16,8 @@
 		46222A532C712CBA001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A522C712CBA001678DF /* FirebaseDatabase */; };
 		46222A552C712D15001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A542C712D15001678DF /* FirebaseDatabase */; };
 		46222A572C712D15001678DF /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A562C712D15001678DF /* FirebaseInstallations */; };
+		469E54232E75D44D001ECD36 /* EquipoOldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54222E75D441001ECD36 /* EquipoOldTableViewCell.swift */; };
+		469E54252E75D84C001ECD36 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 469E54242E75D84C001ECD36 /* GoogleService-Info.plist */; };
 		46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995922C6E90EC00D4951C /* AppDelegate.swift */; };
 		46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995942C6E90EC00D4951C /* SceneDelegate.swift */; };
 		46D995972C6E90EC00D4951C /* TorneoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995962C6E90EC00D4951C /* TorneoViewController.swift */; };
@@ -25,7 +27,6 @@
 		46D995AA2C6E925600D4951C /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995A92C6E925600D4951C /* FirebaseFirestore */; };
 		46D995AC2C6E925600D4951C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AB2C6E925600D4951C /* FirebaseMessaging */; };
 		46D995AE2C6E925600D4951C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AD2C6E925600D4951C /* FirebaseStorage */; };
-		46D995B02C6E930A00D4951C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 46D995AF2C6E930A00D4951C /* GoogleService-Info.plist */; };
 		46D995B22C6EA69A00D4951C /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B12C6EA69A00D4951C /* View+Extension.swift */; };
 		46D995B42C6EA6C100D4951C /* EquipoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */; };
 		46D995B62C6EA6E600D4951C /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B52C6EA6E600D4951C /* Match.swift */; };
@@ -44,6 +45,8 @@
 		4613A7F92CCF2B1B0070034C /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		4613A7FB2CCF2D8D0070034C /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		46222A502C7129A9001678DF /* Partido.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Partido.swift; sourceTree = "<group>"; };
+		469E54222E75D441001ECD36 /* EquipoOldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoOldTableViewCell.swift; sourceTree = "<group>"; };
+		469E54242E75D84C001ECD36 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		46D9958F2C6E90EC00D4951C /* liga1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liga1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46D995922C6E90EC00D4951C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		46D995942C6E90EC00D4951C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -51,7 +54,6 @@
 		46D9959B2C6E90EE00D4951C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		46D9959E2C6E90EE00D4951C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		46D995A02C6E90EE00D4951C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		46D995AF2C6E930A00D4951C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		46D995B12C6EA69A00D4951C /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoTableViewCell.swift; sourceTree = "<group>"; };
 		46D995B52C6EA6E600D4951C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
@@ -112,7 +114,6 @@
 				46D995C82C6ECB0500D4951C /* Cell */,
 				46D995C42C6EC8F100D4951C /* Model */,
 				46D995C32C6EC8D300D4951C /* View */,
-				46D995C12C6EC7FF00D4951C /* MainTabBarController.swift */,
 			);
 			path = liga1;
 			sourceTree = "<group>";
@@ -120,6 +121,7 @@
 		46D995C32C6EC8D300D4951C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				46D995C12C6EC7FF00D4951C /* MainTabBarController.swift */,
 				4613A7F92CCF2B1B0070034C /* LoginViewController.swift */,
 				46D995BB2C6EC00A00D4951C /* HomeViewController.swift */,
 				46D995962C6E90EC00D4951C /* TorneoViewController.swift */,
@@ -163,9 +165,9 @@
 			isa = PBXGroup;
 			children = (
 				46D995A02C6E90EE00D4951C /* Info.plist */,
-				46D995AF2C6E930A00D4951C /* GoogleService-Info.plist */,
 				46D9959D2C6E90EE00D4951C /* LaunchScreen.storyboard */,
 				46D9959B2C6E90EE00D4951C /* Assets.xcassets */,
+				469E54242E75D84C001ECD36 /* GoogleService-Info.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -173,6 +175,7 @@
 		46D995C82C6ECB0500D4951C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				469E54222E75D441001ECD36 /* EquipoOldTableViewCell.swift */,
 				46D995B92C6EB46300D4951C /* HeaderView.swift */,
 				46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */,
 				46FC0DF92C81995500440D2A /* MatchTableViewCell.swift */,
@@ -220,7 +223,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					46D9958E2C6E90EC00D4951C = {
 						CreatedOnToolsVersion = 15.4;
@@ -255,8 +258,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				46D9959C2C6E90EE00D4951C /* Assets.xcassets in Resources */,
-				46D995B02C6E930A00D4951C /* GoogleService-Info.plist in Resources */,
 				46D9959F2C6E90EE00D4951C /* Base in Resources */,
+				469E54252E75D84C001ECD36 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,6 +287,7 @@
 				4613A7FA2CCF2B1B0070034C /* LoginViewController.swift in Sources */,
 				46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */,
 				46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */,
+				469E54232E75D44D001ECD36 /* EquipoOldTableViewCell.swift in Sources */,
 				46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -337,6 +341,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = P6FCYRT7JM;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -400,6 +405,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = P6FCYRT7JM;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -428,7 +434,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P6FCYRT7JM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -456,7 +461,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P6FCYRT7JM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
