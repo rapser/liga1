@@ -8,11 +8,21 @@
 import UIKit
 import FirebaseFirestore
 
-class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+enum TipoTorneo: String {
+    case apertura = "apertura"
+    case clausura = "clausura"
+}
+
+class TorneoViewController: UIViewController {
     
-    var equipos: [Match] = []
-    let tableView = UITableView()
-    let segmentedControl = UISegmentedControl(items: ["Clausura", "Acumulado"])
+    // MARK: - Properties
+    private let tableView = UITableView()
+    let segmentedControl = UISegmentedControl(items: ["Apertura", "Clausura", "Acumulado"])
+    
+    private var equiposApertura: [Match] = []
+    private var equiposClausura: [Match] = []
+    private var equiposAcumulados: [Match] = []
+    var equiposMostrados: [Match] = []
     
     // MARK: - LifeCycle
     
@@ -20,16 +30,17 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.viewDidLoad()
         configureSegmentedControl()
         configureTableView()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        segmentedControl.selectedSegmentIndex = 0
-        cargarEquiposClausura()
+        loadInitialData()
     }
     
     // MARK: - Private methods
+    
+    private func loadInitialData() {
+        segmentedControl.selectedSegmentIndex = 1
+        cargarEquipos(torneo: .clausura) { [weak self] in
+            self?.equiposApertura = self?.equiposMostrados ?? []
+        }
+    }
     
     private func configureSegmentedControl() {
         view.addSubview(segmentedControl)
@@ -44,7 +55,6 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         let liga1RedColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
         segmentedControl.selectedSegmentTintColor = liga1RedColor
-        
         segmentedControl.backgroundColor = .white
         
         let textAttributes: [NSAttributedString.Key: Any] = [
@@ -53,7 +63,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         ]
         
         segmentedControl.setTitleTextAttributes(textAttributes, for: .selected)
-        segmentedControl.setTitleTextAttributes(textAttributes, for: .normal)
+        segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.black], for: .normal)
         
         segmentedControl.addTarget(self, action: #selector(segmentedControlChanged(_:)), for: .valueChanged)
     }
@@ -70,7 +80,6 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         ])
         
         tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
-        
         tableView.allowsSelection = false
         tableView.delegate = self
         tableView.dataSource = self
@@ -79,108 +88,104 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.tableHeaderView = headerView
     }
     
-    func obtenerNombreCompleto(paraId id: String) -> String {
-        switch id {
-        case "ali":
-            return "Alianza Lima"
-        case "uni":
-            return "Universitario"
-        case "cri":
-            return "Sporting Cristal"
-        case "cie":
-            return "Cienciano"
-        case "cus":
-            return "Cusco FC"
-        case "adt":
-            return "ADT"
-        case "atl":
-            return "Alianza Atlético"
-        case "mel":
-            return "Melgar"
-        case "gra":
-            return "Atlético Grau"
-        case "gar":
-            return "Deportivo Garcilaso"
-        case "sba":
-            return "Sport Boys"
-        case "cha":
-            return "Chancas CYC"
-        case "utc":
-            return "UTC Cajamarca"
-        case "hua":
-            return "Sport Huancayo"
-        case "com":
-            return "Unión Comercio"
-        case "cou":
-            return "Comerciantes Unidos"
-        case "man":
-            return "Carlos Mannucci"
-        case "val":
-            return "César Vallejo"
-        default:
-            return "Equipo Desconocido"
-        }
+    private func obtenerNombreCompleto(paraId id: String) -> String {
+        return EquipoPeruano.obtenerNombreCompleto(paraId: id)
     }
     
-    func cargarEquiposClausura() {
+    // MARK: - Data Loading
+    
+    func cargarEquipos(torneo: TipoTorneo, completion: (() -> Void)? = nil) {
         let db = Firestore.firestore()
-        let equiposRef = db.collection("clausura")
+        let equiposRef = db.collection(torneo.rawValue)
                 
         equiposRef.order(by: "points", descending: true)
             .order(by: "goalDifference", descending: true)
-            .getDocuments { (querySnapshot, error) in
+            .getDocuments { [weak self] (querySnapshot, error) in
+                guard let self = self else { return }
+                
                 if let error = error {
-                    print("Error al obtener los equipos: \(error.localizedDescription)")
-                } else {
-                    guard let documents = querySnapshot?.documents else {
-                        print("No se encontraron equipos")
-                        return
-                    }
-                    
-                    self.equipos = documents.map { doc in
-                        let data = doc.data()
-                        return Match(
-                            nombre: self.obtenerNombreCompleto(paraId: doc.documentID),
-                            ciudad: data["city"] as? String ?? "Sin ciudad",
-                            estadio: data["stadium"] as? String ?? "Sin estadio",
-                            logo: data["logo"] as? String ?? "Sin logo",
-                            partidosJugados: data["matchesPlayed"] as? Int ?? 0,
-                            partidosGanados: data["matchesWon"] as? Int ?? 0,
-                            partidosEmpatados: data["matchesDrawn"] as? Int ?? 0,
-                            partidosPerdidos: data["matchesLost"] as? Int ?? 0,
-                            golesFavor: data["goalsScored"] as? Int ?? 0,
-                            golesContra: data["goalsAgainst"] as? Int ?? 0,
-                            diferenciaGoles: data["goalDifference"] as? Int ?? 0,
-                            puntos: data["points"] as? Int ?? 0
-                        )
-                    }
-                    
-                    // Recargar la tabla con los nuevos datos
-                    self.tableView.reloadData()
+                    print("Error al obtener los equipos de \(torneo.rawValue): \(error.localizedDescription)")
+                    completion?()
+                    return
                 }
+                
+                guard let documents = querySnapshot?.documents else {
+                    print("No se encontraron equipos en \(torneo.rawValue)")
+                    completion?()
+                    return
+                }
+                
+                self.equiposMostrados = documents.map { doc in
+                    let data = doc.data()
+                    return Match(
+                        nombre: self.obtenerNombreCompleto(paraId: doc.documentID),
+                        ciudad: data["city"] as? String ?? "Sin ciudad",
+                        estadio: data["stadium"] as? String ?? "Sin estadio",
+                        logo: data["logo"] as? String ?? "Sin logo",
+                        partidosJugados: data["matchesPlayed"] as? Int ?? 0,
+                        partidosGanados: data["matchesWon"] as? Int ?? 0,
+                        partidosEmpatados: data["matchesDrawn"] as? Int ?? 0,
+                        partidosPerdidos: data["matchesLost"] as? Int ?? 0,
+                        golesFavor: data["goalsScored"] as? Int ?? 0,
+                        golesContra: data["goalsAgainst"] as? Int ?? 0,
+                        diferenciaGoles: data["goalDifference"] as? Int ?? 0,
+                        puntos: data["points"] as? Int ?? 0
+                    )
+                }
+                
+                // Guardar en cache según el torneo
+                switch torneo {
+                case .apertura:
+                    self.equiposApertura = self.equiposMostrados
+                case .clausura:
+                    self.equiposClausura = self.equiposMostrados
+                }
+                
+                self.tableView.reloadData()
+                completion?()
             }
     }
     
     @objc private func segmentedControlChanged(_ sender: UISegmentedControl) {
-        
-        self.equipos = []
-        
-        if sender.selectedSegmentIndex == 0 {
-            // Cargar los datos de "Clausura"
-            cargarEquiposClausura()
-        } else {
-            // Cargar los datos acumulados
-            cargarEquiposAcumulados()
+        switch sender.selectedSegmentIndex {
+        case 0: // Apertura
+            if equiposApertura.isEmpty {
+                cargarEquipos(torneo: .apertura) { [weak self] in
+                    self?.equiposApertura = self?.equiposMostrados ?? []
+                }
+            } else {
+                equiposMostrados = equiposApertura
+                tableView.reloadData()
+            }
+            
+        case 1: // Clausura
+            if equiposClausura.isEmpty {
+                cargarEquipos(torneo: .clausura) { [weak self] in
+                    self?.equiposClausura = self?.equiposMostrados ?? []
+                }
+            } else {
+                equiposMostrados = equiposClausura
+                tableView.reloadData()
+            }
+            
+        case 2: // Acumulado
+            if equiposAcumulados.isEmpty {
+                cargarEquiposAcumulados()
+            } else {
+                equiposMostrados = equiposAcumulados
+                tableView.reloadData()
+            }
+            
+        default:
+            break
         }
     }
     
     func cargarEquiposAcumulados() {
-        obtenerDatosAcumulados { equiposAcumulados in
-            // Asignar los equipos acumulados al array de equipos
-            self.equipos = equiposAcumulados
+        obtenerDatosAcumulados { [weak self] equiposAcumulados in
+            guard let self = self else { return }
             
-            // Ordenar los equipos por puntos y diferencia de goles
-            self.equipos.sort {
+            self.equiposAcumulados = equiposAcumulados.sorted {
                 if $0.puntos == $1.puntos {
                     return $0.diferenciaGoles > $1.diferenciaGoles
                 } else {
@@ -188,7 +193,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 }
             }
             
-            // Recargar la tabla con los datos acumulados
+            self.equiposMostrados = self.equiposAcumulados
             self.tableView.reloadData()
         }
     }
@@ -209,7 +214,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 for document in documents {
                     let data = document.data()
                     let equipo = Match(
-                        nombre: data["name"] as? String ?? "Sin nombre",
+                        nombre: self.obtenerNombreCompleto(paraId: document.documentID),
                         ciudad: data["city"] as? String ?? "Sin ciudad",
                         estadio: data["stadium"] as? String ?? "Sin estadio",
                         logo: data["logo"] as? String ?? "Sin logo",
@@ -235,7 +240,7 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 for document in documents {
                     let data = document.data()
                     let equipo = Match(
-                        nombre: data["name"] as? String ?? "Sin nombre",
+                        nombre: self.obtenerNombreCompleto(paraId: document.documentID),
                         ciudad: data["city"] as? String ?? "Sin ciudad",
                         estadio: data["stadium"] as? String ?? "Sin estadio",
                         logo: data["logo"] as? String ?? "Sin logo",
@@ -279,45 +284,5 @@ class TorneoViewController: UIViewController, UITableViewDelegate, UITableViewDa
             completion(equiposAcumulados)
         }
     }
-    
-    
-    // MARK: - UITableViewDataSource
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return equipos.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "EquipoCell", for: indexPath) as! EquipoTableViewCell
-        let equipo = equipos[indexPath.row]
-        
-        cell.configure(with: equipo)
-        
-        // Verificar la selección del UISegmentedControl
-        if segmentedControl.selectedSegmentIndex == 1 { // Acumulado
-            // Cambiar el color de fondo para las celdas basado en la posición
-            switch indexPath.row {
-            case 0, 1:
-                cell.backgroundColor = .lightMustardYellow // Primer lugar
-            case 2:
-                cell.backgroundColor = .lighterMustardYellow // Tercer lugar
-            case 3:
-                cell.backgroundColor = .lightestMustardYellow // Cuarto lugar
-            case 4...7:
-                cell.backgroundColor = .lightPastelSkyBlue // Del quinto al octavo lugar
-            case (equipos.count-3)...(equipos.count-1):
-                cell.backgroundColor = .lightRed // Últimas 3 posiciones
-            default:
-                cell.backgroundColor = .white // Resto de las posiciones
-            }
-        } else { // Clausura
-            // No aplicar colores, dejar fondo blanco
-            cell.backgroundColor = .white
-        }
-        
-        return cell
-    }
-    
 }
-
 

@@ -18,6 +18,8 @@
 		46222A572C712D15001678DF /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A562C712D15001678DF /* FirebaseInstallations */; };
 		469E54232E75D44D001ECD36 /* EquipoOldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54222E75D441001ECD36 /* EquipoOldTableViewCell.swift */; };
 		469E54252E75D84C001ECD36 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 469E54242E75D84C001ECD36 /* GoogleService-Info.plist */; };
+		469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */; };
+		469E542B2E75E490001ECD36 /* EquipoPeruano.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */; };
 		46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995922C6E90EC00D4951C /* AppDelegate.swift */; };
 		46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995942C6E90EC00D4951C /* SceneDelegate.swift */; };
 		46D995972C6E90EC00D4951C /* TorneoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995962C6E90EC00D4951C /* TorneoViewController.swift */; };
@@ -47,6 +49,8 @@
 		46222A502C7129A9001678DF /* Partido.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Partido.swift; sourceTree = "<group>"; };
 		469E54222E75D441001ECD36 /* EquipoOldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoOldTableViewCell.swift; sourceTree = "<group>"; };
 		469E54242E75D84C001ECD36 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
+		469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoPeruano.swift; sourceTree = "<group>"; };
 		46D9958F2C6E90EC00D4951C /* liga1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liga1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46D995922C6E90EC00D4951C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		46D995942C6E90EC00D4951C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -89,6 +93,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		469E54282E75E3B0001ECD36 /* Torneo */ = {
+			isa = PBXGroup;
+			children = (
+				469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */,
+				46D995962C6E90EC00D4951C /* TorneoViewController.swift */,
+			);
+			path = Torneo;
+			sourceTree = "<group>";
+		};
+		469E54292E75E47F001ECD36 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
 		46D995862C6E90EC00D4951C = {
 			isa = PBXGroup;
 			children = (
@@ -108,6 +129,7 @@
 		46D995912C6E90EC00D4951C /* liga1 */ = {
 			isa = PBXGroup;
 			children = (
+				469E54292E75E47F001ECD36 /* Util */,
 				46D995C62C6EC90700D4951C /* App */,
 				46D995C72C6EC91900D4951C /* Resources */,
 				46D995C52C6EC8FE00D4951C /* Extensions */,
@@ -121,10 +143,10 @@
 		46D995C32C6EC8D300D4951C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				469E54282E75E3B0001ECD36 /* Torneo */,
 				46D995C12C6EC7FF00D4951C /* MainTabBarController.swift */,
 				4613A7F92CCF2B1B0070034C /* LoginViewController.swift */,
 				46D995BB2C6EC00A00D4951C /* HomeViewController.swift */,
-				46D995962C6E90EC00D4951C /* TorneoViewController.swift */,
 				46D995BD2C6EC01800D4951C /* PartidoViewController.swift */,
 				46D995BF2C6EC02300D4951C /* PerfilViewController.swift */,
 				4613A7FB2CCF2D8D0070034C /* ProfileViewController.swift */,
@@ -278,6 +300,7 @@
 				46D995B62C6EA6E600D4951C /* Match.swift in Sources */,
 				4613A7FC2CCF2D8D0070034C /* ProfileViewController.swift in Sources */,
 				46D995B22C6EA69A00D4951C /* View+Extension.swift in Sources */,
+				469E542B2E75E490001ECD36 /* EquipoPeruano.swift in Sources */,
 				46FC0DFA2C81995500440D2A /* MatchTableViewCell.swift in Sources */,
 				46D995BC2C6EC00A00D4951C /* HomeViewController.swift in Sources */,
 				46D995C02C6EC02300D4951C /* PerfilViewController.swift in Sources */,
@@ -285,6 +308,7 @@
 				46D995B42C6EA6C100D4951C /* EquipoTableViewCell.swift in Sources */,
 				46FC0DFC2C821B8300440D2A /* Team.swift in Sources */,
 				4613A7FA2CCF2B1B0070034C /* LoginViewController.swift in Sources */,
+				469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */,
 				46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */,
 				46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */,
 				469E54232E75D44D001ECD36 /* EquipoOldTableViewCell.swift in Sources */,

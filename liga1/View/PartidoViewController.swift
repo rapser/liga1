@@ -182,14 +182,17 @@ class PartidoViewController: UIViewController {
         
 //        initializeTeams()
 //        iniciarPartido()
-
 //        registerMatch()
-        
 //        finalizarTodosLosPartidos()
         
-        
 //        actualizarTablaPosiciones()
-        actualizarTablaClausura()
+//        actualizarTablaClausura()
+
+//        cloneCollectionWithBatch(from: "apertura_2025", to: "apertura") { _ in }
+//        cloneCollectionWithBatch(from: "clausura_2025", to: "clausura") { _ in }
+
+        
+//        cloneDocument(from: "apertura_2025", originalDocumentId: "utc", newDocumentId: "bin") { _ in }
         
     }
     
@@ -731,26 +734,77 @@ class PartidoViewController: UIViewController {
         }
     }
 
-    func cloneCollection(from originalCollection: CollectionReference, to newCollection: CollectionReference) {
+    // MARK: - Clonacion
+    
+    func cloneCollectionWithBatch(from originalCollectionPath: String,
+                                to newCollectionPath: String,
+                                completion: @escaping (Error?) -> Void) {
+        let db = Firestore.firestore()
+        let originalCollection = db.collection(originalCollectionPath)
         
-//        let db = Firestore.firestore()
-//        let originalCollection = db.collection("originalData")
-//        let newCollection = db.collection("clonedData")
-//        cloneCollection(from: originalCollection, to: newCollection)
+        originalCollection.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+                completion(error)
+                return
+            }
+            
+            guard let documents = querySnapshot?.documents else {
+                print("No documents found")
+                completion(nil)
+                return
+            }
+            
+            let batch = db.batch()
+            let newCollection = db.collection(newCollectionPath)
+            
+            for document in documents {
+                let newDocRef = newCollection.document(document.documentID)
+                batch.setData(document.data(), forDocument: newDocRef)
+            }
+            
+            batch.commit { error in
+                if let error = error {
+                    print("Error committing batch: \(error)")
+                    completion(error)
+                } else {
+                    print("Batch committed successfully. \(documents.count) documents cloned.")
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func cloneDocument(from collectionName: String,
+                      originalDocumentId: String,
+                      newDocumentId: String,
+                      completion: @escaping (Error?) -> Void) {
         
-        originalCollection.getDocuments { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let data = document.data()
-                    newCollection.document(document.documentID).setData(data) { err in
-                        if let err = err {
-                            print("Error adding document: \(err)")
-                        } else {
-                            print("Document added with ID: \(document.documentID)")
-                        }
-                    }
+        let db = Firestore.firestore()
+        let documentRef = db.collection(collectionName).document(originalDocumentId)
+        
+        documentRef.getDocument { (document, error) in
+            if let error = error {
+                print("Error getting document: \(error)")
+                completion(error)
+                return
+            }
+            
+            guard let document = document, document.exists, let data = document.data() else {
+                print("Document does not exist or has no data")
+                completion(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Document not found"]))
+                return
+            }
+            
+            let newDocumentRef = db.collection(collectionName).document(newDocumentId)
+            
+            newDocumentRef.setData(data) { error in
+                if let error = error {
+                    print("Error cloning document: \(error)")
+                    completion(error)
+                } else {
+                    print("Document cloned successfully from \(originalDocumentId) to \(newDocumentId)")
+                    completion(nil)
                 }
             }
         }
