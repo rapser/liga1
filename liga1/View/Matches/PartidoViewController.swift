@@ -10,10 +10,8 @@ import FirebaseFirestore
 
 class PartidoViewController: UIViewController {
     
-    // Configuración de Firestore
     let db = Firestore.firestore()
     
-    // Definir el botón como una propiedad de la clase
     private let aceptarButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Aceptar", for: .normal)
@@ -35,7 +33,6 @@ class PartidoViewController: UIViewController {
     private func setupConstraints() {
         view.addSubview(aceptarButton)
         
-        // Configurar las restricciones de Auto Layout
         NSLayoutConstraint.activate([
             aceptarButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             aceptarButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -43,7 +40,6 @@ class PartidoViewController: UIViewController {
             aceptarButton.heightAnchor.constraint(equalToConstant: 50)
         ])
         
-        // Añadir la acción para el evento touchUpInside
         aceptarButton.addTarget(self, action: #selector(aceptarTapped), for: .touchUpInside)
 
     }
@@ -52,7 +48,6 @@ class PartidoViewController: UIViewController {
     
     func registerMatch(){
         
-        // Array de partidos a registrar
         let partidosARegistrar: [Partido] = [
             
             Partido(teamAId: "com", teamBId: "gra", fecha: "03", golesTeamA: 1, golesTeamB: 2),
@@ -187,21 +182,51 @@ class PartidoViewController: UIViewController {
         
 //        initializeTeams()
 //        iniciarPartido()
-
 //        registerMatch()
-        
 //        finalizarTodosLosPartidos()
         
-        
 //        actualizarTablaPosiciones()
-        actualizarTablaClausura()
+//        actualizarTablaClausura()
+
+//        cloneCollectionWithBatch(from: "apertura_2025", to: "apertura") { _ in }
+//        cloneCollectionWithBatch(from: "clausura_2025", to: "clausura") { _ in }
+//        cloneDocument(from: "apertura_2025", originalDocumentId: "utc", newDocumentId: "bin") { _ in }
+        
+//        let partidos = [
+//            Match(equipoLocalId: "sba", equipoVisitanteId: "cou", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "atl", equipoVisitanteId: "jpa", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "ali", equipoVisitanteId: "gar", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "auh", equipoVisitanteId: "cie", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "mel", equipoVisitanteId: "uni", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "cus", equipoVisitanteId: "cri", fecha: Date(), torneo: .clausura, jornada: 8)
+//
+//        ]
+//
+//        saveMatches(partidos) { error in
+//            if let error = error {
+//                print("Error al guardar partidos: \(error)")
+//            } else {
+//                print("Todos los partidos se guardaron correctamente")
+//            }
+//        }
         
     }
     
+    func saveMatches(_ matches: [Match], completion: ((Error?) -> Void)? = nil) {
+        let db = Firestore.firestore()
+        let batch = db.batch()
+        
+        for match in matches {
+            let docRef = db.collection("matches").document(match.documentID())
+            batch.setData(match.toDictionary(), forDocument: docRef)
+        }
+        
+        batch.commit { error in
+            completion?(error)
+        }
+    }
+    
     // MARK: - Metodos
-    
-    // En vivo
-    
     func clearInitialStats(for teamId: String) {
         let userDefaults = UserDefaults.standard
         let key = "teamStats_\(teamId)"
@@ -229,7 +254,6 @@ class PartidoViewController: UIViewController {
                 return
             }
             
-            // Extraer las estadísticas iniciales
             let initialStats = [
                 "matchesPlayed": data["matchesPlayed"] as? Int ?? 0,
                 "goalsScored": data["goalsScored"] as? Int ?? 0,
@@ -241,7 +265,6 @@ class PartidoViewController: UIViewController {
                 "matchesWon": data["matchesWon"] as? Int ?? 0
             ] as [String : Any]
             
-            // Guardar estadísticas iniciales en UserDefaults
             UserDefaults.standard.set(initialStats, forKey: "teamStats_\(teamId)")
             print("Estadísticas iniciales guardadas correctamente para el equipo con ID \(teamId).")
         }
@@ -295,13 +318,11 @@ class PartidoViewController: UIViewController {
         let db = Firestore.firestore()
         let teamRef = db.collection("clausura").document(teamId)
         
-        // Recuperar estadísticas iniciales desde UserDefaults
         guard let initialStats = UserDefaults.standard.dictionary(forKey: "teamStats_\(teamId)") as? [String: Int] else {
             print("No se encontraron estadísticas iniciales para el equipo con ID \(teamId)")
             return
         }
         
-        // Desempaquetar valores iniciales
         let initialMatchesPlayed = initialStats["matchesPlayed"] ?? 0
         let initialGoalsScored = initialStats["goalsScored"] ?? 0
         let initialGoalsAgainst = initialStats["goalsAgainst"] ?? 0
@@ -311,7 +332,6 @@ class PartidoViewController: UIViewController {
         let initialMatchesLost = initialStats["matchesLost"] ?? 0
         let initialMatchesWon = initialStats["matchesWon"] ?? 0
         
-        // Variables actualizadas
         var updatedMatchesPlayed = initialMatchesPlayed
         var updatedGoalsScored = initialGoalsScored
         var updatedGoalsAgainst = initialGoalsAgainst
@@ -321,7 +341,6 @@ class PartidoViewController: UIViewController {
         var updatedMatchesLost = initialMatchesLost
         var updatedMatchesWon = initialMatchesWon
         
-        // Determinar el resultado del partido
         if golesScored > golesAgainst {
             updatedPoints += 3 // Victoria
             updatedMatchesWon += 1
@@ -343,7 +362,6 @@ class PartidoViewController: UIViewController {
         // Actualizar el Goal Difference
         updatedGoalDifference = updatedGoalsScored - updatedGoalsAgainst
         
-        // Actualizar los valores en Firestore
         teamRef.updateData([
             "matchesPlayed": updatedMatchesPlayed,
             "goalsScored": updatedGoalsScored,
@@ -361,8 +379,6 @@ class PartidoViewController: UIViewController {
             }
         }
     }
-
-    // Registrar Partido
     
     func registerMatch(partido: Partido) {
         let db = Firestore.firestore()
@@ -411,7 +427,6 @@ class PartidoViewController: UIViewController {
     func actualizarTablaClausura() {
         let db = Firestore.firestore()
 
-        // Primero, obtener todos los documentos de la colección "clausura" y reiniciar sus valores.
         db.collection("clausura").getDocuments { (querySnapshot, error) in
             guard let documents = querySnapshot?.documents else {
                 print("Error al obtener documentos de 'clausura': \(error?.localizedDescription ?? "Unknown error")")
@@ -422,7 +437,6 @@ class PartidoViewController: UIViewController {
             
             for document in documents {
                 let docRef = db.collection("clausura").document(document.documentID)
-                // Reiniciar todos los campos a cero
                 batch.setData([
                     "matchesPlayed": 0,
                     "matchesWon": 0,
@@ -435,14 +449,12 @@ class PartidoViewController: UIViewController {
                 ], forDocument: docRef, merge: false)
             }
             
-            // Commit del batch para reiniciar los documentos
             batch.commit { error in
                 if let error = error {
                     print("Error al reiniciar los documentos en 'clausura': \(error.localizedDescription)")
                 } else {
                     print("Documentos en 'clausura' reiniciados correctamente.")
                     
-                    // Una vez reiniciado, proceder con la actualización según los documentos en "matches"
                     db.collection("matches").getDocuments { (querySnapshot, error) in
                         guard let documents = querySnapshot?.documents else {
                             print("Error al obtener los documentos de 'matches': \(error?.localizedDescription ?? "Unknown error")")
@@ -489,7 +501,6 @@ class PartidoViewController: UIViewController {
                                 var teamAStats = equipos[teamAId]!
                                 var teamBStats = equipos[teamBId]!
 
-                                // Actualizar partidos jugados
                                 teamAStats["matchesPlayed"] = (teamAStats["matchesPlayed"] as? Int ?? 0) + 1
                                 teamBStats["matchesPlayed"] = (teamBStats["matchesPlayed"] as? Int ?? 0) + 1
 
@@ -511,23 +522,19 @@ class PartidoViewController: UIViewController {
                                     teamBStats["points"] = (teamBStats["points"] as? Int ?? 0) + 1
                                 }
                                 
-                                // Actualizar goles y diferencia de goles
                                 teamAStats["goalsScored"] = (teamAStats["goalsScored"] as? Int ?? 0) + golesTeamA
                                 teamAStats["goalsAgainst"] = (teamAStats["goalsAgainst"] as? Int ?? 0) + golesTeamB
                                 teamBStats["goalsScored"] = (teamBStats["goalsScored"] as? Int ?? 0) + golesTeamB
                                 teamBStats["goalsAgainst"] = (teamBStats["goalsAgainst"] as? Int ?? 0) + golesTeamA
 
-                                // Calcular la diferencia de goles
                                 teamAStats["goalDifference"] = (teamAStats["goalsScored"] as? Int ?? 0) - (teamAStats["goalsAgainst"] as? Int ?? 0)
                                 teamBStats["goalDifference"] = (teamBStats["goalsScored"] as? Int ?? 0) - (teamBStats["goalsAgainst"] as? Int ?? 0)
 
-                                // Guardar las actualizaciones en el diccionario principal
                                 equipos[teamAId] = teamAStats
                                 equipos[teamBId] = teamBStats
                             }
                         }
 
-                        // Crear un nuevo batch para actualizar los documentos de "clausura" con los valores calculados
                         let updateBatch = db.batch()
 
                         for (teamId, stats) in equipos {
@@ -596,39 +603,32 @@ class PartidoViewController: UIViewController {
                     var teamAStats = equipos[teamAId]!
                     var teamBStats = equipos[teamBId]!
 
-                    // Actualizar partidos jugados
                     teamAStats["matchesPlayed"] = (teamAStats["matchesPlayed"] as? Int ?? 0) + 1
                     teamBStats["matchesPlayed"] = (teamBStats["matchesPlayed"] as? Int ?? 0) + 1
 
                     if golesTeamA > golesTeamB {
-                        // Victoria de teamA
                         teamAStats["matchesWon"] = (teamAStats["matchesWon"] as? Int ?? 0) + 1
                         teamAStats["points"] = (teamAStats["points"] as? Int ?? 0) + 3
                         teamBStats["matchesLost"] = (teamBStats["matchesLost"] as? Int ?? 0) + 1
                     } else if golesTeamA < golesTeamB {
-                        // Victoria de teamB
                         teamBStats["matchesWon"] = (teamBStats["matchesWon"] as? Int ?? 0) + 1
                         teamBStats["points"] = (teamBStats["points"] as? Int ?? 0) + 3
                         teamAStats["matchesLost"] = (teamAStats["matchesLost"] as? Int ?? 0) + 1
                     } else {
-                        // Empate
                         teamAStats["matchesDrawn"] = (teamAStats["matchesDrawn"] as? Int ?? 0) + 1
                         teamBStats["matchesDrawn"] = (teamBStats["matchesDrawn"] as? Int ?? 0) + 1
                         teamAStats["points"] = (teamAStats["points"] as? Int ?? 0) + 1
                         teamBStats["points"] = (teamBStats["points"] as? Int ?? 0) + 1
                     }
                     
-                    // Actualizar goles y diferencia de goles
                     teamAStats["goalsScored"] = (teamAStats["goalsScored"] as? Int ?? 0) + golesTeamA
                     teamAStats["goalsAgainst"] = (teamAStats["goalsAgainst"] as? Int ?? 0) + golesTeamB
                     teamBStats["goalsScored"] = (teamBStats["goalsScored"] as? Int ?? 0) + golesTeamB
                     teamBStats["goalsAgainst"] = (teamBStats["goalsAgainst"] as? Int ?? 0) + golesTeamA
 
-                    // Calcular la diferencia de goles
                     teamAStats["goalDifference"] = ((teamAStats["goalsScored"] as? Int ?? 0) - (teamAStats["goalsAgainst"] as? Int ?? 0))
                     teamBStats["goalDifference"] = ((teamBStats["goalsScored"] as? Int ?? 0) - (teamBStats["goalsAgainst"] as? Int ?? 0))
 
-                    // Guardar las actualizaciones en el diccionario principal
                     equipos[teamAId] = teamAStats
                     equipos[teamBId] = teamBStats
                 }
@@ -717,7 +717,6 @@ class PartidoViewController: UIViewController {
         }
     }
 
-    // Función para inicializar los equipos
     func initializeTeams() {
         
         let teams: [(String, String, String, String)] = [
@@ -765,26 +764,77 @@ class PartidoViewController: UIViewController {
         }
     }
 
-    func cloneCollection(from originalCollection: CollectionReference, to newCollection: CollectionReference) {
+    // MARK: - Clonacion
+    
+    func cloneCollectionWithBatch(from originalCollectionPath: String,
+                                to newCollectionPath: String,
+                                completion: @escaping (Error?) -> Void) {
+        let db = Firestore.firestore()
+        let originalCollection = db.collection(originalCollectionPath)
         
-//        let db = Firestore.firestore()
-//        let originalCollection = db.collection("originalData")
-//        let newCollection = db.collection("clonedData")
-//        cloneCollection(from: originalCollection, to: newCollection)
+        originalCollection.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+                completion(error)
+                return
+            }
+            
+            guard let documents = querySnapshot?.documents else {
+                print("No documents found")
+                completion(nil)
+                return
+            }
+            
+            let batch = db.batch()
+            let newCollection = db.collection(newCollectionPath)
+            
+            for document in documents {
+                let newDocRef = newCollection.document(document.documentID)
+                batch.setData(document.data(), forDocument: newDocRef)
+            }
+            
+            batch.commit { error in
+                if let error = error {
+                    print("Error committing batch: \(error)")
+                    completion(error)
+                } else {
+                    print("Batch committed successfully. \(documents.count) documents cloned.")
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func cloneDocument(from collectionName: String,
+                      originalDocumentId: String,
+                      newDocumentId: String,
+                      completion: @escaping (Error?) -> Void) {
         
-        originalCollection.getDocuments { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let data = document.data()
-                    newCollection.document(document.documentID).setData(data) { err in
-                        if let err = err {
-                            print("Error adding document: \(err)")
-                        } else {
-                            print("Document added with ID: \(document.documentID)")
-                        }
-                    }
+        let db = Firestore.firestore()
+        let documentRef = db.collection(collectionName).document(originalDocumentId)
+        
+        documentRef.getDocument { (document, error) in
+            if let error = error {
+                print("Error getting document: \(error)")
+                completion(error)
+                return
+            }
+            
+            guard let document = document, document.exists, let data = document.data() else {
+                print("Document does not exist or has no data")
+                completion(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Document not found"]))
+                return
+            }
+            
+            let newDocumentRef = db.collection(collectionName).document(newDocumentId)
+            
+            newDocumentRef.setData(data) { error in
+                if let error = error {
+                    print("Error cloning document: \(error)")
+                    completion(error)
+                } else {
+                    print("Document cloned successfully from \(originalDocumentId) to \(newDocumentId)")
+                    completion(nil)
                 }
             }
         }

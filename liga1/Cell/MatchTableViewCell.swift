@@ -2,115 +2,119 @@
 //  MatchTableViewCell.swift
 //  liga1
 //
-//  Created by miguel tomairo on 30/08/24.
+//  Created by miguel tomairo on 14/09/25.
 //
 
 import UIKit
 
 class MatchTableViewCell: UITableViewCell {
     
-    // Elementos de la celda (etiquetas, imágenes, etc.)
-    private let team1LogoImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        return imageView
+    static let identifier = "MatchTableViewCell"
+    
+    let estrellaImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.image = UIImage(systemName: "star")
+        iv.tintColor = .systemYellow
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
-    private let team1NameLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        return label
+    let logoLocalImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
-    private let scoreLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.textAlignment = .center
-        return label
+    let nombreLocalLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.font = .systemFont(ofSize: 14, weight: .medium)
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        return lbl
     }()
     
-    private let team2NameLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        return label
+    let logoVisitanteImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
-    private let team2LogoImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        return imageView
+    let nombreVisitanteLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.font = .systemFont(ofSize: 14)
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        return lbl
     }()
     
-    private let estadoLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        // Inicialmente, oculta el label
-        label.isHidden = true
-        return label
+    let horaLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.font = .systemFont(ofSize: 12)
+        lbl.textAlignment = .center
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        return lbl
     }()
     
-    // StackView para organizar los elementos
-    private lazy var mainStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [
-            team1LogoImageView,
-            team1NameLabel,
-            scoreLabel,
-            team2NameLabel,
-            team2LogoImageView
-        ])
-        stackView.axis = .horizontal
-        stackView.distribution = .fillProportionally
-        stackView.spacing = 8
-        return stackView
-    }()
-    
+    // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        // Agregar el StackView a la celda
-        contentView.addSubview(mainStackView)
-        mainStackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            mainStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            mainStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            mainStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            mainStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
-        ])
+        contentView.addSubview(estrellaImageView)
+        contentView.addSubview(logoLocalImageView)
+        contentView.addSubview(nombreLocalLabel)
+        contentView.addSubview(logoVisitanteImageView)
+        contentView.addSubview(nombreVisitanteLabel)
+        contentView.addSubview(horaLabel)
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    func configure(with partido: Partido) {
-        // Asumiendo que tienes una forma de obtener los nombres y logos de los equipos a partir de los IDs
-        team1NameLabel.text = obtenerNombreEquipo(porId: partido.teamAId)
-        team2NameLabel.text = obtenerNombreEquipo(porId: partido.teamBId)
-        scoreLabel.text = "\(partido.golesTeamA) - \(partido.golesTeamB)"
-        
-        // Asignar las imágenes a las ImageViews
-        team1LogoImageView.image = UIImage(named: partido.teamAId)
-        team2LogoImageView.image = UIImage(named: partido.teamBId)
-        
-        // Configurar el label de estado
-        estadoLabel.text = partido.estado.rawValue.capitalized
-        estadoLabel.isHidden = false
-        
-        // Aplicar el color de texto según el estado
-        switch partido.estado {
-        case .pendiente:
-            estadoLabel.textColor = .systemGray
-        case .enJuego:
-            estadoLabel.textColor = .systemGreen
-        case .finalizado:
-            estadoLabel.textColor = .systemGray
-        }
+    
+    // MARK: - Constraints
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            // Estrella centrada verticalmente respecto a toda la celda
+            estrellaImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            estrellaImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            estrellaImageView.widthAnchor.constraint(equalToConstant: 30),
+            estrellaImageView.heightAnchor.constraint(equalToConstant: 30),
+            
+            // Logo local
+            logoLocalImageView.leadingAnchor.constraint(equalTo: estrellaImageView.trailingAnchor, constant: 8),
+            logoLocalImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+            logoLocalImageView.widthAnchor.constraint(equalToConstant: 20),
+            logoLocalImageView.heightAnchor.constraint(equalToConstant: 20),
+            
+            // Nombre local
+            nombreLocalLabel.leadingAnchor.constraint(equalTo: logoLocalImageView.trailingAnchor, constant: 8),
+            nombreLocalLabel.centerYAnchor.constraint(equalTo: logoLocalImageView.centerYAnchor),
+            
+            // Hora centrada verticalmente respecto a toda la celda
+            horaLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            horaLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            
+            // Logo visitante
+            logoVisitanteImageView.leadingAnchor.constraint(equalTo: logoLocalImageView.leadingAnchor),
+            logoVisitanteImageView.topAnchor.constraint(equalTo: logoLocalImageView.bottomAnchor, constant: 8),
+            logoVisitanteImageView.widthAnchor.constraint(equalToConstant: 20),
+            logoVisitanteImageView.heightAnchor.constraint(equalToConstant: 20),
+            
+            // Nombre visitante
+            nombreVisitanteLabel.leadingAnchor.constraint(equalTo: logoVisitanteImageView.trailingAnchor, constant: 8),
+            nombreVisitanteLabel.centerYAnchor.constraint(equalTo: logoVisitanteImageView.centerYAnchor),
+            nombreVisitanteLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
+        ])
     }
     
-    // Función auxiliar para obtener el nombre del equipo por su ID
-    private func obtenerNombreEquipo(porId: String) -> String {
-        // Aquí implementarías la lógica para obtener el nombre del equipo a partir de su ID
-        // Por ejemplo, podrías hacer una consulta a una base de datos o a una API
-        return "Equipo \(porId)" // Placeholder
+    // MARK: - Config
+    func configure(with match: Match, logoLocal: UIImage?, logoVisitante: UIImage?) {
+        nombreLocalLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoLocalId)
+        nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoVisitanteId)
+        logoLocalImageView.image = logoLocal
+        logoVisitanteImageView.image = logoVisitante
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        horaLabel.text = formatter.string(from: match.fecha)
     }
 }
