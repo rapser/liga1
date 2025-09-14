@@ -24,6 +24,9 @@ class MainTabBarController: UITabBarController {
         let partidoVC = PartidoViewController()
         partidoVC.title = "Partido"
         
+        let newsVC = NewsViewController()
+        newsVC.title = "Noticias"
+        
         let perfilVC = ProfileViewController()
         perfilVC.title = "Mi Perfil"
         
@@ -46,13 +49,18 @@ class MainTabBarController: UITabBarController {
             imageSystemName: "figure.soccer"
         )
         
+        let newsNav = createNavController(
+            rootViewController: newsVC,
+            title: "noticias",
+            imageSystemName: "newspaper")
+        
         let perfilNav = createNavController(
             rootViewController: perfilVC,
             title: "perfil",
             imageSystemName: "person"
         )
         
-        viewControllers = [homeNav, torneoNav, partidoNav, perfilNav]
+        viewControllers = [homeNav, torneoNav, partidoNav, newsNav, perfilNav]
     }
     
     private func configureTabBarAppearance() {
