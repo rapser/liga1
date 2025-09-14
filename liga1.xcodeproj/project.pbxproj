@@ -16,6 +16,8 @@
 		46222A532C712CBA001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A522C712CBA001678DF /* FirebaseDatabase */; };
 		46222A552C712D15001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A542C712D15001678DF /* FirebaseDatabase */; };
 		46222A572C712D15001678DF /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A562C712D15001678DF /* FirebaseInstallations */; };
+		4636E0A02E772827009CCB4B /* MatchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4636E09F2E772826009CCB4B /* MatchCell.swift */; };
+		4636E0A22E7728EA009CCB4B /* MatchesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */; };
 		469E54252E75D84C001ECD36 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 469E54242E75D84C001ECD36 /* GoogleService-Info.plist */; };
 		469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */; };
 		469E542B2E75E490001ECD36 /* EquipoPeruano.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */; };
@@ -58,6 +60,8 @@
 		4613A7F92CCF2B1B0070034C /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		4613A7FB2CCF2D8D0070034C /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		46222A502C7129A9001678DF /* Partido.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Partido.swift; sourceTree = "<group>"; };
+		4636E09F2E772826009CCB4B /* MatchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCell.swift; sourceTree = "<group>"; };
+		4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesViewController.swift; sourceTree = "<group>"; };
 		469E54242E75D84C001ECD36 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
 		469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoPeruano.swift; sourceTree = "<group>"; };
@@ -181,6 +185,7 @@
 		469E543B2E766914001ECD36 /* Matches */ = {
 			isa = PBXGroup;
 			children = (
+				4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */,
 				46D995BD2C6EC01800D4951C /* PartidoViewController.swift */,
 			);
 			path = Matches;
@@ -276,6 +281,7 @@
 		46D995C82C6ECB0500D4951C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				4636E09F2E772826009CCB4B /* MatchCell.swift */,
 				469E544E2E76A337001ECD36 /* MatchTableViewCell.swift */,
 				469E54432E7671FB001ECD36 /* NewsHeaderView.swift */,
 				469E543C2E766CBC001ECD36 /* NewsCell.swift */,
@@ -397,9 +403,11 @@
 				4613A7FA2CCF2B1B0070034C /* LoginViewController.swift in Sources */,
 				469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */,
 				469E54442E7671FC001ECD36 /* NewsHeaderView.swift in Sources */,
+				4636E0A02E772827009CCB4B /* MatchCell.swift in Sources */,
 				46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */,
 				469E544C2E7698C9001ECD36 /* Match.swift in Sources */,
 				469E54312E765120001ECD36 /* AppRouter.swift in Sources */,
+				4636E0A22E7728EA009CCB4B /* MatchesViewController.swift in Sources */,
 				46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */,
 				469E54482E768C05001ECD36 /* NewsHeaderWrapperCell.swift in Sources */,
 				469E543D2E766CBD001ECD36 /* NewsCell.swift in Sources */,

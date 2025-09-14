@@ -21,8 +21,8 @@ class MainTabBarController: UITabBarController {
         let torneoVC = TorneoViewController()
         torneoVC.title = "Torneo"
         
-        let partidoVC = PartidoViewController()
-        partidoVC.title = "Partido"
+        let matchVC = MatchesViewController()
+        matchVC.title = "Partidos"
         
         let newsVC = NewsViewController()
         newsVC.title = "Noticias"
@@ -43,8 +43,8 @@ class MainTabBarController: UITabBarController {
             imageSystemName: "chart.bar.doc.horizontal"
         )
         
-        let partidoNav = createNavController(
-            rootViewController: partidoVC,
+        let matchNav = createNavController(
+            rootViewController: matchVC,
             title: "partido",
             imageSystemName: "figure.soccer"
         )
@@ -60,7 +60,7 @@ class MainTabBarController: UITabBarController {
             imageSystemName: "person"
         )
         
-        viewControllers = [homeNav, torneoNav, partidoNav, newsNav, perfilNav]
+        viewControllers = [homeNav, torneoNav, matchNav, newsNav, perfilNav]
     }
     
     private func configureTabBarAppearance() {
