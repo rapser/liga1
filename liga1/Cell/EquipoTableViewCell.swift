@@ -11,24 +11,32 @@ class EquipoTableViewCell: UITableViewCell {
     
     private let stackView = UIStackView()
     
-    let nombreLabel: UILabel = {
+    private let posicionLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textAlignment = .left
-        label.numberOfLines = 1
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.5
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textAlignment = .center
         return label
     }()
     
-    let partidosJugadosLabel: UILabel = createValueLabel()
-    let partidosGanadosLabel: UILabel = createValueLabel()
-    let partidosEmpatadosLabel: UILabel = createValueLabel()
-    let partidosPerdidosLabel: UILabel = createValueLabel()
-    let golesFavorLabel: UILabel = createValueLabel()
-    let golesContraLabel: UILabel = createValueLabel()
-    let puntosLabel: UILabel = {
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
+    private let nombreLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment = .left
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    private let partidosJugadosLabel = createValueLabel()
+    private let golesLabel = createValueLabel()
+    private let puntosLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textColor = .black
@@ -38,57 +46,55 @@ class EquipoTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        stackView.axis = .horizontal
-        stackView.distribution = .fill
-        stackView.alignment = .center
-        stackView.spacing = 2 // Adjust spacing as needed
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        stackView.addArrangedSubview(nombreLabel)
-        stackView.addArrangedSubview(partidosJugadosLabel)
-        stackView.addArrangedSubview(partidosGanadosLabel)
-        stackView.addArrangedSubview(partidosEmpatadosLabel)
-        stackView.addArrangedSubview(partidosPerdidosLabel)
-        stackView.addArrangedSubview(golesFavorLabel)
-        stackView.addArrangedSubview(golesContraLabel)
-        stackView.addArrangedSubview(puntosLabel)
-        
-        // Add stack view to content view
-        contentView.addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-            stackView.heightAnchor.constraint(equalToConstant: 35),
-            
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            stackView.widthAnchor.constraint(equalTo: contentView.widthAnchor, constant: -16),
-            
-            nombreLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: 0.35),
-            
-            partidosJugadosLabel.widthAnchor.constraint(equalTo: partidosGanadosLabel.widthAnchor),
-            partidosGanadosLabel.widthAnchor.constraint(equalTo: partidosEmpatadosLabel.widthAnchor),
-            partidosEmpatadosLabel.widthAnchor.constraint(equalTo: partidosPerdidosLabel.widthAnchor),
-            partidosPerdidosLabel.widthAnchor.constraint(equalTo: golesFavorLabel.widthAnchor),
-            golesFavorLabel.widthAnchor.constraint(equalTo: golesContraLabel.widthAnchor),
-            golesContraLabel.widthAnchor.constraint(equalTo: puntosLabel.widthAnchor),
-        ])
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with model: Match) {
+    private func setupUI() {
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = 4
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Equipo stack → logo + nombre
+        let equipoStack = UIStackView(arrangedSubviews: [logoImageView, nombreLabel])
+        equipoStack.axis = .horizontal
+        equipoStack.spacing = 4
+        equipoStack.alignment = .center
+        
+        stackView.addArrangedSubview(posicionLabel)
+        stackView.addArrangedSubview(equipoStack)
+        stackView.addArrangedSubview(partidosJugadosLabel)
+        stackView.addArrangedSubview(golesLabel)
+        stackView.addArrangedSubview(puntosLabel)
+        
+        contentView.addSubview(stackView)
+        
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
+            
+            posicionLabel.widthAnchor.constraint(equalToConstant: 25),
+            partidosJugadosLabel.widthAnchor.constraint(equalToConstant: 30),
+            golesLabel.widthAnchor.constraint(equalToConstant: 60),
+            puntosLabel.widthAnchor.constraint(equalToConstant: 40),
+            
+            logoImageView.widthAnchor.constraint(equalToConstant: 20),
+            logoImageView.heightAnchor.constraint(equalToConstant: 20)
+        ])
+    }
+    
+    func configure(with model: Match, position: Int) {
+        posicionLabel.text = "\(position)."
+        logoImageView.image = UIImage(named: model.logo)
         nombreLabel.text = model.nombre
         partidosJugadosLabel.text = "\(model.partidosJugados)"
-        partidosGanadosLabel.text = "\(model.partidosGanados)"
-        partidosEmpatadosLabel.text = "\(model.partidosEmpatados)"
-        partidosPerdidosLabel.text = "\(model.partidosPerdidos)"
-        golesFavorLabel.text = "\(model.golesFavor)"
-        golesContraLabel.text = "\(model.golesContra)"
+        golesLabel.text = "\(model.golesFavor) - \(model.golesContra)"
         puntosLabel.text = "\(model.puntos)"
     }
     

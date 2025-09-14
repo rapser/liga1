@@ -8,11 +8,6 @@
 import UIKit
 import FirebaseFirestore
 
-enum TipoTorneo: String {
-    case apertura = "apertura"
-    case clausura = "clausura"
-}
-
 class TorneoViewController: UIViewController {
     
     // MARK: - Properties
@@ -38,7 +33,7 @@ class TorneoViewController: UIViewController {
     private func loadInitialData() {
         segmentedControl.selectedSegmentIndex = 1
         cargarEquipos(torneo: .clausura) { [weak self] in
-            self?.equiposApertura = self?.equiposMostrados ?? []
+            self?.equiposClausura = self?.equiposMostrados ?? []
         }
     }
     
@@ -56,7 +51,7 @@ class TorneoViewController: UIViewController {
         let liga1RedColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
         segmentedControl.selectedSegmentTintColor = liga1RedColor
         segmentedControl.backgroundColor = .white
-        
+                
         let textAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.white,
             .font: UIFont.systemFont(ofSize: 14, weight: .bold)
@@ -72,8 +67,13 @@ class TorneoViewController: UIViewController {
         view.addSubview(tableView)
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
+//        tableView.backgroundColor = .systemBlue
+        tableView.contentInset = .zero
+        tableView.scrollIndicatorInsets = .zero
+        tableView.sectionHeaderTopPadding = 0
+
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 16),
+            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 4),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -84,8 +84,6 @@ class TorneoViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        let headerView = HeaderView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 50))
-        tableView.tableHeaderView = headerView
     }
     
     private func obtenerNombreCompleto(paraId id: String) -> String {
@@ -94,7 +92,7 @@ class TorneoViewController: UIViewController {
     
     // MARK: - Data Loading
     
-    func cargarEquipos(torneo: TipoTorneo, completion: (() -> Void)? = nil) {
+    func cargarEquipos(torneo: TorneoType, completion: (() -> Void)? = nil) {
         let db = Firestore.firestore()
         let equiposRef = db.collection(torneo.rawValue)
                 
@@ -139,6 +137,8 @@ class TorneoViewController: UIViewController {
                     self.equiposApertura = self.equiposMostrados
                 case .clausura:
                     self.equiposClausura = self.equiposMostrados
+                case .acumulado:
+                    print("sin guardar")
                 }
                 
                 self.tableView.reloadData()

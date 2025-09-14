@@ -59,13 +59,11 @@ enum EquipoPeruano: String, CaseIterable {
         }
     }
     
-    // Función estática para obtener el nombre completo desde un ID
     static func obtenerNombreCompleto(paraId id: String) -> String {
         return EquipoPeruano(rawValue: id)?.nombreCompleto ?? "Equipo Desconocido"
     }
 }
 
-// Extensión para métodos utilitarios
 extension EquipoPeruano {
     static var todosLosEquipos: [EquipoPeruano] {
         return allCases

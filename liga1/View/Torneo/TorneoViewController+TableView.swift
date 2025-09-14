@@ -7,51 +7,6 @@
 
 import UIKit
 
-enum TorneoType {
-    case apertura
-    case clausura
-    case acumulado
-}
-
-enum TablePosition {
-    case libertadoresDirecta          // Puestos 1-2
-    case libertadoresFase2           // Puesto 3
-    case libertadoresFase1           // Puesto 4
-    case sudamericana                // Puestos 5-8
-    case descenso                    // Últimos 3 puestos
-    case campeon                     // Solo puesto 1 en torneos regulares
-    case normal                      // Posiciones normales
-    
-    var backgroundColor: UIColor {
-        switch self {
-        case .libertadoresDirecta, .campeon:
-            return .libertadoresGold
-        case .libertadoresFase2:
-            return .libertadoresLightGold
-        case .libertadoresFase1:
-            return .libertadoresLighterGold
-        case .sudamericana:
-            return .sudamericanaBlue
-        case .descenso:
-            return .relegationRed
-        case .normal:
-            return .white
-        }
-    }
-    
-    var description: String {
-        switch self {
-        case .libertadoresDirecta: return "Clasificado a Fase de Grupos Libertadores"
-        case .libertadoresFase2: return "Clasificado a Fase 2 Libertadores"
-        case .libertadoresFase1: return "Clasificado a Fase 1 Libertadores"
-        case .sudamericana: return "Clasificado a Copa Sudamericana"
-        case .descenso: return "Zona de descenso"
-        case .campeon: return "Campeón del torneo"
-        case .normal: return "Posición normal"
-        }
-    }
-}
-
 extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -62,7 +17,7 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "EquipoCell", for: indexPath) as! EquipoTableViewCell
         let equipo = equiposMostrados[indexPath.row]
         
-        cell.configure(with: equipo)
+        cell.configure(with: equipo, position: indexPath.row + 1)
         cell.backgroundColor = backgroundColorForPosition(at: indexPath)
         return cell
     }
@@ -95,6 +50,18 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
         default: // Apertura o Clausura (torneos regulares)
             return row == 0 ? .campeon : .normal
         }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 30
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return HeaderView()
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40
     }
     
 }
