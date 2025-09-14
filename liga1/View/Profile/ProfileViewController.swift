@@ -8,68 +8,129 @@
 import UIKit
 import FirebaseAuth
 
-class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    let options = ["Nombre", "Marcadores", "Contacto", "Cerrar Sesión"]
-    
-    let tableView: UITableView = {
-        let tableView = UITableView()
+class ProfileViewController: UIViewController {
+
+    // MARK: - Modelo de opción
+    struct Option {
+        let title: String
+        let icon: UIImage?
+        let subtitle: String? // Para versión o info adicional
+        let action: (() -> Void)?
+    }
+
+    struct Section {
+        let title: String
+        let options: [Option]
+    }
+
+    var sections: [Section] = []
+
+    // MARK: - Tabla
+    private let tableView: UITableView = {
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
-    
+
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
+        setupSections()
         setupTableView()
     }
-    
+
+    // MARK: - Configuración secciones
+    private func setupSections() {
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "N/A"
+        let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "N/A"
+        let versionString = "\(appVersion) (\(buildNumber))"
+
+        sections = [
+            Section(title: "Notificaciones Push", options: [
+                Option(title: "Ajustes de notificaciones", icon: UIImage(systemName: "bell.fill"), subtitle: nil, action: {
+                    print("Abrir ajustes de notificaciones")
+                })
+            ]),
+            Section(title: "Usuario", options: [
+                Option(title: "Nombre de usuario", icon: UIImage(systemName: "person.fill"), subtitle: nil, action: {
+                    print("Editar nombre de usuario")
+                }),
+                Option(title: "Cerrar Sesión", icon: UIImage(systemName: "arrow.backward.circle.fill"), subtitle: nil, action: { [weak self] in
+                    self?.showLogoutConfirmation()
+                })
+            ]),
+            Section(title: "Tema", options: [
+                Option(title: "Modo Claro / Modo Oscuro", icon: UIImage(systemName: "circle.lefthalf.fill"), subtitle: nil, action: { [weak self] in
+                    self?.showThemeBottomSheet()
+                })
+            ]),
+            Section(title: "Otros", options: [
+                Option(title: "Envía tus comentarios", icon: UIImage(systemName: "envelope.fill"), subtitle: nil, action: {
+                    print("Enviar feedback")
+                }),
+                Option(title: "Condiciones de uso", icon: UIImage(systemName: "doc.text.fill"), subtitle: nil, action: {
+                    print("Mostrar condiciones de uso")
+                }),
+                Option(title: "Políticas de privacidad", icon: UIImage(systemName: "lock.shield.fill"), subtitle: nil, action: {
+                    print("Mostrar políticas de privacidad")
+                }),
+                Option(title: "Ajustes de privacidad", icon: UIImage(systemName: "gearshape.fill"), subtitle: nil, action: {
+                    print("Abrir ajustes de privacidad")
+                }),
+                Option(title: "Versión", icon: nil, subtitle: versionString, action: nil)
+            ])
+        ]
+    }
+
+    // MARK: - Configuración Tabla
     private func setupTableView() {
         view.addSubview(tableView)
-        
-        tableView.delegate = self
-        tableView.dataSource = self
+
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        
+
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+
+        tableView.delegate = self
+        tableView.dataSource = self
     }
-    
-    // MARK: - UITableViewDataSource
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return options.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = options[indexPath.row]
-        return cell
-    }
-    
-    // MARK: - UITableViewDelegate
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        switch indexPath.row {
-        case 0:
-            print("Seleccionado: Nombre")
-        case 1:
-            print("Seleccionado: Marcadores")
-        case 2:
-            print("Seleccionado: Contacto")
-        case 3:
-            showLogoutConfirmation()
-        default:
-            break
+
+    // MARK: - Bottom Sheet Tema
+    private func showThemeBottomSheet() {
+        let alertController = UIAlertController(title: "Selecciona un tema",
+                                                message: nil,
+                                                preferredStyle: .actionSheet)
+
+        alertController.addAction(UIAlertAction(title: "Claro", style: .default, handler: { _ in
+            self.overrideUserInterfaceStyle = .light
+            print("Modo Claro activado")
+        }))
+
+        alertController.addAction(UIAlertAction(title: "Oscuro", style: .default, handler: { _ in
+            self.overrideUserInterfaceStyle = .dark
+            print("Modo Oscuro activado")
+        }))
+
+        alertController.addAction(UIAlertAction(title: "Automático", style: .default, handler: { _ in
+            self.overrideUserInterfaceStyle = .unspecified
+            print("Modo Automático activado")
+        }))
+
+        alertController.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: nil))
+
+        if let sheet = alertController.sheetPresentationController {
+            sheet.detents = [.medium()]
         }
+
+        present(alertController, animated: true, completion: nil)
     }
-    
+
+    // MARK: - Logout
     private func showLogoutConfirmation() {
         let alert = UIAlertController(title: "Cerrar Sesión",
                                       message: "¿Estás seguro de que deseas cerrar sesión?",
@@ -102,5 +163,4 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             print("Error al cerrar sesión: \(error.localizedDescription)")
         }
     }
-
 }

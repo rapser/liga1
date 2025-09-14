@@ -99,7 +99,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         if indexPath.section == 0 {
             return 340 // NewsHeaderView
         } else {
-            return 80 // NewsCell
+            return 90 // NewsCell
         }
     }
 }

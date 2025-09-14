@@ -45,7 +45,7 @@ class NewsCell: UITableViewCell {
         NSLayoutConstraint.activate([
             newsImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             newsImageView.widthAnchor.constraint(equalToConstant: 120),
-            newsImageView.heightAnchor.constraint(equalToConstant: 60),
+            newsImageView.heightAnchor.constraint(equalToConstant: 70),
             newsImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
 
             titleLabel.leadingAnchor.constraint(equalTo: newsImageView.trailingAnchor, constant: 12),
