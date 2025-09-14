@@ -14,10 +14,10 @@ class TorneoViewController: UIViewController {
     private let tableView = UITableView()
     let segmentedControl = UISegmentedControl(items: ["Apertura", "Clausura", "Acumulado"])
     
-    private var equiposApertura: [Match] = []
-    private var equiposClausura: [Match] = []
-    private var equiposAcumulados: [Match] = []
-    var equiposMostrados: [Match] = []
+    private var equiposApertura: [Team] = []
+    private var equiposClausura: [Team] = []
+    private var equiposAcumulados: [Team] = []
+    var equiposMostrados: [Team] = []
     
     // MARK: - LifeCycle
     
@@ -115,7 +115,7 @@ class TorneoViewController: UIViewController {
                 
                 self.equiposMostrados = documents.map { doc in
                     let data = doc.data()
-                    return Match(
+                    return Team(
                         nombre: self.obtenerNombreCompleto(paraId: doc.documentID),
                         ciudad: data["city"] as? String ?? "Sin ciudad",
                         estadio: data["stadium"] as? String ?? "Sin estadio",
@@ -198,12 +198,12 @@ class TorneoViewController: UIViewController {
         }
     }
     
-    func obtenerDatosAcumulados(completion: @escaping ([Match]) -> Void) {
+    func obtenerDatosAcumulados(completion: @escaping ([Team]) -> Void) {
         let db = Firestore.firestore()
         
-        var equiposApertura: [String: Match] = [:]
-        var equiposClausura: [String: Match] = [:]
-        var equiposAcumulados: [Match] = []
+        var equiposApertura: [String: Team] = [:]
+        var equiposClausura: [String: Team] = [:]
+        var equiposAcumulados: [Team] = []
         
         let dispatchGroup = DispatchGroup()
         
@@ -213,7 +213,7 @@ class TorneoViewController: UIViewController {
             if let documents = snapshot?.documents {
                 for document in documents {
                     let data = document.data()
-                    let equipo = Match(
+                    let equipo = Team(
                         nombre: self.obtenerNombreCompleto(paraId: document.documentID),
                         ciudad: data["city"] as? String ?? "Sin ciudad",
                         estadio: data["stadium"] as? String ?? "Sin estadio",
@@ -239,7 +239,7 @@ class TorneoViewController: UIViewController {
             if let documents = snapshot?.documents {
                 for document in documents {
                     let data = document.data()
-                    let equipo = Match(
+                    let equipo = Team(
                         nombre: self.obtenerNombreCompleto(paraId: document.documentID),
                         ciudad: data["city"] as? String ?? "Sin ciudad",
                         estadio: data["stadium"] as? String ?? "Sin estadio",
@@ -264,7 +264,7 @@ class TorneoViewController: UIViewController {
             for (documentID, equipoApertura) in equiposApertura {
                 if let equipoClausura = equiposClausura[documentID] {
                     // Sumar los valores de ambos torneos
-                    let equipoAcumulado = Match(
+                    let equipoAcumulado = Team(
                         nombre: equipoApertura.nombre,
                         ciudad: equipoApertura.ciudad,
                         estadio: equipoApertura.estadio,

@@ -89,7 +89,7 @@ class EquipoTableViewCell: UITableViewCell {
         ])
     }
     
-    func configure(with model: Match, position: Int) {
+    func configure(with model: Team, position: Int) {
         posicionLabel.text = "\(position)."
         logoImageView.image = UIImage(named: model.logo)
         nombreLabel.text = model.nombre

@@ -190,10 +190,40 @@ class PartidoViewController: UIViewController {
 
 //        cloneCollectionWithBatch(from: "apertura_2025", to: "apertura") { _ in }
 //        cloneCollectionWithBatch(from: "clausura_2025", to: "clausura") { _ in }
-
-        
 //        cloneDocument(from: "apertura_2025", originalDocumentId: "utc", newDocumentId: "bin") { _ in }
         
+//        let partidos = [
+//            Match(equipoLocalId: "sba", equipoVisitanteId: "cou", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "atl", equipoVisitanteId: "jpa", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "ali", equipoVisitanteId: "gar", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "auh", equipoVisitanteId: "cie", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "mel", equipoVisitanteId: "uni", fecha: Date(), torneo: .clausura, jornada: 8),
+//            Match(equipoLocalId: "cus", equipoVisitanteId: "cri", fecha: Date(), torneo: .clausura, jornada: 8)
+//
+//        ]
+//
+//        saveMatches(partidos) { error in
+//            if let error = error {
+//                print("Error al guardar partidos: \(error)")
+//            } else {
+//                print("Todos los partidos se guardaron correctamente")
+//            }
+//        }
+        
+    }
+    
+    func saveMatches(_ matches: [Match], completion: ((Error?) -> Void)? = nil) {
+        let db = Firestore.firestore()
+        let batch = db.batch()
+        
+        for match in matches {
+            let docRef = db.collection("matches").document(match.documentID())
+            batch.setData(match.toDictionary(), forDocument: docRef)
+        }
+        
+        batch.commit { error in
+            completion?(error)
+        }
     }
     
     // MARK: - Metodos
