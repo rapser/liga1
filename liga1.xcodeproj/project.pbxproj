@@ -22,6 +22,8 @@
 		469E542B2E75E490001ECD36 /* EquipoPeruano.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */; };
 		469E542D2E764A1A001ECD36 /* TablePosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542C2E764A19001ECD36 /* TablePosition.swift */; };
 		469E542F2E764A54001ECD36 /* TorneoType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542E2E764A53001ECD36 /* TorneoType.swift */; };
+		469E54312E765120001ECD36 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54302E76511F001ECD36 /* AppRouter.swift */; };
+		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995922C6E90EC00D4951C /* AppDelegate.swift */; };
 		46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995942C6E90EC00D4951C /* SceneDelegate.swift */; };
 		46D995972C6E90EC00D4951C /* TorneoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995962C6E90EC00D4951C /* TorneoViewController.swift */; };
@@ -55,6 +57,8 @@
 		469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoPeruano.swift; sourceTree = "<group>"; };
 		469E542C2E764A19001ECD36 /* TablePosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TablePosition.swift; sourceTree = "<group>"; };
 		469E542E2E764A53001ECD36 /* TorneoType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorneoType.swift; sourceTree = "<group>"; };
+		469E54302E76511F001ECD36 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
+		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		46D9958F2C6E90EC00D4951C /* liga1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liga1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46D995922C6E90EC00D4951C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		46D995942C6E90EC00D4951C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -135,7 +139,7 @@
 		46D995912C6E90EC00D4951C /* liga1 */ = {
 			isa = PBXGroup;
 			children = (
-				46D995C62C6EC90700D4951C /* App */,
+				46D995C62C6EC90700D4951C /* Application */,
 				46D995C82C6ECB0500D4951C /* Cell */,
 				46D995C52C6EC8FE00D4951C /* Extensions */,
 				46D995C42C6EC8F100D4951C /* Model */,
@@ -180,13 +184,15 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		46D995C62C6EC90700D4951C /* App */ = {
+		46D995C62C6EC90700D4951C /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				469E54302E76511F001ECD36 /* AppRouter.swift */,
 				46D995922C6E90EC00D4951C /* AppDelegate.swift */,
+				469E54322E765141001ECD36 /* SessionManager.swift */,
 				46D995942C6E90EC00D4951C /* SceneDelegate.swift */,
 			);
-			path = App;
+			path = Application;
 			sourceTree = "<group>";
 		};
 		46D995C72C6EC91900D4951C /* Resources */ = {
@@ -301,6 +307,7 @@
 				46D995972C6E90EC00D4951C /* TorneoViewController.swift in Sources */,
 				46D995B82C6EB18E00D4951C /* Color+Extension.swift in Sources */,
 				46D995C22C6EC7FF00D4951C /* MainTabBarController.swift in Sources */,
+				469E54332E765142001ECD36 /* SessionManager.swift in Sources */,
 				46222A512C7129A9001678DF /* Partido.swift in Sources */,
 				46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */,
 				469E542D2E764A1A001ECD36 /* TablePosition.swift in Sources */,
@@ -318,6 +325,7 @@
 				4613A7FA2CCF2B1B0070034C /* LoginViewController.swift in Sources */,
 				469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */,
 				46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */,
+				469E54312E765120001ECD36 /* AppRouter.swift in Sources */,
 				46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */,
 				469E54232E75D44D001ECD36 /* EquipoOldTableViewCell.swift in Sources */,
 				46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */,
