@@ -22,7 +22,7 @@ class MainTabBarController: UITabBarController {
         torneoVC.title = "Torneo"
         
         let matchVC = MatchesViewController()
-        matchVC.title = "Partidos"
+        matchVC.title = "Favoritos"
         
         let newsVC = NewsViewController()
         newsVC.title = "Noticias"
@@ -45,8 +45,8 @@ class MainTabBarController: UITabBarController {
         
         let matchNav = createNavController(
             rootViewController: matchVC,
-            title: "partido",
-            imageSystemName: "figure.soccer"
+            title: "favoritos",
+            imageSystemName: "star"
         )
         
         let newsNav = createNavController(

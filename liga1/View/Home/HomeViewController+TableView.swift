@@ -35,35 +35,32 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     // Header
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
-        view.backgroundColor = .white
-        
+        view.backgroundColor = .systemBackground
+
         let fechaLabel = UILabel()
         fechaLabel.font = .boldSystemFont(ofSize: 18)
-        fechaLabel.textColor = .black
+        fechaLabel.textColor = .label
         fechaLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM."
-        fechaLabel.text = "Hoy \(formatter.string(from: Date()))"
-        
+        fechaLabel.text = "Fecha 8"
+
         let torneoLabel = UILabel()
         torneoLabel.font = .systemFont(ofSize: 14)
-        torneoLabel.textColor = .darkGray
+        torneoLabel.textColor = .secondaryLabel
         torneoLabel.translatesAutoresizingMaskIntoConstraints = false
-        torneoLabel.text = "Liga 1 - Clausura"
-        
+        torneoLabel.text = "Liga 1 - Clausura 2025"
+
         view.addSubview(fechaLabel)
         view.addSubview(torneoLabel)
-        
+
         NSLayoutConstraint.activate([
             fechaLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             fechaLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 8),
-            
+
             torneoLabel.leadingAnchor.constraint(equalTo: fechaLabel.leadingAnchor),
             torneoLabel.topAnchor.constraint(equalTo: fechaLabel.bottomAnchor, constant: 4),
             torneoLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -8)
         ])
-        
+
         return view
     }
     

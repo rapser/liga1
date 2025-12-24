@@ -36,12 +36,12 @@ class HomeViewController: UIViewController {
     // MARK: - Firestore
     func fetchMatchesForToday() {
         let db = Firestore.firestore()
-        let today = Calendar.current.startOfDay(for: Date())
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
-        
+
+        // Cargar todos los partidos de la jornada 8 del torneo Clausura
         db.collection("matches")
-            .whereField("fecha", isGreaterThanOrEqualTo: Timestamp(date: today))
-            .whereField("fecha", isLessThan: Timestamp(date: tomorrow))
+            .whereField("jornada", isEqualTo: 8)
+            .whereField("torneo", isEqualTo: "clausura")
+            .order(by: "fecha")
             .getDocuments { snapshot, error in
                 if let error = error {
                     print("Error fetching matches: \(error)")
