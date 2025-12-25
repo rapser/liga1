@@ -99,7 +99,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
-            return 340 // NewsHeaderView
+            return 380 // NewsHeaderView
         } else {
             return 90 // NewsCell
         }
