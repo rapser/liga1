@@ -15,11 +15,11 @@ class NewsViewController: UIViewController {
     var featuredNews: [NewsItem] = []
     var groupedNews: [String: [NewsItem]] = [:]
 
-    private let tableView = UITableView(frame: .zero, style: .grouped)
+    private let tableView = UITableView(frame: .zero, style: .plain)
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         title = "Noticias"
 
         setupTableView()
@@ -28,6 +28,7 @@ class NewsViewController: UIViewController {
 
     private func setupTableView() {
         view.addSubview(tableView)
+        tableView.backgroundColor = .systemBackground
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -40,7 +41,10 @@ class NewsViewController: UIViewController {
         tableView.dataSource = self
 
         tableView.register(NewsCell.self, forCellReuseIdentifier: "NewsCell")
-        tableView.estimatedSectionHeaderHeight = 220
+        tableView.register(FeaturedNewsContentCell.self, forCellReuseIdentifier: FeaturedNewsContentCell.reuseIdentifier)
+        tableView.register(FeaturedNewsTitleHeaderView.self, forHeaderFooterViewReuseIdentifier: FeaturedNewsTitleHeaderView.reuseIdentifier)
+        tableView.register(CategoryHeaderView.self, forHeaderFooterViewReuseIdentifier: CategoryHeaderView.reuseIdentifier)
+        tableView.estimatedSectionHeaderHeight = 40
         tableView.sectionHeaderHeight = UITableView.automaticDimension
     }
 

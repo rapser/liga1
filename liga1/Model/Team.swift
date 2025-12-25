@@ -7,19 +7,19 @@
 
 import Foundation
 
-struct Team {
-    let nombre: String
-    let ciudad: String
-    let estadio: String
-    let logo: String
-    let partidosJugados: Int
-    let partidosGanados: Int
-    let partidosEmpatados: Int
-    let partidosPerdidos: Int
-    let golesFavor: Int
-    let golesContra: Int
-    let diferenciaGoles: Int
-    let puntos: Int
+struct Team: Codable {
+    var nombre: String
+    var ciudad: String
+    var estadio: String
+    var logo: String
+    var partidosJugados: Int
+    var partidosGanados: Int
+    var partidosEmpatados: Int
+    var partidosPerdidos: Int
+    var golesFavor: Int
+    var golesContra: Int
+    var diferenciaGoles: Int
+    var puntos: Int
 
     init(nombre: String = "Sin nombre",
          ciudad: String = "Sin ciudad",

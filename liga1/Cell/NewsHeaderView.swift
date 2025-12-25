@@ -10,79 +10,44 @@ import Kingfisher
 
 class NewsHeaderView: UIView {
 
-    private let sectionLabel = UILabel()
     private let newsImageView = UIImageView()
     private let titleLabel = UILabel()
-    private let categoriaLabel = UILabel()
-    private let fechaLabel = UILabel()
 
     init(item: NewsItem, sectionTitle: String) {
         super.init(frame: .zero)
+        backgroundColor = .systemBackground
 
-        // Imagen
+        // Imagen con padding de 16 a los lados
         newsImageView.contentMode = .scaleAspectFill
         newsImageView.clipsToBounds = true
+        newsImageView.layer.cornerRadius = 8
         newsImageView.translatesAutoresizingMaskIntoConstraints = false
         if let url = URL(string: item.imageUrl) {
             newsImageView.kf.setImage(with: url)
         }
 
-        // Fondo para destacar
-        if item.destacada {
-            backgroundColor = UIColor(red: 1, green: 0.95, blue: 0.8, alpha: 1)
-        }
-
-        // Sección
-        sectionLabel.font = .boldSystemFont(ofSize: 14)
-        sectionLabel.text = sectionTitle
-        sectionLabel.translatesAutoresizingMaskIntoConstraints = false
-
-        // Título
-        titleLabel.font = .boldSystemFont(ofSize: 20)
+        // Título con máximo 3 líneas y padding 16
+        titleLabel.font = .boldSystemFont(ofSize: 18)
         titleLabel.numberOfLines = 3
         titleLabel.text = item.title
+        titleLabel.textColor = .label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        // Categoría
-        categoriaLabel.font = .boldSystemFont(ofSize: 14)
-        categoriaLabel.text = item.categoria
-        categoriaLabel.translatesAutoresizingMaskIntoConstraints = false
-
-        // Fecha
-        fechaLabel.font = .systemFont(ofSize: 12)
-        fechaLabel.textColor = .gray
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        fechaLabel.text = formatter.string(from: item.fecha)
-        fechaLabel.translatesAutoresizingMaskIntoConstraints = false
-
         addSubview(newsImageView)
-        addSubview(sectionLabel)
         addSubview(titleLabel)
-        addSubview(categoriaLabel)
-        addSubview(fechaLabel)
 
         NSLayoutConstraint.activate([
-            // Imagen ocupa todo el top y ancho
-            newsImageView.topAnchor.constraint(equalTo: topAnchor),
-            newsImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            newsImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            // Imagen con padding 16 izquierda/derecha desde arriba
+            newsImageView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            newsImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            newsImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            newsImageView.heightAnchor.constraint(equalToConstant: 240),
 
-            // Sección y títulos debajo de la imagen
-            sectionLabel.topAnchor.constraint(equalTo: newsImageView.bottomAnchor, constant: 8),
-            sectionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-
-            titleLabel.topAnchor.constraint(equalTo: sectionLabel.bottomAnchor, constant: 4),
+            // Título con padding 16 y máximo 3 líneas
+            titleLabel.topAnchor.constraint(equalTo: newsImageView.bottomAnchor, constant: 8),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-
-            categoriaLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            categoriaLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-
-            fechaLabel.centerYAnchor.constraint(equalTo: categoriaLabel.centerYAnchor),
-            fechaLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            fechaLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
         ])
     }
 

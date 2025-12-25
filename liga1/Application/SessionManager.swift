@@ -14,7 +14,7 @@ final class SessionManager {
     private init() {}
     
     private var inactivityTimer: Timer?
-    private let inactivityTimeLimit: TimeInterval = 600 // 10 minutos
+    private let inactivityTimeLimit: TimeInterval = 432000 // 5 días (5 * 24 * 60 * 60)
     
     weak var window: UIWindow?
     

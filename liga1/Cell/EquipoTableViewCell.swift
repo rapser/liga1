@@ -39,7 +39,7 @@ class EquipoTableViewCell: UITableViewCell {
     private let puntosLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
-        label.textColor = .black
+        label.textColor = .label
         label.textAlignment = .center
         return label
     }()
@@ -58,19 +58,19 @@ class EquipoTableViewCell: UITableViewCell {
         stackView.alignment = .center
         stackView.spacing = 4
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         // Equipo stack → logo + nombre
         let equipoStack = UIStackView(arrangedSubviews: [logoImageView, nombreLabel])
         equipoStack.axis = .horizontal
         equipoStack.spacing = 4
         equipoStack.alignment = .center
-        
+
         stackView.addArrangedSubview(posicionLabel)
         stackView.addArrangedSubview(equipoStack)
         stackView.addArrangedSubview(partidosJugadosLabel)
         stackView.addArrangedSubview(golesLabel)
         stackView.addArrangedSubview(puntosLabel)
-        
+
         contentView.addSubview(stackView)
         
         NSLayoutConstraint.activate([
@@ -89,8 +89,18 @@ class EquipoTableViewCell: UITableViewCell {
         ])
     }
     
-    func configure(with model: Team, position: Int) {
+    func configure(with model: Team, position: Int, positionColor: UIColor? = nil) {
         posicionLabel.text = "\(position)."
+
+        // Aplicar color a la posición si se proporciona (modo oscuro)
+        if let color = positionColor {
+            posicionLabel.textColor = color
+            posicionLabel.font = UIFont.boldSystemFont(ofSize: 14)
+        } else {
+            posicionLabel.textColor = .label
+            posicionLabel.font = UIFont.systemFont(ofSize: 12)
+        }
+
         logoImageView.image = UIImage(named: model.logo)
         nombreLabel.text = model.nombre
         partidosJugadosLabel.text = "\(model.partidosJugados)"

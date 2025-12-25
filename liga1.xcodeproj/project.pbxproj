@@ -16,7 +16,11 @@
 		46222A532C712CBA001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A522C712CBA001678DF /* FirebaseDatabase */; };
 		46222A552C712D15001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A542C712D15001678DF /* FirebaseDatabase */; };
 		46222A572C712D15001678DF /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A562C712D15001678DF /* FirebaseInstallations */; };
-		469E54252E75D84C001ECD36 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 469E54242E75D84C001ECD36 /* GoogleService-Info.plist */; };
+		4635E3672EFDE393004A541C /* Jornada.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4635E3662EFDE393004A541C /* Jornada.swift */; };
+		4635E3692EFDEF93004A541C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4635E3682EFDEF93004A541C /* GoogleService-Info.plist */; };
+		4636E0A02E772827009CCB4B /* MatchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4636E09F2E772826009CCB4B /* MatchCell.swift */; };
+		4688774F2EFCAF4C00FD1B90 /* FavoritosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */; };
+		468877522EFCAFB200FD1B90 /* FavoritesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468877502EFCAFB200FD1B90 /* FavoritesManager.swift */; };
 		469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */; };
 		469E542B2E75E490001ECD36 /* EquipoPeruano.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */; };
 		469E542D2E764A1A001ECD36 /* TablePosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542C2E764A19001ECD36 /* TablePosition.swift */; };
@@ -58,7 +62,12 @@
 		4613A7F92CCF2B1B0070034C /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		4613A7FB2CCF2D8D0070034C /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		46222A502C7129A9001678DF /* Partido.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Partido.swift; sourceTree = "<group>"; };
-		469E54242E75D84C001ECD36 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4635E3662EFDE393004A541C /* Jornada.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jornada.swift; sourceTree = "<group>"; };
+		4635E3682EFDEF93004A541C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4636E09F2E772826009CCB4B /* MatchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCell.swift; sourceTree = "<group>"; };
+		4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesViewController.swift; sourceTree = "<group>"; };
+		4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosViewController.swift; sourceTree = "<group>"; };
+		468877502EFCAFB200FD1B90 /* FavoritesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesManager.swift; sourceTree = "<group>"; };
 		469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
 		469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoPeruano.swift; sourceTree = "<group>"; };
 		469E542C2E764A19001ECD36 /* TablePosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TablePosition.swift; sourceTree = "<group>"; };
@@ -115,6 +124,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4688774E2EFCAF4C00FD1B90 /* Favoritos */ = {
+			isa = PBXGroup;
+			children = (
+				4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */,
+			);
+			path = Favoritos;
+			sourceTree = "<group>";
+		};
+		468877512EFCAFB200FD1B90 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				468877502EFCAFB200FD1B90 /* FavoritesManager.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		469E54282E75E3B0001ECD36 /* Tabla */ = {
 			isa = PBXGroup;
 			children = (
@@ -181,6 +206,7 @@
 		469E543B2E766914001ECD36 /* Matches */ = {
 			isa = PBXGroup;
 			children = (
+				4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */,
 				46D995BD2C6EC01800D4951C /* PartidoViewController.swift */,
 			);
 			path = Matches;
@@ -205,6 +231,7 @@
 		46D995912C6E90EC00D4951C /* liga1 */ = {
 			isa = PBXGroup;
 			children = (
+				468877512EFCAFB200FD1B90 /* Manager */,
 				46D995C62C6EC90700D4951C /* Application */,
 				46D995C82C6ECB0500D4951C /* Cell */,
 				46D995C52C6EC8FE00D4951C /* Extensions */,
@@ -219,6 +246,7 @@
 		46D995C32C6EC8D300D4951C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4688774E2EFCAF4C00FD1B90 /* Favoritos */,
 				469E54362E7667B5001ECD36 /* Login */,
 				469E54352E7667A8001ECD36 /* TabBar */,
 				469E54342E766784001ECD36 /* Home */,
@@ -233,6 +261,7 @@
 		46D995C42C6EC8F100D4951C /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4635E3662EFDE393004A541C /* Jornada.swift */,
 				469E544B2E7698C7001ECD36 /* Match.swift */,
 				469E543E2E766CE2001ECD36 /* NewsItem.swift */,
 				46D995B52C6EA6E600D4951C /* Team.swift */,
@@ -268,7 +297,7 @@
 				46D995A02C6E90EE00D4951C /* Info.plist */,
 				46D9959D2C6E90EE00D4951C /* LaunchScreen.storyboard */,
 				46D9959B2C6E90EE00D4951C /* Assets.xcassets */,
-				469E54242E75D84C001ECD36 /* GoogleService-Info.plist */,
+				4635E3682EFDEF93004A541C /* GoogleService-Info.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -276,6 +305,7 @@
 		46D995C82C6ECB0500D4951C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				4636E09F2E772826009CCB4B /* MatchCell.swift */,
 				469E544E2E76A337001ECD36 /* MatchTableViewCell.swift */,
 				469E54432E7671FB001ECD36 /* NewsHeaderView.swift */,
 				469E543C2E766CBC001ECD36 /* NewsCell.swift */,
@@ -363,7 +393,7 @@
 			files = (
 				46D9959C2C6E90EE00D4951C /* Assets.xcassets in Resources */,
 				46D9959F2C6E90EE00D4951C /* Base in Resources */,
-				469E54252E75D84C001ECD36 /* GoogleService-Info.plist in Resources */,
+				4635E3692EFDEF93004A541C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,16 +422,20 @@
 				469E542F2E764A54001ECD36 /* TorneoType.swift in Sources */,
 				46D995BC2C6EC00A00D4951C /* HomeViewController.swift in Sources */,
 				469E54512E76A6DE001ECD36 /* HomeViewController+TableView.swift in Sources */,
+				4688774F2EFCAF4C00FD1B90 /* FavoritosViewController.swift in Sources */,
 				46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */,
 				46D995B42C6EA6C100D4951C /* EquipoTableViewCell.swift in Sources */,
 				4613A7FA2CCF2B1B0070034C /* LoginViewController.swift in Sources */,
 				469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */,
 				469E54442E7671FC001ECD36 /* NewsHeaderView.swift in Sources */,
+				4636E0A02E772827009CCB4B /* MatchCell.swift in Sources */,
 				46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */,
 				469E544C2E7698C9001ECD36 /* Match.swift in Sources */,
 				469E54312E765120001ECD36 /* AppRouter.swift in Sources */,
 				46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */,
 				469E54482E768C05001ECD36 /* NewsHeaderWrapperCell.swift in Sources */,
+				4635E3672EFDE393004A541C /* Jornada.swift in Sources */,
+				468877522EFCAFB200FD1B90 /* FavoritesManager.swift in Sources */,
 				469E543D2E766CBD001ECD36 /* NewsCell.swift in Sources */,
 				469E543F2E766CE3001ECD36 /* NewsItem.swift in Sources */,
 				46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */,
@@ -548,8 +582,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -562,8 +598,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = pe.rapser.liga1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rapser.liga1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -575,8 +612,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -589,8 +628,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = pe.rapser.liga1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rapser.liga1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

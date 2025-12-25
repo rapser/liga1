@@ -20,13 +20,13 @@ class HeaderView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .white
+        backgroundColor = .systemBackground
         setupUI()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        backgroundColor = .white
+        backgroundColor = .systemBackground
         setupUI()
     }
     
