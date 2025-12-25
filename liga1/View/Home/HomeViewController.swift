@@ -66,50 +66,62 @@ class HomeViewController: UIViewController {
     func fetchMatchesForToday() {
         let db = Firestore.firestore()
 
-        // DEBUG: Primero ver qué hay en la colección
-        db.collection("matches").limit(to: 3).getDocuments { snapshot, error in
-            if let docs = snapshot?.documents {
-                print("🔍 DEBUG - Primeros 3 documentos en 'matches':")
-                for doc in docs {
-                    print("  - ID: \(doc.documentID)")
-                    print("    Data: \(doc.data())")
-                }
-            }
-        }
-
         // Cargar todos los partidos de la jornada 8 del torneo Clausura
+        // Usar getDocuments(source: .cache) primero para carga instantánea
         db.collection("matches")
             .whereField("jornada", isEqualTo: 8)
             .whereField("torneo", isEqualTo: "clausura")
             .order(by: "fecha")
-            .getDocuments { [weak self] snapshot, error in
+            .getDocuments(source: .cache) { [weak self] snapshot, error in
                 guard let self = self else { return }
 
-                if let error = error {
-                    print("❌ Error fetching matches: \(error)")
-                    print("❌ Error localizedDescription: \(error.localizedDescription)")
-                    return
+                // Si hay datos en caché, cargarlos inmediatamente
+                if let documents = snapshot?.documents, !documents.isEmpty {
+                    self.matches = documents.compactMap { doc in
+                        return try? doc.data(as: Match.self)
+                    }
+                    print("✅ Partidos cargados desde caché: \(self.matches.count)")
+                    self.updateMatchesFavoriteStatus()
+
+                    // Asegurar que la tabla se actualice aunque no haya favoritos
+                    if self.favoriteMatchIds.isEmpty {
+                        self.tableView.reloadData()
+                    }
                 }
 
-                print("📦 Total documentos encontrados: \(snapshot?.documents.count ?? 0)")
+                // Luego, consultar el servidor en segundo plano para actualizaciones
+                db.collection("matches")
+                    .whereField("jornada", isEqualTo: 8)
+                    .whereField("torneo", isEqualTo: "clausura")
+                    .order(by: "fecha")
+                    .getDocuments(source: .server) { [weak self] serverSnapshot, serverError in
+                        guard let self = self else { return }
 
-                guard let documents = snapshot?.documents else {
-                    print("⚠️ No hay documentos en snapshot")
-                    return
-                }
+                        if let serverError = serverError {
+                            print("⚠️ Error al actualizar desde servidor: \(serverError.localizedDescription)")
+                            // Si no hay conexión, no pasa nada, ya tenemos datos del caché
+                            return
+                        }
 
-                self.matches = documents.compactMap { doc in
-                    print("📄 Procesando doc: \(doc.documentID)")
-                    return try? doc.data(as: Match.self)
-                }
+                        guard let serverDocuments = serverSnapshot?.documents, !serverDocuments.isEmpty else {
+                            return
+                        }
 
-                print("✅ Partidos cargados: \(self.matches.count)")
-                self.updateMatchesFavoriteStatus()
+                        let serverMatches = serverDocuments.compactMap { doc in
+                            return try? doc.data(as: Match.self)
+                        }
 
-                // Asegurar que la tabla se actualice aunque no haya favoritos
-                if self.favoriteMatchIds.isEmpty {
-                    self.tableView.reloadData()
-                }
+                        // Solo actualizar si hay cambios
+                        if serverMatches.count != self.matches.count {
+                            self.matches = serverMatches
+                            print("🔄 Partidos actualizados desde servidor: \(self.matches.count)")
+                            self.updateMatchesFavoriteStatus()
+
+                            if self.favoriteMatchIds.isEmpty {
+                                self.tableView.reloadData()
+                            }
+                        }
+                    }
             }
     }
 
