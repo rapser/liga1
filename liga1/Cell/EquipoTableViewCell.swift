@@ -89,8 +89,18 @@ class EquipoTableViewCell: UITableViewCell {
         ])
     }
     
-    func configure(with model: Team, position: Int) {
+    func configure(with model: Team, position: Int, positionColor: UIColor? = nil) {
         posicionLabel.text = "\(position)."
+
+        // Aplicar color a la posición si se proporciona (modo oscuro)
+        if let color = positionColor {
+            posicionLabel.textColor = color
+            posicionLabel.font = UIFont.boldSystemFont(ofSize: 14)
+        } else {
+            posicionLabel.textColor = .label
+            posicionLabel.font = UIFont.systemFont(ofSize: 12)
+        }
+
         logoImageView.image = UIImage(named: model.logo)
         nombreLabel.text = model.nombre
         partidosJugadosLabel.text = "\(model.partidosJugados)"
