@@ -16,13 +16,27 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "EquipoCell", for: indexPath) as! EquipoTableViewCell
         let equipo = equiposMostrados[indexPath.row]
-        
-        cell.configure(with: equipo, position: indexPath.row + 1)
+
+        let position = determinePosition(for: indexPath.row)
+        let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark
+
+        // En modo oscuro, solo colorear posiciones importantes (no las normales)
+        var positionColor: UIColor? = nil
+        if isDarkMode && position != .normal {
+            positionColor = position.backgroundColor
+        }
+
+        cell.configure(with: equipo, position: indexPath.row + 1, positionColor: positionColor)
         cell.backgroundColor = backgroundColorForPosition(at: indexPath)
         return cell
     }
     
     private func backgroundColorForPosition(at indexPath: IndexPath) -> UIColor {
+        // En modo oscuro, usar fondo uniforme sin colores de posición
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return .systemBackground
+        }
+
         let position = determinePosition(for: indexPath.row)
         return position.backgroundColor
     }
