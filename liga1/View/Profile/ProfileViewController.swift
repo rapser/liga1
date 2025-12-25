@@ -107,18 +107,15 @@ class ProfileViewController: UIViewController {
                                                 preferredStyle: .actionSheet)
 
         alertController.addAction(UIAlertAction(title: "Claro", style: .default, handler: { _ in
-            self.overrideUserInterfaceStyle = .light
-            print("Modo Claro activado")
+            self.setAppTheme(.light)
         }))
 
         alertController.addAction(UIAlertAction(title: "Oscuro", style: .default, handler: { _ in
-            self.overrideUserInterfaceStyle = .dark
-            print("Modo Oscuro activado")
+            self.setAppTheme(.dark)
         }))
 
         alertController.addAction(UIAlertAction(title: "Automático", style: .default, handler: { _ in
-            self.overrideUserInterfaceStyle = .unspecified
-            print("Modo Automático activado")
+            self.setAppTheme(.unspecified)
         }))
 
         alertController.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: nil))
@@ -128,6 +125,22 @@ class ProfileViewController: UIViewController {
         }
 
         present(alertController, animated: true, completion: nil)
+    }
+
+    private func setAppTheme(_ style: UIUserInterfaceStyle) {
+        // Guardar preferencia en UserDefaults
+        UserDefaults.standard.set(style.rawValue, forKey: "userInterfaceStyle")
+
+        // Aplicar el tema a toda la app (window)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                window.overrideUserInterfaceStyle = style
+            }, completion: nil)
+        }
+
+        let themeName = style == .light ? "Claro" : (style == .dark ? "Oscuro" : "Automático")
+        print("Modo \(themeName) activado")
     }
 
     // MARK: - Logout

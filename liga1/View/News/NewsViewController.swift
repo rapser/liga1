@@ -15,11 +15,11 @@ class NewsViewController: UIViewController {
     var featuredNews: [NewsItem] = []
     var groupedNews: [String: [NewsItem]] = [:]
 
-    private let tableView = UITableView(frame: .zero, style: .grouped)
+    private let tableView = UITableView(frame: .zero, style: .plain)
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         title = "Noticias"
 
         setupTableView()
@@ -28,6 +28,7 @@ class NewsViewController: UIViewController {
 
     private func setupTableView() {
         view.addSubview(tableView)
+        tableView.backgroundColor = .systemBackground
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),

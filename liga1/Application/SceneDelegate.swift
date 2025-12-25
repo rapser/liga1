@@ -16,15 +16,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene,
                willConnectTo session: UISceneSession,
                options connectionOptions: UIScene.ConnectionOptions) {
-        
+
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         self.window = window
-        
+
+        // Configurar color de tint global de la app
+        window.tintColor = .liga1Red
+
+        // Aplicar modo oscuro por defecto
+        window.overrideUserInterfaceStyle = .dark
+
         // Configurar singletons
         AppRouter.shared.configure(window: window)
         SessionManager.shared.configure(with: window)
-        
+
         // Mostrar pantalla inicial
         AppRouter.shared.setInitialViewController()
         window.makeKeyAndVisible()

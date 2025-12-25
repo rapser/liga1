@@ -72,7 +72,7 @@ class NewsCell: UITableViewCell {
         if item.destacada {
             contentView.backgroundColor = UIColor(red: 1, green: 0.95, blue: 0.8, alpha: 1)
         } else {
-            contentView.backgroundColor = .white
+            contentView.backgroundColor = .systemBackground
         }
     }
 }

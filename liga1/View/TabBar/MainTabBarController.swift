@@ -11,13 +11,14 @@ import UIKit
 class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        configureNavigationBarAppearance()
         configureTabBarAppearance()
-        
+
         // Configuración de los tabs
         let homeVC = HomeViewController()
         homeVC.title = "Home"
-        
+
         let torneoVC = TorneoViewController()
         torneoVC.title = "Torneo"
 
@@ -26,17 +27,17 @@ class MainTabBarController: UITabBarController {
 
         let newsVC = NewsViewController()
         newsVC.title = "Noticias"
-        
+
         let perfilVC = ProfileViewController()
         perfilVC.title = "Mi Perfil"
-        
+
         // Crear NavControllers con estilo Large Title
         let homeNav = createNavController(
             rootViewController: homeVC,
             title: "home",
             imageSystemName: "house"
         )
-        
+
         let torneoNav = createNavController(
             rootViewController: torneoVC,
             title: "torneo",
@@ -53,7 +54,7 @@ class MainTabBarController: UITabBarController {
             rootViewController: newsVC,
             title: "noticias",
             imageSystemName: "newspaper")
-        
+
         let perfilNav = createNavController(
             rootViewController: perfilVC,
             title: "perfil",
@@ -63,15 +64,38 @@ class MainTabBarController: UITabBarController {
         viewControllers = [homeNav, torneoNav, favoritosNav, newsNav, perfilNav]
     }
     
+    private func configureNavigationBarAppearance() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = .systemBackground
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().tintColor = .liga1Red
+    }
+
     private func configureTabBarAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
-        appearance.backgroundColor = .white
-        
+        appearance.backgroundColor = .systemBackground
+
+        // Configurar color del item seleccionado (rojo Liga 1)
+        let selectedItemAppearance = UITabBarItemAppearance()
+        selectedItemAppearance.selected.iconColor = .liga1Red
+        selectedItemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.liga1Red]
+
+        appearance.stackedLayoutAppearance = selectedItemAppearance
+        appearance.inlineLayoutAppearance = selectedItemAppearance
+        appearance.compactInlineLayoutAppearance = selectedItemAppearance
+
         tabBar.standardAppearance = appearance
         tabBar.scrollEdgeAppearance = appearance
         tabBar.isTranslucent = false
-        tabBar.barTintColor = .white
+        tabBar.tintColor = .liga1Red // Color para items seleccionados
+        tabBar.unselectedItemTintColor = .systemGray // Color para items no seleccionados
     }
     
     private func createNavController(rootViewController: UIViewController,
@@ -79,7 +103,7 @@ class MainTabBarController: UITabBarController {
                                      imageSystemName: String) -> UINavigationController {
         let nav = UINavigationController(rootViewController: rootViewController)
         nav.navigationBar.prefersLargeTitles = true
-        rootViewController.view.backgroundColor = .white
+        rootViewController.view.backgroundColor = .systemBackground
         rootViewController.tabBarItem = UITabBarItem(title: title,
                                                      image: UIImage(systemName: imageSystemName),
                                                      tag: 0)

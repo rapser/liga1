@@ -28,7 +28,7 @@ enum TablePosition {
         case .descenso:
             return .relegationRed
         case .normal:
-            return .white
+            return .systemBackground
         }
     }
     

@@ -10,17 +10,18 @@ import FirebaseFirestore
 
 class HomeViewController: UIViewController {
 
-    let tableView = UITableView(frame: .zero, style: .grouped)
+    let tableView = UITableView(frame: .zero, style: .plain)
     var matches: [Match] = []
     var favoriteMatchIds: Set<String> = []
     var favoritesListener: ListenerRegistration?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        
+        view.backgroundColor = .systemBackground
+
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.backgroundColor = .systemBackground
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)

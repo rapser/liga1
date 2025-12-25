@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 class FavoritosViewController: UIViewController {
 
-    let tableView = UITableView(frame: .zero, style: .grouped)
+    let tableView = UITableView(frame: .zero, style: .plain)
     var matches: [Match] = []
     var favoriteMatchIds: Set<String> = []
     var favoritesListener: ListenerRegistration?
@@ -45,6 +45,7 @@ class FavoritosViewController: UIViewController {
     private func setupTableView() {
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.backgroundColor = .systemBackground
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
