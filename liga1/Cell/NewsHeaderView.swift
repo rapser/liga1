@@ -45,19 +45,19 @@ class NewsHeaderView: UIView {
         addSubview(titleLabel)
 
         NSLayoutConstraint.activate([
-            // "NOTICIA DESTACADA" arriba con padding 16
-            destacadaLabel.topAnchor.constraint(equalTo: topAnchor, constant: 12),
+            // "NOTICIA DESTACADA" con padding superior aumentado
+            destacadaLabel.topAnchor.constraint(equalTo: topAnchor, constant: 16),
             destacadaLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             destacadaLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
 
-            // Imagen con padding 16 izquierda/derecha
-            newsImageView.topAnchor.constraint(equalTo: destacadaLabel.bottomAnchor, constant: 12),
+            // Imagen con padding 16 izquierda/derecha y 8px desde label
+            newsImageView.topAnchor.constraint(equalTo: destacadaLabel.bottomAnchor, constant: 8),
             newsImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             newsImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             newsImageView.heightAnchor.constraint(equalToConstant: 240),
 
             // Título con padding 16 y máximo 3 líneas
-            titleLabel.topAnchor.constraint(equalTo: newsImageView.bottomAnchor, constant: 12),
+            titleLabel.topAnchor.constraint(equalTo: newsImageView.bottomAnchor, constant: 8),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)

@@ -40,7 +40,9 @@ class NewsViewController: UIViewController {
         tableView.dataSource = self
 
         tableView.register(NewsCell.self, forCellReuseIdentifier: "NewsCell")
-        tableView.estimatedSectionHeaderHeight = 220
+        tableView.register(FeaturedNewsHeaderView.self, forHeaderFooterViewReuseIdentifier: FeaturedNewsHeaderView.reuseIdentifier)
+        tableView.register(CategoryHeaderView.self, forHeaderFooterViewReuseIdentifier: CategoryHeaderView.reuseIdentifier)
+        tableView.estimatedSectionHeaderHeight = 360
         tableView.sectionHeaderHeight = UITableView.automaticDimension
     }
 
