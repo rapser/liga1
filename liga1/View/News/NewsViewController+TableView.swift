@@ -25,37 +25,39 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        // No mostrar header para sección destacada (ya tiene su propio label integrado)
+        if section == 0 {
+            return nil
+        }
+
         let container = UIView()
         container.backgroundColor = .white
-        
+
         let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: 12, weight: .semibold)
+        label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(label)
-        
+
         NSLayoutConstraint.activate([
             label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 16),
             label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16),
-            label.topAnchor.constraint(equalTo: container.topAnchor, constant: 4),
-            label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -4)
+            label.topAnchor.constraint(equalTo: container.topAnchor, constant: 12),
+            label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -8)
         ])
-        
-        if section == 0 {
-            label.text = "Noticias Destacadas"
-        } else {
-            let categorias = Array(groupedNews.keys)
-            let categoria = categorias[section - 1]
-            label.text = categoria
-        }
-        
+
+        let categorias = Array(groupedNews.keys)
+        let categoria = categorias[section - 1]
+        label.text = categoria.uppercased()
+
         return container
     }
-    
+
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 0 {
-            return 40 // Altura para "Noticias Destacadas"
+            return 0 // Sin header para sección destacada
         } else {
-            return 30 // Altura para categorías normales
+            return 40 // Altura para categorías (Liga 1, etc)
         }
     }
 

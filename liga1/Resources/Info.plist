@@ -2,32 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
-    <!-- Google Sign-In: Client ID de iOS -->
-    <key>GIDClientID</key>
-    <string>104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn.apps.googleusercontent.com</string>
-    
-    <!-- Google Sign-In: reversed client ID -->
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>com.googleusercontent.apps.104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn</string>
-            </array>
-        </dict>
-    </array>
-    
-    <!-- Necesario para iOS 9+ cuando usas SafariViewController -->
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>google</string>
-        <string>com.googleusercontent.apps.104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn</string>
-    </array>
-    
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn</string>
+			</array>
+		</dict>
+	</array>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>GIDClientID</key>
+	<string>104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn.apps.googleusercontent.com</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>google</string>
+		<string>com.googleusercontent.apps.104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

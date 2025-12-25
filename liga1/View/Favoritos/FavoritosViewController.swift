@@ -2,7 +2,7 @@
 //  FavoritosViewController.swift
 //  liga1
 //
-//  Created by Claude on 24/12/24.
+//  Created by miguel tomairo on 24/12/24.
 //
 
 import UIKit
