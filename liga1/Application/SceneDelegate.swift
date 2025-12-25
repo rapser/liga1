@@ -24,8 +24,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Configurar color de tint global de la app
         window.tintColor = .liga1Red
 
-        // Aplicar modo oscuro por defecto
-        window.overrideUserInterfaceStyle = .dark
+        // Cargar preferencia de tema guardada (o usar automático por defecto)
+        let savedStyle = UserDefaults.standard.integer(forKey: "userInterfaceStyle")
+        window.overrideUserInterfaceStyle = UIUserInterfaceStyle(rawValue: savedStyle) ?? .unspecified
 
         // Configurar singletons
         AppRouter.shared.configure(window: window)
