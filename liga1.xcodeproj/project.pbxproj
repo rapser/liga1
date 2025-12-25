@@ -18,6 +18,8 @@
 		46222A572C712D15001678DF /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A562C712D15001678DF /* FirebaseInstallations */; };
 		4636E0A02E772827009CCB4B /* MatchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4636E09F2E772826009CCB4B /* MatchCell.swift */; };
 		4636E0A22E7728EA009CCB4B /* MatchesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */; };
+		4688774F2EFCAF4C00FD1B90 /* FavoritosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */; };
+		468877522EFCAFB200FD1B90 /* FavoritesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468877502EFCAFB200FD1B90 /* FavoritesManager.swift */; };
 		469E54252E75D84C001ECD36 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 469E54242E75D84C001ECD36 /* GoogleService-Info.plist */; };
 		469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */; };
 		469E542B2E75E490001ECD36 /* EquipoPeruano.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */; };
@@ -62,6 +64,8 @@
 		46222A502C7129A9001678DF /* Partido.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Partido.swift; sourceTree = "<group>"; };
 		4636E09F2E772826009CCB4B /* MatchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCell.swift; sourceTree = "<group>"; };
 		4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesViewController.swift; sourceTree = "<group>"; };
+		4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosViewController.swift; sourceTree = "<group>"; };
+		468877502EFCAFB200FD1B90 /* FavoritesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesManager.swift; sourceTree = "<group>"; };
 		469E54242E75D84C001ECD36 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
 		469E542A2E75E48E001ECD36 /* EquipoPeruano.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoPeruano.swift; sourceTree = "<group>"; };
@@ -119,6 +123,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4688774E2EFCAF4C00FD1B90 /* Favoritos */ = {
+			isa = PBXGroup;
+			children = (
+				4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */,
+			);
+			path = Favoritos;
+			sourceTree = "<group>";
+		};
+		468877512EFCAFB200FD1B90 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				468877502EFCAFB200FD1B90 /* FavoritesManager.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		469E54282E75E3B0001ECD36 /* Tabla */ = {
 			isa = PBXGroup;
 			children = (
@@ -210,6 +230,7 @@
 		46D995912C6E90EC00D4951C /* liga1 */ = {
 			isa = PBXGroup;
 			children = (
+				468877512EFCAFB200FD1B90 /* Manager */,
 				46D995C62C6EC90700D4951C /* Application */,
 				46D995C82C6ECB0500D4951C /* Cell */,
 				46D995C52C6EC8FE00D4951C /* Extensions */,
@@ -224,6 +245,7 @@
 		46D995C32C6EC8D300D4951C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4688774E2EFCAF4C00FD1B90 /* Favoritos */,
 				469E54362E7667B5001ECD36 /* Login */,
 				469E54352E7667A8001ECD36 /* TabBar */,
 				469E54342E766784001ECD36 /* Home */,
@@ -398,6 +420,7 @@
 				469E542F2E764A54001ECD36 /* TorneoType.swift in Sources */,
 				46D995BC2C6EC00A00D4951C /* HomeViewController.swift in Sources */,
 				469E54512E76A6DE001ECD36 /* HomeViewController+TableView.swift in Sources */,
+				4688774F2EFCAF4C00FD1B90 /* FavoritosViewController.swift in Sources */,
 				46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */,
 				46D995B42C6EA6C100D4951C /* EquipoTableViewCell.swift in Sources */,
 				4613A7FA2CCF2B1B0070034C /* LoginViewController.swift in Sources */,
@@ -410,6 +433,7 @@
 				4636E0A22E7728EA009CCB4B /* MatchesViewController.swift in Sources */,
 				46D995BA2C6EB46300D4951C /* HeaderView.swift in Sources */,
 				469E54482E768C05001ECD36 /* NewsHeaderWrapperCell.swift in Sources */,
+				468877522EFCAFB200FD1B90 /* FavoritesManager.swift in Sources */,
 				469E543D2E766CBD001ECD36 /* NewsCell.swift in Sources */,
 				469E543F2E766CE3001ECD36 /* NewsItem.swift in Sources */,
 				46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */,

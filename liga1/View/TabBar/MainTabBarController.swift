@@ -20,10 +20,10 @@ class MainTabBarController: UITabBarController {
         
         let torneoVC = TorneoViewController()
         torneoVC.title = "Torneo"
-        
-        let matchVC = MatchesViewController()
-        matchVC.title = "Favoritos"
-        
+
+        let favoritosVC = FavoritosViewController()
+        favoritosVC.title = "Favoritos"
+
         let newsVC = NewsViewController()
         newsVC.title = "Noticias"
         
@@ -42,13 +42,13 @@ class MainTabBarController: UITabBarController {
             title: "torneo",
             imageSystemName: "chart.bar.doc.horizontal"
         )
-        
-        let matchNav = createNavController(
-            rootViewController: matchVC,
+
+        let favoritosNav = createNavController(
+            rootViewController: favoritosVC,
             title: "favoritos",
             imageSystemName: "star"
         )
-        
+
         let newsNav = createNavController(
             rootViewController: newsVC,
             title: "noticias",
@@ -59,8 +59,8 @@ class MainTabBarController: UITabBarController {
             title: "perfil",
             imageSystemName: "person"
         )
-        
-        viewControllers = [homeNav, torneoNav, matchNav, newsNav, perfilNav]
+
+        viewControllers = [homeNav, torneoNav, favoritosNav, newsNav, perfilNav]
     }
     
     private func configureTabBarAppearance() {

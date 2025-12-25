@@ -27,7 +27,8 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         // Aquí deberías cargar tus logos según el equipo
         let logoLocal = UIImage(named: match.equipoLocalId)
         let logoVisitante = UIImage(named: match.equipoVisitanteId)
-        
+
+        cell.delegate = self
         cell.configure(with: match, logoLocal: logoLocal, logoVisitante: logoVisitante)
         return cell
     }
@@ -66,5 +67,24 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60
+    }
+}
+
+// MARK: - MatchTableViewCellDelegate
+extension HomeViewController: MatchTableViewCellDelegate {
+    func didTapFavorite(cell: MatchTableViewCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let match = matches[indexPath.row]
+
+        guard let matchId = match.id else { return }
+
+        FavoritesManager.shared.toggleFavorite(matchId: matchId) { isFavorite, error in
+            if let error = error {
+                print("Error toggling favorite: \(error)")
+                return
+            }
+
+            // La UI se actualizará automáticamente mediante el listener
+        }
     }
 }

@@ -7,16 +7,21 @@
 
 import UIKit
 
+protocol MatchTableViewCellDelegate: AnyObject {
+    func didTapFavorite(cell: MatchTableViewCell)
+}
+
 class MatchTableViewCell: UITableViewCell {
-    
+
     static let identifier = "MatchTableViewCell"
-    
-    let estrellaImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.image = UIImage(systemName: "star")
-        iv.tintColor = .systemYellow
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
+    weak var delegate: MatchTableViewCellDelegate?
+
+    let estrellaButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setImage(UIImage(systemName: "star"), for: .normal)
+        btn.tintColor = .systemYellow
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
     }()
     
     let logoLocalImageView: UIImageView = {
@@ -74,7 +79,7 @@ class MatchTableViewCell: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.addSubview(estrellaImageView)
+        contentView.addSubview(estrellaButton)
         contentView.addSubview(logoLocalImageView)
         contentView.addSubview(nombreLocalLabel)
         contentView.addSubview(logoVisitanteImageView)
@@ -83,6 +88,15 @@ class MatchTableViewCell: UITableViewCell {
         contentView.addSubview(marcadorLocalLabel)
         contentView.addSubview(marcadorVisitanteLabel)
         setupConstraints()
+        setupActions()
+    }
+
+    private func setupActions() {
+        estrellaButton.addTarget(self, action: #selector(favoriteTapped), for: .touchUpInside)
+    }
+
+    @objc private func favoriteTapped() {
+        delegate?.didTapFavorite(cell: self)
     }
     
     required init?(coder: NSCoder) {
@@ -93,10 +107,10 @@ class MatchTableViewCell: UITableViewCell {
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             // Estrella centrada verticalmente respecto a toda la celda
-            estrellaImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            estrellaImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            estrellaImageView.widthAnchor.constraint(equalToConstant: 24),
-            estrellaImageView.heightAnchor.constraint(equalToConstant: 24),
+            estrellaButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            estrellaButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            estrellaButton.widthAnchor.constraint(equalToConstant: 32),
+            estrellaButton.heightAnchor.constraint(equalToConstant: 32),
 
             // Marcador local - pegado a la derecha con padding de 8px
             marcadorLocalLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
@@ -104,7 +118,7 @@ class MatchTableViewCell: UITableViewCell {
             marcadorLocalLabel.widthAnchor.constraint(equalToConstant: 30),
 
             // Logo local
-            logoLocalImageView.leadingAnchor.constraint(equalTo: estrellaImageView.trailingAnchor, constant: 12),
+            logoLocalImageView.leadingAnchor.constraint(equalTo: estrellaButton.trailingAnchor, constant: 8),
             logoLocalImageView.centerYAnchor.constraint(equalTo: marcadorLocalLabel.centerYAnchor),
             logoLocalImageView.widthAnchor.constraint(equalToConstant: 24),
             logoLocalImageView.heightAnchor.constraint(equalToConstant: 24),
@@ -139,6 +153,10 @@ class MatchTableViewCell: UITableViewCell {
         nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoVisitanteId)
         logoLocalImageView.image = logoLocal
         logoVisitanteImageView.image = logoVisitante
+
+        // Actualizar estrella de favorito
+        let starImage = match.isFavorite ? "star.fill" : "star"
+        estrellaButton.setImage(UIImage(systemName: starImage), for: .normal)
 
         // Mostrar marcadores según el estado del partido
         switch match.estado {

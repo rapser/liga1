@@ -9,6 +9,7 @@ import Foundation
 import FirebaseFirestore
 
 struct Match: Codable {
+    @DocumentID var id: String?
     let equipoLocalId: String
     let equipoVisitanteId: String
     let fecha: Date
@@ -17,8 +18,25 @@ struct Match: Codable {
     var golesEquipoLocal: Int
     var golesEquipoVisitante: Int
     var estado: EstadoMatch
+
+    // isFavorite no se guarda en Firestore, es solo para UI
+    var isFavorite: Bool = false
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case equipoLocalId
+        case equipoVisitanteId
+        case fecha
+        case torneo
+        case jornada
+        case golesEquipoLocal
+        case golesEquipoVisitante
+        case estado
+        // isFavorite NO está en CodingKeys, por lo que no se codifica/decodifica
+    }
     
     init(
+        id: String? = nil,
         equipoLocalId: String,
         equipoVisitanteId: String,
         fecha: Date,
@@ -26,8 +44,10 @@ struct Match: Codable {
         jornada: Int,
         golesEquipoLocal: Int = 0,
         golesEquipoVisitante: Int = 0,
-        estado: EstadoMatch = .pendiente
+        estado: EstadoMatch = .pendiente,
+        isFavorite: Bool = false
     ) {
+        self.id = id
         self.equipoLocalId = equipoLocalId
         self.equipoVisitanteId = equipoVisitanteId
         self.fecha = fecha
@@ -36,6 +56,7 @@ struct Match: Codable {
         self.golesEquipoLocal = golesEquipoLocal
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
+        self.isFavorite = isFavorite
     }
     
     // Enum para estado del partido
