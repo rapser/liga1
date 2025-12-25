@@ -215,12 +215,14 @@ class PartidoViewController: UIViewController {
     func saveMatches(_ matches: [Match], completion: ((Error?) -> Void)? = nil) {
         let db = Firestore.firestore()
         let batch = db.batch()
-        
+
         for match in matches {
-            let docRef = db.collection("matches").document(match.documentID())
+            // Usar el id del match, o generar uno automático si no existe
+            let matchId = match.id ?? "\(match.equipoLocalId ?? "")_\(match.equipoVisitanteId ?? "")"
+            let docRef = db.collection("matches").document(matchId)
             batch.setData(match.toDictionary(), forDocument: docRef)
         }
-        
+
         batch.commit { error in
             completion?(error)
         }

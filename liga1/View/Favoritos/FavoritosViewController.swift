@@ -136,8 +136,8 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
 
-        let logoLocal = UIImage(named: match.equipoLocalId)
-        let logoVisitante = UIImage(named: match.equipoVisitanteId)
+        let logoLocal = UIImage(named: match.equipoLocalId ?? "shield.fill")
+        let logoVisitante = UIImage(named: match.equipoVisitanteId ?? "shield.fill")
 
         cell.delegate = self
         cell.configure(with: match, logoLocal: logoLocal, logoVisitante: logoVisitante)

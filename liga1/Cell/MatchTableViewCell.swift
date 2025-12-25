@@ -149,8 +149,8 @@ class MatchTableViewCell: UITableViewCell {
     
     // MARK: - Config
     func configure(with match: Match, logoLocal: UIImage?, logoVisitante: UIImage?) {
-        nombreLocalLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoLocalId)
-        nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoVisitanteId)
+        nombreLocalLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoLocalId ?? "shield.fill")
+        nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoVisitanteId ?? "shield.fill")
         logoLocalImageView.image = logoLocal
         logoVisitanteImageView.image = logoVisitante
 

@@ -19,7 +19,7 @@ enum EquipoPeruano: String, CaseIterable {
     case atleticoGrau = "gra"
     case deportivoGarcilaso = "gar"
     case sportBoys = "sba"
-    case chancasCYC = "cha"
+    case chankas = "cha"
     case utcCajamarca = "utc"
     case sportHuancayo = "hua"
     case unionComercio = "com"
@@ -30,6 +30,8 @@ enum EquipoPeruano: String, CaseIterable {
     case alianzauniversidad = "auh"
     case binacional = "bin"
     case ayacuchofc = "aya"
+    case cajamarca = "caj"
+    case moquegua = "moq"
     
     
     var nombreCompleto: String {
@@ -45,17 +47,19 @@ enum EquipoPeruano: String, CaseIterable {
         case .atleticoGrau: return "Atlético Grau"
         case .deportivoGarcilaso: return "Deportivo Garcilaso"
         case .sportBoys: return "Sport Boys"
-        case .chancasCYC: return "Chancas CYC"
+        case .chankas: return "Los Chankas"
         case .utcCajamarca: return "UTC Cajamarca"
         case .sportHuancayo: return "Sport Huancayo"
         case .unionComercio: return "Unión Comercio"
         case .comerciantesUnidos: return "Comerciantes Unidos"
         case .carlosMannucci: return "Carlos Mannucci"
         case .cesarVallejo: return "César Vallejo"
-        case .juanpablo: return "Juan Pablo II"
+        case .juanpablo: return "Juan Pablo II College"
         case .alianzauniversidad: return "Alianza Universidad"
         case .binacional: return "Deportivo Binacional"
         case .ayacuchofc: return "Ayacucho FC"
+        case .cajamarca: return "FC Cajamarca"
+        case .moquegua: return "Deportivo Moquegua"
         }
     }
     

@@ -9,53 +9,59 @@ import Foundation
 import FirebaseFirestore
 
 struct Match: Codable {
-    @DocumentID var id: String?
-    let equipoLocalId: String
-    let equipoVisitanteId: String
+    @DocumentID var id: String?  // Ej: "adt_utc"
     let fecha: Date
-    let torneo: Torneo
-    let jornada: Int
     var golesEquipoLocal: Int
     var golesEquipoVisitante: Int
     var estado: EstadoMatch
+    var suspendido: Bool
 
     // isFavorite no se guarda en Firestore, es solo para UI
     var isFavorite: Bool = false
 
+    // Propiedades para UI que se setean desde la jornada padre
+    var jornadaNumero: Int = 0
+    var torneoNombre: String = ""
+
+    // Propiedades computadas para extraer equipos del ID
+    var equipoLocalId: String? {
+        guard let id = id else { return nil }
+        let components = id.split(separator: "_")
+        return components.first.map(String.init)
+    }
+
+    var equipoVisitanteId: String? {
+        guard let id = id else { return nil }
+        let components = id.split(separator: "_")
+        guard components.count >= 2 else { return nil }
+        return String(components[1])
+    }
+
     enum CodingKeys: String, CodingKey {
         case id
-        case equipoLocalId
-        case equipoVisitanteId
         case fecha
-        case torneo
-        case jornada
         case golesEquipoLocal
         case golesEquipoVisitante
         case estado
-        // isFavorite NO está en CodingKeys, por lo que no se codifica/decodifica
+        case suspendido
+        // isFavorite, jornadaNumero, torneoNombre NO están en CodingKeys
     }
-    
+
     init(
         id: String? = nil,
-        equipoLocalId: String,
-        equipoVisitanteId: String,
         fecha: Date,
-        torneo: Torneo,
-        jornada: Int,
         golesEquipoLocal: Int = 0,
         golesEquipoVisitante: Int = 0,
         estado: EstadoMatch = .pendiente,
+        suspendido: Bool = false,
         isFavorite: Bool = false
     ) {
         self.id = id
-        self.equipoLocalId = equipoLocalId
-        self.equipoVisitanteId = equipoVisitanteId
         self.fecha = fecha
-        self.torneo = torneo
-        self.jornada = jornada
         self.golesEquipoLocal = golesEquipoLocal
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
+        self.suspendido = suspendido
         self.isFavorite = isFavorite
     }
     
@@ -68,29 +74,15 @@ struct Match: Codable {
         case suspendido
     }
     
-    enum Torneo: String, Codable {
-        case apertura
-        case clausura
-    }
-    
     // Función para convertir a diccionario compatible con Firestore
     func toDictionary() -> [String: Any] {
         return [
-            "equipoLocalId": equipoLocalId,
-            "equipoVisitanteId": equipoVisitanteId,
             "fecha": Timestamp(date: fecha),
-            "torneo": torneo.rawValue,
-            "jornada": jornada,
             "golesEquipoLocal": golesEquipoLocal,
             "golesEquipoVisitante": golesEquipoVisitante,
-            "estado": estado.rawValue
+            "estado": estado.rawValue,
+            "suspendido": suspendido
         ]
-    }
-    
-    // Generar documentID único
-    func documentID() -> String {
-        let jornadaString = String(format: "%02d", jornada)
-        return "\(torneo.rawValue)_\(jornadaString)_\(equipoLocalId)_\(equipoVisitanteId)"
     }
 }
 
