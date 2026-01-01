@@ -67,13 +67,3 @@ enum EquipoPeruano: String, CaseIterable {
         return EquipoPeruano(rawValue: id)?.nombreCompleto ?? "Equipo Desconocido"
     }
 }
-
-extension EquipoPeruano {
-    static var todosLosEquipos: [EquipoPeruano] {
-        return allCases
-    }
-    
-    static func desdeNombreCompleto(_ nombre: String) -> EquipoPeruano? {
-        return allCases.first { $0.nombreCompleto == nombre }
-    }
-}

@@ -18,7 +18,6 @@
 		46222A572C712D15001678DF /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A562C712D15001678DF /* FirebaseInstallations */; };
 		4635E3672EFDE393004A541C /* Jornada.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4635E3662EFDE393004A541C /* Jornada.swift */; };
 		4635E3692EFDEF93004A541C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4635E3682EFDEF93004A541C /* GoogleService-Info.plist */; };
-		4636E0A02E772827009CCB4B /* MatchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4636E09F2E772826009CCB4B /* MatchCell.swift */; };
 		4688774F2EFCAF4C00FD1B90 /* FavoritosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */; };
 		468877522EFCAFB200FD1B90 /* FavoritesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 468877502EFCAFB200FD1B90 /* FavoritesManager.swift */; };
 		469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */; };
@@ -64,7 +63,6 @@
 		46222A502C7129A9001678DF /* Partido.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Partido.swift; sourceTree = "<group>"; };
 		4635E3662EFDE393004A541C /* Jornada.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jornada.swift; sourceTree = "<group>"; };
 		4635E3682EFDEF93004A541C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		4636E09F2E772826009CCB4B /* MatchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchCell.swift; sourceTree = "<group>"; };
 		4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesViewController.swift; sourceTree = "<group>"; };
 		4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosViewController.swift; sourceTree = "<group>"; };
 		468877502EFCAFB200FD1B90 /* FavoritesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesManager.swift; sourceTree = "<group>"; };
@@ -305,7 +303,6 @@
 		46D995C82C6ECB0500D4951C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				4636E09F2E772826009CCB4B /* MatchCell.swift */,
 				469E544E2E76A337001ECD36 /* MatchTableViewCell.swift */,
 				469E54432E7671FB001ECD36 /* NewsHeaderView.swift */,
 				469E543C2E766CBC001ECD36 /* NewsCell.swift */,
@@ -428,7 +425,6 @@
 				4613A7FA2CCF2B1B0070034C /* LoginViewController.swift in Sources */,
 				469E54272E75E3A6001ECD36 /* TorneoViewController+TableView.swift in Sources */,
 				469E54442E7671FC001ECD36 /* NewsHeaderView.swift in Sources */,
-				4636E0A02E772827009CCB4B /* MatchCell.swift in Sources */,
 				46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */,
 				469E544C2E7698C9001ECD36 /* Match.swift in Sources */,
 				469E54312E765120001ECD36 /* AppRouter.swift in Sources */,

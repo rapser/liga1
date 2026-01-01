@@ -351,16 +351,6 @@ class LoginViewController: UIViewController {
         }
     }
 
-    private func navigateToMainTabBar2() {
-        guard let navigationController = self.navigationController else {
-            return
-        }
-        
-        let mainTabBarController = MainTabBarController()
-        navigationController.setNavigationBarHidden(true, animated: true)
-        navigationController.pushViewController(mainTabBarController, animated: true)
-    }
-    
     private func navigateToMainTabBar() {
         let mainTabBarController = MainTabBarController()
         

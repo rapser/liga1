@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import FirebaseCore
+import FirebaseFirestore
 
 struct NewsItem {
     let title: String
