@@ -10,15 +10,15 @@ import UIKit
 extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return jornadaSections.count
+        return viewModel.jornadaSections.count
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return jornadaSections[section].matches.count
+        return viewModel.jornadaSections[section].matches.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let match = jornadaSections[indexPath.section].matches[indexPath.row]
+        let match = viewModel.jornadaSections[indexPath.section].matches[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
             return UITableViewCell()
         }
@@ -34,7 +34,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     
     // Header
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let jornadaSection = jornadaSections[section]
+        let jornadaSection = viewModel.jornadaSections[section]
         let view = UIView()
         view.backgroundColor = .systemBackground
 
@@ -77,7 +77,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 extension HomeViewController: MatchTableViewCellDelegate {
     func didTapFavorite(cell: MatchTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let jornadaSection = jornadaSections[indexPath.section]
+        let jornadaSection = viewModel.jornadaSections[indexPath.section]
         let match = jornadaSection.matches[indexPath.row]
 
         guard let matchId = match.id else { return }
@@ -85,13 +85,6 @@ extension HomeViewController: MatchTableViewCellDelegate {
         // El ID completo incluye la jornada: "clausura_01_adt_utc"
         let fullMatchId = "\(jornadaSection.jornadaId)_\(matchId)"
 
-        FavoritesManager.shared.toggleFavorite(matchId: fullMatchId) { isFavorite, error in
-            if let error = error {
-                print("Error toggling favorite: \(error)")
-                return
-            }
-
-            // La UI se actualizará automáticamente mediante el listener
-        }
+        viewModel.toggleFavorite(matchId: fullMatchId)
     }
 }
