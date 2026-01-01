@@ -51,14 +51,6 @@ class MatchTableViewCell: UITableViewCell {
         lbl.translatesAutoresizingMaskIntoConstraints = false
         return lbl
     }()
-    
-    let horaLabel: UILabel = {
-        let lbl = UILabel()
-        lbl.font = .systemFont(ofSize: 12)
-        lbl.textAlignment = .center
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-        return lbl
-    }()
 
     let marcadorLocalLabel: UILabel = {
         let lbl = UILabel()
@@ -84,7 +76,7 @@ class MatchTableViewCell: UITableViewCell {
         contentView.addSubview(nombreLocalLabel)
         contentView.addSubview(logoVisitanteImageView)
         contentView.addSubview(nombreVisitanteLabel)
-        contentView.addSubview(horaLabel)
+//        contentView.addSubview(horaLabel)
         contentView.addSubview(marcadorLocalLabel)
         contentView.addSubview(marcadorVisitanteLabel)
         setupConstraints()

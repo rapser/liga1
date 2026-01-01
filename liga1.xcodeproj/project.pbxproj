@@ -46,7 +46,6 @@
 		46D995AA2C6E925600D4951C /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995A92C6E925600D4951C /* FirebaseFirestore */; };
 		46D995AC2C6E925600D4951C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AB2C6E925600D4951C /* FirebaseMessaging */; };
 		46D995AE2C6E925600D4951C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AD2C6E925600D4951C /* FirebaseStorage */; };
-		46D995B22C6EA69A00D4951C /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B12C6EA69A00D4951C /* View+Extension.swift */; };
 		46D995B42C6EA6C100D4951C /* EquipoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */; };
 		46D995B62C6EA6E600D4951C /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B52C6EA6E600D4951C /* Team.swift */; };
 		46D995B82C6EB18E00D4951C /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995B72C6EB18E00D4951C /* Color+Extension.swift */; };
@@ -54,7 +53,6 @@
 		46D995BC2C6EC00A00D4951C /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995BB2C6EC00A00D4951C /* HomeViewController.swift */; };
 		46D995BE2C6EC01800D4951C /* PartidoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995BD2C6EC01800D4951C /* PartidoViewController.swift */; };
 		46D995C22C6EC7FF00D4951C /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995C12C6EC7FF00D4951C /* MainTabBarController.swift */; };
-		46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995C92C6EDC1900D4951C /* TextField+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,7 +61,6 @@
 		46222A502C7129A9001678DF /* Partido.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Partido.swift; sourceTree = "<group>"; };
 		4635E3662EFDE393004A541C /* Jornada.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jornada.swift; sourceTree = "<group>"; };
 		4635E3682EFDEF93004A541C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesViewController.swift; sourceTree = "<group>"; };
 		4688774D2EFCAF4C00FD1B90 /* FavoritosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosViewController.swift; sourceTree = "<group>"; };
 		468877502EFCAFB200FD1B90 /* FavoritesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesManager.swift; sourceTree = "<group>"; };
 		469E54262E75E3A5001ECD36 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
@@ -89,7 +86,6 @@
 		46D9959B2C6E90EE00D4951C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		46D9959E2C6E90EE00D4951C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		46D995A02C6E90EE00D4951C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		46D995B12C6EA69A00D4951C /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 		46D995B32C6EA6C100D4951C /* EquipoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoTableViewCell.swift; sourceTree = "<group>"; };
 		46D995B52C6EA6E600D4951C /* Team.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
 		46D995B72C6EB18E00D4951C /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
@@ -97,7 +93,6 @@
 		46D995BB2C6EC00A00D4951C /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		46D995BD2C6EC01800D4951C /* PartidoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartidoViewController.swift; sourceTree = "<group>"; };
 		46D995C12C6EC7FF00D4951C /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
-		46D995C92C6EDC1900D4951C /* TextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,7 +199,6 @@
 		469E543B2E766914001ECD36 /* Matches */ = {
 			isa = PBXGroup;
 			children = (
-				4636E0A12E7728E8009CCB4B /* MatchesViewController.swift */,
 				46D995BD2C6EC01800D4951C /* PartidoViewController.swift */,
 			);
 			path = Matches;
@@ -271,9 +265,7 @@
 		46D995C52C6EC8FE00D4951C /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				46D995B12C6EA69A00D4951C /* View+Extension.swift */,
 				46D995B72C6EB18E00D4951C /* Color+Extension.swift */,
-				46D995C92C6EDC1900D4951C /* TextField+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -414,7 +406,6 @@
 				469E542D2E764A1A001ECD36 /* TablePosition.swift in Sources */,
 				46D995B62C6EA6E600D4951C /* Team.swift in Sources */,
 				4613A7FC2CCF2D8D0070034C /* ProfileViewController.swift in Sources */,
-				46D995B22C6EA69A00D4951C /* View+Extension.swift in Sources */,
 				469E542B2E75E490001ECD36 /* EquipoPeruano.swift in Sources */,
 				469E542F2E764A54001ECD36 /* TorneoType.swift in Sources */,
 				46D995BC2C6EC00A00D4951C /* HomeViewController.swift in Sources */,
@@ -434,7 +425,6 @@
 				468877522EFCAFB200FD1B90 /* FavoritesManager.swift in Sources */,
 				469E543D2E766CBD001ECD36 /* NewsCell.swift in Sources */,
 				469E543F2E766CE3001ECD36 /* NewsItem.swift in Sources */,
-				46D995CA2C6EDC1900D4951C /* TextField+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

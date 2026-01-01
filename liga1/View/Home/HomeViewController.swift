@@ -14,7 +14,6 @@ class HomeViewController: UIViewController {
     var matches: [Match] = []
     var favoriteMatchIds: Set<String> = []
     var favoritesListener: ListenerRegistration?
-    var currentJornada: Int = 8 // Jornada actual que se está mostrando
 
     // Estructura para agrupar partidos por jornada
     struct JornadaSection {
@@ -180,11 +179,6 @@ class HomeViewController: UIViewController {
 
             // Ordenar secciones por número de jornada descendente
             self.jornadaSections = tempSections.sorted { $0.numero > $1.numero }
-
-            // Actualizar currentJornada
-            if let primeraSeccion = self.jornadaSections.first {
-                self.currentJornada = primeraSeccion.numero
-            }
 
             self.tableView.reloadData()
 
