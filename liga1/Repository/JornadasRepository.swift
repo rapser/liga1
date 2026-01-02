@@ -24,43 +24,24 @@ class JornadasRepository: JornadasRepositoryProtocol {
                 return
             }
 
-            print("🔍 JornadasRepository: Consultando jornadas con mostrar=true...")
-
             self.db.collection("jornadas")
                 .whereField("mostrar", isEqualTo: true)
                 .order(by: "fechaInicio", descending: true)
                 .getDocuments(source: .default) { snapshot, error in
                     if let error = error {
-                        print("❌ JornadasRepository: Error en consulta: \(error.localizedDescription)")
                         promise(.failure(error))
                         return
                     }
 
-                    print("📄 JornadasRepository: Documentos obtenidos: \(snapshot?.documents.count ?? 0)")
-
                     guard let documents = snapshot?.documents else {
-                        print("⚠️ JornadasRepository: Sin documentos")
                         promise(.success([]))
                         return
                     }
 
-                    // Debug: mostrar todos los documentos raw
-                    documents.forEach { doc in
-                        print("  📄 Doc ID: \(doc.documentID), data: \(doc.data())")
-                    }
-
                     let jornadas = documents.compactMap { doc -> Jornada? in
-                        do {
-                            let jornada = try doc.data(as: Jornada.self)
-                            print("  ✅ Jornada parseada: \(jornada.id ?? "sin id")")
-                            return jornada
-                        } catch {
-                            print("  ❌ Error parseando jornada \(doc.documentID): \(error)")
-                            return nil
-                        }
+                        try? doc.data(as: Jornada.self)
                     }
 
-                    print("✅ JornadasRepository: Total jornadas parseadas: \(jornadas.count)")
                     promise(.success(jornadas))
                 }
         }

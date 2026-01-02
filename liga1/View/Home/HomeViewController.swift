@@ -59,7 +59,6 @@ class HomeViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
                 // TODO: Mostrar/ocultar indicador de carga
-                print(isLoading ? "🔄 Cargando..." : "✅ Carga completada")
             }
             .store(in: &cancellables)
 
