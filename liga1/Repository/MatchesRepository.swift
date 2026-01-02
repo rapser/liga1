@@ -27,8 +27,8 @@ class MatchesRepository: MatchesRepositoryProtocol {
 
             self.db.collection("jornadas")
                 .document(jornadaId)
-                .collection("partidos")
-                .order(by: "fecha", descending: false)
+                .collection("matches")
+                .order(by: "fecha")
                 .getDocuments(source: .default) { snapshot, error in
                     if let error = error {
                         promise(.failure(error))

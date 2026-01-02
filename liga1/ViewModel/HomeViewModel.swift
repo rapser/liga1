@@ -47,6 +47,8 @@ class HomeViewModel {
         isLoading = true
         error = nil
 
+        print("🔄 Iniciando carga de jornadas...")
+
         jornadasRepository.fetchActiveJornadas()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -56,6 +58,10 @@ class HomeViewModel {
                     print("❌ Error al cargar jornadas: \(error)")
                 }
             } receiveValue: { [weak self] jornadas in
+                print("✅ Jornadas recibidas: \(jornadas.count)")
+                jornadas.forEach { jornada in
+                    print("  - Jornada ID: \(jornada.id ?? "nil"), numero: \(jornada.numero ?? -1), torneo: \(jornada.torneo ?? "nil")")
+                }
                 self?.loadMatchesForJornadas(jornadas)
             }
             .store(in: &cancellables)
@@ -87,13 +93,21 @@ class HomeViewModel {
     }
 
     private func loadMatchesForJornadas(_ jornadas: [Jornada]) {
+        print("🔄 Cargando partidos para \(jornadas.count) jornadas...")
+
         let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
             guard let jornadaId = jornada.id else {
+                print("⚠️ Jornada sin ID, saltando...")
                 return Fail(error: NSError(domain: "HomeViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Jornada sin ID"]))
                     .eraseToAnyPublisher()
             }
 
+            print("🔄 Obteniendo partidos para jornada: \(jornadaId)")
+
             return matchesRepository.fetchMatches(for: jornadaId)
+                .handleEvents(receiveOutput: { matches in
+                    print("✅ Recibidos \(matches.count) partidos para \(jornadaId)")
+                })
                 .map { matches in (jornada, matches) }
                 .eraseToAnyPublisher()
         }
@@ -107,6 +121,7 @@ class HomeViewModel {
                     print("❌ Error al cargar partidos: \(error)")
                 }
             } receiveValue: { [weak self] results in
+                print("✅ Total de resultados recibidos: \(results.count)")
                 self?.processJornadasWithMatches(results)
             }
             .store(in: &cancellables)
