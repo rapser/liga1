@@ -14,17 +14,9 @@ class FavoritosViewController: UIViewController {
     let viewModel = FavoritosViewModel()
     private var cancellables = Set<AnyCancellable>()
 
-    private let emptyStateLabel: UILabel = {
-        let label = UILabel()
-        label.text = "No tienes partidos favoritos\nToca la estrella en un partido para agregarlo"
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        label.textColor = .secondaryLabel
-        label.font = .systemFont(ofSize: 16)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.isHidden = true
-        return label
-    }()
+    private lazy var emptyStateLabel = LayoutPresets.emptyStateLabel(
+        text: "No tienes partidos favoritos\nToca la estrella en un partido para agregarlo"
+    )
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,30 +30,12 @@ class FavoritosViewController: UIViewController {
 
     // MARK: - Setup UI
     private func setupTableView() {
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.backgroundColor = .systemBackground
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
-
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        LayoutPresets.configureTableView(tableView, in: view, delegate: self, dataSource: self)
     }
 
     private func setupEmptyState() {
-        view.addSubview(emptyStateLabel)
-
-        NSLayoutConstraint.activate([
-            emptyStateLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emptyStateLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            emptyStateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
-            emptyStateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
-        ])
+        LayoutPresets.setupEmptyState(label: emptyStateLabel, in: view)
     }
 
     private func bindViewModel() {
@@ -124,24 +98,17 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let view = UIView()
-        view.backgroundColor = .systemBackground
+        let containerView = UIView()
+        containerView.backgroundColor = .systemBackground
 
-        let titleLabel = UILabel()
-        titleLabel.font = .boldSystemFont(ofSize: 18)
-        titleLabel.textColor = .label
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Mis Partidos Favoritos"
+        let titleLabel = LayoutPresets.titleLabel(text: "Mis Partidos Favoritos", fontSize: 18)
+        titleLabel
+            .addTo(containerView)
+            .pinLeading(constant: Spacing.standard)
+            .pinTop(constant: Spacing.small)
+            .pinBottom(constant: Spacing.small)
 
-        view.addSubview(titleLabel)
-
-        NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 8),
-            titleLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -8)
-        ])
-
-        return view
+        return containerView
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

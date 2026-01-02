@@ -52,51 +52,20 @@ class TorneoViewController: UIViewController {
     }
 
     private func configureSegmentedControl() {
-        view.addSubview(segmentedControl)
-
-        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            segmentedControl.heightAnchor.constraint(equalToConstant: 30)
-        ])
-
-        let liga1RedColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
-        segmentedControl.selectedSegmentTintColor = liga1RedColor
-        segmentedControl.backgroundColor = .systemBackground
-
-        let textAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.systemFont(ofSize: 14, weight: .bold)
-        ]
-
-        segmentedControl.setTitleTextAttributes(textAttributes, for: .selected)
-        segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.label], for: .normal)
-
         segmentedControl.addTarget(self, action: #selector(segmentedControlChanged(_:)), for: .valueChanged)
+        LayoutPresets.configureSegmentedControl(segmentedControl, in: view)
     }
 
     private func configureTableView() {
-        view.addSubview(tableView)
-
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.backgroundColor = .systemBackground
-        tableView.contentInset = .zero
-        tableView.scrollIndicatorInsets = .zero
-        tableView.sectionHeaderTopPadding = 0
-
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 4),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
-
         tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
         tableView.allowsSelection = false
-        tableView.delegate = self
-        tableView.dataSource = self
+        LayoutPresets.configureTableViewBelow(
+            tableView,
+            topView: segmentedControl,
+            in: view,
+            delegate: self,
+            dataSource: self
+        )
     }
 
     @objc private func segmentedControlChanged(_ sender: UISegmentedControl) {

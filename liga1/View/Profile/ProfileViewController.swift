@@ -26,9 +26,9 @@ class ProfileViewController: UIViewController {
     var sections: [Section] = []
 
     // MARK: - Tabla
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.prepareForAutoLayout()
         return tableView
     }()
 
@@ -85,16 +85,12 @@ class ProfileViewController: UIViewController {
 
     // MARK: - Configuración Tabla
     private func setupTableView() {
-        view.addSubview(tableView)
-
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+        tableView
+            .addTo(view)
+            .pinTop(useSafeArea: true)
+            .pinBottom(useSafeArea: true)
+            .pinHorizontal()
 
         tableView.delegate = self
         tableView.dataSource = self

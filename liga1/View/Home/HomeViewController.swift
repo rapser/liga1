@@ -29,20 +29,8 @@ class HomeViewController: UIViewController {
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
-
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.backgroundColor = .systemBackground
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
-
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        LayoutPresets.configureTableView(tableView, in: view, delegate: self, dataSource: self)
     }
 
     private func bindViewModel() {
