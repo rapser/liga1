@@ -11,25 +11,21 @@ import UIKit
 class FeaturedNewsTitleHeaderView: UITableViewHeaderFooterView {
     static let reuseIdentifier = "FeaturedNewsTitleHeaderView"
 
-    private let label = UILabel()
+    private lazy var label = UILabel()
+        .prepareForAutoLayout()
+        .font(.systemFont(ofSize: 12, weight: .semibold))
+        .text("NOTICIA DESTACADA")
+        .textColor(.secondaryLabel)
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-
         contentView.backgroundColor = .systemBackground
 
-        label.font = .systemFont(ofSize: 12, weight: .semibold)
-        label.text = "NOTICIA DESTACADA"
-        label.textColor = .secondaryLabel
-        label.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(label)
-
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
-        ])
+        label
+            .addTo(contentView)
+            .pinHorizontal(padding: Spacing.standard)
+            .pinTop(constant: Spacing.medium)
+            .pinBottom(constant: Spacing.small)
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -53,15 +49,10 @@ class FeaturedNewsContentCell: UITableViewCell {
 
         // Crear nueva vista
         let headerView = NewsHeaderView(item: item, sectionTitle: "")
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(headerView)
-
-        NSLayoutConstraint.activate([
-            headerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            headerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-        ])
+        headerView
+            .prepareForAutoLayout()
+            .addTo(contentView)
+            .fillSuperview()
 
         self.newsHeaderView = headerView
     }
@@ -73,24 +64,20 @@ class FeaturedNewsContentCell: UITableViewCell {
 class CategoryHeaderView: UITableViewHeaderFooterView {
     static let reuseIdentifier = "CategoryHeaderView"
 
-    private let label = UILabel()
+    private lazy var label = UILabel()
+        .prepareForAutoLayout()
+        .font(.systemFont(ofSize: 12, weight: .semibold))
+        .textColor(.secondaryLabel)
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-
         contentView.backgroundColor = .systemBackground
 
-        label.font = .systemFont(ofSize: 12, weight: .semibold)
-        label.textColor = .secondaryLabel
-        label.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(label)
-
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
-        ])
+        label
+            .addTo(contentView)
+            .pinHorizontal(padding: Spacing.standard)
+            .pinTop(constant: Spacing.medium)
+            .pinBottom(constant: Spacing.small)
     }
 
     func configure(with title: String) {

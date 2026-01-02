@@ -93,6 +93,20 @@ extension UIView {
         return self
     }
 
+    /// Centra verticalmente con respecto a otro anchor
+    @discardableResult
+    func centerY(to anchor: NSLayoutYAxisAnchor, constant: CGFloat = 0) -> Self {
+        centerYAnchor.constraint(equalTo: anchor, constant: constant).isActive = true
+        return self
+    }
+
+    /// Centra horizontalmente con respecto a otro anchor
+    @discardableResult
+    func centerX(to anchor: NSLayoutXAxisAnchor, constant: CGFloat = 0) -> Self {
+        centerXAnchor.constraint(equalTo: anchor, constant: constant).isActive = true
+        return self
+    }
+
     // MARK: - Size
 
     /// Establece el tamaño de la vista
@@ -101,6 +115,16 @@ extension UIView {
         NSLayoutConstraint.activate([
             widthAnchor.constraint(equalToConstant: size.width),
             heightAnchor.constraint(equalToConstant: size.height)
+        ])
+        return self
+    }
+
+    /// Establece el tamaño de la vista con ancho y alto
+    @discardableResult
+    func size(width: CGFloat, height: CGFloat) -> Self {
+        NSLayoutConstraint.activate([
+            widthAnchor.constraint(equalToConstant: width),
+            heightAnchor.constraint(equalToConstant: height)
         ])
         return self
     }

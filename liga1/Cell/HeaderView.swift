@@ -8,14 +8,18 @@
 import UIKit
 
 class HeaderView: UIView {
-    
-    private let posicionLabel = UILabel()
-    private let equipoLabel = UILabel()
-    private let partidosJugadosLabel = UILabel()
-    private let golesLabel = UILabel()
-    private let puntosLabel = UILabel()
-    
-    private let stackView = UIStackView()
+
+    private lazy var posicionLabel = UILabel()
+    private lazy var equipoLabel = UILabel()
+    private lazy var partidosJugadosLabel = UILabel()
+    private lazy var golesLabel = UILabel()
+    private lazy var puntosLabel = UILabel()
+
+    private lazy var stackView = UIStackView()
+        .prepareForAutoLayout()
+        .axis(.horizontal)
+        .alignment(.center)
+        .spacing(Spacing.tiny)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,42 +34,40 @@ class HeaderView: UIView {
     }
     
     private func setupUI() {
-        posicionLabel.text = "#"
-        equipoLabel.text = "Equipo"
-        partidosJugadosLabel.text = "PJ"
-        golesLabel.text = "G"
-        puntosLabel.text = "PTS"
-        
+        // Configurar textos
+        posicionLabel.text("#")
+        equipoLabel.text("Equipo")
+        partidosJugadosLabel.text("PJ")
+        golesLabel.text("G")
+        puntosLabel.text("PTS")
+
+        // Configurar estilos para todos los labels
         let labels = [posicionLabel, equipoLabel, partidosJugadosLabel, golesLabel, puntosLabel]
         labels.forEach {
-            $0.font = UIFont.boldSystemFont(ofSize: 12)
-            $0.textAlignment = .center
+            $0.font(.boldSystemFont(ofSize: 12))
+            $0.alignment(.center)
         }
-        equipoLabel.textAlignment = .left
-        
-        stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.spacing = 4
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        stackView.addArrangedSubview(posicionLabel)
-        stackView.addArrangedSubview(equipoLabel)
-        stackView.addArrangedSubview(partidosJugadosLabel)
-        stackView.addArrangedSubview(golesLabel)
-        stackView.addArrangedSubview(puntosLabel)
-        
-        addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
-            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 4),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -4),
-            
-            posicionLabel.widthAnchor.constraint(equalToConstant: 25),
-            partidosJugadosLabel.widthAnchor.constraint(equalToConstant: 30),
-            golesLabel.widthAnchor.constraint(equalToConstant: 60),
-            puntosLabel.widthAnchor.constraint(equalToConstant: 40),
+        equipoLabel.alignment(.left)
+
+        // Agregar labels al stack
+        stackView.addArranged([
+            posicionLabel,
+            equipoLabel,
+            partidosJugadosLabel,
+            golesLabel,
+            puntosLabel
         ])
+
+        // Agregar stack a la vista
+        stackView
+            .addTo(self)
+            .pinHorizontal(padding: Spacing.small)
+            .pinVertical(padding: Spacing.tiny)
+
+        // Anchos específicos
+        posicionLabel.width(25)
+        partidosJugadosLabel.width(30)
+        golesLabel.width(60)
+        puntosLabel.width(40)
     }
 }

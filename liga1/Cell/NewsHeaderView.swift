@@ -10,45 +10,42 @@ import Kingfisher
 
 class NewsHeaderView: UIView {
 
-    private let newsImageView = UIImageView()
-    private let titleLabel = UILabel()
+    private lazy var newsImageView = UIImageView()
+        .prepareForAutoLayout()
+        .contentMode(.scaleAspectFill)
+        .clip()
+        .corner(8)
+
+    private lazy var titleLabel = UILabel()
+        .prepareForAutoLayout()
+        .font(.boldSystemFont(ofSize: 18))
+        .lines(3)
+        .textColor(.label)
 
     init(item: NewsItem, sectionTitle: String) {
         super.init(frame: .zero)
         backgroundColor = .systemBackground
 
-        // Imagen con padding de 16 a los lados
-        newsImageView.contentMode = .scaleAspectFill
-        newsImageView.clipsToBounds = true
-        newsImageView.layer.cornerRadius = 8
-        newsImageView.translatesAutoresizingMaskIntoConstraints = false
+        // Cargar imagen
         if let url = URL(string: item.imageUrl) {
             newsImageView.kf.setImage(with: url)
         }
 
-        // Título con máximo 3 líneas y padding 16
-        titleLabel.font = .boldSystemFont(ofSize: 18)
-        titleLabel.numberOfLines = 3
-        titleLabel.text = item.title
-        titleLabel.textColor = .label
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        // Configurar título
+        titleLabel.text(item.title)
 
-        addSubview(newsImageView)
-        addSubview(titleLabel)
+        // Layout
+        newsImageView
+            .addTo(self)
+            .pinTop(constant: Spacing.small)
+            .pinHorizontal(padding: Spacing.standard)
+            .height(240)
 
-        NSLayoutConstraint.activate([
-            // Imagen con padding 16 izquierda/derecha desde arriba
-            newsImageView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            newsImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            newsImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            newsImageView.heightAnchor.constraint(equalToConstant: 240),
-
-            // Título con padding 16 y máximo 3 líneas
-            titleLabel.topAnchor.constraint(equalTo: newsImageView.bottomAnchor, constant: 8),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
-        ])
+        titleLabel
+            .addTo(self)
+            .pinTop(to: newsImageView.bottomAnchor, constant: Spacing.small)
+            .pinHorizontal(padding: Spacing.standard)
+            .pinBottom(constant: Spacing.standard)
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }

@@ -10,9 +10,21 @@ import Kingfisher
 
 class NewsCell: UITableViewCell {
 
-    private let newsImageView = UIImageView()
-    private let titleLabel = UILabel()
-    private let fechaLabel = UILabel()
+    private lazy var newsImageView = UIImageView()
+        .prepareForAutoLayout()
+        .contentMode(.scaleAspectFill)
+        .clip()
+        .corner(4)
+
+    private lazy var titleLabel = UILabel()
+        .prepareForAutoLayout()
+        .font(.boldSystemFont(ofSize: 12))
+        .lines(3)
+
+    private lazy var fechaLabel = UILabel()
+        .prepareForAutoLayout()
+        .font(.systemFont(ofSize: 10))
+        .textColor(.gray)
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -22,41 +34,29 @@ class NewsCell: UITableViewCell {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     private func setupViews() {
-        // Imagen
-        newsImageView.contentMode = .scaleAspectFill
-        newsImageView.clipsToBounds = true
-        newsImageView.layer.cornerRadius = 4
-        newsImageView.translatesAutoresizingMaskIntoConstraints = false
+        // Imagen - centrada verticalmente, tamaño fijo
+        newsImageView
+            .addTo(contentView)
+            .pinLeading(constant: Spacing.standard)
+            .centerY()
+            .size(width: 120, height: 70)
 
-        // Título
-        titleLabel.font = .boldSystemFont(ofSize: 12)
-        titleLabel.numberOfLines = 3
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        // Título - parte superior
+        titleLabel
+            .addTo(contentView)
+            .pinLeading(to: newsImageView.trailingAnchor, constant: Spacing.medium)
+            .pinTrailing(constant: Spacing.standard)
+            .pinTop(constant: Spacing.small)
 
-        // Fecha
-        fechaLabel.font = .systemFont(ofSize: 10)
-        fechaLabel.textColor = .gray
-        fechaLabel.translatesAutoresizingMaskIntoConstraints = false
+        // Fecha - debajo del título
+        fechaLabel
+            .addTo(contentView)
+            .pinLeading(to: newsImageView.trailingAnchor, constant: Spacing.medium)
+            .pinTrailing(constant: Spacing.standard)
+            .pinTop(to: titleLabel.bottomAnchor, constant: Spacing.tiny)
 
-        contentView.addSubview(newsImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(fechaLabel)
-
-        NSLayoutConstraint.activate([
-            newsImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            newsImageView.widthAnchor.constraint(equalToConstant: 120),
-            newsImageView.heightAnchor.constraint(equalToConstant: 70),
-            newsImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-
-            titleLabel.leadingAnchor.constraint(equalTo: newsImageView.trailingAnchor, constant: 12),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-
-            fechaLabel.leadingAnchor.constraint(equalTo: newsImageView.trailingAnchor, constant: 12),
-            fechaLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            fechaLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            fechaLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8)
-        ])
+        // Bottom constraint con lessThanOrEqual
+        fechaLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -Spacing.small).isActive = true
     }
 
     func configure(with item: NewsItem) {

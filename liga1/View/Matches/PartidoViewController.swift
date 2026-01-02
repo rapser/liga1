@@ -12,13 +12,11 @@ class PartidoViewController: UIViewController {
     
     let db = Firestore.firestore()
     
-    private let aceptarButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Aceptar", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 10
-        button.translatesAutoresizingMaskIntoConstraints = false
+    private lazy var aceptarButton: UIButton = {
+        let button = LayoutPresets.primaryButton(
+            title: "Aceptar",
+            backgroundColor: .systemBlue
+        )
         return button
     }()
     
@@ -31,17 +29,13 @@ class PartidoViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        view.addSubview(aceptarButton)
-        
-        NSLayoutConstraint.activate([
-            aceptarButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            aceptarButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            aceptarButton.widthAnchor.constraint(equalToConstant: 150),
-            aceptarButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
-        
-        aceptarButton.addTarget(self, action: #selector(aceptarTapped), for: .touchUpInside)
+        aceptarButton
+            .addTo(view)
+            .centerInSuperview()
+            .width(150)
+            .height(50)
 
+        aceptarButton.addTarget(self, action: #selector(aceptarTapped), for: .touchUpInside)
     }
     
     // MARK: - Liga 1
