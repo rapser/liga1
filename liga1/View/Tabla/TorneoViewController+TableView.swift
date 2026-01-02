@@ -8,14 +8,14 @@
 import UIKit
 
 extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return equiposMostrados.count
+        return viewModel.displayedTeams.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "EquipoCell", for: indexPath) as! EquipoTableViewCell
-        let equipo = equiposMostrados[indexPath.row]
+        let equipo = viewModel.displayedTeams[indexPath.row]
 
         let position = determinePosition(for: indexPath.row)
         let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark
@@ -42,7 +42,7 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private func determinePosition(for row: Int) -> TablePosition {
-        let totalRows = equiposMostrados.count
+        let totalRows = viewModel.displayedTeams.count
         
         switch segmentedControl.selectedSegmentIndex {
         case 2: // Acumulado

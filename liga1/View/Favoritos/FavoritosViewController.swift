@@ -6,14 +6,13 @@
 //
 
 import UIKit
-import FirebaseFirestore
+import Combine
 
 class FavoritosViewController: UIViewController {
 
     let tableView = UITableView(frame: .zero, style: .plain)
-    var matches: [Match] = []
-    var favoriteMatchIds: Set<String> = []
-    var favoritesListener: ListenerRegistration?
+    let viewModel = FavoritosViewModel()
+    private var cancellables = Set<AnyCancellable>()
 
     private let emptyStateLabel: UILabel = {
         let label = UILabel()
@@ -34,11 +33,7 @@ class FavoritosViewController: UIViewController {
 
         setupTableView()
         setupEmptyState()
-        listenToFavorites()
-    }
-
-    deinit {
-        favoritesListener?.remove()
+        bindViewModel()
     }
 
     // MARK: - Setup UI
@@ -69,53 +64,37 @@ class FavoritosViewController: UIViewController {
         ])
     }
 
-    // MARK: - Firestore
-    private func listenToFavorites() {
-        favoritesListener = FavoritesManager.shared.listenToFavorites { [weak self] favoriteIds in
-            guard let self = self else { return }
-            self.favoriteMatchIds = Set(favoriteIds)
-            self.fetchFavoriteMatches()
-        }
-    }
-
-    private func fetchFavoriteMatches() {
-        guard !favoriteMatchIds.isEmpty else {
-            self.matches = []
-            self.tableView.reloadData()
-            self.updateEmptyState()
-            return
-        }
-
-        let db = Firestore.firestore()
-
-        db.collection("matches")
-            .whereField(FieldPath.documentID(), in: Array(favoriteMatchIds))
-            .getDocuments { [weak self] snapshot, error in
-                guard let self = self else { return }
-
-                if let error = error {
-                    print("Error fetching favorite matches: \(error)")
-                    return
-                }
-
-                guard let documents = snapshot?.documents else { return }
-
-                self.matches = documents.compactMap { doc -> Match? in
-                    var match = try? doc.data(as: Match.self)
-                    match?.isFavorite = true
-                    return match
-                }
-
-                // Ordenar por fecha
-                self.matches.sort { $0.fecha < $1.fecha }
-                self.tableView.reloadData()
-                self.updateEmptyState()
+    private func bindViewModel() {
+        viewModel.$matches
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] matches in
+                self?.tableView.reloadData()
+                self?.updateEmptyState()
             }
+            .store(in: &cancellables)
+
+        viewModel.$error
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showError(error)
+            }
+            .store(in: &cancellables)
     }
 
     private func updateEmptyState() {
-        emptyStateLabel.isHidden = !matches.isEmpty
-        tableView.isHidden = matches.isEmpty
+        emptyStateLabel.isHidden = !viewModel.matches.isEmpty
+        tableView.isHidden = viewModel.matches.isEmpty
+    }
+
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "Error",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -127,11 +106,11 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return matches.count
+        return viewModel.matches.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let match = matches[indexPath.row]
+        let match = viewModel.matches[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
             return UITableViewCell()
         }
@@ -166,7 +145,7 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return matches.isEmpty ? 0 : 50
+        return viewModel.matches.isEmpty ? 0 : 50
     }
 }
 
@@ -174,17 +153,10 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
 extension FavoritosViewController: MatchTableViewCellDelegate {
     func didTapFavorite(cell: MatchTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let match = matches[indexPath.row]
+        let match = viewModel.matches[indexPath.row]
 
         guard let matchId = match.id else { return }
 
-        FavoritesManager.shared.toggleFavorite(matchId: matchId) { isFavorite, error in
-            if let error = error {
-                print("Error toggling favorite: \(error)")
-                return
-            }
-
-            // La UI se actualizará automáticamente mediante el listener
-        }
+        viewModel.toggleFavorite(matchId: matchId)
     }
 }

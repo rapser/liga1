@@ -6,15 +6,12 @@
 //
 
 import UIKit
-import Kingfisher
-import FirebaseFirestore
+import Combine
 
 class NewsViewController: UIViewController {
 
-    private var news: [NewsItem] = []
-    var featuredNews: [NewsItem] = []
-    var groupedNews: [String: [NewsItem]] = [:]
-
+    let viewModel = NewsViewModel()
+    private var cancellables = Set<AnyCancellable>()
     private let tableView = UITableView(frame: .zero, style: .plain)
 
     override func viewDidLoad() {
@@ -23,7 +20,8 @@ class NewsViewController: UIViewController {
         title = "Noticias"
 
         setupTableView()
-        fetchNews()
+        bindViewModel()
+        viewModel.fetchNews()
     }
 
     private func setupTableView() {
@@ -48,21 +46,37 @@ class NewsViewController: UIViewController {
         tableView.sectionHeaderHeight = UITableView.automaticDimension
     }
 
-    private func fetchNews() {
-        let db = Firestore.firestore()
-        db.collection("news").order(by: "fecha", descending: true).getDocuments { [weak self] snapshot, error in
-            guard let self = self else { return }
-            if let snapshot = snapshot {
-                let items = snapshot.documents.compactMap { NewsItem(from: $0.data()) }
-                self.featuredNews = items.filter { $0.destacada }
-                self.news = items.filter { !$0.destacada }
-                self.groupNews()
-                self.tableView.reloadData()
+    private func bindViewModel() {
+        viewModel.$featuredNews
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.tableView.reloadData()
             }
-        }
+            .store(in: &cancellables)
+
+        viewModel.$groupedNews
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.tableView.reloadData()
+            }
+            .store(in: &cancellables)
+
+        viewModel.$error
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showError(error)
+            }
+            .store(in: &cancellables)
     }
 
-    private func groupNews() {
-        groupedNews = Dictionary(grouping: news, by: { $0.categoria })
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "Error",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
