@@ -6,11 +6,14 @@
 //
 
 import UIKit
-import FirebaseAuth
-import GoogleSignIn
-import FirebaseCore
+import Combine
 
 class LoginViewController: UIViewController {
+
+    // MARK: - Properties
+
+    private let viewModel = LoginViewModel()
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - UI Components
 
@@ -71,6 +74,7 @@ class LoginViewController: UIViewController {
         setupLayout()
         setupActions()
         setupKeyboardDismissal()
+        bindViewModel()
     }
 
     // MARK: - Setup
@@ -219,60 +223,44 @@ class LoginViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
 
+    private func bindViewModel() {
+        viewModel.$isLoading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.showLoading(isLoading)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$error
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showAlert(title: "Error", message: error)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$loginSuccessful
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.navigateToHome()
+            }
+            .store(in: &cancellables)
+    }
+
     // MARK: - Actions
 
     @objc private func loginButtonTapped() {
-        guard let email = emailTextField.text, !email.isEmpty,
-              let password = passwordTextField.text, !password.isEmpty else {
-            showAlert(title: "Error", message: "Por favor completa todos los campos")
+        guard let email = emailTextField.text,
+              let password = passwordTextField.text else {
             return
         }
 
-        showLoading(true)
-
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
-            self?.showLoading(false)
-
-            if let error = error {
-                self?.showAlert(title: "Error", message: error.localizedDescription)
-                return
-            }
-
-            self?.navigateToHome()
-        }
+        viewModel.login(email: email, password: password)
     }
 
     @objc private func googleSignInTapped() {
-        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
-        let config = GIDConfiguration(clientID: clientID)
-        GIDSignIn.sharedInstance.configuration = config
-
-        GIDSignIn.sharedInstance.signIn(withPresenting: self) { [weak self] result, error in
-            guard let self = self else { return }
-
-            if let error = error {
-                self.showAlert(title: "Error", message: error.localizedDescription)
-                return
-            }
-
-            guard let user = result?.user, let idToken = user.idToken?.tokenString else { return }
-
-            let credential = GoogleAuthProvider.credential(withIDToken: idToken,
-                                                          accessToken: user.accessToken.tokenString)
-
-            self.showLoading(true)
-
-            Auth.auth().signIn(with: credential) { authResult, error in
-                self.showLoading(false)
-
-                if let error = error {
-                    self.showAlert(title: "Error", message: error.localizedDescription)
-                    return
-                }
-
-                self.navigateToHome()
-            }
-        }
+        viewModel.signInWithGoogle(presentingViewController: self)
     }
 
     @objc private func dismissKeyboard() {

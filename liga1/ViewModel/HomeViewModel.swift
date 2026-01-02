@@ -64,7 +64,7 @@ class HomeViewModel {
         favoritesService.toggleFavorite(matchId: matchId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                if case .failure(let error) = completion {
+                if case .failure(_) = completion {
                     // Handle error silently or log if needed
                 }
             } receiveValue: { _ in

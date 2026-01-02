@@ -45,7 +45,7 @@ class HomeViewController: UIViewController {
         // Observar estado de carga
         viewModel.$isLoading
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isLoading in
+            .sink { isLoading in
                 // TODO: Mostrar/ocultar indicador de carga
             }
             .store(in: &cancellables)

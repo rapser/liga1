@@ -6,24 +6,14 @@
 //
 
 import UIKit
-import FirebaseAuth
+import Combine
 
 class ProfileViewController: UIViewController {
 
-    // MARK: - Modelo de opción
-    struct Option {
-        let title: String
-        let icon: UIImage?
-        let subtitle: String? // Para versión o info adicional
-        let action: (() -> Void)?
-    }
+    // MARK: - Properties
 
-    struct Section {
-        let title: String
-        let options: [Option]
-    }
-
-    var sections: [Section] = []
+    let viewModel = ProfileViewModel()
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Tabla
     private lazy var tableView: UITableView = {
@@ -36,54 +26,12 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        setupSections()
         setupTableView()
+        bindViewModel()
     }
 
-    // MARK: - Configuración secciones
-    private func setupSections() {
-        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "N/A"
-        let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "N/A"
-        let versionString = "\(appVersion) (\(buildNumber))"
+    // MARK: - Setup
 
-        sections = [
-            Section(title: "Notificaciones Push", options: [
-                Option(title: "Ajustes de notificaciones", icon: UIImage(systemName: "bell.fill"), subtitle: nil, action: {
-                    print("Abrir ajustes de notificaciones")
-                })
-            ]),
-            Section(title: "Usuario", options: [
-                Option(title: "Nombre de usuario", icon: UIImage(systemName: "person.fill"), subtitle: nil, action: {
-                    print("Editar nombre de usuario")
-                }),
-                Option(title: "Cerrar Sesión", icon: UIImage(systemName: "arrow.backward.circle.fill"), subtitle: nil, action: { [weak self] in
-                    self?.showLogoutConfirmation()
-                })
-            ]),
-            Section(title: "Tema", options: [
-                Option(title: "Modo Claro / Modo Oscuro", icon: UIImage(systemName: "circle.lefthalf.fill"), subtitle: nil, action: { [weak self] in
-                    self?.showThemeBottomSheet()
-                })
-            ]),
-            Section(title: "Otros", options: [
-                Option(title: "Envía tus comentarios", icon: UIImage(systemName: "envelope.fill"), subtitle: nil, action: {
-                    print("Enviar feedback")
-                }),
-                Option(title: "Condiciones de uso", icon: UIImage(systemName: "doc.text.fill"), subtitle: nil, action: {
-                    print("Mostrar condiciones de uso")
-                }),
-                Option(title: "Políticas de privacidad", icon: UIImage(systemName: "lock.shield.fill"), subtitle: nil, action: {
-                    print("Mostrar políticas de privacidad")
-                }),
-                Option(title: "Ajustes de privacidad", icon: UIImage(systemName: "gearshape.fill"), subtitle: nil, action: {
-                    print("Abrir ajustes de privacidad")
-                }),
-                Option(title: "Versión", icon: nil, subtitle: versionString, action: nil)
-            ])
-        ]
-    }
-
-    // MARK: - Configuración Tabla
     private func setupTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView
@@ -96,22 +44,71 @@ class ProfileViewController: UIViewController {
         tableView.dataSource = self
     }
 
-    // MARK: - Bottom Sheet Tema
+    private func bindViewModel() {
+        viewModel.$sections
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.tableView.reloadData()
+            }
+            .store(in: &cancellables)
+
+        viewModel.$error
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.showError(error)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$logoutSuccessful
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.navigateToLogin()
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Internal Methods
+
+    func handleAction(_ action: ProfileViewModel.ProfileAction) {
+        switch action {
+        case .notification:
+            print("Abrir ajustes de notificaciones")
+        case .editUsername:
+            print("Editar nombre de usuario")
+        case .logout:
+            showLogoutConfirmation()
+        case .theme:
+            showThemeBottomSheet()
+        case .feedback:
+            print("Enviar feedback")
+        case .terms:
+            print("Mostrar condiciones de uso")
+        case .privacy:
+            print("Mostrar políticas de privacidad")
+        case .privacySettings:
+            print("Abrir ajustes de privacidad")
+        case .none:
+            break
+        }
+    }
+
     private func showThemeBottomSheet() {
         let alertController = UIAlertController(title: "Selecciona un tema",
                                                 message: nil,
                                                 preferredStyle: .actionSheet)
 
-        alertController.addAction(UIAlertAction(title: "Claro", style: .default, handler: { _ in
-            self.setAppTheme(.light)
+        alertController.addAction(UIAlertAction(title: "Claro", style: .default, handler: { [weak self] _ in
+            self?.setAppTheme(.light)
         }))
 
-        alertController.addAction(UIAlertAction(title: "Oscuro", style: .default, handler: { _ in
-            self.setAppTheme(.dark)
+        alertController.addAction(UIAlertAction(title: "Oscuro", style: .default, handler: { [weak self] _ in
+            self?.setAppTheme(.dark)
         }))
 
-        alertController.addAction(UIAlertAction(title: "Automático", style: .default, handler: { _ in
-            self.setAppTheme(.unspecified)
+        alertController.addAction(UIAlertAction(title: "Automático", style: .default, handler: { [weak self] _ in
+            self?.setAppTheme(.unspecified)
         }))
 
         alertController.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: nil))
@@ -124,52 +121,48 @@ class ProfileViewController: UIViewController {
     }
 
     private func setAppTheme(_ style: UIUserInterfaceStyle) {
-        // Guardar preferencia en UserDefaults
-        UserDefaults.standard.set(style.rawValue, forKey: "userInterfaceStyle")
+        viewModel.updateTheme(style)
 
-        // Aplicar el tema a toda la app (window)
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first {
             UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
                 window.overrideUserInterfaceStyle = style
             }, completion: nil)
         }
-
-        let themeName = style == .light ? "Claro" : (style == .dark ? "Oscuro" : "Automático")
-        print("Modo \(themeName) activado")
     }
 
-    // MARK: - Logout
     private func showLogoutConfirmation() {
         let alert = UIAlertController(title: "Cerrar Sesión",
                                       message: "¿Estás seguro de que deseas cerrar sesión?",
                                       preferredStyle: .alert)
-        
+
         alert.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Aceptar", style: .destructive, handler: { [weak self] _ in
-            self?.logout()
+            self?.viewModel.logout()
         }))
-        
+
         present(alert, animated: true, completion: nil)
     }
 
-    private func logout() {
-        do {
-            try Auth.auth().signOut()
+    private func navigateToLogin() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            let loginViewController = LoginViewController()
 
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let window = windowScene.windows.first {
-                let loginViewController = LoginViewController()
-                
-                window.rootViewController = loginViewController
-                window.makeKeyAndVisible()
-                
-                UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
-            }
+            window.rootViewController = loginViewController
+            window.makeKeyAndVisible()
 
-            print("Usuario cerrado sesión.")
-        } catch let error {
-            print("Error al cerrar sesión: \(error.localizedDescription)")
+            UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
         }
+    }
+
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "Error",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
