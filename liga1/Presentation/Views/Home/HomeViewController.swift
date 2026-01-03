@@ -15,6 +15,7 @@ class HomeViewController: UIViewController {
     let tableView = UITableView(frame: .zero, style: .plain)
     let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
+    private let refreshControl = UIRefreshControl()
 
     // MARK: - Initialization
 
@@ -42,7 +43,16 @@ class HomeViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemBackground
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
+
+        // Configurar refresh control
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+
         LayoutPresets.configureTableView(tableView, in: view, delegate: self, dataSource: self)
+    }
+
+    @objc private func handleRefresh() {
+        viewModel.fetchActiveJornadas()
     }
 
     private func bindViewModel() {
@@ -57,8 +67,10 @@ class HomeViewController: UIViewController {
         // Observar estado de carga
         viewModel.$isLoading
             .receive(on: DispatchQueue.main)
-            .sink { isLoading in
-                // TODO: Mostrar/ocultar indicador de carga
+            .sink { [weak self] isLoading in
+                if !isLoading {
+                    self?.refreshControl.endRefreshing()
+                }
             }
             .store(in: &cancellables)
 

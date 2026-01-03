@@ -19,9 +19,10 @@ class HomeViewModel {
 
     // MARK: - Dependencies
 
-    private let jornadasRepository: JornadasRepositoryProtocol
-    private let matchesRepository: MatchesRepositoryProtocol
-    private let favoritesService: FavoritesServiceProtocol
+    private let fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol
+    private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
+    private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
+    private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
 
     // MARK: - Private Properties
 
@@ -30,13 +31,15 @@ class HomeViewModel {
     // MARK: - Initialization
 
     init(
-        jornadasRepository: JornadasRepositoryProtocol = JornadasRepository(),
-        matchesRepository: MatchesRepositoryProtocol = MatchesRepository(),
-        favoritesService: FavoritesServiceProtocol = FavoritesService()
+        fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol = DIContainer.shared.makeFetchActiveJornadasUseCase(),
+        fetchMatchesUseCase: FetchMatchesUseCaseProtocol = DIContainer.shared.makeFetchMatchesUseCase(),
+        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol = DIContainer.shared.makeToggleFavoriteUseCase(),
+        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol = DIContainer.shared.makeObserveFavoritesUseCase()
     ) {
-        self.jornadasRepository = jornadasRepository
-        self.matchesRepository = matchesRepository
-        self.favoritesService = favoritesService
+        self.fetchActiveJornadasUseCase = fetchActiveJornadasUseCase
+        self.fetchMatchesUseCase = fetchMatchesUseCase
+        self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.observeFavoritesUseCase = observeFavoritesUseCase
 
         observeFavorites()
     }
@@ -47,7 +50,9 @@ class HomeViewModel {
         isLoading = true
         error = nil
 
-        jornadasRepository.fetchActiveJornadas()
+        Logger.shared.debug("Fetching active jornadas")
+
+        fetchActiveJornadasUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -56,13 +61,14 @@ class HomeViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] jornadas in
+                Logger.shared.info("Successfully fetched \(jornadas.count) active jornadas")
                 self?.loadMatchesForJornadas(jornadas)
             }
             .store(in: &cancellables)
     }
 
     func toggleFavorite(matchId: String) {
-        favoritesService.toggleFavorite(matchId: matchId)
+        toggleFavoriteUseCase.execute(matchId: matchId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 if case .failure(let error) = completion {
@@ -77,7 +83,7 @@ class HomeViewModel {
     // MARK: - Private Methods
 
     private func observeFavorites() {
-        favoritesService.observeFavorites()
+        observeFavoritesUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] favoriteIds in
                 self?.favoriteMatchIds = favoriteIds
@@ -87,13 +93,15 @@ class HomeViewModel {
     }
 
     private func loadMatchesForJornadas(_ jornadas: [Jornada]) {
+        Logger.shared.debug("Loading matches for \(jornadas.count) jornadas")
+
         let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
             guard let jornadaId = jornada.id else {
                 return Fail(error: NSError(domain: "HomeViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Jornada sin ID"]))
                     .eraseToAnyPublisher()
             }
 
-            return matchesRepository.fetchMatches(for: jornadaId)
+            return fetchMatchesUseCase.execute(for: jornadaId)
                 .map { matches in (jornada, matches) }
                 .eraseToAnyPublisher()
         }
@@ -107,6 +115,7 @@ class HomeViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] results in
+                Logger.shared.info("Successfully loaded matches for all jornadas")
                 self?.processJornadasWithMatches(results)
             }
             .store(in: &cancellables)

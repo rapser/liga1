@@ -123,9 +123,10 @@ class DIContainer {
 
     func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(
-            jornadasRepository: makeJornadasRepository(),
-            matchesRepository: makeMatchesRepository(),
-            favoritesService: makeFavoritesService()
+            fetchActiveJornadasUseCase: makeFetchActiveJornadasUseCase(),
+            fetchMatchesUseCase: makeFetchMatchesUseCase(),
+            toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
+            observeFavoritesUseCase: makeObserveFavoritesUseCase()
         )
     }
 
