@@ -44,14 +44,6 @@
 		464001DE2F08853F00A8C905 /* NewsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001932F08853F00A8C905 /* NewsHeaderView.swift */; };
 		464001DF2F08853F00A8C905 /* NewsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001892F08853F00A8C905 /* NewsItem.swift */; };
 		464001E12F08853F00A8C905 /* FavoritesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001842F08853F00A8C905 /* FavoritesService.swift */; };
-		464009A92F098CD100A8C905 /* MatchDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009A02F098CD100A8C905 /* MatchDTO.swift */; };
-		464009AA2F098CD100A8C905 /* NewsItemMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009A62F098CD100A8C905 /* NewsItemMapper.swift */; };
-		464009AB2F098CD100A8C905 /* TeamMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009A72F098CD100A8C905 /* TeamMapper.swift */; };
-		464009AC2F098CD100A8C905 /* JornadaDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640099F2F098CD100A8C905 /* JornadaDTO.swift */; };
-		464009AD2F098CD100A8C905 /* MatchMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009A52F098CD100A8C905 /* MatchMapper.swift */; };
-		464009AE2F098CD100A8C905 /* JornadaMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009A42F098CD100A8C905 /* JornadaMapper.swift */; };
-		464009AF2F098CD100A8C905 /* TeamDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009A22F098CD100A8C905 /* TeamDTO.swift */; };
-		464009B02F098CD100A8C905 /* NewsItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009A12F098CD100A8C905 /* NewsItemDTO.swift */; };
 		464009B42F098D2000A8C905 /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009B32F098D2000A8C905 /* UIViewController+Alert.swift */; };
 		464009BB2F098D4F00A8C905 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009B92F098D4F00A8C905 /* Logger.swift */; };
 		464009BC2F098D4F00A8C905 /* FirestoreConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009B52F098D4F00A8C905 /* FirestoreConstants.swift */; };
@@ -699,11 +691,9 @@
 				464001B62F08853F00A8C905 /* NewsViewModel.swift in Sources */,
 				464001B72F08853F00A8C905 /* UIView+Layout.swift in Sources */,
 				464001BA2F08853F00A8C905 /* FavoritosViewModel.swift in Sources */,
-				464009A92F098CD100A8C905 /* MatchDTO.swift in Sources */,
 				464009BB2F098D4F00A8C905 /* Logger.swift in Sources */,
 				464009BC2F098D4F00A8C905 /* FirestoreConstants.swift in Sources */,
 				464009BD2F098D4F00A8C905 /* FirestoreManager.swift in Sources */,
-				464009AA2F098CD100A8C905 /* NewsItemMapper.swift in Sources */,
 				464009CF2F098D8D00A8C905 /* LogoutUseCase.swift in Sources */,
 				464009D02F098D8D00A8C905 /* LoginUseCase.swift in Sources */,
 				464009D12F098D8D00A8C905 /* FetchTeamsUseCase.swift in Sources */,
@@ -714,12 +704,6 @@
 				464009D62F098D8D00A8C905 /* RegisterMatchesUseCase.swift in Sources */,
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
-				464009AB2F098CD100A8C905 /* TeamMapper.swift in Sources */,
-				464009AC2F098CD100A8C905 /* JornadaDTO.swift in Sources */,
-				464009AD2F098CD100A8C905 /* MatchMapper.swift in Sources */,
-				464009AE2F098CD100A8C905 /* JornadaMapper.swift in Sources */,
-				464009AF2F098CD100A8C905 /* TeamDTO.swift in Sources */,
-				464009B02F098CD100A8C905 /* NewsItemDTO.swift in Sources */,
 				464001BB2F08853F00A8C905 /* TeamsRepository.swift in Sources */,
 				464001BD2F08853F00A8C905 /* Color+Extension.swift in Sources */,
 				464001BF2F08853F00A8C905 /* Match.swift in Sources */,

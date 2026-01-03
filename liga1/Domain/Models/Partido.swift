@@ -13,15 +13,26 @@ struct Partido: Codable {
     let teamBId: String
     let fecha: String
     let torneo: String
+    let jornadaId: String
     var golesTeamA: Int
     var golesTeamB: Int
     var estado: EstadoPartido
-    
-    init(teamAId: String, teamBId: String, fecha: String, golesTeamA: Int, golesTeamB: Int) {
+
+    // Propiedades computadas para compatibilidad con RegisterMatchesUseCase
+    var equipoA: String {
+        return teamAId
+    }
+
+    var equipoB: String {
+        return teamBId
+    }
+
+    init(teamAId: String, teamBId: String, fecha: String, jornadaId: String, torneo: String = "clausura", golesTeamA: Int = 0, golesTeamB: Int = 0) {
         self.teamAId = teamAId
         self.teamBId = teamBId
         self.fecha = fecha
-        self.torneo = "clausura"
+        self.jornadaId = jornadaId
+        self.torneo = torneo
         self.golesTeamA = golesTeamA
         self.golesTeamB = golesTeamB
         self.estado = .pendiente

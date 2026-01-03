@@ -136,10 +136,24 @@ extension UIView {
         return self
     }
 
+    /// Establece el ancho igual al de otra vista
+    @discardableResult
+    func width(to view: UIView) -> Self {
+        widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        return self
+    }
+
     /// Establece el alto de la vista
     @discardableResult
     func height(_ height: CGFloat) -> Self {
         heightAnchor.constraint(equalToConstant: height).isActive = true
+        return self
+    }
+
+    /// Establece el alto igual al de otra vista
+    @discardableResult
+    func height(to view: UIView) -> Self {
+        heightAnchor.constraint(equalTo: view.heightAnchor).isActive = true
         return self
     }
 
@@ -205,6 +219,15 @@ extension UIView {
     func pinVertical(padding: CGFloat = 0, useSafeArea: Bool = false) -> Self {
         return pinTop(constant: padding, useSafeArea: useSafeArea)
             .pinBottom(constant: padding, useSafeArea: useSafeArea)
+    }
+
+    /// Pin a todos los edges del superview
+    @discardableResult
+    func pinEdges(padding: UIEdgeInsets = .zero, useSafeArea: Bool = false) -> Self {
+        return pinTop(constant: padding.top, useSafeArea: useSafeArea)
+            .pinLeading(constant: padding.left)
+            .pinTrailing(constant: padding.right)
+            .pinBottom(constant: padding.bottom, useSafeArea: useSafeArea)
     }
 
     // MARK: - Style Helpers

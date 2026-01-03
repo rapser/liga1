@@ -54,7 +54,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -1,
                 userInfo: [NSLocalizedDescriptionKey: "La lista de partidos no puede estar vacía"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: Empty partidos array")
+            Logger.shared.error("RegisterMatchesUseCase: Empty partidos array", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
@@ -90,7 +90,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -2,
                 userInfo: [NSLocalizedDescriptionKey: "El ID del equipo A no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: teamAId is empty")
+            Logger.shared.error("RegisterMatchesUseCase: teamAId is empty", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
@@ -100,7 +100,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -3,
                 userInfo: [NSLocalizedDescriptionKey: "El ID del equipo B no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: teamBId is empty")
+            Logger.shared.error("RegisterMatchesUseCase: teamBId is empty", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
@@ -110,7 +110,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -4,
                 userInfo: [NSLocalizedDescriptionKey: "La fecha no puede estar vacía"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: fecha is empty")
+            Logger.shared.error("RegisterMatchesUseCase: fecha is empty", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
@@ -120,7 +120,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -5,
                 userInfo: [NSLocalizedDescriptionKey: "Los puntajes no pueden ser negativos"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: Invalid scores - teamA: \(teamAScore), teamB: \(teamBScore)")
+            Logger.shared.error("RegisterMatchesUseCase: Invalid scores - teamA: \(teamAScore), teamB: \(teamBScore)", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
@@ -154,7 +154,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -6,
                 userInfo: [NSLocalizedDescriptionKey: "El ID del equipo A no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: teamAId is empty for finalization")
+            Logger.shared.error("RegisterMatchesUseCase: teamAId is empty for finalization", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
@@ -164,7 +164,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -7,
                 userInfo: [NSLocalizedDescriptionKey: "El ID del equipo B no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: teamBId is empty for finalization")
+            Logger.shared.error("RegisterMatchesUseCase: teamBId is empty for finalization", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
@@ -174,7 +174,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -8,
                 userInfo: [NSLocalizedDescriptionKey: "La fecha no puede estar vacía"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: fecha is empty for finalization")
+            Logger.shared.error("RegisterMatchesUseCase: fecha is empty for finalization", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 

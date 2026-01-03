@@ -24,15 +24,9 @@ class FetchTeamsUseCase: FetchTeamsUseCaseProtocol {
     func execute(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         Logger.shared.debug("FetchTeamsUseCase: Fetching teams for torneo: \(torneo)")
 
-        let torneoString: String
-        switch torneo {
-        case .apertura:
-            torneoString = "Apertura"
-        case .clausura:
-            torneoString = "Clausura"
-        case .acumulado:
-            // Acumulado no debería llamar directamente a repository
-            Logger.shared.error("FetchTeamsUseCase: Invalid torneo type 'acumulado' for single fetch")
+        // Validar que no sea acumulado
+        if torneo == .acumulado {
+            Logger.shared.error("FetchTeamsUseCase: Invalid torneo type 'acumulado' for single fetch", error: nil)
             return Fail(error: NSError(
                 domain: "FetchTeamsUseCase",
                 code: -1,
@@ -40,7 +34,7 @@ class FetchTeamsUseCase: FetchTeamsUseCaseProtocol {
             )).eraseToAnyPublisher()
         }
 
-        return repository.fetchTeams(torneo: torneoString)
+        return repository.fetchTeams(for: torneo)
             .handleEvents(
                 receiveOutput: { teams in
                     Logger.shared.info("FetchTeamsUseCase: Successfully fetched \(teams.count) teams for \(torneo)")

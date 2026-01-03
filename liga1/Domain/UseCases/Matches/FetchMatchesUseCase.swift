@@ -24,7 +24,7 @@ class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
     func execute(for jornadaId: String) -> AnyPublisher<[Match], Error> {
         // Validación de negocio
         guard !jornadaId.isEmpty else {
-            Logger.shared.error("FetchMatchesUseCase: jornadaId is empty")
+            Logger.shared.error("FetchMatchesUseCase: jornadaId is empty", error: nil)
             return Fail(error: NSError(
                 domain: "FetchMatchesUseCase",
                 code: -1,

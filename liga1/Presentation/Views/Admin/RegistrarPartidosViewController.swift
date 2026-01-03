@@ -176,8 +176,8 @@ class RegistrarPartidosViewController: UIViewController {
         // Ejemplo de partidos para registrar rápidamente en 2026
         // Este array puede ser modificado según la jornada que se necesite registrar
         let partidosARegistrar: [Partido] = [
-            Partido(teamAId: "com", teamBId: "gra", fecha: "03", golesTeamA: 1, golesTeamB: 2),
-            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", golesTeamA: 3, golesTeamB: 0)
+            Partido(teamAId: "com", teamBId: "gra", fecha: "03", jornadaId: "clausura_2026_01", torneo: "clausura", golesTeamA: 1, golesTeamB: 2),
+            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", jornadaId: "clausura_2026_01", torneo: "clausura", golesTeamA: 3, golesTeamB: 0)
         ]
 
         viewModel.registerMultipleMatches(partidos: partidosARegistrar)
