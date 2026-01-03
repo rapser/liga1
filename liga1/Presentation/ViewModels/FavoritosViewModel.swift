@@ -46,11 +46,11 @@ class FavoritosViewModel {
         favoritesService.toggleFavorite(matchId: matchId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                if case .failure(_) = completion {
-                    // Handle error silently or log if needed
+                if case .failure(let error) = completion {
+                    Logger.shared.error("Failed to toggle favorite for match: \(matchId)", error: error)
                 }
             } receiveValue: { _ in
-                // Favorite toggled successfully
+                Logger.shared.debug("Favorite toggled successfully for match: \(matchId)")
             }
             .store(in: &cancellables)
     }

@@ -74,10 +74,12 @@ class TorneoViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
+                    Logger.shared.error("Failed to fetch teams for torneo: \(torneo)", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] teams in
                 guard let self = self else { return }
+                Logger.shared.info("Fetched \(teams.count) teams for \(torneo)")
                 self.displayedTeams = teams
 
                 switch torneo {
@@ -104,10 +106,12 @@ class TorneoViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
+                    Logger.shared.error("Failed to fetch acumulado teams", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] (aperturaTeams, clausuraTeams) in
                 guard let self = self else { return }
+                Logger.shared.info("Calculating acumulado from \(aperturaTeams.count) apertura and \(clausuraTeams.count) clausura teams")
 
                 var teamsDict: [String: Team] = [:]
 
