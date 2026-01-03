@@ -63,25 +63,68 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 return
             }
 
-            self.db.collection(FirestoreConstants.Collection.matches)
-                .whereField(FieldPath.documentID(), in: matchIds)
-                .getDocuments { snapshot, error in
-                    if let error = error {
-                        promise(.failure(error))
-                        return
-                    }
+            Logger.shared.debug("MatchesRepository: Fetching \(matchIds.count) favorite matches")
+            Logger.shared.debug("MatchesRepository: Match IDs: \(matchIds)")
 
-                    guard let documents = snapshot?.documents else {
-                        promise(.success([]))
-                        return
-                    }
+            // Los matchIds tienen formato: "apertura_01_atl_uni" donde:
+            // - apertura_01 es el jornadaId
+            // - atl_uni es el matchId dentro de esa jornada
+            // Estructura: jornadas/{jornadaId}/matches/{matchId}
 
-                    let matches = documents.compactMap { doc -> Match? in
-                        try? doc.data(as: Match.self)
-                    }
+            let dispatchGroup = DispatchGroup()
+            var allMatches: [Match] = []
+            var fetchError: Error?
 
-                    promise(.success(matches))
+            for fullMatchId in matchIds {
+                // Separar el jornadaId del matchId
+                let components = fullMatchId.split(separator: "_", maxSplits: 2)
+                guard components.count == 3 else {
+                    Logger.shared.debug("MatchesRepository: Invalid match ID format: \(fullMatchId)")
+                    continue
                 }
+
+                let torneo = String(components[0])      // "apertura" o "clausura"
+                let numero = String(components[1])       // "01"
+                let matchId = String(components[2])      // "atl_uni"
+                let jornadaId = "\(torneo)_\(numero)"   // "apertura_01"
+
+                dispatchGroup.enter()
+
+                self.db.collection(FirestoreConstants.Collection.jornadas)
+                    .document(jornadaId)
+                    .collection(FirestoreConstants.Collection.matches)
+                    .document(matchId)
+                    .getDocument { snapshot, error in
+                        defer { dispatchGroup.leave() }
+
+                        if let error = error {
+                            Logger.shared.error("MatchesRepository: Error fetching match \(fullMatchId)", error: error)
+                            fetchError = error
+                            return
+                        }
+
+                        guard let snapshot = snapshot, snapshot.exists else {
+                            Logger.shared.debug("MatchesRepository: Match \(fullMatchId) not found")
+                            return
+                        }
+
+                        if let match = try? snapshot.data(as: Match.self) {
+                            allMatches.append(match)
+                            Logger.shared.debug("MatchesRepository: Successfully fetched match \(fullMatchId)")
+                        } else {
+                            Logger.shared.debug("MatchesRepository: Failed to decode match \(fullMatchId)")
+                        }
+                    }
+            }
+
+            dispatchGroup.notify(queue: .global()) {
+                if let error = fetchError {
+                    promise(.failure(error))
+                } else {
+                    Logger.shared.debug("MatchesRepository: Successfully fetched \(allMatches.count) matches")
+                    promise(.success(allMatches))
+                }
+            }
         }
         .eraseToAnyPublisher()
     }
