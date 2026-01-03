@@ -10,13 +10,28 @@ import Foundation
 import Combine
 import UIKit
 
+/// Delegate para comunicar eventos de navegación al Coordinator
+protocol LoginViewModelCoordinatorDelegate: AnyObject {
+    func loginViewModelDidRequestGoogleSignIn(_ viewModel: LoginViewModel)
+    func loginViewModelDidLogin(_ viewModel: LoginViewModel)
+}
+
+/// Delegate para comunicar eventos de UI al ViewController
+protocol LoginViewModelDelegate: AnyObject {
+    func loginViewModelNeedsGoogleSignInPresentation(_ viewModel: LoginViewModel)
+}
+
 class LoginViewModel {
 
     // MARK: - Published Properties
 
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: String?
-    @Published var loginSuccessful: Bool = false
+
+    // MARK: - Delegates
+
+    weak var coordinatorDelegate: LoginViewModelCoordinatorDelegate?
+    weak var delegate: LoginViewModelDelegate?
 
     // MARK: - Dependencies
 
@@ -50,12 +65,18 @@ class LoginViewModel {
                 }
             } receiveValue: { [weak self] _ in
                 Logger.shared.info("User logged in successfully with email: \(email)")
-                self?.loginSuccessful = true
+                guard let self = self else { return }
+                self.coordinatorDelegate?.loginViewModelDidLogin(self)
             }
             .store(in: &cancellables)
     }
 
-    func signInWithGoogle(presentingViewController: UIViewController) {
+    func signInWithGoogle() {
+        Logger.shared.debug("Requesting Google Sign In presentation")
+        delegate?.loginViewModelNeedsGoogleSignInPresentation(self)
+    }
+
+    func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
 
@@ -71,7 +92,8 @@ class LoginViewModel {
                 }
             } receiveValue: { [weak self] _ in
                 Logger.shared.info("User logged in successfully with Google")
-                self?.loginSuccessful = true
+                guard let self = self else { return }
+                self.coordinatorDelegate?.loginViewModelDidLogin(self)
             }
             .store(in: &cancellables)
     }

@@ -13,6 +13,7 @@ class ProfileViewController: UIViewController {
     // MARK: - Properties
 
     let viewModel: ProfileViewModel
+    private let container: DIContainer
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Tabla
@@ -24,14 +25,14 @@ class ProfileViewController: UIViewController {
 
     // MARK: - Initialization
 
-    init(viewModel: ProfileViewModel = DIContainer.shared.makeProfileViewModel()) {
+    init(viewModel: ProfileViewModel, container: DIContainer) {
         self.viewModel = viewModel
+        self.container = container
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.viewModel = DIContainer.shared.makeProfileViewModel()
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented - use init(viewModel:container:)")
     }
 
     // MARK: - Lifecycle
@@ -161,8 +162,7 @@ class ProfileViewController: UIViewController {
     private func navigateToLogin() {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first {
-            let viewModel = DIContainer.shared.makeLoginViewModel()
-            let loginViewController = LoginViewController(viewModel: viewModel)
+            let loginViewController = container.makeLoginViewController()
 
             window.rootViewController = loginViewController
             window.makeKeyAndVisible()
@@ -172,7 +172,7 @@ class ProfileViewController: UIViewController {
     }
 
     private func navigateToRegistrarPartidos() {
-        let registrarPartidosVC = RegistrarPartidosViewController()
+        let registrarPartidosVC = container.makeRegistrarPartidosViewController()
         navigationController?.pushViewController(registrarPartidosVC, animated: true)
     }
 

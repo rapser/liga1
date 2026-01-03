@@ -12,21 +12,21 @@ class HomeViewController: UIViewController {
 
     // MARK: - Properties
 
-    let tableView = UITableView(frame: .zero, style: .plain)
-    let viewModel: HomeViewModel
+    private let tableView = UITableView(frame: .zero, style: .plain)
+    private let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
     private let refreshControl = UIRefreshControl()
+    private lazy var tableViewAdapter = HomeTableViewAdapter(tableView: tableView)
 
     // MARK: - Initialization
 
-    init(viewModel: HomeViewModel = DIContainer.shared.makeHomeViewModel()) {
+    init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.viewModel = DIContainer.shared.makeHomeViewModel()
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented - use init(viewModel:)")
     }
 
     // MARK: - Lifecycle
@@ -34,6 +34,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupAdapter()
         bindViewModel()
         viewModel.fetchActiveJornadas()
     }
@@ -42,13 +43,18 @@ class HomeViewController: UIViewController {
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
 
         // Configurar refresh control
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
 
-        LayoutPresets.configureTableView(tableView, in: view, delegate: self, dataSource: self)
+        // Agregar tableView a la vista
+        tableView.prepareForAutoLayout()
+        tableView.addTo(view).fillSuperview()
+    }
+
+    private func setupAdapter() {
+        tableViewAdapter.delegate = self
     }
 
     @objc private func handleRefresh() {
@@ -59,8 +65,8 @@ class HomeViewController: UIViewController {
         // Observar cambios en las secciones de jornadas
         viewModel.$jornadaSections
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.tableView.reloadData()
+            .sink { [weak self] sections in
+                self?.tableViewAdapter.update(with: sections)
             }
             .store(in: &cancellables)
 
@@ -82,5 +88,13 @@ class HomeViewController: UIViewController {
                 self?.showError(error)
             }
             .store(in: &cancellables)
+    }
+}
+
+// MARK: - HomeTableViewAdapterDelegate
+
+extension HomeViewController: HomeTableViewAdapterDelegate {
+    func didTapFavorite(matchId: String, in jornadaId: String) {
+        viewModel.toggleFavorite(matchId: matchId)
     }
 }

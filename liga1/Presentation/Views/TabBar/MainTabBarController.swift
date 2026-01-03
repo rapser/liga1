@@ -8,6 +8,18 @@
 import UIKit
 
 class MainTabBarController: UITabBarController {
+
+    private let container: DIContainer
+
+    init(container: DIContainer) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented - use init(container:)")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -15,19 +27,19 @@ class MainTabBarController: UITabBarController {
         configureTabBarAppearance()
 
         // Configuración de los tabs
-        let homeVC = HomeViewController()
+        let homeVC = container.makeHomeViewController()
         homeVC.title = "Home"
 
-        let torneoVC = TorneoViewController()
+        let torneoVC = container.makeTorneoViewController()
         torneoVC.title = "Torneo"
 
-        let favoritosVC = FavoritosViewController()
+        let favoritosVC = container.makeFavoritosViewController()
         favoritosVC.title = "Favoritos"
 
-        let newsVC = NewsViewController()
+        let newsVC = container.makeNewsViewController()
         newsVC.title = "Noticias"
 
-        let perfilVC = ProfileViewController()
+        let perfilVC = container.makeProfileViewController()
         perfilVC.title = "Mi Perfil"
 
         // Crear NavControllers con estilo Large Title

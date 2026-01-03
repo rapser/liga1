@@ -9,18 +9,20 @@ import UIKit
 import FirebaseAuth
 
 final class SessionManager {
-    
+
     static let shared = SessionManager()
     private init() {}
-    
+
     private var inactivityTimer: Timer?
     private let inactivityTimeLimit: TimeInterval = 432000 // 5 días (5 * 24 * 60 * 60)
-    
+
     weak var window: UIWindow?
-    
+    private var container: DIContainer?
+
     // MARK: - Configuración inicial
-    func configure(with window: UIWindow?) {
+    func configure(with window: UIWindow?, container: DIContainer) {
         self.window = window
+        self.container = container
     }
     
     // MARK: - Inactividad
@@ -39,10 +41,14 @@ final class SessionManager {
     
     // MARK: - Logout
     func logout() {
+        guard let container = container else {
+            Logger.shared.error("❌ SessionManager: Container no configurado", error: nil)
+            return
+        }
+
         do {
             try Auth.auth().signOut()
-            let viewModel = DIContainer.shared.makeLoginViewModel()
-            let loginVC = LoginViewController(viewModel: viewModel)
+            let loginVC = container.makeLoginViewController()
             let nav = UINavigationController(rootViewController: loginVC)
             window?.rootViewController = nav
             Logger.shared.info("✅ Usuario cerrado sesión automáticamente por inactividad.")

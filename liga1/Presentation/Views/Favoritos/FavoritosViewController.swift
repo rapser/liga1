@@ -20,14 +20,13 @@ class FavoritosViewController: UIViewController {
 
     // MARK: - Initialization
 
-    init(viewModel: FavoritosViewModel = DIContainer.shared.makeFavoritosViewModel()) {
+    init(viewModel: FavoritosViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.viewModel = DIContainer.shared.makeFavoritosViewModel()
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented - use init(viewModel:)")
     }
 
     override func viewDidLoad() {

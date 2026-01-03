@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Dependency Injection Container
 /// Responsable de crear y proveer todas las dependencias de la app
@@ -177,5 +178,45 @@ final class DIContainer {
         return RegistrarPartidosViewModel(
             registerMatchesUseCase: makeRegisterMatchesUseCase()
         )
+    }
+
+    // MARK: - ViewControllers
+
+    func makeHomeViewController() -> HomeViewController {
+        return HomeViewController(viewModel: makeHomeViewModel())
+    }
+
+    func makeTorneoViewController() -> TorneoViewController {
+        return TorneoViewController(viewModel: makeTorneoViewModel())
+    }
+
+    func makeFavoritosViewController() -> FavoritosViewController {
+        return FavoritosViewController(viewModel: makeFavoritosViewModel())
+    }
+
+    func makeNewsViewController() -> NewsViewController {
+        return NewsViewController(viewModel: makeNewsViewModel())
+    }
+
+    func makeProfileViewController() -> ProfileViewController {
+        return ProfileViewController(viewModel: makeProfileViewModel(), container: self)
+    }
+
+    func makeLoginViewController() -> LoginViewController {
+        return LoginViewController(viewModel: makeLoginViewModel())
+    }
+
+    func makeRegistrarPartidosViewController() -> RegistrarPartidosViewController {
+        return RegistrarPartidosViewController(viewModel: makeRegistrarPartidosViewModel())
+    }
+
+    // MARK: - Coordinators
+
+    func makeAppCoordinator(window: UIWindow) -> AppCoordinator {
+        return AppCoordinator(window: window, container: self)
+    }
+
+    func makeLoginCoordinator(navigationController: UINavigationController) -> LoginCoordinator {
+        return LoginCoordinator(navigationController: navigationController, container: self)
     }
 }

@@ -71,14 +71,13 @@ class RegistrarPartidosViewController: UIViewController {
 
     // MARK: - Initialization
 
-    init(viewModel: RegistrarPartidosViewModel = DIContainer.shared.makeRegistrarPartidosViewModel()) {
+    init(viewModel: RegistrarPartidosViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.viewModel = DIContainer.shared.makeRegistrarPartidosViewModel()
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented - use init(viewModel:)")
     }
 
     // MARK: - Lifecycle

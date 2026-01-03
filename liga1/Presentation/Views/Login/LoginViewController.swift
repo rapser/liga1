@@ -12,7 +12,7 @@ class LoginViewController: UIViewController {
 
     // MARK: - Properties
 
-    private let viewModel: LoginViewModel
+    let viewModel: LoginViewModel
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
@@ -81,6 +81,8 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+
+        viewModel.delegate = self
 
         setupLayout()
         setupActions()
@@ -250,13 +252,6 @@ class LoginViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        viewModel.$loginSuccessful
-            .filter { $0 }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.navigateToHome()
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: - Actions
@@ -271,7 +266,7 @@ class LoginViewController: UIViewController {
     }
 
     @objc private func googleSignInTapped() {
-        viewModel.signInWithGoogle(presentingViewController: self)
+        viewModel.signInWithGoogle()
     }
 
     @objc private func dismissKeyboard() {
@@ -285,12 +280,12 @@ class LoginViewController: UIViewController {
         show ? loadingComponents.indicator.startAnimating() : loadingComponents.indicator.stopAnimating()
     }
 
-    private func navigateToHome() {
-        let mainTabBar = MainTabBarController()
-        if let window = view.window {
-            window.rootViewController = mainTabBar
-            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: nil)
-        }
-    }
+}
 
+// MARK: - LoginViewModelDelegate
+
+extension LoginViewController: LoginViewModelDelegate {
+    func loginViewModelNeedsGoogleSignInPresentation(_ viewModel: LoginViewModel) {
+        viewModel.performGoogleSignIn(presentingViewController: self)
+    }
 }

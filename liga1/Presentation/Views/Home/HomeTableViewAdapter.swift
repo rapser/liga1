@@ -1,24 +1,64 @@
 //
-//  HomeViewController+TableView.swift
+//  HomeTableViewAdapter.swift
 //  liga1
 //
-//  Created by miguel tomairo on 14/09/25.
+//  Created by Claude Code on 03/01/26.
 //
 
 import UIKit
 
-extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
+/// Protocolo para comunicar eventos del adapter al ViewController
+protocol HomeTableViewAdapterDelegate: AnyObject {
+    func didTapFavorite(matchId: String, in jornadaId: String)
+}
+
+/// Adapter para separar la lógica de TableView del HomeViewController
+final class HomeTableViewAdapter: NSObject {
+
+    // MARK: - Properties
+
+    private weak var tableView: UITableView?
+    private var sections: [HomeViewModel.JornadaSection] = []
+    weak var delegate: HomeTableViewAdapterDelegate?
+
+    // MARK: - Initialization
+
+    init(tableView: UITableView) {
+        self.tableView = tableView
+        super.init()
+        setupTableView()
+    }
+
+    // MARK: - Public Methods
+
+    func update(with sections: [HomeViewModel.JornadaSection]) {
+        self.sections = sections
+        tableView?.reloadData()
+    }
+
+    // MARK: - Private Methods
+
+    private func setupTableView() {
+        tableView?.dataSource = self
+        tableView?.delegate = self
+        tableView?.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
+    }
+}
+
+// MARK: - UITableViewDataSource
+
+extension HomeTableViewAdapter: UITableViewDataSource {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.jornadaSections.count
+        return sections.count
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.jornadaSections[section].matches.count
+        return sections[section].matches.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let match = viewModel.jornadaSections[indexPath.section].matches[indexPath.row]
+        let match = sections[indexPath.section].matches[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
             return UITableViewCell()
         }
@@ -31,10 +71,14 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         cell.configure(with: match, logoLocal: logoLocal, logoVisitante: logoVisitante)
         return cell
     }
-    
-    // Header
+}
+
+// MARK: - UITableViewDelegate
+
+extension HomeTableViewAdapter: UITableViewDelegate {
+
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let jornadaSection = viewModel.jornadaSections[section]
+        let jornadaSection = sections[section]
         let view = UIView()
         view.backgroundColor = .systemBackground
 
@@ -67,17 +111,20 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
         return view
     }
-    
+
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 60
     }
 }
 
 // MARK: - MatchTableViewCellDelegate
-extension HomeViewController: MatchTableViewCellDelegate {
+
+extension HomeTableViewAdapter: MatchTableViewCellDelegate {
     func didTapFavorite(cell: MatchTableViewCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let jornadaSection = viewModel.jornadaSections[indexPath.section]
+        guard let tableView = tableView,
+              let indexPath = tableView.indexPath(for: cell) else { return }
+
+        let jornadaSection = sections[indexPath.section]
         let match = jornadaSection.matches[indexPath.row]
 
         guard let matchId = match.id else { return }
@@ -85,6 +132,6 @@ extension HomeViewController: MatchTableViewCellDelegate {
         // El ID completo incluye la jornada: "clausura_01_adt_utc"
         let fullMatchId = "\(jornadaSection.jornadaId)_\(matchId)"
 
-        viewModel.toggleFavorite(matchId: fullMatchId)
+        delegate?.didTapFavorite(matchId: fullMatchId, in: jornadaSection.jornadaId)
     }
 }
