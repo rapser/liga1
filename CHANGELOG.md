@@ -5,6 +5,189 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [2.0.0] - 2026-01-02
+
+### 🏗️ REFACTORIZACIÓN MAYOR - Clean Architecture
+
+#### Arquitectura
+- **🎯 Migración a Clean Architecture**: Reorganización completa del proyecto en 4 capas principales
+  - **Presentation Layer**: Views, ViewModels, Components
+  - **Domain Layer**: Models, Use Cases
+  - **Data Layer**: Repositories, Services, Managers
+  - **Core Layer**: Extensions, Utils, Resources
+
+- **📱 Nueva estructura de carpetas**:
+  ```
+  liga1/
+  ├── Presentation/     # Capa de presentación
+  │   ├── Views/        # ViewControllers
+  │   ├── ViewModels/   # Lógica de presentación
+  │   └── Components/   # Componentes UI reutilizables
+  ├── Domain/           # Capa de dominio
+  │   ├── Models/       # Entidades de negocio
+  │   └── UseCases/     # Casos de uso
+  ├── Data/             # Capa de datos
+  │   ├── Repositories/ # Acceso a datos
+  │   ├── Services/     # Servicios transversales
+  │   └── Managers/     # Gestión de persistencia
+  └── Core/             # Capa central
+      ├── Extensions/   # Extensions de UIKit
+      ├── Utils/        # Utilidades generales
+      └── Resources/    # Recursos compartidos
+  ```
+
+#### ✨ Patrón MVVM + Combine
+
+- **ViewModels implementados**:
+  - ✅ `HomeViewModel` - Gestión de jornadas activas
+  - ✅ `NewsViewModel` - Gestión de noticias
+  - ✅ `TorneoViewModel` - Gestión de tabla de posiciones
+  - ✅ `FavoritosViewModel` - Gestión de favoritos
+  - ✅ `ProfileViewModel` - Gestión de perfil y configuración
+  - ✅ `LoginViewModel` - Gestión de autenticación
+
+- **Características de ViewModels**:
+  - `@Published` properties para reactive updates
+  - Dependency injection con protocolos
+  - Separación clara de lógica de presentación
+  - Sin referencias a UIKit
+  - Testing-friendly
+
+#### 📦 Repositories Pattern
+
+- **Nuevos Repositories**:
+  - `JornadasRepository` - Obtención de jornadas desde Firestore
+  - `MatchesRepository` - Obtención de partidos
+  - `TeamsRepository` - Obtención de equipos
+  - `NewsRepository` - Obtención de noticias
+  - `AdminMatchRepository` - Operaciones administrativas
+
+- **Características**:
+  - Retornan `AnyPublisher<T, Error>` usando Combine
+  - Implementan protocolos para facilitar testing
+  - Abstracción de la fuente de datos
+  - Cache-first strategy
+
+#### 🔧 Services Layer
+
+- **Nuevos Services**:
+  - `AuthService` - Servicio de autenticación con Firebase
+  - `FavoritesService` - Gestión de favoritos con Combine
+
+- **Características**:
+  - Protocolos para dependency injection
+  - Operaciones asíncronas con Combine
+  - Manejo centralizado de lógica transversal
+
+#### 🎨 UI Programático - 100% Código
+
+- **Refactorización de ViewControllers**:
+  - `HomeViewController` - Ahora usa HomeViewModel + Combine
+  - `NewsViewController` - Usa NewsViewModel
+  - `TorneoViewController` - Usa TorneoViewModel
+  - `FavoritosViewController` - Usa FavoritosViewModel
+  - `ProfileViewController` - Usa ProfileViewModel
+  - `LoginViewController` - Usa LoginViewModel
+
+- **Características**:
+  - Layout 100% programático (sin Storyboards)
+  - Extensions para TableView delegates en archivos separados
+  - Binding reactivo con Combine
+  - Manejo de errores centralizado
+
+#### 🔄 Reactive Programming
+
+- **Combine Framework**:
+  - Publishers para todas las operaciones asíncronas
+  - `@Published` properties en ViewModels
+  - `sink` y `store(in:)` para subscripciones
+  - `AnyCancellable` para gestión de memoria
+  - Operadores: `map`, `filter`, `compactMap`, `receive(on:)`
+
+#### 📐 Custom Extensions
+
+- **Layout Extensions**:
+  - `UIView+Layout.swift` - DSL para Auto Layout
+  - `UIStackView+Builder.swift` - Builder pattern
+  - `Color+Extension.swift` - Colores custom
+
+- **Layout Helpers**:
+  - `LayoutPresets.swift` - Componentes reutilizables
+  - `LayoutExamples.swift` - Ejemplos de uso
+
+### 📝 Documentación
+
+- **Nuevos archivos de documentación**:
+  - `ARCHITECTURE.md` - Documentación completa de arquitectura
+    - Diagramas de capas
+    - Flujo de datos
+    - Estructura del proyecto
+    - Mejores prácticas
+    - Convenciones de nombres
+    - Guía de migración
+
+- **README.md actualizado**:
+  - Nueva sección de arquitectura
+  - Diagramas de Clean Architecture
+  - Ejemplos de código con Combine
+  - Roadmap actualizado
+  - Guías de contribución
+
+### 🔧 Mejoras Técnicas
+
+- **Dependency Injection**: Inyección de dependencias en ViewModels
+- **Protocol-Oriented**: Abstracciones con protocolos
+- **Memory Management**: Uso correcto de `[weak self]`
+- **Error Handling**: Manejo centralizado de errores
+- **Loading States**: Estados de carga reactivos
+
+### 🎯 Beneficios de la Refactorización
+
+1. ✅ **Separación clara de responsabilidades**
+2. ✅ **Mayor testabilidad** (cada capa es independiente)
+3. ✅ **Código más mantenible** y escalable
+4. ✅ **Reutilización de código** mejorada
+5. ✅ **Flujo de datos reactivo** con Combine
+6. ✅ **Preparado para crecimiento** del equipo
+7. ✅ **Sigue principios SOLID**
+
+### 📊 Estadísticas de Migración
+
+- 📁 **40+ archivos** reorganizados
+- 🎯 **6 ViewModels** creados
+- 📦 **5 Repositories** implementados
+- 🔧 **2 Services** nuevos
+- 📐 **3 Extension files** para UI
+- 📝 **2 archivos** de documentación
+
+### ⚠️ Breaking Changes
+
+- **Estructura de carpetas completamente reorganizada**
+- **Migración de MVC a MVVM + Clean Architecture**
+- **Requiere actualización del proyecto en Xcode**:
+  1. Eliminar referencias antiguas (View/, ViewModel/, Cell/, etc.)
+  2. Agregar nuevas carpetas (Presentation/, Domain/, Data/, Core/)
+  3. Agregar nuevos archivos al target
+
+### 🔄 Migration Guide
+
+Ver `ARCHITECTURE.md` para la guía completa de migración:
+
+```
+Estructura Anterior → Nueva
+View/              → Presentation/Views/
+ViewModel/         → Presentation/ViewModels/
+Cell/              → Presentation/Components/Cells/
+Model/             → Domain/Models/
+Repository/        → Data/Repositories/
+Service/           → Data/Services/
+Manager/           → Data/Managers/
+Extensions/        → Core/Extensions/
+Util/              → Core/Utils/
+```
+
+---
+
 ## [1.0.0] - 2025-12-25
 
 ### ✨ Características Principales
@@ -58,6 +241,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 #### 👤 Perfil de Usuario
 - Visualización de información del usuario autenticado
+- Selector de tema (Claro/Oscuro/Automático)
 - Opción de cerrar sesión
 - Navegación de vuelta al login después de logout
 
@@ -86,7 +270,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 #### UI/UX
 - Soporte completo para Dark Mode
-- Navegación con UITabBarController (4 tabs)
+- Navegación con UITabBarController (5 tabs)
 - Safe area handling optimizado
 - Constraints responsivos
 - Colores personalizados: `.liga1Red`
@@ -133,17 +317,6 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Logo de Liga 1 para pantalla de login
 - Colores brand personalizados
 
-### 📝 Documentación
-
-- README completo con:
-  - Descripción del proyecto
-  - Stack tecnológico
-  - Arquitectura MVC
-  - Estructura de Firestore
-  - Guía de instalación
-  - Estrategia de caché
-  - Roadmap
-
 ---
 
 ## Formato
@@ -156,3 +329,5 @@ Los tipos de cambios incluidos son:
 - `🐛 Fixed` para corrección de bugs
 - `🔒 Security` para vulnerabilidades corregidas
 - `⚡ Performance` para mejoras de rendimiento
+- `🏗️ Refactor` para refactorizaciones importantes
+- `📝 Docs` para cambios en documentación

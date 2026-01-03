@@ -9,13 +9,15 @@ Aplicación iOS para seguir en tiempo real la Liga 1 de Fútbol Profesional del 
 - **Favoritos**: Marca tus partidos favoritos para seguimiento rápido
 - **Noticias**: Mantente informado con las últimas noticias del fútbol peruano
 - **Autenticación**: Ingresa con Google o correo electrónico para sincronizar tus favoritos
-- **Modo Offline**: Los datos se cachean localmente para acceso sin conexión
+- **Modo Oscuro**: Soporte completo para Dark Mode
+- **UI Programático**: Interfaz construida 100% con código (sin Storyboards)
 
 ## 🛠 Tecnologías y Frameworks
 
 ### Lenguaje
 - **Swift 5.0+**
-- **UIKit** - Framework nativo de Apple para construcción de interfaces
+- **UIKit Programático** - Construcción de interfaces sin Storyboards
+- **Combine** - Framework reactivo para manejo de eventos
 
 ### Backend & Servicios
 - **Firebase**
@@ -33,17 +35,64 @@ Aplicación iOS para seguir en tiempo real la Liga 1 de Fútbol Profesional del 
 ## 🏗 Arquitectura
 
 ### Patrón de Diseño
-- **MVC (Model-View-Controller)**: Arquitectura principal del proyecto
-  - **Models**: Estructuras `Codable` para sincronización con Firestore
-  - **Views**: UIKit components (UIViewController, UITableView, Custom Cells)
-  - **Controllers**: ViewControllers para lógica de negocio
+La aplicación sigue **Clean Architecture** con el patrón **MVVM + Combine**:
+
+```
+┌─────────────────────────────────────────────┐
+│         Presentation Layer                   │
+│  (Views, ViewModels, Components)            │
+└─────────────────┬───────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────┐
+│          Domain Layer                        │
+│      (Models, Use Cases)                    │
+└─────────────────┬───────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────┐
+│           Data Layer                         │
+│  (Repositories, Services, Managers)         │
+└─────────────────┬───────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────┐
+│          Core Layer                          │
+│     (Extensions, Utils, Resources)          │
+└─────────────────────────────────────────────┘
+```
+
+### Capas de la Arquitectura
+
+#### 📱 Presentation Layer
+- **Views**: ViewControllers construidos programáticamente con UIKit
+- **ViewModels**: Lógica de presentación con `@Published` properties
+- **Components**: Celdas y componentes UI reutilizables
+
+#### 🎯 Domain Layer
+- **Models**: Entidades de negocio (`Codable` para Firestore)
+- **Use Cases**: Lógica de negocio pura (en desarrollo)
+
+#### 💾 Data Layer
+- **Repositories**: Abstracción de acceso a datos con Combine
+- **Services**: Servicios transversales (Auth, Favorites)
+- **Managers**: Gestión de persistencia local
+
+#### 🔧 Core Layer
+- **Extensions**: Extensions de UIKit para layout programático
+- **Utils**: Utilidades compartidas y presets de UI
+
+### Características Técnicas
+
+- **Reactive Programming**: Uso de Combine para flujo de datos reactivo
+- **Dependency Injection**: Protocolos e inyección de dependencias
+- **Programmatic UI**: 100% código, layout con Auto Layout + Extensions
+- **Protocol-Oriented**: Abstracciones con protocolos para testing
 
 ### Estructura de Navegación
-- **UITabBarController**: Navegación principal con 4 pestañas
+- **UITabBarController**: Navegación principal con 5 pestañas
   - Home (Partidos)
   - Favoritos
   - Tabla de Posiciones
   - Noticias
+  - Perfil
 
 ### Estructura del Proyecto
 
@@ -51,61 +100,88 @@ Aplicación iOS para seguir en tiempo real la Liga 1 de Fútbol Profesional del 
 liga1/
 ├── Application/
 │   ├── AppDelegate.swift
-│   └── SceneDelegate.swift
-├── Model/
-│   ├── Match.swift          # Modelo de partido
-│   ├── Jornada.swift        # Modelo de jornada
-│   ├── Team.swift           # Modelo de equipo
-│   ├── News.swift           # Modelo de noticia
-│   └── User.swift           # Modelo de usuario
-├── View/
-│   ├── Home/
-│   │   ├── HomeViewController.swift
-│   │   └── HomeViewController+TableView.swift
-│   ├── Favoritos/
-│   │   └── FavoritosViewController.swift
-│   ├── Tabla/
-│   │   ├── TorneoViewController.swift
-│   │   └── TorneoViewController+TableView.swift
-│   ├── Noticias/
-│   │   └── NewsViewController.swift
-│   ├── Login/
-│   │   └── LoginViewController.swift
-│   ├── Profile/
-│   │   └── ProfileViewController.swift
-│   └── TabBar/
-│       └── MainTabBarController.swift
-├── Cell/
-│   ├── MatchTableViewCell.swift
-│   ├── EquipoTableViewCell.swift
-│   ├── NewsTableViewCell.swift
-│   └── HeaderView.swift
-├── Manager/
-│   └── FavoritesManager.swift
-├── Extensions/
-│   ├── Color+Extension.swift
-│   └── Date+Extension.swift
+│   ├── SceneDelegate.swift
+│   ├── SessionManager.swift
+│   └── AppRouter.swift
+│
+├── Presentation/
+│   ├── Views/
+│   │   ├── Home/               # Pantalla principal
+│   │   ├── News/                # Noticias
+│   │   ├── Tabla/               # Tabla de posiciones
+│   │   ├── Favoritos/           # Partidos favoritos
+│   │   ├── Profile/             # Perfil de usuario
+│   │   ├── Login/               # Autenticación
+│   │   └── TabBar/              # Navegación principal
+│   ├── ViewModels/
+│   │   ├── HomeViewModel.swift
+│   │   ├── NewsViewModel.swift
+│   │   ├── TorneoViewModel.swift
+│   │   ├── FavoritosViewModel.swift
+│   │   ├── ProfileViewModel.swift
+│   │   └── LoginViewModel.swift
+│   └── Components/
+│       └── Cells/               # Celdas reutilizables
+│
+├── Domain/
+│   ├── Models/
+│   │   ├── Team.swift
+│   │   ├── Match.swift
+│   │   ├── Jornada.swift
+│   │   ├── NewsItem.swift
+│   │   └── Partido.swift
+│   └── UseCases/                # (En desarrollo)
+│
+├── Data/
+│   ├── Repositories/
+│   │   ├── JornadasRepository.swift
+│   │   ├── MatchesRepository.swift
+│   │   ├── TeamsRepository.swift
+│   │   ├── NewsRepository.swift
+│   │   └── AdminMatchRepository.swift
+│   ├── Services/
+│   │   ├── AuthService.swift
+│   │   └── FavoritesService.swift
+│   └── Managers/
+│       └── FavoritesManager.swift
+│
+├── Core/
+│   ├── Extensions/
+│   │   ├── UIView+Layout.swift
+│   │   ├── UIStackView+Builder.swift
+│   │   └── Color+Extension.swift
+│   └── Utils/
+│       ├── LayoutPresets.swift
+│       ├── EquipoPeruano.swift
+│       └── TorneoType.swift
+│
 └── Resources/
     ├── Assets.xcassets
     ├── GoogleService-Info.plist
     └── Info.plist
 ```
 
+Para más detalles sobre la arquitectura, consulta [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## 🗄 Estructura de Datos en Firestore
 
 ### Colección: `jornadas`
 ```
 jornadas/
-├── {jornadaId}              # Ejemplo: "apertura_01"
+├── {jornadaId}              # Ejemplo: "apertura_2026_01"
 │   ├── mostrar: Bool        # Si se muestra en el home
+│   ├── numero: Int          # Número de jornada
+│   ├── torneo: String       # apertura/clausura
 │   ├── fechaInicio: Date    # Fecha de inicio de la jornada
 │   └── matches/             # Subcolección de partidos
 │       └── {matchId}        # Ejemplo: "adt_utc"
 │           ├── fecha: Timestamp
-│           ├── golesEquipoLocal: Int
-│           ├── golesEquipoVisitante: Int
-│           ├── estado: String  # pendiente, enJuego, finalizado
-│           └── suspendido: Bool
+│           ├── golesTeamA: Int
+│           ├── golesTeamB: Int
+│           ├── estado: String    # pendiente, enJuego, finalizado
+│           ├── suspendido: Bool
+│           └── equipoLocalId: String
+│           └── equipoVisitanteId: String
 ```
 
 ### Colección: `users`
@@ -113,7 +189,7 @@ jornadas/
 users/
 └── {userId}/
     └── favorites/
-        └── {matchId}: Bool  # Ejemplo: "apertura_01_adt_utc"
+        └── {matchId}: Bool  # Ejemplo: "apertura_2026_01_adt_utc"
 ```
 
 ### Colección: `noticias`
@@ -129,17 +205,19 @@ noticias/
 
 ## 🎨 Características de UI/UX
 
-- **Diseño Adaptativo**: Soporte para modo claro y oscuro
+- **Layout Programático**: 100% código con Auto Layout
+- **Diseño Adaptativo**: Soporte completo para modo claro y oscuro
 - **Animaciones**: Transiciones suaves entre pantallas
 - **Pull-to-Refresh**: Actualización manual de datos
 - **Loading States**: Indicadores de carga para mejor experiencia
 - **Error Handling**: Mensajes informativos para errores de red
+- **Custom Extensions**: Helpers para layout declarativo
 
 ## 🚀 Instalación y Configuración
 
 ### Requisitos Previos
-- Xcode 14.0+
-- iOS 15.0+
+- Xcode 15.0+
+- iOS 18.0+
 - Cuenta de Firebase
 - Cuenta de desarrollador de Google (para Google Sign-In)
 
@@ -147,7 +225,7 @@ noticias/
 
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/liga1.git
+   git clone https://github.com/rapser/liga1.git
    cd liga1
    ```
 
@@ -166,28 +244,36 @@ noticias/
    - Las dependencias SPM se resolverán automáticamente
 
 5. **Ejecutar el proyecto**
-   - Selecciona un simulador o dispositivo
+   - Selecciona un simulador o dispositivo con iOS 18.0+
    - Presiona `Cmd + R` para compilar y ejecutar
 
 ## 📊 Estrategia de Caché
 
-La aplicación implementa una estrategia de **Cache-First** con actualización en background:
+La aplicación implementa una estrategia de **Cache-First** con actualización en background usando Combine:
 
 1. **Primera carga**: Lee desde caché de Firestore (offline) → Respuesta instantánea
 2. **Segunda carga**: Actualiza desde servidor en background
 3. **Persistencia**: Los datos se mantienen disponibles offline
+4. **Reactive Updates**: ViewModels publican cambios automáticamente
 
 ```swift
-// Ejemplo de implementación
-db.collection("jornadas")
-    .getDocuments(source: .cache) { snapshot, error in
-        // Carga rápida desde caché
-    }
+// Ejemplo de implementación con Combine
+func fetchJornadas() -> AnyPublisher<[Jornada], Error> {
+    return Future<[Jornada], Error> { promise in
+        // Carga desde caché primero
+        self.db.collection("jornadas")
+            .getDocuments(source: .cache) { snapshot, error in
+                // Procesar caché...
+            }
 
-db.collection("jornadas")
-    .getDocuments(source: .server) { snapshot, error in
-        // Actualización en background
+        // Actualización desde servidor
+        self.db.collection("jornadas")
+            .getDocuments(source: .server) { snapshot, error in
+                // Actualizar datos...
+            }
     }
+    .eraseToAnyPublisher()
+}
 ```
 
 ## 🔐 Autenticación
@@ -198,19 +284,29 @@ db.collection("jornadas")
 
 ### Flujo de Autenticación
 1. Usuario selecciona método de login
-2. Firebase Auth valida credenciales
-3. Se crea/obtiene UID del usuario
-4. Se sincroniza colección de favoritos
-5. Navegación a pantalla principal
+2. LoginViewModel valida credenciales usando AuthService
+3. Firebase Auth retorna UID del usuario
+4. Se sincroniza colección de favoritos con FavoritesService
+5. Navegación reactiva a pantalla principal usando Combine
 
 ## 🎯 Roadmap
 
+- [x] Arquitectura Clean Architecture + MVVM
+- [x] UI Programático completo
+- [x] Reactive Programming con Combine
+- [x] Modo Oscuro
 - [ ] Push Notifications para partidos en vivo
 - [ ] Widget de iOS para próximos partidos
 - [ ] Compartir resultados en redes sociales
 - [ ] Estadísticas detalladas por jugador
 - [ ] Modo landscape para tablets
-- [ ] Soporte para watchOS
+- [ ] Tests unitarios y UI tests
+- [ ] CI/CD con GitHub Actions
+
+## 📚 Documentación Adicional
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Documentación detallada de arquitectura
+- [CHANGELOG.md](CHANGELOG.md) - Historial de cambios del proyecto
 
 ## 👥 Contribución
 
@@ -221,6 +317,13 @@ Las contribuciones son bienvenidas. Por favor:
 3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
+
+### Guías de Estilo
+- Sigue la arquitectura Clean Architecture establecida
+- Usa programmatic UI (sin Storyboards)
+- Implementa Combine para operaciones asíncronas
+- Escribe código siguiendo Swift style guide
+- Documenta cambios en CHANGELOG.md
 
 ## 📄 Licencia
 
