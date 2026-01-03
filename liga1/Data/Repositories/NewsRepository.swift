@@ -24,20 +24,36 @@ class NewsRepository: NewsRepositoryProtocol {
                 return
             }
 
+            Logger.shared.debug("NewsRepository: Fetching from collection: \(FirestoreConstants.Collection.news)")
+
             self.db.collection(FirestoreConstants.Collection.news)
                 .order(by: FirestoreConstants.NewsField.fecha, descending: true)
                 .getDocuments { snapshot, error in
                     if let error = error {
+                        Logger.shared.error("NewsRepository: Error fetching documents", error: error)
                         promise(.failure(error))
                         return
                     }
 
                     guard let documents = snapshot?.documents else {
+                        Logger.shared.debug("NewsRepository: No documents found, returning empty array")
                         promise(.success([]))
                         return
                     }
 
-                    let newsItems = documents.compactMap { NewsItem(from: $0.data()) }
+                    Logger.shared.debug("NewsRepository: Found \(documents.count) documents")
+
+                    let newsItems = documents.compactMap { document -> NewsItem? in
+                        Logger.shared.debug("NewsRepository: Processing document: \(document.documentID)")
+                        Logger.shared.debug("NewsRepository: Document data: \(document.data())")
+                        let item = NewsItem(from: document.data())
+                        if item == nil {
+                            Logger.shared.debug("NewsRepository: Failed to parse document \(document.documentID)")
+                        }
+                        return item
+                    }
+
+                    Logger.shared.debug("NewsRepository: Successfully parsed \(newsItems.count) news items")
                     promise(.success(newsItems))
                 }
         }

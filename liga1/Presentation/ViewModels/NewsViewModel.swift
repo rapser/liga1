@@ -49,9 +49,9 @@ class NewsViewModel {
             } receiveValue: { [weak self] newsItems in
                 guard let self = self else { return }
                 Logger.shared.info("Fetched \(newsItems.count) news items")
-                self.featuredNews = newsItems.filter { $0.destacada }
-                let regularNews = newsItems.filter { !$0.destacada }
-                self.groupedNews = Dictionary(grouping: regularNews, by: { $0.categoria })
+                self.featuredNews = newsItems.filter { $0.featured }
+                let regularNews = newsItems.filter { !$0.featured }
+                self.groupedNews = Dictionary(grouping: regularNews, by: { $0.category })
             }
             .store(in: &cancellables)
     }

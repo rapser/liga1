@@ -18,7 +18,7 @@ public enum FirestoreConstants {
         public static let matches = "matches"
         public static let users = "users"
         public static let favorites = "favoritos"
-        public static let news = "noticias"
+        public static let news = "news"
         public static let teams = "equipos"
 
         // Tournaments

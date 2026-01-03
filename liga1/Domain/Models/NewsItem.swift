@@ -12,19 +12,19 @@ struct NewsItem {
     let title: String
     let imageUrl: String
     let url: String
-    let periodico: String
-    let categoria: String
-    let destacada: Bool
-    let fecha: Date
+    let source: String
+    let category: String
+    let featured: Bool
+    let publishedDate: Date
 
-    init(title: String, imageUrl: String, url: String, periodico: String, categoria: String, destacada: Bool, fecha: Date) {
+    init(title: String, imageUrl: String, url: String, source: String, category: String, featured: Bool, publishedDate: Date) {
         self.title = title
         self.imageUrl = imageUrl
         self.url = url
-        self.periodico = periodico
-        self.categoria = categoria
-        self.destacada = destacada
-        self.fecha = fecha
+        self.source = source
+        self.category = category
+        self.featured = featured
+        self.publishedDate = publishedDate
     }
 }
 
@@ -33,19 +33,19 @@ extension NewsItem {
         guard let title = dict["title"] as? String,
               let imageUrl = dict["image"] as? String,
               let url = dict["url"] as? String,
-              let periodico = dict["periodico"] as? String,
-              let categoria = dict["categoria"] as? String,
-              let destacada = dict["destacada"] as? Bool,
+              let source = dict["periodico"] as? String,
+              let category = dict["categoria"] as? String,
+              let featured = dict["destacada"] as? Bool,
               let timestamp = dict["fecha"] as? Timestamp else {
             return nil
         }
-        
+
         self.title = title
         self.imageUrl = imageUrl
         self.url = url
-        self.periodico = periodico
-        self.categoria = categoria
-        self.destacada = destacada
-        self.fecha = timestamp.dateValue()
+        self.source = source
+        self.category = category
+        self.featured = featured
+        self.publishedDate = timestamp.dateValue()
     }
 }

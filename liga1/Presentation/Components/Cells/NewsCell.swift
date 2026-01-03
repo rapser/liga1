@@ -67,9 +67,9 @@ class NewsCell: UITableViewCell {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
-        fechaLabel.text = formatter.string(from: item.fecha)
+        fechaLabel.text = formatter.string(from: item.publishedDate)
 
-        if item.destacada {
+        if item.featured {
             contentView.backgroundColor = UIColor(red: 1, green: 0.95, blue: 0.8, alpha: 1)
         } else {
             contentView.backgroundColor = .systemBackground

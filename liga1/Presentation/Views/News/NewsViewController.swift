@@ -31,6 +31,7 @@ class NewsViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = "Noticias"
 
+        Logger.shared.debug("NewsViewController: viewDidLoad called")
         setupTableView()
         bindViewModel()
         viewModel.fetchNews()
@@ -50,14 +51,19 @@ class NewsViewController: UIViewController {
     private func bindViewModel() {
         viewModel.$featuredNews
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] featuredNews in
+                Logger.shared.debug("NewsViewController: Featured news count: \(featuredNews.count)")
                 self?.tableView.reloadData()
             }
             .store(in: &cancellables)
 
         viewModel.$groupedNews
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] groupedNews in
+                Logger.shared.debug("NewsViewController: Grouped news categories: \(groupedNews.keys.count)")
+                for (category, items) in groupedNews {
+                    Logger.shared.debug("NewsViewController: Category '\(category)' has \(items.count) items")
+                }
                 self?.tableView.reloadData()
             }
             .store(in: &cancellables)
@@ -66,6 +72,7 @@ class NewsViewController: UIViewController {
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
+                Logger.shared.error("NewsViewController: Error received", error: error)
                 self?.showError(error)
             }
             .store(in: &cancellables)
