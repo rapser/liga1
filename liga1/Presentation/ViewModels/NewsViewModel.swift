@@ -3,6 +3,7 @@
 //  liga1
 //
 //  Created by Claude Code on 01/01/26.
+//  Refactored on 03/01/26.
 //
 
 import Foundation
@@ -19,7 +20,7 @@ class NewsViewModel {
 
     // MARK: - Dependencies
 
-    private let newsRepository: NewsRepositoryProtocol
+    private let fetchNewsUseCase: FetchNewsUseCaseProtocol
 
     // MARK: - Private Properties
 
@@ -27,8 +28,8 @@ class NewsViewModel {
 
     // MARK: - Initialization
 
-    init(newsRepository: NewsRepositoryProtocol = NewsRepository()) {
-        self.newsRepository = newsRepository
+    init(fetchNewsUseCase: FetchNewsUseCaseProtocol = DIContainer.shared.makeFetchNewsUseCase()) {
+        self.fetchNewsUseCase = fetchNewsUseCase
     }
 
     // MARK: - Public Methods
@@ -37,7 +38,7 @@ class NewsViewModel {
         isLoading = true
         error = nil
 
-        newsRepository.fetchNews()
+        fetchNewsUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false

@@ -11,6 +11,7 @@ import Combine
 
 protocol MatchesRepositoryProtocol {
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error>
+    func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error>
     func observeMatch(id: String) -> AnyPublisher<Match, Error>
 }
 
@@ -30,6 +31,41 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 .collection(FirestoreConstants.Collection.matches)
                 .order(by: FirestoreConstants.MatchField.fecha)
                 .getDocuments(source: .default) { snapshot, error in
+                    if let error = error {
+                        promise(.failure(error))
+                        return
+                    }
+
+                    guard let documents = snapshot?.documents else {
+                        promise(.success([]))
+                        return
+                    }
+
+                    let matches = documents.compactMap { doc -> Match? in
+                        try? doc.data(as: Match.self)
+                    }
+
+                    promise(.success(matches))
+                }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error> {
+        return Future<[Match], Error> { [weak self] promise in
+            guard let self = self else {
+                promise(.failure(NSError(domain: "MatchesRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
+                return
+            }
+
+            guard !matchIds.isEmpty else {
+                promise(.success([]))
+                return
+            }
+
+            self.db.collection(FirestoreConstants.Collection.matches)
+                .whereField(FieldPath.documentID(), in: matchIds)
+                .getDocuments { snapshot, error in
                     if let error = error {
                         promise(.failure(error))
                         return

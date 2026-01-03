@@ -3,11 +3,11 @@
 //  liga1
 //
 //  Created by Claude Code on 01/01/26.
+//  Refactored on 03/01/26.
 //
 
 import Foundation
 import Combine
-import FirebaseFirestore
 
 class FavoritosViewModel {
 
@@ -20,22 +20,24 @@ class FavoritosViewModel {
 
     // MARK: - Dependencies
 
-    private let matchesRepository: MatchesRepositoryProtocol
-    private let favoritesService: FavoritesServiceProtocol
+    private let fetchFavoriteMatchesUseCase: FetchFavoriteMatchesUseCaseProtocol
+    private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
+    private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
 
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
-    private let db = Firestore.firestore()
 
     // MARK: - Initialization
 
     init(
-        matchesRepository: MatchesRepositoryProtocol = MatchesRepository(),
-        favoritesService: FavoritesServiceProtocol = FavoritesService()
+        fetchFavoriteMatchesUseCase: FetchFavoriteMatchesUseCaseProtocol = DIContainer.shared.makeFetchFavoriteMatchesUseCase(),
+        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol = DIContainer.shared.makeToggleFavoriteUseCase(),
+        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol = DIContainer.shared.makeObserveFavoritesUseCase()
     ) {
-        self.matchesRepository = matchesRepository
-        self.favoritesService = favoritesService
+        self.fetchFavoriteMatchesUseCase = fetchFavoriteMatchesUseCase
+        self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.observeFavoritesUseCase = observeFavoritesUseCase
 
         observeFavorites()
     }
@@ -43,7 +45,7 @@ class FavoritosViewModel {
     // MARK: - Public Methods
 
     func toggleFavorite(matchId: String) {
-        favoritesService.toggleFavorite(matchId: matchId)
+        toggleFavoriteUseCase.execute(matchId: matchId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 if case .failure(let error) = completion {
@@ -58,7 +60,7 @@ class FavoritosViewModel {
     // MARK: - Private Methods
 
     private func observeFavorites() {
-        favoritesService.observeFavorites()
+        observeFavoritesUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] favoriteIds in
                 self?.favoriteMatchIds = favoriteIds
@@ -74,34 +76,22 @@ class FavoritosViewModel {
         }
 
         isLoading = true
+        error = nil
 
-        db.collection("matches")
-            .whereField(FieldPath.documentID(), in: Array(favoriteMatchIds))
-            .getDocuments { [weak self] snapshot, error in
-                guard let self = self else { return }
+        Logger.shared.debug("Fetching \(favoriteMatchIds.count) favorite matches")
 
-                DispatchQueue.main.async {
-                    self.isLoading = false
-
-                    if let error = error {
-                        self.error = error
-                        return
-                    }
-
-                    guard let documents = snapshot?.documents else {
-                        self.matches = []
-                        return
-                    }
-
-                    var fetchedMatches = documents.compactMap { doc -> Match? in
-                        var match = try? doc.data(as: Match.self)
-                        match?.isFavorite = true
-                        return match
-                    }
-
-                    fetchedMatches.sort { $0.fecha < $1.fecha }
-                    self.matches = fetchedMatches
+        fetchFavoriteMatchesUseCase.execute(favoriteMatchIds: favoriteMatchIds)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                self?.isLoading = false
+                if case .failure(let error) = completion {
+                    Logger.shared.error("Failed to fetch favorite matches", error: error)
+                    self?.error = error
                 }
+            } receiveValue: { [weak self] matches in
+                Logger.shared.info("Successfully fetched \(matches.count) favorite matches")
+                self?.matches = matches
             }
+            .store(in: &cancellables)
     }
 }

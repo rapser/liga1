@@ -3,6 +3,7 @@
 //  liga1
 //
 //  Created by Claude Code on 01/01/26.
+//  Refactored on 03/01/26.
 //
 
 import Foundation
@@ -19,7 +20,7 @@ class TorneoViewModel {
 
     // MARK: - Dependencies
 
-    private let teamsRepository: TeamsRepositoryProtocol
+    private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
 
     // MARK: - Private Properties
 
@@ -30,8 +31,8 @@ class TorneoViewModel {
 
     // MARK: - Initialization
 
-    init(teamsRepository: TeamsRepositoryProtocol = TeamsRepository()) {
-        self.teamsRepository = teamsRepository
+    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol = DIContainer.shared.makeFetchTeamsUseCase()) {
+        self.fetchTeamsUseCase = fetchTeamsUseCase
     }
 
     // MARK: - Public Methods
@@ -69,7 +70,7 @@ class TorneoViewModel {
         isLoading = true
         error = nil
 
-        teamsRepository.fetchTeams(for: torneo)
+        fetchTeamsUseCase.execute(for: torneo)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -98,8 +99,8 @@ class TorneoViewModel {
         isLoading = true
         error = nil
 
-        let aperturaPublisher = teamsRepository.fetchTeams(for: .apertura)
-        let clausuraPublisher = teamsRepository.fetchTeams(for: .clausura)
+        let aperturaPublisher = fetchTeamsUseCase.execute(for: .apertura)
+        let clausuraPublisher = fetchTeamsUseCase.execute(for: .clausura)
 
         Publishers.Zip(aperturaPublisher, clausuraPublisher)
             .receive(on: DispatchQueue.main)

@@ -247,7 +247,7 @@ class LoginViewController: UIViewController {
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
-                self?.showAlert(title: "Error", message: error)
+                self?.showError(title: "Error", message: error)
             }
             .store(in: &cancellables)
 
@@ -294,9 +294,4 @@ class LoginViewController: UIViewController {
         }
     }
 
-    private func showAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
 }

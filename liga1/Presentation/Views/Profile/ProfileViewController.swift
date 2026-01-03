@@ -101,6 +101,8 @@ class ProfileViewController: UIViewController {
             print("Mostrar políticas de privacidad")
         case .privacySettings:
             print("Abrir ajustes de privacidad")
+        case .registrarPartidos:
+            navigateToRegistrarPartidos()
         case .none:
             break
         }
@@ -168,13 +170,9 @@ class ProfileViewController: UIViewController {
         }
     }
 
-    private func showError(_ error: Error) {
-        let alert = UIAlertController(
-            title: "Error",
-            message: error.localizedDescription,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+    private func navigateToRegistrarPartidos() {
+        let registrarPartidosVC = RegistrarPartidosViewController()
+        navigationController?.pushViewController(registrarPartidosVC, animated: true)
     }
+
 }

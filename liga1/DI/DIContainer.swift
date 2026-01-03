@@ -91,6 +91,12 @@ class DIContainer {
         )
     }
 
+    func makeFetchFavoriteMatchesUseCase() -> FetchFavoriteMatchesUseCaseProtocol {
+        return FetchFavoriteMatchesUseCase(
+            matchesRepository: makeMatchesRepository()
+        )
+    }
+
     // MARK: - Use Cases - Auth
 
     func makeLoginUseCase() -> LoginUseCaseProtocol {
@@ -102,6 +108,14 @@ class DIContainer {
     func makeLogoutUseCase() -> LogoutUseCaseProtocol {
         return LogoutUseCase(
             authService: makeAuthService()
+        )
+    }
+
+    // MARK: - Use Cases - Admin
+
+    func makeRegisterMatchesUseCase() -> RegisterMatchesUseCaseProtocol {
+        return RegisterMatchesUseCase(
+            adminMatchRepository: AdminMatchRepository()
         )
     }
 
@@ -117,33 +131,39 @@ class DIContainer {
 
     func makeNewsViewModel() -> NewsViewModel {
         return NewsViewModel(
-            newsRepository: makeNewsRepository()
+            fetchNewsUseCase: makeFetchNewsUseCase()
         )
     }
 
     func makeTorneoViewModel() -> TorneoViewModel {
         return TorneoViewModel(
-            teamsRepository: makeTeamsRepository()
+            fetchTeamsUseCase: makeFetchTeamsUseCase()
         )
     }
 
     func makeFavoritosViewModel() -> FavoritosViewModel {
         return FavoritosViewModel(
-            jornadasRepository: makeJornadasRepository(),
-            matchesRepository: makeMatchesRepository(),
-            favoritesService: makeFavoritesService()
+            fetchFavoriteMatchesUseCase: makeFetchFavoriteMatchesUseCase(),
+            toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
+            observeFavoritesUseCase: makeObserveFavoritesUseCase()
         )
     }
 
     func makeProfileViewModel() -> ProfileViewModel {
         return ProfileViewModel(
-            authService: makeAuthService()
+            logoutUseCase: makeLogoutUseCase()
         )
     }
 
     func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            authService: makeAuthService()
+            loginUseCase: makeLoginUseCase()
+        )
+    }
+
+    func makeRegistrarPartidosViewModel() -> RegistrarPartidosViewModel {
+        return RegistrarPartidosViewModel(
+            registerMatchesUseCase: makeRegisterMatchesUseCase()
         )
     }
 }

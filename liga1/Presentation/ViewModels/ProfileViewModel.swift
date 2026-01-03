@@ -3,6 +3,7 @@
 //  liga1
 //
 //  Created by Claude Code on 02/01/26.
+//  Refactored on 03/01/26.
 //
 
 import Foundation
@@ -21,13 +22,13 @@ class ProfileViewModel {
 
     // MARK: - Private Properties
 
-    private let authService: AuthServiceProtocol
+    private let logoutUseCase: LogoutUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
-    init(authService: AuthServiceProtocol = AuthService()) {
-        self.authService = authService
+    init(logoutUseCase: LogoutUseCaseProtocol = DIContainer.shared.makeLogoutUseCase()) {
+        self.logoutUseCase = logoutUseCase
         loadCurrentTheme()
         setupSections()
     }
@@ -38,7 +39,7 @@ class ProfileViewModel {
         isLoading = true
         error = nil
 
-        authService.logout()
+        logoutUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -101,6 +102,14 @@ class ProfileViewModel {
                     action: .theme
                 )
             ]),
+            ProfileSection(title: "Administración", options: [
+                ProfileOption(
+                    title: "Registrar Partidos",
+                    icon: UIImage(systemName: "football.fill"),
+                    subtitle: "Herramienta para registro masivo",
+                    action: .registrarPartidos
+                )
+            ]),
             ProfileSection(title: "Otros", options: [
                 ProfileOption(
                     title: "Envía tus comentarios",
@@ -159,12 +168,7 @@ class ProfileViewModel {
         case terms
         case privacy
         case privacySettings
+        case registrarPartidos
         case none
     }
-}
-
-// MARK: - Auth Service Protocol
-
-protocol AuthServiceProtocol {
-    func logout() -> AnyPublisher<Void, Error>
 }

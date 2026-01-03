@@ -3,13 +3,12 @@
 //  liga1
 //
 //  Created by Claude Code on 02/01/26.
+//  Refactored on 03/01/26.
 //
 
 import Foundation
 import Combine
-import FirebaseAuth
-import GoogleSignIn
-import FirebaseCore
+import UIKit
 
 class LoginViewModel {
 
@@ -21,7 +20,7 @@ class LoginViewModel {
 
     // MARK: - Dependencies
 
-    private let authService: AuthServiceProtocol
+    private let loginUseCase: LoginUseCaseProtocol
 
     // MARK: - Private Properties
 
@@ -29,73 +28,52 @@ class LoginViewModel {
 
     // MARK: - Initialization
 
-    init(authService: AuthServiceProtocol = AuthService()) {
-        self.authService = authService
+    init(loginUseCase: LoginUseCaseProtocol = DIContainer.shared.makeLoginUseCase()) {
+        self.loginUseCase = loginUseCase
     }
 
     // MARK: - Public Methods
 
     func login(email: String, password: String) {
-        guard !email.isEmpty, !password.isEmpty else {
-            error = "Por favor completa todos los campos"
-            return
-        }
-
         isLoading = true
         error = nil
 
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
-            DispatchQueue.main.async {
+        Logger.shared.debug("Attempting login for email: \(email)")
+
+        loginUseCase.execute(email: email, password: password)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
                 self?.isLoading = false
-
-                if let error = error {
+                if case .failure(let error) = completion {
+                    Logger.shared.error("Login failed for email: \(email)", error: error)
                     self?.error = error.localizedDescription
-                    return
                 }
-
+            } receiveValue: { [weak self] _ in
+                Logger.shared.info("User logged in successfully with email: \(email)")
                 self?.loginSuccessful = true
             }
-        }
+            .store(in: &cancellables)
     }
 
     func signInWithGoogle(presentingViewController: UIViewController) {
-        guard let clientID = FirebaseApp.app()?.options.clientID else {
-            error = "Error al configurar Google Sign In"
-            return
-        }
+        isLoading = true
+        error = nil
 
-        let config = GIDConfiguration(clientID: clientID)
-        GIDSignIn.sharedInstance.configuration = config
+        Logger.shared.debug("Attempting Google Sign In")
 
-        GIDSignIn.sharedInstance.signIn(withPresenting: presentingViewController) { [weak self] result, error in
-            if let error = error {
-                self?.error = error.localizedDescription
-                return
-            }
-
-            guard let user = result?.user, let idToken = user.idToken?.tokenString else {
-                self?.error = "Error al obtener credenciales de Google"
-                return
-            }
-
-            let credential = GoogleAuthProvider.credential(withIDToken: idToken,
-                                                          accessToken: user.accessToken.tokenString)
-
-            self?.isLoading = true
-
-            Auth.auth().signIn(with: credential) { authResult, error in
-                DispatchQueue.main.async {
-                    self?.isLoading = false
-
-                    if let error = error {
-                        self?.error = error.localizedDescription
-                        return
-                    }
-
-                    self?.loginSuccessful = true
+        loginUseCase.executeWithGoogle(presentingViewController: presentingViewController)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                self?.isLoading = false
+                if case .failure(let error) = completion {
+                    Logger.shared.error("Google Sign In failed", error: error)
+                    self?.error = error.localizedDescription
                 }
+            } receiveValue: { [weak self] _ in
+                Logger.shared.info("User logged in successfully with Google")
+                self?.loginSuccessful = true
             }
-        }
+            .store(in: &cancellables)
     }
 
     func clearError() {

@@ -7,10 +7,12 @@
 
 import Foundation
 import Combine
+import UIKit
 
 /// Use Case para realizar login
 protocol LoginUseCaseProtocol {
     func execute(email: String, password: String) -> AnyPublisher<Void, Error>
+    func executeWithGoogle(presentingViewController: UIViewController) -> AnyPublisher<Void, Error>
 }
 
 class LoginUseCase: LoginUseCaseProtocol {
@@ -22,21 +24,39 @@ class LoginUseCase: LoginUseCaseProtocol {
     }
 
     func execute(email: String, password: String) -> AnyPublisher<Void, Error> {
-        // Aquí iría la lógica de validación de negocio
+        // Validación de negocio
         guard !email.isEmpty, !password.isEmpty else {
             return Fail(error: NSError(
                 domain: "LoginUseCase",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Email y contraseña son requeridos"]
+                userInfo: [NSLocalizedDescriptionKey: "Por favor completa todos los campos"]
+            ))
+            .eraseToAnyPublisher()
+        }
+
+        // Validación de formato de email
+        guard isValidEmail(email) else {
+            return Fail(error: NSError(
+                domain: "LoginUseCase",
+                code: -2,
+                userInfo: [NSLocalizedDescriptionKey: "El formato del email no es válido"]
             ))
             .eraseToAnyPublisher()
         }
 
         // Delegar la autenticación al servicio
-        return Future<Void, Error> { _ in
-            // La implementación real debería usar authService
-            // Por ahora esto es un placeholder
-        }
-        .eraseToAnyPublisher()
+        return authService.login(email: email, password: password)
+    }
+
+    func executeWithGoogle(presentingViewController: UIViewController) -> AnyPublisher<Void, Error> {
+        return authService.loginWithGoogle(presentingViewController: presentingViewController)
+    }
+
+    // MARK: - Private Methods
+
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
+        return emailPredicate.evaluate(with: email)
     }
 }
