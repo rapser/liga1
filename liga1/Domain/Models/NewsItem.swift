@@ -16,6 +16,16 @@ struct NewsItem {
     let categoria: String
     let destacada: Bool
     let fecha: Date
+
+    init(title: String, imageUrl: String, url: String, periodico: String, categoria: String, destacada: Bool, fecha: Date) {
+        self.title = title
+        self.imageUrl = imageUrl
+        self.url = url
+        self.periodico = periodico
+        self.categoria = categoria
+        self.destacada = destacada
+        self.fecha = fecha
+    }
 }
 
 extension NewsItem {

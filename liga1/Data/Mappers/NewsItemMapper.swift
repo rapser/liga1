@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 /// Mapper para convertir entre NewsItemDTO (Data Layer) y NewsItem (Domain Layer)
 struct NewsItemMapper {
@@ -13,24 +14,27 @@ struct NewsItemMapper {
     /// Convierte NewsItemDTO a NewsItem (Domain Model)
     static func toDomain(from dto: NewsItemDTO) -> NewsItem {
         return NewsItem(
-            id: dto.id,
-            titulo: dto.titulo ?? "",
-            descripcion: dto.descripcion ?? "",
-            imageUrl: dto.imageUrl,
-            fecha: dto.fecha?.dateValue(),
-            destacado: dto.destacado ?? false
+            title: dto.title ?? "",
+            imageUrl: dto.image ?? "",
+            url: dto.url ?? "",
+            periodico: dto.periodico ?? "",
+            categoria: dto.categoria ?? "",
+            destacada: dto.destacada ?? false,
+            fecha: dto.fecha?.dateValue() ?? Date()
         )
     }
 
     /// Convierte NewsItem (Domain Model) a NewsItemDTO
     static func toDTO(from domain: NewsItem) -> NewsItemDTO {
         return NewsItemDTO(
-            id: domain.id,
-            titulo: domain.titulo,
-            descripcion: domain.descripcion,
-            imageUrl: domain.imageUrl,
-            fecha: domain.fecha != nil ? Timestamp(date: domain.fecha!) : nil,
-            destacado: domain.destacado
+            id: nil,
+            title: domain.title,
+            image: domain.imageUrl,
+            url: domain.url,
+            periodico: domain.periodico,
+            categoria: domain.categoria,
+            destacada: domain.destacada,
+            fecha: Timestamp(date: domain.fecha)
         )
     }
 

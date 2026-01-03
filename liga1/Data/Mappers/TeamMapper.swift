@@ -13,36 +13,36 @@ struct TeamMapper {
     /// Convierte TeamDTO a Team (Domain Model)
     static func toDomain(from dto: TeamDTO) -> Team {
         return Team(
-            id: dto.id,
-            name: dto.name ?? "",
-            city: dto.city,
-            stadium: dto.stadium,
-            matchesPlayed: dto.matchesPlayed ?? 0,
-            matchesWon: dto.matchesWon ?? 0,
-            matchesDrawn: dto.matchesDrawn ?? 0,
-            matchesLost: dto.matchesLost ?? 0,
-            goalsScored: dto.goalsScored ?? 0,
-            goalsAgainst: dto.goalsAgainst ?? 0,
-            goalDifference: dto.goalDifference ?? 0,
-            points: dto.points ?? 0
+            nombre: dto.name ?? "",
+            ciudad: dto.city ?? "",
+            estadio: dto.stadium ?? "",
+            logo: "",  // Logo no está en el DTO
+            partidosJugados: dto.matchesPlayed ?? 0,
+            partidosGanados: dto.matchesWon ?? 0,
+            partidosEmpatados: dto.matchesDrawn ?? 0,
+            partidosPerdidos: dto.matchesLost ?? 0,
+            golesFavor: dto.goalsScored ?? 0,
+            golesContra: dto.goalsAgainst ?? 0,
+            diferenciaGoles: dto.goalDifference ?? 0,
+            puntos: dto.points ?? 0
         )
     }
 
     /// Convierte Team (Domain Model) a TeamDTO
     static func toDTO(from domain: Team) -> TeamDTO {
         return TeamDTO(
-            id: domain.id,
-            name: domain.name,
-            city: domain.city,
-            stadium: domain.stadium,
-            matchesPlayed: domain.matchesPlayed,
-            matchesWon: domain.matchesWon,
-            matchesDrawn: domain.matchesDrawn,
-            matchesLost: domain.matchesLost,
-            goalsScored: domain.goalsScored,
-            goalsAgainst: domain.goalsAgainst,
-            goalDifference: domain.goalDifference,
-            points: domain.points
+            id: nil,  // ID se genera en Firestore
+            name: domain.nombre,
+            city: domain.ciudad,
+            stadium: domain.estadio,
+            matchesPlayed: domain.partidosJugados,
+            matchesWon: domain.partidosGanados,
+            matchesDrawn: domain.partidosEmpatados,
+            matchesLost: domain.partidosPerdidos,
+            goalsScored: domain.golesFavor,
+            goalsAgainst: domain.golesContra,
+            goalDifference: domain.diferenciaGoles,
+            points: domain.puntos
         )
     }
 

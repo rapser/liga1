@@ -6,21 +6,29 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 /// Mapper para convertir entre MatchDTO (Data Layer) y Match (Domain Layer)
 struct MatchMapper {
 
     /// Convierte MatchDTO a Match (Domain Model)
     static func toDomain(from dto: MatchDTO) -> Match {
+        // Convertir estado de String a EstadoMatch enum
+        let estadoMatch: Match.EstadoMatch
+        if let estadoString = dto.estado {
+            estadoMatch = Match.EstadoMatch(rawValue: estadoString) ?? .pendiente
+        } else {
+            estadoMatch = .pendiente
+        }
+
         return Match(
             id: dto.id,
-            equipoLocalId: dto.equipoLocalId,
-            equipoVisitanteId: dto.equipoVisitanteId,
-            fecha: dto.fecha?.dateValue(),
-            golesTeamA: dto.golesTeamA ?? 0,
-            golesTeamB: dto.golesTeamB ?? 0,
-            estado: dto.estado ?? "pendiente",
-            suspendido: dto.suspendido ?? false
+            fecha: dto.fecha?.dateValue() ?? Date(),
+            golesEquipoLocal: dto.golesTeamA ?? 0,
+            golesEquipoVisitante: dto.golesTeamB ?? 0,
+            estado: estadoMatch,
+            suspendido: dto.suspendido ?? false,
+            isFavorite: false
         )
     }
 
@@ -30,10 +38,10 @@ struct MatchMapper {
             id: domain.id,
             equipoLocalId: domain.equipoLocalId,
             equipoVisitanteId: domain.equipoVisitanteId,
-            fecha: domain.fecha != nil ? Timestamp(date: domain.fecha!) : nil,
-            golesTeamA: domain.golesTeamA,
-            golesTeamB: domain.golesTeamB,
-            estado: domain.estado,
+            fecha: Timestamp(date: domain.fecha),
+            golesTeamA: domain.golesEquipoLocal,
+            golesTeamB: domain.golesEquipoVisitante,
+            estado: domain.estado.rawValue,
             suspendido: domain.suspendido
         )
     }

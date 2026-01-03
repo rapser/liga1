@@ -80,6 +80,7 @@
 		464009FB2F098DF600A8C905 /* ProfileViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009EA2F098DF600A8C905 /* ProfileViewController+TableView.swift */; };
 		464009FC2F098DF600A8C905 /* NewsViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009E72F098DF600A8C905 /* NewsViewController+TableView.swift */; };
 		464009FD2F098DF600A8C905 /* FavoritosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009DD2F098DF600A8C905 /* FavoritosViewController.swift */; };
+		46400A002F098EB800A8C905 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009FE2F098EB800A8C905 /* DIContainer.swift */; };
 		469E54312E765120001ECD36 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54302E76511F001ECD36 /* AppRouter.swift */; };
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
@@ -161,6 +162,7 @@
 		464009EC2F098DF600A8C905 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		464009EE2F098DF600A8C905 /* TorneoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorneoViewController.swift; sourceTree = "<group>"; };
 		464009EF2F098DF600A8C905 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
+		464009FE2F098EB800A8C905 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		469E54302E76511F001ECD36 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		46D9958F2C6E90EC00D4951C /* liga1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liga1.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -543,6 +545,14 @@
 			path = Tabla;
 			sourceTree = "<group>";
 		};
+		464009FF2F098EB800A8C905 /* DI */ = {
+			isa = PBXGroup;
+			children = (
+				464009FE2F098EB800A8C905 /* DIContainer.swift */,
+			);
+			path = DI;
+			sourceTree = "<group>";
+		};
 		46D995862C6E90EC00D4951C = {
 			isa = PBXGroup;
 			children = (
@@ -564,6 +574,7 @@
 			children = (
 				46D995C62C6EC90700D4951C /* Application */,
 				4640017A2F08853F00A8C905 /* Core */,
+				464009FF2F098EB800A8C905 /* DI */,
 				464001862F08853F00A8C905 /* Data */,
 				4640018E2F08853F00A8C905 /* Domain */,
 				464001B42F08853F00A8C905 /* Presentation */,
@@ -734,6 +745,7 @@
 				464009F42F098DF600A8C905 /* HomeViewController.swift in Sources */,
 				464009F52F098DF600A8C905 /* MainTabBarController.swift in Sources */,
 				464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */,
+				46400A002F098EB800A8C905 /* DIContainer.swift in Sources */,
 				464009F72F098DF600A8C905 /* NewsHeaderWrapperCell.swift in Sources */,
 				464009F82F098DF600A8C905 /* TorneoViewController.swift in Sources */,
 				464009F92F098DF600A8C905 /* TorneoViewController+TableView.swift in Sources */,

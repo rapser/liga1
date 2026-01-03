@@ -23,4 +23,12 @@ struct JornadaDTO: Codable {
         case torneo
         case fechaInicio
     }
+
+    init(id: String? = nil, mostrar: Bool?, numero: Int?, torneo: String?, fechaInicio: Timestamp?) {
+        self.id = id
+        self.mostrar = mostrar
+        self.numero = numero
+        self.torneo = torneo
+        self.fechaInicio = fechaInicio
+    }
 }

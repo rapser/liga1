@@ -37,4 +37,19 @@ struct TeamDTO: Codable {
         case goalDifference
         case points
     }
+
+    init(id: String? = nil, name: String?, city: String?, stadium: String?, matchesPlayed: Int?, matchesWon: Int?, matchesDrawn: Int?, matchesLost: Int?, goalsScored: Int?, goalsAgainst: Int?, goalDifference: Int?, points: Int?) {
+        self.id = id
+        self.name = name
+        self.city = city
+        self.stadium = stadium
+        self.matchesPlayed = matchesPlayed
+        self.matchesWon = matchesWon
+        self.matchesDrawn = matchesDrawn
+        self.matchesLost = matchesLost
+        self.goalsScored = goalsScored
+        self.goalsAgainst = goalsAgainst
+        self.goalDifference = goalDifference
+        self.points = points
+    }
 }

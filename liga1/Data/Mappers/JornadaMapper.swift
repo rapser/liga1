@@ -6,19 +6,37 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 /// Mapper para convertir entre JornadaDTO (Data Layer) y Jornada (Domain Layer)
 struct JornadaMapper {
 
     /// Convierte JornadaDTO a Jornada (Domain Model)
-    static func toDomain(from dto: JornadaDTO) -> Jornada {
-        return Jornada(
-            id: dto.id,
-            mostrar: dto.mostrar ?? false,
-            numero: dto.numero,
-            torneo: dto.torneo,
-            fechaInicio: dto.fechaInicio?.dateValue()
-        )
+    /// Nota: Jornada tiene propiedades computadas (torneo, numero) que se extraen del id
+    static func toDomain(from dto: JornadaDTO) -> Jornada? {
+        // Jornada requiere mostrar y fechaInicio como propiedades stored
+        guard let mostrar = dto.mostrar,
+              let fechaInicio = dto.fechaInicio?.dateValue() else {
+            return nil
+        }
+
+        // Usar inicializador desde diccionario para crear Jornada
+        var dict: [String: Any] = [
+            "mostrar": mostrar,
+            "fechaInicio": Timestamp(date: fechaInicio)
+        ]
+
+        if let id = dto.id {
+            dict["id"] = id
+        }
+
+        // Decodificar desde diccionario
+        guard let data = try? JSONSerialization.data(withJSONObject: dict),
+              let jornada = try? JSONDecoder().decode(Jornada.self, from: data) else {
+            return nil
+        }
+
+        return jornada
     }
 
     /// Convierte Jornada (Domain Model) a JornadaDTO
@@ -28,12 +46,12 @@ struct JornadaMapper {
             mostrar: domain.mostrar,
             numero: domain.numero,
             torneo: domain.torneo,
-            fechaInicio: domain.fechaInicio != nil ? Timestamp(date: domain.fechaInicio!) : nil
+            fechaInicio: Timestamp(date: domain.fechaInicio)
         )
     }
 
     /// Convierte array de JornadaDTO a array de Jornada
     static func toDomainArray(from dtos: [JornadaDTO]) -> [Jornada] {
-        return dtos.map { toDomain(from: $0) }
+        return dtos.compactMap { toDomain(from: $0) }
     }
 }

@@ -29,4 +29,15 @@ struct MatchDTO: Codable {
         case estado
         case suspendido
     }
+
+    init(id: String? = nil, equipoLocalId: String?, equipoVisitanteId: String?, fecha: Timestamp?, golesTeamA: Int?, golesTeamB: Int?, estado: String?, suspendido: Bool?) {
+        self.id = id
+        self.equipoLocalId = equipoLocalId
+        self.equipoVisitanteId = equipoVisitanteId
+        self.fecha = fecha
+        self.golesTeamA = golesTeamA
+        self.golesTeamB = golesTeamB
+        self.estado = estado
+        self.suspendido = suspendido
+    }
 }
