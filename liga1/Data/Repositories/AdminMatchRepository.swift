@@ -30,20 +30,31 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 return
             }
 
-            do {
-                let data = try Firestore.Encoder().encode(partido)
-                let documentId = "clausura_\(partido.fecha)_\(partido.teamAId)_\(partido.teamBId)"
+            // Estructura: jornadas/{jornadaId}/matches/{matchId}
+            // matchId: adt_utc (código de 3 letras de cada equipo)
+            let matchId = "\(partido.teamAId)_\(partido.teamBId)"
 
-                self.db.collection(FirestoreConstants.Collection.matches).document(documentId).setData(data) { error in
+            let matchData: [String: Any] = [
+                "equipoLocalId": partido.teamAId,
+                "equipoVisitanteId": partido.teamBId,
+                "golesTeamA": partido.golesTeamA,
+                "golesTeamB": partido.golesTeamB,
+                "estado": partido.estado.rawValue,
+                "suspendido": false,
+                "fecha": Timestamp(date: Date()) // Puedes ajustar esto según necesites
+            ]
+
+            self.db.collection("jornadas")
+                .document(partido.jornadaId)
+                .collection("matches")
+                .document(matchId)
+                .setData(matchData) { error in
                     if let error = error {
                         promise(.failure(error))
                     } else {
                         promise(.success(()))
                     }
                 }
-            } catch {
-                promise(.failure(error))
-            }
         }
         .eraseToAnyPublisher()
     }
@@ -64,19 +75,23 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 return
             }
 
-            let documentId = "clausura_\(fecha)_\(teamAId)_\(teamBId)"
-            let matchRef = self.db.collection(FirestoreConstants.Collection.matches).document(documentId)
+            // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
+            let matchId = "\(teamAId)_\(teamBId)"
 
-            matchRef.updateData([
-                FirestoreConstants.MatchField.golesTeamA: teamAScore,
-                FirestoreConstants.MatchField.golesTeamB: teamBScore
-            ]) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
+            self.db.collection("jornadas")
+                .document(fecha)
+                .collection("matches")
+                .document(matchId)
+                .updateData([
+                    "golesTeamA": teamAScore,
+                    "golesTeamB": teamBScore
+                ]) { error in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(()))
+                    }
                 }
-            }
         }
         .eraseToAnyPublisher()
     }
@@ -88,21 +103,24 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 return
             }
 
-            let torneo = FirestoreConstants.Collection.clausura
-            let matchId = "\(torneo)_\(fecha)_\(teamAId)_\(teamBId)"
-            let matchRef = self.db.collection(FirestoreConstants.Collection.matches).document(matchId)
+            // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
+            let matchId = "\(teamAId)_\(teamBId)"
 
-            matchRef.updateData([
-                FirestoreConstants.MatchField.golesTeamA: teamAScore,
-                FirestoreConstants.MatchField.golesTeamB: teamBScore,
-                FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.playing
-            ]) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
+            self.db.collection("jornadas")
+                .document(fecha)
+                .collection("matches")
+                .document(matchId)
+                .updateData([
+                    "golesTeamA": teamAScore,
+                    "golesTeamB": teamBScore,
+                    "estado": "enJuego"
+                ]) { error in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(()))
+                    }
                 }
-            }
         }
         .eraseToAnyPublisher()
     }
@@ -114,18 +132,22 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 return
             }
 
-            let torneo = FirestoreConstants.Collection.clausura
-            let matchId = "\(torneo)_\(fecha)_\(teamAId)_\(teamBId)"
+            // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
+            let matchId = "\(teamAId)_\(teamBId)"
 
-            self.db.collection(FirestoreConstants.Collection.matches).document(matchId).updateData([
-                FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.finished
-            ]) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
+            self.db.collection("jornadas")
+                .document(fecha)
+                .collection("matches")
+                .document(matchId)
+                .updateData([
+                    "estado": "finalizado"
+                ]) { error in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(()))
+                    }
                 }
-            }
         }
         .eraseToAnyPublisher()
     }

@@ -174,10 +174,13 @@ class RegistrarPartidosViewController: UIViewController {
 
     private func registerExampleMatches() {
         // Ejemplo de partidos para registrar rápidamente en 2026
-        // Este array puede ser modificado según la jornada que se necesite registrar
+        // IMPORTANTE: El jornadaId debe coincidir con un documento existente en Firestore
+        // Formato del jornadaId: "{torneo}_{numero}" ejemplo: "apertura_01", "clausura_10"
+
+        // Los partidos se registrarán en: jornadas/{jornadaId}/matches/{teamAId}_{teamBId}
         let partidosARegistrar: [Partido] = [
-            Partido(teamAId: "com", teamBId: "gra", fecha: "03", jornadaId: "clausura_2026_01", torneo: "clausura", golesTeamA: 1, golesTeamB: 2),
-            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", jornadaId: "clausura_2026_01", torneo: "clausura", golesTeamA: 3, golesTeamB: 0)
+            Partido(teamAId: "com", teamBId: "gra", fecha: "03", jornadaId: "apertura_01", torneo: "apertura", golesTeamA: 1, golesTeamB: 2),
+            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", jornadaId: "apertura_01", torneo: "apertura", golesTeamA: 3, golesTeamB: 0)
         ]
 
         viewModel.registerMultipleMatches(partidos: partidosARegistrar)
@@ -201,17 +204,22 @@ class RegistrarPartidosViewController: UIViewController {
      Para registrar partidos de una jornada específica, modifica el array partidosARegistrar:
 
      let partidosARegistrar: [Partido] = [
-         // Jornada 10 - Ejemplo
-         Partido(teamAId: "utc", teamBId: "cie", fecha: "10", golesTeamA: 1, golesTeamB: 2),
-         Partido(teamAId: "gar", teamBId: "adt", fecha: "10", golesTeamA: 1, golesTeamB: 0),
-         Partido(teamAId: "val", teamBId: "com", fecha: "10", golesTeamA: 1, golesTeamB: 0),
-         Partido(teamAId: "cus", teamBId: "cou", fecha: "10", golesTeamA: 2, golesTeamB: 1),
-         Partido(teamAId: "sba", teamBId: "gra", fecha: "10", golesTeamA: 0, golesTeamB: 0),
-         Partido(teamAId: "hua", teamBId: "cri", fecha: "10", golesTeamA: 1, golesTeamB: 2),
-         Partido(teamAId: "ali", teamBId: "man", fecha: "10", golesTeamA: 1, golesTeamB: 0),
-         Partido(teamAId: "atl", teamBId: "uni", fecha: "10", golesTeamA: 0, golesTeamB: 3),
-         Partido(teamAId: "mel", teamBId: "cha", fecha: "10", golesTeamA: 2, golesTeamB: 0)
+         // Jornada 10 - Apertura 2026
+         Partido(teamAId: "utc", teamBId: "cie", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 2),
+         Partido(teamAId: "gar", teamBId: "adt", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 0),
+         Partido(teamAId: "val", teamBId: "com", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 0),
+         Partido(teamAId: "cus", teamBId: "cou", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 2, golesTeamB: 1),
+         Partido(teamAId: "sba", teamBId: "gra", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 0, golesTeamB: 0),
+         Partido(teamAId: "hua", teamBId: "cri", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 2),
+         Partido(teamAId: "ali", teamBId: "man", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 0),
+         Partido(teamAId: "atl", teamBId: "uni", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 0, golesTeamB: 3),
+         Partido(teamAId: "mel", teamBId: "cha", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 2, golesTeamB: 0)
      ]
+
+     IMPORTANTE:
+     - jornadaId: Debe coincidir con un documento existente en Firestore (formato: "{torneo}_{numero}")
+     - Estructura en Firestore: jornadas/{jornadaId}/matches/{teamAId}_{teamBId}
+     - Antes de usar, asegúrate de que el documento jornada ya existe en Firestore
 
      Códigos de equipos:
      - ali: Alianza Lima
