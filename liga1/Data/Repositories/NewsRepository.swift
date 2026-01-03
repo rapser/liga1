@@ -15,7 +15,7 @@ protocol NewsRepositoryProtocol {
 
 class NewsRepository: NewsRepositoryProtocol {
 
-    private let db = Firestore.firestore()
+    private let db = FirestoreManager.shared.db
 
     func fetchNews() -> AnyPublisher<[NewsItem], Error> {
         return Future<[NewsItem], Error> { [weak self] promise in
@@ -24,8 +24,8 @@ class NewsRepository: NewsRepositoryProtocol {
                 return
             }
 
-            self.db.collection("news")
-                .order(by: "fecha", descending: true)
+            self.db.collection(FirestoreConstants.Collection.news)
+                .order(by: FirestoreConstants.NewsField.fecha, descending: true)
                 .getDocuments { snapshot, error in
                     if let error = error {
                         promise(.failure(error))

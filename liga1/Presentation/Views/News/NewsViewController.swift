@@ -10,9 +10,21 @@ import Combine
 
 class NewsViewController: UIViewController {
 
-    let viewModel = NewsViewModel()
+    let viewModel: NewsViewModel
     private var cancellables = Set<AnyCancellable>()
     private let tableView = UITableView(frame: .zero, style: .plain)
+
+    // MARK: - Initialization
+
+    init(viewModel: NewsViewModel = DIContainer.shared.makeNewsViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.viewModel = DIContainer.shared.makeNewsViewModel()
+        super.init(coder: coder)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,15 +69,5 @@ class NewsViewController: UIViewController {
                 self?.showError(error)
             }
             .store(in: &cancellables)
-    }
-
-    private func showError(_ error: Error) {
-        let alert = UIAlertController(
-            title: "Error",
-            message: error.localizedDescription,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
 }

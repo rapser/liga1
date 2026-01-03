@@ -16,7 +16,7 @@ protocol MatchesRepositoryProtocol {
 
 class MatchesRepository: MatchesRepositoryProtocol {
 
-    private let db = Firestore.firestore()
+    private let db = FirestoreManager.shared.db
 
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error> {
         return Future<[Match], Error> { [weak self] promise in
@@ -25,10 +25,10 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 return
             }
 
-            self.db.collection("jornadas")
+            self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(jornadaId)
-                .collection("matches")
-                .order(by: "fecha")
+                .collection(FirestoreConstants.Collection.matches)
+                .order(by: FirestoreConstants.MatchField.fecha)
                 .getDocuments(source: .default) { snapshot, error in
                     if let error = error {
                         promise(.failure(error))

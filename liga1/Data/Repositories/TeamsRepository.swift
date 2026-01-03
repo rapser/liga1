@@ -15,7 +15,7 @@ protocol TeamsRepositoryProtocol {
 
 class TeamsRepository: TeamsRepositoryProtocol {
 
-    private let db = Firestore.firestore()
+    private let db = FirestoreManager.shared.db
 
     func fetchTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         return Future<[Team], Error> { [weak self] promise in
@@ -25,8 +25,8 @@ class TeamsRepository: TeamsRepositoryProtocol {
             }
 
             self.db.collection(torneo.rawValue)
-                .order(by: "points", descending: true)
-                .order(by: "goalDifference", descending: true)
+                .order(by: FirestoreConstants.TeamField.points, descending: true)
+                .order(by: FirestoreConstants.TeamField.goalDifference, descending: true)
                 .getDocuments { snapshot, error in
                     if let error = error {
                         promise(.failure(error))
@@ -42,17 +42,17 @@ class TeamsRepository: TeamsRepositoryProtocol {
                         let data = doc.data()
                         return Team(
                             nombre: EquipoPeruano.obtenerNombreCompleto(paraId: doc.documentID),
-                            ciudad: data["city"] as? String ?? "Sin ciudad",
-                            estadio: data["stadium"] as? String ?? "Sin estadio",
+                            ciudad: data[FirestoreConstants.TeamField.city] as? String ?? "Sin ciudad",
+                            estadio: data[FirestoreConstants.TeamField.stadium] as? String ?? "Sin estadio",
                             logo: data["logo"] as? String ?? "Sin logo",
-                            partidosJugados: data["matchesPlayed"] as? Int ?? 0,
-                            partidosGanados: data["matchesWon"] as? Int ?? 0,
-                            partidosEmpatados: data["matchesDrawn"] as? Int ?? 0,
-                            partidosPerdidos: data["matchesLost"] as? Int ?? 0,
-                            golesFavor: data["goalsScored"] as? Int ?? 0,
-                            golesContra: data["goalsAgainst"] as? Int ?? 0,
-                            diferenciaGoles: data["goalDifference"] as? Int ?? 0,
-                            puntos: data["points"] as? Int ?? 0
+                            partidosJugados: data[FirestoreConstants.TeamField.matchesPlayed] as? Int ?? 0,
+                            partidosGanados: data[FirestoreConstants.TeamField.matchesWon] as? Int ?? 0,
+                            partidosEmpatados: data[FirestoreConstants.TeamField.matchesDrawn] as? Int ?? 0,
+                            partidosPerdidos: data[FirestoreConstants.TeamField.matchesLost] as? Int ?? 0,
+                            golesFavor: data[FirestoreConstants.TeamField.goalsScored] as? Int ?? 0,
+                            golesContra: data[FirestoreConstants.TeamField.goalsAgainst] as? Int ?? 0,
+                            diferenciaGoles: data[FirestoreConstants.TeamField.goalDifference] as? Int ?? 0,
+                            puntos: data[FirestoreConstants.TeamField.points] as? Int ?? 0
                         )
                     }
 

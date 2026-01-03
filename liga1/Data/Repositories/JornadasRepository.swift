@@ -15,7 +15,7 @@ protocol JornadasRepositoryProtocol {
 
 class JornadasRepository: JornadasRepositoryProtocol {
 
-    private let db = Firestore.firestore()
+    private let db = FirestoreManager.shared.db
 
     func fetchActiveJornadas() -> AnyPublisher<[Jornada], Error> {
         return Future<[Jornada], Error> { [weak self] promise in
@@ -24,9 +24,9 @@ class JornadasRepository: JornadasRepositoryProtocol {
                 return
             }
 
-            self.db.collection("jornadas")
-                .whereField("mostrar", isEqualTo: true)
-                .order(by: "fechaInicio", descending: true)
+            self.db.collection(FirestoreConstants.Collection.jornadas)
+                .whereField(FirestoreConstants.JornadaField.mostrar, isEqualTo: true)
+                .order(by: FirestoreConstants.JornadaField.fechaInicio, descending: true)
                 .getDocuments(source: .default) { snapshot, error in
                     if let error = error {
                         promise(.failure(error))

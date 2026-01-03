@@ -13,8 +13,20 @@ class HomeViewController: UIViewController {
     // MARK: - Properties
 
     let tableView = UITableView(frame: .zero, style: .plain)
-    let viewModel = HomeViewModel()
+    let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Initialization
+
+    init(viewModel: HomeViewModel = DIContainer.shared.makeHomeViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.viewModel = DIContainer.shared.makeHomeViewModel()
+        super.init(coder: coder)
+    }
 
     // MARK: - Lifecycle
 
@@ -58,17 +70,5 @@ class HomeViewController: UIViewController {
                 self?.showError(error)
             }
             .store(in: &cancellables)
-    }
-
-    // MARK: - Private Methods
-
-    private func showError(_ error: Error) {
-        let alert = UIAlertController(
-            title: "Error",
-            message: error.localizedDescription,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
 }

@@ -13,8 +13,20 @@ class TorneoViewController: UIViewController {
     // MARK: - Properties
     private let tableView = UITableView()
     let segmentedControl = UISegmentedControl(items: ["Apertura", "Clausura", "Acumulado"])
-    let viewModel = TorneoViewModel()
+    let viewModel: TorneoViewModel
     private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Initialization
+
+    init(viewModel: TorneoViewModel = DIContainer.shared.makeTorneoViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.viewModel = DIContainer.shared.makeTorneoViewModel()
+        super.init(coder: coder)
+    }
 
     // MARK: - LifeCycle
 
@@ -79,15 +91,5 @@ class TorneoViewController: UIViewController {
         default:
             break
         }
-    }
-
-    private func showError(_ error: Error) {
-        let alert = UIAlertController(
-            title: "Error",
-            message: error.localizedDescription,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
 }

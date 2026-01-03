@@ -19,7 +19,7 @@ protocol FavoritesServiceProtocol {
 
 class FavoritesService: FavoritesServiceProtocol {
 
-    private let db = Firestore.firestore()
+    private let db = FirestoreManager.shared.db
     private var favoritesListener: ListenerRegistration?
 
     // Subject para emitir cambios en tiempo real
@@ -42,9 +42,9 @@ class FavoritesService: FavoritesServiceProtocol {
     private func startObservingFavorites() {
         guard let userId = getUserId() else { return }
 
-        favoritesListener = db.collection("users")
+        favoritesListener = db.collection(FirestoreConstants.Collection.users)
             .document(userId)
-            .collection("favoritos")
+            .collection(FirestoreConstants.Collection.favorites)
             .addSnapshotListener { [weak self] snapshot, error in
                 if let error = error {
                     print("❌ Error listening to favorites: \(error)")
@@ -70,7 +70,7 @@ class FavoritesService: FavoritesServiceProtocol {
                 return
             }
 
-            let favRef = self.db.collection("users").document(userId).collection("favoritos").document(matchId)
+            let favRef = self.db.collection(FirestoreConstants.Collection.users).document(userId).collection(FirestoreConstants.Collection.favorites).document(matchId)
 
             favRef.getDocument { snapshot, error in
                 if let error = error {

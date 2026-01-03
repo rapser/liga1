@@ -11,12 +11,24 @@ import Combine
 class FavoritosViewController: UIViewController {
 
     let tableView = UITableView(frame: .zero, style: .plain)
-    let viewModel = FavoritosViewModel()
+    let viewModel: FavoritosViewModel
     private var cancellables = Set<AnyCancellable>()
 
     private lazy var emptyStateLabel = LayoutPresets.emptyStateLabel(
         text: "No tienes partidos favoritos\nToca la estrella en un partido para agregarlo"
     )
+
+    // MARK: - Initialization
+
+    init(viewModel: FavoritosViewModel = DIContainer.shared.makeFavoritosViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.viewModel = DIContainer.shared.makeFavoritosViewModel()
+        super.init(coder: coder)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,16 +71,6 @@ class FavoritosViewController: UIViewController {
     private func updateEmptyState() {
         emptyStateLabel.isHidden = !viewModel.matches.isEmpty
         tableView.isHidden = viewModel.matches.isEmpty
-    }
-
-    private func showError(_ error: Error) {
-        let alert = UIAlertController(
-            title: "Error",
-            message: error.localizedDescription,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
 }
 

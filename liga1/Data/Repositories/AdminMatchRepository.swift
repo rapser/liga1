@@ -21,7 +21,7 @@ protocol AdminMatchRepositoryProtocol {
 
 class AdminMatchRepository: AdminMatchRepositoryProtocol {
 
-    private let db = Firestore.firestore()
+    private let db = FirestoreManager.shared.db
 
     func registerMatch(partido: Partido) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
@@ -34,7 +34,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 let data = try Firestore.Encoder().encode(partido)
                 let documentId = "clausura_\(partido.fecha)_\(partido.teamAId)_\(partido.teamBId)"
 
-                self.db.collection("matches").document(documentId).setData(data) { error in
+                self.db.collection(FirestoreConstants.Collection.matches).document(documentId).setData(data) { error in
                     if let error = error {
                         promise(.failure(error))
                     } else {
@@ -65,11 +65,11 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             }
 
             let documentId = "clausura_\(fecha)_\(teamAId)_\(teamBId)"
-            let matchRef = self.db.collection("matches").document(documentId)
+            let matchRef = self.db.collection(FirestoreConstants.Collection.matches).document(documentId)
 
             matchRef.updateData([
-                "golesTeamA": teamAScore,
-                "golesTeamB": teamBScore
+                FirestoreConstants.MatchField.golesTeamA: teamAScore,
+                FirestoreConstants.MatchField.golesTeamB: teamBScore
             ]) { error in
                 if let error = error {
                     promise(.failure(error))
@@ -88,14 +88,14 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 return
             }
 
-            let torneo = "clausura"
+            let torneo = FirestoreConstants.Collection.clausura
             let matchId = "\(torneo)_\(fecha)_\(teamAId)_\(teamBId)"
-            let matchRef = self.db.collection("matches").document(matchId)
+            let matchRef = self.db.collection(FirestoreConstants.Collection.matches).document(matchId)
 
             matchRef.updateData([
-                "golesTeamA": teamAScore,
-                "golesTeamB": teamBScore,
-                "estado": "enJuego"
+                FirestoreConstants.MatchField.golesTeamA: teamAScore,
+                FirestoreConstants.MatchField.golesTeamB: teamBScore,
+                FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.playing
             ]) { error in
                 if let error = error {
                     promise(.failure(error))
@@ -114,11 +114,11 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 return
             }
 
-            let torneo = "clausura"
+            let torneo = FirestoreConstants.Collection.clausura
             let matchId = "\(torneo)_\(fecha)_\(teamAId)_\(teamBId)"
 
-            self.db.collection("matches").document(matchId).updateData([
-                "estado": "finalizado"
+            self.db.collection(FirestoreConstants.Collection.matches).document(matchId).updateData([
+                FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.finished
             ]) { error in
                 if let error = error {
                     promise(.failure(error))
@@ -137,7 +137,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 return
             }
 
-            self.db.collection("matches").getDocuments { (querySnapshot, error) in
+            self.db.collection(FirestoreConstants.Collection.matches).getDocuments { (querySnapshot, error) in
                 if let error = error {
                     promise(.failure(error))
                     return
@@ -151,8 +151,8 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                 let batch = self.db.batch()
 
                 for document in documents {
-                    let matchRef = self.db.collection("matches").document(document.documentID)
-                    batch.updateData(["estado": "finalizado"], forDocument: matchRef)
+                    let matchRef = self.db.collection(FirestoreConstants.Collection.matches).document(document.documentID)
+                    batch.updateData([FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.finished], forDocument: matchRef)
                 }
 
                 batch.commit { error in
@@ -178,7 +178,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
 
             for match in matches {
                 let matchId = match.id ?? "\(match.equipoLocalId ?? "")_\(match.equipoVisitanteId ?? "")"
-                let docRef = self.db.collection("matches").document(matchId)
+                let docRef = self.db.collection(FirestoreConstants.Collection.matches).document(matchId)
                 batch.setData(match.toDictionary(), forDocument: docRef)
             }
 

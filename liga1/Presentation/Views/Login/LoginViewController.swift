@@ -12,8 +12,20 @@ class LoginViewController: UIViewController {
 
     // MARK: - Properties
 
-    private let viewModel = LoginViewModel()
+    private let viewModel: LoginViewModel
     private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Initialization
+
+    init(viewModel: LoginViewModel = DIContainer.shared.makeLoginViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.viewModel = DIContainer.shared.makeLoginViewModel()
+        super.init(coder: coder)
+    }
 
     // MARK: - UI Components
 

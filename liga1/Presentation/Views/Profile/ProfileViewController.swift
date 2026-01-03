@@ -12,7 +12,7 @@ class ProfileViewController: UIViewController {
 
     // MARK: - Properties
 
-    let viewModel = ProfileViewModel()
+    let viewModel: ProfileViewModel
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Tabla
@@ -21,6 +21,18 @@ class ProfileViewController: UIViewController {
         tableView.prepareForAutoLayout()
         return tableView
     }()
+
+    // MARK: - Initialization
+
+    init(viewModel: ProfileViewModel = DIContainer.shared.makeProfileViewModel()) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.viewModel = DIContainer.shared.makeProfileViewModel()
+        super.init(coder: coder)
+    }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
