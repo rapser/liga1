@@ -27,7 +27,7 @@ class ProfileViewModel {
 
     // MARK: - Initialization
 
-    init(logoutUseCase: LogoutUseCaseProtocol = DIContainer.shared.makeLogoutUseCase()) {
+    init(logoutUseCase: LogoutUseCaseProtocol) {
         self.logoutUseCase = logoutUseCase
         loadCurrentTheme()
         setupSections()

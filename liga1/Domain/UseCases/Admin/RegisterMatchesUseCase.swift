@@ -19,7 +19,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
 
     private let adminMatchRepository: AdminMatchRepositoryProtocol
 
-    init(adminMatchRepository: AdminMatchRepositoryProtocol = AdminMatchRepository()) {
+    init(adminMatchRepository: AdminMatchRepositoryProtocol) {
         self.adminMatchRepository = adminMatchRepository
     }
 

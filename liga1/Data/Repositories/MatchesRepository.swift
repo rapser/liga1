@@ -17,7 +17,15 @@ protocol MatchesRepositoryProtocol {
 
 class MatchesRepository: MatchesRepositoryProtocol {
 
-    private let db = FirestoreManager.shared.db
+    private let database: DatabaseProtocol
+
+    init(database: DatabaseProtocol) {
+        self.database = database
+    }
+
+    private var db: Firestore {
+        database.db
+    }
 
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error> {
         return Future<[Match], Error> { [weak self] promise in

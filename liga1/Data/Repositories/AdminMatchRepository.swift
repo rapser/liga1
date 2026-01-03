@@ -21,7 +21,15 @@ protocol AdminMatchRepositoryProtocol {
 
 class AdminMatchRepository: AdminMatchRepositoryProtocol {
 
-    private let db = FirestoreManager.shared.db
+    private let database: DatabaseProtocol
+
+    init(database: DatabaseProtocol) {
+        self.database = database
+    }
+
+    private var db: Firestore {
+        database.db
+    }
 
     func registerMatch(partido: Partido) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in

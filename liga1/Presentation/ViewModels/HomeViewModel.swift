@@ -31,10 +31,10 @@ class HomeViewModel {
     // MARK: - Initialization
 
     init(
-        fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol = DIContainer.shared.makeFetchActiveJornadasUseCase(),
-        fetchMatchesUseCase: FetchMatchesUseCaseProtocol = DIContainer.shared.makeFetchMatchesUseCase(),
-        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol = DIContainer.shared.makeToggleFavoriteUseCase(),
-        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol = DIContainer.shared.makeObserveFavoritesUseCase()
+        fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol,
+        fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
+        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
+        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
     ) {
         self.fetchActiveJornadasUseCase = fetchActiveJornadasUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase

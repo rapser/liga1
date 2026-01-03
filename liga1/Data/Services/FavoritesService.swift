@@ -47,7 +47,7 @@ class FavoritesService: FavoritesServiceProtocol {
             .collection(FirestoreConstants.Collection.favorites)
             .addSnapshotListener { [weak self] snapshot, error in
                 if let error = error {
-                    print("❌ Error listening to favorites: \(error)")
+                    Logger.shared.error("❌ Error listening to favorites", error: error)
                     return
                 }
 

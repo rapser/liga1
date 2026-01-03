@@ -15,7 +15,15 @@ protocol TeamsRepositoryProtocol {
 
 class TeamsRepository: TeamsRepositoryProtocol {
 
-    private let db = FirestoreManager.shared.db
+    private let database: DatabaseProtocol
+
+    init(database: DatabaseProtocol) {
+        self.database = database
+    }
+
+    private var db: Firestore {
+        database.db
+    }
 
     func fetchTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         return Future<[Team], Error> { [weak self] promise in

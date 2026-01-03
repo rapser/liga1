@@ -31,7 +31,7 @@ class TorneoViewModel {
 
     // MARK: - Initialization
 
-    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol = DIContainer.shared.makeFetchTeamsUseCase()) {
+    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol) {
         self.fetchTeamsUseCase = fetchTeamsUseCase
     }
 

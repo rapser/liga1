@@ -23,7 +23,7 @@ class RegistrarPartidosViewModel {
 
     // MARK: - Initialization
 
-    init(registerMatchesUseCase: RegisterMatchesUseCaseProtocol = RegisterMatchesUseCase()) {
+    init(registerMatchesUseCase: RegisterMatchesUseCaseProtocol) {
         self.registerMatchesUseCase = registerMatchesUseCase
     }
 

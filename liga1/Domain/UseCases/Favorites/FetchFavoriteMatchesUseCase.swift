@@ -17,7 +17,7 @@ final class FetchFavoriteMatchesUseCase: FetchFavoriteMatchesUseCaseProtocol {
 
     private let matchesRepository: MatchesRepositoryProtocol
 
-    init(matchesRepository: MatchesRepositoryProtocol = MatchesRepository()) {
+    init(matchesRepository: MatchesRepositoryProtocol) {
         self.matchesRepository = matchesRepository
     }
 

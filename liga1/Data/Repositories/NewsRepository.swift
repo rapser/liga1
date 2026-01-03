@@ -15,7 +15,15 @@ protocol NewsRepositoryProtocol {
 
 class NewsRepository: NewsRepositoryProtocol {
 
-    private let db = FirestoreManager.shared.db
+    private let database: DatabaseProtocol
+
+    init(database: DatabaseProtocol) {
+        self.database = database
+    }
+
+    private var db: Firestore {
+        database.db
+    }
 
     func fetchNews() -> AnyPublisher<[NewsItem], Error> {
         return Future<[NewsItem], Error> { [weak self] promise in

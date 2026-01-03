@@ -86,21 +86,21 @@ class ProfileViewController: UIViewController {
     func handleAction(_ action: ProfileViewModel.ProfileAction) {
         switch action {
         case .notification:
-            print("Abrir ajustes de notificaciones")
+            Logger.shared.debug("Abrir ajustes de notificaciones")
         case .editUsername:
-            print("Editar nombre de usuario")
+            Logger.shared.debug("Editar nombre de usuario")
         case .logout:
             showLogoutConfirmation()
         case .theme:
             showThemeBottomSheet()
         case .feedback:
-            print("Enviar feedback")
+            Logger.shared.debug("Enviar feedback")
         case .terms:
-            print("Mostrar condiciones de uso")
+            Logger.shared.debug("Mostrar condiciones de uso")
         case .privacy:
-            print("Mostrar políticas de privacidad")
+            Logger.shared.debug("Mostrar políticas de privacidad")
         case .privacySettings:
-            print("Abrir ajustes de privacidad")
+            Logger.shared.debug("Abrir ajustes de privacidad")
         case .registrarPartidos:
             navigateToRegistrarPartidos()
         case .none:

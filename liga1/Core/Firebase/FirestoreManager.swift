@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 /// Singleton manager para acceso centralizado a Firestore
 /// Elimina la duplicación de `Firestore.firestore()` en todo el proyecto
-public final class FirestoreManager {
+public final class FirestoreManager: DatabaseProtocol {
 
     // MARK: - Singleton
 

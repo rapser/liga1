@@ -76,6 +76,7 @@
 		469E54312E765120001ECD36 /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54302E76511F001ECD36 /* AppRouter.swift */; };
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
+		46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */; };
 		46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995922C6E90EC00D4951C /* AppDelegate.swift */; };
 		46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995942C6E90EC00D4951C /* SceneDelegate.swift */; };
 		46D9959C2C6E90EE00D4951C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 46D9959B2C6E90EE00D4951C /* Assets.xcassets */; };
@@ -157,6 +158,7 @@
 		464009FE2F098EB800A8C905 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		469E54302E76511F001ECD36 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseProtocol.swift; sourceTree = "<group>"; };
 		46D9958F2C6E90EC00D4951C /* liga1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liga1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46D995922C6E90EC00D4951C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		46D995942C6E90EC00D4951C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 		464009B82F098D4F00A8C905 /* Firebase */ = {
 			isa = PBXGroup;
 			children = (
+				46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */,
 				464009B72F098D4F00A8C905 /* FirestoreManager.swift */,
 			);
 			path = Firebase;
@@ -710,6 +713,7 @@
 				464001C02F08853F00A8C905 /* JornadasRepository.swift in Sources */,
 				464001C12F08853F00A8C905 /* EquipoTableViewCell.swift in Sources */,
 				464001C22F08853F00A8C905 /* HeaderView.swift in Sources */,
+				46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */,
 				464001C32F08853F00A8C905 /* TorneoType.swift in Sources */,
 				464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */,
 				464001C62F08853F00A8C905 /* Partido.swift in Sources */,

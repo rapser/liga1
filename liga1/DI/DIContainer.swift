@@ -17,22 +17,32 @@ final class DIContainer {
 
     private init() {}
 
+    // MARK: - Database
+
+    private func makeDatabase() -> DatabaseProtocol {
+        return FirestoreManager.shared
+    }
+
     // MARK: - Repositories
 
     func makeJornadasRepository() -> JornadasRepositoryProtocol {
-        return JornadasRepository()
+        return JornadasRepository(database: makeDatabase())
     }
 
     func makeMatchesRepository() -> MatchesRepositoryProtocol {
-        return MatchesRepository()
+        return MatchesRepository(database: makeDatabase())
     }
 
     func makeTeamsRepository() -> TeamsRepositoryProtocol {
-        return TeamsRepository()
+        return TeamsRepository(database: makeDatabase())
     }
 
     func makeNewsRepository() -> NewsRepositoryProtocol {
-        return NewsRepository()
+        return NewsRepository(database: makeDatabase())
+    }
+
+    func makeAdminMatchRepository() -> AdminMatchRepositoryProtocol {
+        return AdminMatchRepository(database: makeDatabase())
     }
 
     // MARK: - Services
@@ -115,7 +125,7 @@ final class DIContainer {
 
     func makeRegisterMatchesUseCase() -> RegisterMatchesUseCaseProtocol {
         return RegisterMatchesUseCase(
-            adminMatchRepository: AdminMatchRepository()
+            adminMatchRepository: makeAdminMatchRepository()
         )
     }
 

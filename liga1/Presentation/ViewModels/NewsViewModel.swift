@@ -28,7 +28,7 @@ class NewsViewModel {
 
     // MARK: - Initialization
 
-    init(fetchNewsUseCase: FetchNewsUseCaseProtocol = DIContainer.shared.makeFetchNewsUseCase()) {
+    init(fetchNewsUseCase: FetchNewsUseCaseProtocol) {
         self.fetchNewsUseCase = fetchNewsUseCase
     }
 

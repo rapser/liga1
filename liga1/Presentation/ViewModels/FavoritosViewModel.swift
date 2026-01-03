@@ -31,9 +31,9 @@ class FavoritosViewModel {
     // MARK: - Initialization
 
     init(
-        fetchFavoriteMatchesUseCase: FetchFavoriteMatchesUseCaseProtocol = DIContainer.shared.makeFetchFavoriteMatchesUseCase(),
-        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol = DIContainer.shared.makeToggleFavoriteUseCase(),
-        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol = DIContainer.shared.makeObserveFavoritesUseCase()
+        fetchFavoriteMatchesUseCase: FetchFavoriteMatchesUseCaseProtocol,
+        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
+        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
     ) {
         self.fetchFavoriteMatchesUseCase = fetchFavoriteMatchesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase

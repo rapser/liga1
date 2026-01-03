@@ -28,7 +28,7 @@ class LoginViewModel {
 
     // MARK: - Initialization
 
-    init(loginUseCase: LoginUseCaseProtocol = DIContainer.shared.makeLoginUseCase()) {
+    init(loginUseCase: LoginUseCaseProtocol) {
         self.loginUseCase = loginUseCase
     }
 
