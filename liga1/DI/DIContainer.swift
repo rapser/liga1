@@ -9,7 +9,7 @@ import Foundation
 
 /// Dependency Injection Container
 /// Responsable de crear y proveer todas las dependencias de la app
-class DIContainer {
+final class DIContainer {
 
     // MARK: - Singleton
 

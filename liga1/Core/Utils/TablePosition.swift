@@ -6,7 +6,7 @@
 //
 import UIKit
 
-enum TablePosition {
+public enum TablePosition {
     case libertadoresDirecta          // Puestos 1-2
     case libertadoresFase2           // Puesto 3
     case libertadoresFase1           // Puesto 4
@@ -14,8 +14,8 @@ enum TablePosition {
     case descenso                    // Últimos 3 puestos
     case campeon                     // Solo puesto 1 en torneos regulares
     case normal                      // Posiciones normales
-    
-    var backgroundColor: UIColor {
+
+    public var backgroundColor: UIColor {
         switch self {
         case .libertadoresDirecta, .campeon:
             return .libertadoresGold
@@ -31,8 +31,9 @@ enum TablePosition {
             return .systemBackground
         }
     }
-    
-    var description: String {
+
+
+    public var description: String {
         switch self {
         case .libertadoresDirecta: return "Clasificado a Fase de Grupos Libertadores"
         case .libertadoresFase2: return "Clasificado a Fase 2 Libertadores"

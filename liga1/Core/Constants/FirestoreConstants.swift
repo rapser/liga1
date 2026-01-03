@@ -9,79 +9,79 @@ import Foundation
 
 /// Constantes centralizadas para colecciones y campos de Firestore
 /// Elimina magic strings hardcodeados en todo el proyecto
-enum FirestoreConstants {
+public enum FirestoreConstants {
 
     // MARK: - Collections
 
-    enum Collection {
-        static let jornadas = "jornadas"
-        static let matches = "matches"
-        static let users = "users"
-        static let favorites = "favoritos"
-        static let news = "noticias"
-        static let teams = "equipos"
+    public enum Collection {
+        public static let jornadas = "jornadas"
+        public static let matches = "matches"
+        public static let users = "users"
+        public static let favorites = "favoritos"
+        public static let news = "noticias"
+        public static let teams = "equipos"
 
         // Tournaments
-        static let apertura = "apertura"
-        static let clausura = "clausura"
-        static let acumulado = "acumulado"
+        public static let apertura = "apertura"
+        public static let clausura = "clausura"
+        public static let acumulado = "acumulado"
     }
 
     // MARK: - Match Fields
 
-    enum MatchField {
-        static let id = "id"
-        static let equipoLocalId = "equipoLocalId"
-        static let equipoVisitanteId = "equipoVisitanteId"
-        static let fecha = "fecha"
-        static let golesTeamA = "golesTeamA"
-        static let golesTeamB = "golesTeamB"
-        static let estado = "estado"
-        static let suspendido = "suspendido"
+    public enum MatchField {
+        public static let id = "id"
+        public static let equipoLocalId = "equipoLocalId"
+        public static let equipoVisitanteId = "equipoVisitanteId"
+        public static let fecha = "fecha"
+        public static let golesTeamA = "golesTeamA"
+        public static let golesTeamB = "golesTeamB"
+        public static let estado = "estado"
+        public static let suspendido = "suspendido"
     }
 
     // MARK: - Match States
 
-    enum MatchState {
-        static let pending = "pendiente"
-        static let playing = "enJuego"
-        static let finished = "finalizado"
-        static let cancelled = "anulado"
-        static let suspended = "suspendido"
+    public enum MatchState {
+        public static let pending = "pendiente"
+        public static let playing = "enJuego"
+        public static let finished = "finalizado"
+        public static let cancelled = "anulado"
+        public static let suspended = "suspendido"
     }
 
     // MARK: - Team Fields
 
-    enum TeamField {
-        static let name = "name"
-        static let city = "city"
-        static let stadium = "stadium"
-        static let matchesPlayed = "matchesPlayed"
-        static let matchesWon = "matchesWon"
-        static let matchesDrawn = "matchesDrawn"
-        static let matchesLost = "matchesLost"
-        static let goalsScored = "goalsScored"
-        static let goalsAgainst = "goalsAgainst"
-        static let goalDifference = "goalDifference"
-        static let points = "points"
+    public enum TeamField {
+        public static let name = "name"
+        public static let city = "city"
+        public static let stadium = "stadium"
+        public static let matchesPlayed = "matchesPlayed"
+        public static let matchesWon = "matchesWon"
+        public static let matchesDrawn = "matchesDrawn"
+        public static let matchesLost = "matchesLost"
+        public static let goalsScored = "goalsScored"
+        public static let goalsAgainst = "goalsAgainst"
+        public static let goalDifference = "goalDifference"
+        public static let points = "points"
     }
 
     // MARK: - Jornada Fields
 
-    enum JornadaField {
-        static let mostrar = "mostrar"
-        static let numero = "numero"
-        static let torneo = "torneo"
-        static let fechaInicio = "fechaInicio"
+    public enum JornadaField {
+        public static let mostrar = "mostrar"
+        public static let numero = "numero"
+        public static let torneo = "torneo"
+        public static let fechaInicio = "fechaInicio"
     }
 
     // MARK: - News Fields
 
-    enum NewsField {
-        static let titulo = "titulo"
-        static let descripcion = "descripcion"
-        static let imageUrl = "imageUrl"
-        static let fecha = "fecha"
-        static let destacado = "destacado"
+    public enum NewsField {
+        public static let titulo = "titulo"
+        public static let descripcion = "descripcion"
+        public static let imageUrl = "imageUrl"
+        public static let fecha = "fecha"
+        public static let destacado = "destacado"
     }
 }

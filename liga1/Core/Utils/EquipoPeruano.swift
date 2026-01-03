@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum EquipoPeruano: String, CaseIterable {
+public enum EquipoPeruano: String, CaseIterable {
     case alianzaLima = "ali"
     case universitario = "uni"
     case sportingCristal = "cri"
@@ -32,9 +32,9 @@ enum EquipoPeruano: String, CaseIterable {
     case ayacuchofc = "aya"
     case cajamarca = "caj"
     case moquegua = "moq"
-    
-    
-    var nombreCompleto: String {
+
+
+    public var nombreCompleto: String {
         switch self {
         case .alianzaLima: return "Alianza Lima"
         case .universitario: return "Universitario"
@@ -62,8 +62,8 @@ enum EquipoPeruano: String, CaseIterable {
         case .moquegua: return "Deportivo Moquegua"
         }
     }
-    
-    static func obtenerNombreCompleto(paraId id: String) -> String {
+
+    public static func obtenerNombreCompleto(paraId id: String) -> String {
         return EquipoPeruano(rawValue: id)?.nombreCompleto ?? "Equipo Desconocido"
     }
 }

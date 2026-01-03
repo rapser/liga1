@@ -8,12 +8,12 @@
 import UIKit
 
 // MARK: - Layout Presets
-struct LayoutPresets {
+public struct LayoutPresets {
 
     // MARK: - TableView Preset
 
     /// Configura un TableView con valores estándar
-    static func configureTableView(
+    public static func configureTableView(
         _ tableView: UITableView,
         in superview: UIView,
         delegate: UITableViewDelegate? = nil,
@@ -35,7 +35,7 @@ struct LayoutPresets {
     }
 
     /// Configura un TableView debajo de un control superior
-    static func configureTableViewBelow(
+    public static func configureTableViewBelow(
         _ tableView: UITableView,
         topView: UIView,
         in superview: UIView,
@@ -64,7 +64,7 @@ struct LayoutPresets {
     // MARK: - TextField Preset
 
     /// Configura un TextField con estilo estándar
-    static func styledTextField(
+    public static func styledTextField(
         placeholder: String,
         cornerRadius: CGFloat = 12,
         leftPadding: CGFloat = Spacing.standard
@@ -84,7 +84,7 @@ struct LayoutPresets {
     // MARK: - Button Preset
 
     /// Crea un botón primario con estilo estándar
-    static func primaryButton(
+    public static func primaryButton(
         title: String,
         backgroundColor: UIColor = .systemBlue,
         cornerRadius: CGFloat = 12,
@@ -102,7 +102,7 @@ struct LayoutPresets {
     }
 
     /// Crea un botón secundario con borde
-    static func secondaryButton(
+    public static func secondaryButton(
         title: String,
         borderColor: UIColor = .separator,
         cornerRadius: CGFloat = 12,
@@ -124,7 +124,7 @@ struct LayoutPresets {
     // MARK: - Label Presets
 
     /// Crea un label de título
-    static func titleLabel(
+    public static func titleLabel(
         text: String? = nil,
         fontSize: CGFloat = 24,
         weight: UIFont.Weight = .bold
@@ -138,7 +138,7 @@ struct LayoutPresets {
     }
 
     /// Crea un label de subtítulo
-    static func subtitleLabel(
+    public static func subtitleLabel(
         text: String? = nil,
         fontSize: CGFloat = 16,
         weight: UIFont.Weight = .regular
@@ -153,7 +153,7 @@ struct LayoutPresets {
     }
 
     /// Crea un label para empty state
-    static func emptyStateLabel(
+    public static func emptyStateLabel(
         text: String,
         fontSize: CGFloat = 16
     ) -> UILabel {
@@ -171,7 +171,7 @@ struct LayoutPresets {
     // MARK: - ImageView Preset
 
     /// Crea un ImageView con aspecto y tinte
-    static func imageView(
+    public static func imageView(
         image: UIImage? = nil,
         contentMode: UIView.ContentMode = .scaleAspectFit,
         tintColor: UIColor? = nil
@@ -188,7 +188,7 @@ struct LayoutPresets {
     // MARK: - Empty State Layout
 
     /// Configura un empty state centrado con label
-    static func setupEmptyState(
+    public static func setupEmptyState(
         label: UILabel,
         in superview: UIView,
         horizontalPadding: CGFloat = 40
@@ -205,7 +205,7 @@ struct LayoutPresets {
     // MARK: - Loading Overlay
 
     /// Crea un overlay de carga
-    static func loadingOverlay(
+    public static func loadingOverlay(
         in superview: UIView,
         activityIndicatorColor: UIColor = .systemBlue
     ) -> (overlay: UIView, indicator: UIActivityIndicatorView) {
@@ -237,7 +237,7 @@ struct LayoutPresets {
     // MARK: - Segmented Control
 
     /// Configura un segmented control con estilo estándar
-    static func configureSegmentedControl(
+    public static func configureSegmentedControl(
         _ segmentedControl: UISegmentedControl,
         in superview: UIView,
         topOffset: CGFloat = Spacing.standard,

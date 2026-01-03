@@ -17,14 +17,13 @@ class LoginViewController: UIViewController {
 
     // MARK: - Initialization
 
-    init(viewModel: LoginViewModel = DIContainer.shared.makeLoginViewModel()) {
+    init(viewModel: LoginViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        self.viewModel = DIContainer.shared.makeLoginViewModel()
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented - use init(viewModel:)")
     }
 
     // MARK: - UI Components

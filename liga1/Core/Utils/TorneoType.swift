@@ -5,7 +5,7 @@
 //  Created by miguel tomairo on 13/09/25.
 //
 
-enum TorneoType: String {
+public enum TorneoType: String {
     case apertura = "apertura"
     case clausura = "clausura"
     case acumulado = "acumulado"

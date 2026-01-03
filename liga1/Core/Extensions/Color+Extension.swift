@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UIColor {
+public extension UIColor {
     static let libertadoresGold = UIColor(red: 1.0, green: 0.8, blue: 0.0, alpha: 1.0)        // #FFCC00
     static let libertadoresLightGold = UIColor(red: 1.0, green: 0.9, blue: 0.4, alpha: 1.0)   // #FFE666
     static let libertadoresLighterGold = UIColor(red: 1.0, green: 0.95, blue: 0.7, alpha: 1.0) // #FFF2B3

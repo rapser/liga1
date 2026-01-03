@@ -27,7 +27,8 @@ final class AppRouter {
             let mainTabBarController = MainTabBarController()
             window.rootViewController = mainTabBarController
         } else {
-            let loginVC = LoginViewController()
+            let viewModel = DIContainer.shared.makeLoginViewModel()
+            let loginVC = LoginViewController(viewModel: viewModel)
             let nav = UINavigationController(rootViewController: loginVC)
             window.rootViewController = nav
         }

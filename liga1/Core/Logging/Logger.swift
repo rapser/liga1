@@ -8,7 +8,7 @@
 import Foundation
 
 /// Protocol para logging centralizado
-protocol LoggerProtocol {
+public protocol LoggerProtocol {
     func error(_ message: String, error: Error?)
     func warning(_ message: String)
     func info(_ message: String)
@@ -17,17 +17,17 @@ protocol LoggerProtocol {
 
 /// Logger centralizado para toda la aplicación
 /// Permite logging en DEBUG y puede extenderse para enviar a analytics en producción
-final class Logger: LoggerProtocol {
+public final class Logger: LoggerProtocol {
 
     // MARK: - Singleton
 
-    static let shared: LoggerProtocol = Logger()
+    public static let shared: LoggerProtocol = Logger()
 
     private init() {}
 
     // MARK: - Public Methods
 
-    func error(_ message: String, error: Error? = nil) {
+    public func error(_ message: String, error: Error? = nil) {
         #if DEBUG
         print("❌ ERROR: \(message)")
         if let error = error {
@@ -37,20 +37,20 @@ final class Logger: LoggerProtocol {
         // TODO: En producción, enviar a servicio de analytics (Firebase Crashlytics, etc.)
     }
 
-    func warning(_ message: String) {
+    public func warning(_ message: String) {
         #if DEBUG
         print("⚠️ WARNING: \(message)")
         #endif
         // TODO: En producción, enviar a servicio de analytics
     }
 
-    func info(_ message: String) {
+    public func info(_ message: String) {
         #if DEBUG
         print("ℹ️ INFO: \(message)")
         #endif
     }
 
-    func debug(_ message: String) {
+    public func debug(_ message: String) {
         #if DEBUG
         print("🔍 DEBUG: \(message)")
         #endif

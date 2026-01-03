@@ -10,15 +10,15 @@ import FirebaseFirestore
 
 /// Singleton manager para acceso centralizado a Firestore
 /// Elimina la duplicación de `Firestore.firestore()` en todo el proyecto
-final class FirestoreManager {
+public final class FirestoreManager {
 
     // MARK: - Singleton
 
-    static let shared = FirestoreManager()
+    public static let shared = FirestoreManager()
 
     // MARK: - Properties
 
-    let db: Firestore
+    public let db: Firestore
 
     // MARK: - Initialization
 

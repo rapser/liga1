@@ -22,6 +22,19 @@ class FetchNewsUseCase: FetchNewsUseCaseProtocol {
     }
 
     func execute() -> AnyPublisher<[NewsItem], Error> {
+        Logger.shared.debug("FetchNewsUseCase: Fetching news")
+
         return repository.fetchNews()
+            .handleEvents(
+                receiveOutput: { news in
+                    Logger.shared.info("FetchNewsUseCase: Successfully fetched \(news.count) news items")
+                },
+                receiveCompletion: { completion in
+                    if case .failure(let error) = completion {
+                        Logger.shared.error("FetchNewsUseCase: Failed to fetch news", error: error)
+                    }
+                }
+            )
+            .eraseToAnyPublisher()
     }
 }

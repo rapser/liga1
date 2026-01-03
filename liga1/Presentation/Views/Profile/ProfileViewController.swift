@@ -161,7 +161,8 @@ class ProfileViewController: UIViewController {
     private func navigateToLogin() {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first {
-            let loginViewController = LoginViewController()
+            let viewModel = DIContainer.shared.makeLoginViewModel()
+            let loginViewController = LoginViewController(viewModel: viewModel)
 
             window.rootViewController = loginViewController
             window.makeKeyAndVisible()

@@ -41,7 +41,8 @@ final class SessionManager {
     func logout() {
         do {
             try Auth.auth().signOut()
-            let loginVC = LoginViewController()
+            let viewModel = DIContainer.shared.makeLoginViewModel()
+            let loginVC = LoginViewController(viewModel: viewModel)
             let nav = UINavigationController(rootViewController: loginVC)
             window?.rootViewController = nav
             print("✅ Usuario cerrado sesión automáticamente por inactividad.")
