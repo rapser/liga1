@@ -125,26 +125,26 @@ class MatchTableViewCell: UITableViewCell {
     }
     
     // MARK: - Config
-    func configure(with match: Match, logoLocal: UIImage?, logoVisitante: UIImage?) {
-        nombreLocalLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoLocalId ?? "shield.fill")
-        nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: match.equipoVisitanteId ?? "shield.fill")
+    func configure(with presentationMatch: MatchPresentationModel, logoLocal: UIImage?, logoVisitante: UIImage?) {
+        nombreLocalLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: presentationMatch.equipoLocalId ?? "shield.fill")
+        nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: presentationMatch.equipoVisitanteId ?? "shield.fill")
         logoLocalImageView.image = logoLocal
         logoVisitanteImageView.image = logoVisitante
 
         // Actualizar estrella de favorito
-        let starImage = match.isFavorite ? "star.fill" : "star"
+        let starImage = presentationMatch.isFavorite ? "star.fill" : "star"
         estrellaButton.setImage(UIImage(systemName: starImage), for: .normal)
 
         // Mostrar marcadores según el estado del partido
-        switch match.estado {
+        switch presentationMatch.estado {
         case .pendiente:
             marcadorLocalLabel.text = "-"
             marcadorVisitanteLabel.text = "-"
             marcadorLocalLabel.textColor = .secondaryLabel
             marcadorVisitanteLabel.textColor = .secondaryLabel
         case .enJuego, .finalizado:
-            marcadorLocalLabel.text = "\(match.golesEquipoLocal)"
-            marcadorVisitanteLabel.text = "\(match.golesEquipoVisitante)"
+            marcadorLocalLabel.text = "\(presentationMatch.golesEquipoLocal)"
+            marcadorVisitanteLabel.text = "\(presentationMatch.golesEquipoVisitante)"
             marcadorLocalLabel.textColor = .label
             marcadorVisitanteLabel.textColor = .label
         case .anulado, .suspendido:

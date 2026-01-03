@@ -32,14 +32,8 @@ final class FetchFavoriteMatchesUseCase: FetchFavoriteMatchesUseCaseProtocol {
         // Obtener los partidos favoritos
         return matchesRepository.fetchMatchesByIds(matchIds: Array(favoriteMatchIds))
             .map { matches in
-                // Marcar todos como favoritos y ordenar por fecha
-                var favoriteMatches = matches.map { match in
-                    var updatedMatch = match
-                    updatedMatch.isFavorite = true
-                    return updatedMatch
-                }
-                favoriteMatches.sort { $0.fecha < $1.fecha }
-                return favoriteMatches
+                // Ordenar por fecha
+                matches.sorted { $0.fecha < $1.fecha }
             }
             .eraseToAnyPublisher()
     }

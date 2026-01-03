@@ -133,11 +133,21 @@ class HomeViewModel {
                   let numero = jornada.numero,
                   let torneo = jornada.torneo else { continue }
 
+            // Convertir Match a MatchPresentationModel
+            let presentationMatches = matches.map { match in
+                MatchPresentationModel(
+                    match: match,
+                    isFavorite: false, // Se actualizará con updateMatchesFavoriteStatus()
+                    jornadaNumero: numero,
+                    torneoNombre: torneo
+                )
+            }
+
             let section = JornadaSection(
                 jornadaId: jornadaId,
                 numero: numero,
                 torneo: torneo,
-                matches: matches
+                matches: presentationMatches
             )
             tempSections.append(section)
         }
@@ -152,8 +162,8 @@ class HomeViewModel {
         // Actualizar el estado de favoritos en cada sección
         for (index, section) in jornadaSections.enumerated() {
             var updatedMatches = section.matches
-            for (matchIndex, match) in updatedMatches.enumerated() {
-                if let matchId = match.id {
+            for (matchIndex, presentationMatch) in updatedMatches.enumerated() {
+                if let matchId = presentationMatch.id {
                     // El ID completo incluye la jornada
                     let fullMatchId = "\(section.jornadaId)_\(matchId)"
                     let isFav = favoriteMatchIds.contains(fullMatchId)
@@ -171,6 +181,6 @@ class HomeViewModel {
         let jornadaId: String
         let numero: Int
         let torneo: String
-        var matches: [Match]
+        var matches: [MatchPresentationModel]
     }
 }

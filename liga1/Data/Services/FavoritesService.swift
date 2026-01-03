@@ -19,13 +19,20 @@ protocol FavoritesServiceProtocol {
 
 class FavoritesService: FavoritesServiceProtocol {
 
-    private let db = FirestoreManager.shared.db
+    private let database: DatabaseProtocol
+    private let authProvider: AuthProvider
     private var favoritesListener: ListenerRegistration?
 
     // Subject para emitir cambios en tiempo real
     private let favoritesSubject = CurrentValueSubject<Set<String>, Never>([])
 
-    init() {
+    private var db: Firestore {
+        database.db
+    }
+
+    init(database: DatabaseProtocol, authProvider: AuthProvider) {
+        self.database = database
+        self.authProvider = authProvider
         startObservingFavorites()
     }
 
@@ -36,7 +43,7 @@ class FavoritesService: FavoritesServiceProtocol {
     // MARK: - Private Helpers
 
     private func getUserId() -> String? {
-        return Auth.auth().currentUser?.uid
+        return authProvider.currentUserId
     }
 
     private func startObservingFavorites() {

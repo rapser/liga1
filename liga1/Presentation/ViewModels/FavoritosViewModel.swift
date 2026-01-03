@@ -13,7 +13,7 @@ class FavoritosViewModel {
 
     // MARK: - Published Properties
 
-    @Published private(set) var matches: [Match] = []
+    @Published private(set) var matches: [MatchPresentationModel] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: Error?
     @Published private(set) var favoriteMatchIds: Set<String> = []
@@ -90,7 +90,11 @@ class FavoritosViewModel {
                 }
             } receiveValue: { [weak self] matches in
                 Logger.shared.info("Successfully fetched \(matches.count) favorite matches")
-                self?.matches = matches
+                // Convertir Match a MatchPresentationModel
+                let presentationMatches = matches.map { match in
+                    MatchPresentationModel(match: match, isFavorite: true)
+                }
+                self?.matches = presentationMatches
             }
             .store(in: &cancellables)
     }

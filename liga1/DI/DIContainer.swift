@@ -52,7 +52,8 @@ final class DIContainer {
     }
 
     func makeFavoritesService() -> FavoritesServiceProtocol {
-        return FavoritesService()
+        let authService = makeAuthService() as! AuthService
+        return FavoritesService(database: makeDatabase(), authProvider: authService)
     }
 
     // MARK: - Use Cases - Jornadas

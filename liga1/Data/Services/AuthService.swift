@@ -19,7 +19,13 @@ protocol AuthServiceProtocol {
     func getCurrentUser() -> AnyPublisher<User?, Never>
 }
 
-class AuthService: AuthServiceProtocol {
+class AuthService: AuthServiceProtocol, AuthProvider {
+
+    // MARK: - AuthProvider
+
+    var currentUserId: String? {
+        return Auth.auth().currentUser?.uid
+    }
 
     func login(email: String, password: String) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { promise in

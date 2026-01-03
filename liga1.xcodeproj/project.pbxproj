@@ -77,6 +77,8 @@
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
 		46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */; };
+		46D8209E2F09D71600FAA836 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209C2F09D71600FAA836 /* AuthProvider.swift */; };
+		46D820A12F09D72A00FAA836 /* MatchPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */; };
 		46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995922C6E90EC00D4951C /* AppDelegate.swift */; };
 		46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D995942C6E90EC00D4951C /* SceneDelegate.swift */; };
 		46D9959C2C6E90EE00D4951C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 46D9959B2C6E90EE00D4951C /* Assets.xcassets */; };
@@ -159,6 +161,8 @@
 		469E54302E76511F001ECD36 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseProtocol.swift; sourceTree = "<group>"; };
+		46D8209C2F09D71600FAA836 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
+		46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPresentationModel.swift; sourceTree = "<group>"; };
 		46D9958F2C6E90EC00D4951C /* liga1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liga1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		46D995922C6E90EC00D4951C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		46D995942C6E90EC00D4951C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -214,6 +218,7 @@
 		4640017A2F08853F00A8C905 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				46D8209D2F09D71600FAA836 /* Auth */,
 				464009B62F098D4F00A8C905 /* Constants */,
 				464009B82F098D4F00A8C905 /* Firebase */,
 				464009BA2F098D4F00A8C905 /* Logging */,
@@ -351,6 +356,7 @@
 		464001B42F08853F00A8C905 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				46D820A02F09D72A00FAA836 /* Models */,
 				464001962F08853F00A8C905 /* Components */,
 				4640019D2F08853F00A8C905 /* ViewModels */,
 				464001B32F08853F00A8C905 /* Views */,
@@ -548,6 +554,22 @@
 			path = DI;
 			sourceTree = "<group>";
 		};
+		46D8209D2F09D71600FAA836 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				46D8209C2F09D71600FAA836 /* AuthProvider.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		46D820A02F09D72A00FAA836 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		46D995862C6E90EC00D4951C = {
 			isa = PBXGroup;
 			children = (
@@ -720,6 +742,7 @@
 				464001C72F08853F00A8C905 /* Team.swift in Sources */,
 				464001C92F08853F00A8C905 /* ProfileViewModel.swift in Sources */,
 				464001CD2F08853F00A8C905 /* MatchesRepository.swift in Sources */,
+				46D820A12F09D72A00FAA836 /* MatchPresentationModel.swift in Sources */,
 				464001CE2F08853F00A8C905 /* UIStackView+Builder.swift in Sources */,
 				464001D02F08853F00A8C905 /* LoginViewModel.swift in Sources */,
 				464001D12F08853F00A8C905 /* AdminMatchRepository.swift in Sources */,
@@ -746,6 +769,7 @@
 				464001DA2F08853F00A8C905 /* TorneoViewModel.swift in Sources */,
 				464001DB2F08853F00A8C905 /* MatchTableViewCell.swift in Sources */,
 				464001DC2F08853F00A8C905 /* Jornada.swift in Sources */,
+				46D8209E2F09D71600FAA836 /* AuthProvider.swift in Sources */,
 				464001DD2F08853F00A8C905 /* TablePosition.swift in Sources */,
 				464001DE2F08853F00A8C905 /* NewsHeaderView.swift in Sources */,
 				464001DF2F08853F00A8C905 /* NewsItem.swift in Sources */,

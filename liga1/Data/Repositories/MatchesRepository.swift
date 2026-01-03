@@ -9,11 +9,19 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-protocol MatchesRepositoryProtocol {
+/// Protocolo para obtener partidos
+protocol FetchMatchesRepositoryProtocol {
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error>
     func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error>
+}
+
+/// Protocolo para observar partidos en tiempo real (futuro)
+protocol ObserveMatchRepositoryProtocol {
     func observeMatch(id: String) -> AnyPublisher<Match, Error>
 }
+
+/// Alias para compatibilidad con código existente
+typealias MatchesRepositoryProtocol = FetchMatchesRepositoryProtocol
 
 class MatchesRepository: MatchesRepositoryProtocol {
 
@@ -136,12 +144,13 @@ class MatchesRepository: MatchesRepositoryProtocol {
         }
         .eraseToAnyPublisher()
     }
-
-    func observeMatch(id: String) -> AnyPublisher<Match, Error> {
-        // Future implementation for real-time match updates
-        return Future<Match, Error> { promise in
-            promise(.failure(NSError(domain: "MatchesRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Not implemented"])))
-        }
-        .eraseToAnyPublisher()
-    }
 }
+
+// MARK: - Future: ObserveMatchRepositoryProtocol implementation
+// Cuando se implemente observación en tiempo real, descomentar:
+//
+// extension MatchesRepository: ObserveMatchRepositoryProtocol {
+//     func observeMatch(id: String) -> AnyPublisher<Match, Error> {
+//         // Real-time implementation here
+//     }
+// }

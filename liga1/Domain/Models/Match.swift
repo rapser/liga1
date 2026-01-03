@@ -16,13 +16,6 @@ struct Match: Codable {
     var estado: EstadoMatch
     var suspendido: Bool
 
-    // isFavorite no se guarda en Firestore, es solo para UI
-    var isFavorite: Bool = false
-
-    // Propiedades para UI que se setean desde la jornada padre
-    var jornadaNumero: Int = 0
-    var torneoNombre: String = ""
-
     // Propiedades computadas para extraer equipos del ID
     var equipoLocalId: String? {
         guard let id = id else { return nil }
@@ -44,7 +37,6 @@ struct Match: Codable {
         case golesEquipoVisitante
         case estado
         case suspendido
-        // isFavorite, jornadaNumero, torneoNombre NO están en CodingKeys
     }
 
     init(
@@ -53,8 +45,7 @@ struct Match: Codable {
         golesEquipoLocal: Int = 0,
         golesEquipoVisitante: Int = 0,
         estado: EstadoMatch = .pendiente,
-        suspendido: Bool = false,
-        isFavorite: Bool = false
+        suspendido: Bool = false
     ) {
         self.id = id
         self.fecha = fecha
@@ -62,7 +53,6 @@ struct Match: Codable {
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
         self.suspendido = suspendido
-        self.isFavorite = isFavorite
     }
     
     // Enum para estado del partido
