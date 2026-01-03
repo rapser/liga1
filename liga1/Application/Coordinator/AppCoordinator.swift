@@ -20,7 +20,6 @@ final class AppCoordinator: Coordinator {
         self.window = window
         self.container = container
         self.navigationController = UINavigationController()
-        self.window.rootViewController = navigationController
     }
 
     func start() {
@@ -36,12 +35,13 @@ final class AppCoordinator: Coordinator {
         let loginCoordinator = container.makeLoginCoordinator(navigationController: navigationController)
         loginCoordinator.delegate = self
         addChildCoordinator(loginCoordinator)
+        window.rootViewController = navigationController
         loginCoordinator.start()
     }
 
     func showMainFlow() {
         let mainTabBar = MainTabBarController(container: container)
-        navigationController.setViewControllers([mainTabBar], animated: true)
+        window.rootViewController = mainTabBar
     }
 }
 
