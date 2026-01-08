@@ -25,7 +25,6 @@
 		464001C22F08853F00A8C905 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001902F08853F00A8C905 /* HeaderView.swift */; };
 		464001C32F08853F00A8C905 /* TorneoType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001782F08853F00A8C905 /* TorneoType.swift */; };
 		464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001742F08853F00A8C905 /* EquipoPeruano.swift */; };
-		464001C62F08853F00A8C905 /* Partido.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640018A2F08853F00A8C905 /* Partido.swift */; };
 		464001C72F08853F00A8C905 /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640018B2F08853F00A8C905 /* Team.swift */; };
 		464001C92F08853F00A8C905 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640019B2F08853F00A8C905 /* ProfileViewModel.swift */; };
 		464001CD2F08853F00A8C905 /* MatchesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640017F2F08853F00A8C905 /* MatchesRepository.swift */; };
@@ -74,6 +73,7 @@
 		46400A002F098EB800A8C905 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009FE2F098EB800A8C905 /* DIContainer.swift */; };
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
+		46CDF4712F1058A100F280E6 /* NewsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4702F1058A100F280E6 /* NewsCategory.swift */; };
 		46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */; };
 		46D8209E2F09D71600FAA836 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209C2F09D71600FAA836 /* AuthProvider.swift */; };
 		46D820A12F09D72A00FAA836 /* MatchPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */; };
@@ -152,6 +152,7 @@
 		464009EF2F098DF600A8C905 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
 		464009FE2F098EB800A8C905 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		46CDF4702F1058A100F280E6 /* NewsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCategory.swift; sourceTree = "<group>"; };
 		46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseProtocol.swift; sourceTree = "<group>"; };
 		46D8209C2F09D71600FAA836 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
 		46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPresentationModel.swift; sourceTree = "<group>"; };
@@ -203,6 +204,7 @@
 		464001792F08853F00A8C905 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4702F1058A100F280E6 /* NewsCategory.swift */,
 				464001742F08853F00A8C905 /* EquipoPeruano.swift */,
 				464001762F08853F00A8C905 /* LayoutPresets.swift */,
 				464001772F08853F00A8C905 /* TablePosition.swift */,
@@ -705,6 +707,7 @@
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
 				464001BB2F08853F00A8C905 /* TeamsRepository.swift in Sources */,
+				46CDF4712F1058A100F280E6 /* NewsCategory.swift in Sources */,
 				464001BD2F08853F00A8C905 /* Color+Extension.swift in Sources */,
 				464001BF2F08853F00A8C905 /* Match.swift in Sources */,
 				464001C02F08853F00A8C905 /* JornadasRepository.swift in Sources */,
@@ -713,7 +716,6 @@
 				46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */,
 				464001C32F08853F00A8C905 /* TorneoType.swift in Sources */,
 				464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */,
-				464001C62F08853F00A8C905 /* Partido.swift in Sources */,
 				464001C72F08853F00A8C905 /* Team.swift in Sources */,
 				464001C92F08853F00A8C905 /* ProfileViewModel.swift in Sources */,
 				464001CD2F08853F00A8C905 /* MatchesRepository.swift in Sources */,
