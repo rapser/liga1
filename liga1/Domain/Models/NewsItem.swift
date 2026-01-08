@@ -13,11 +13,11 @@ struct NewsItem {
     let imageUrl: String
     let url: String
     let source: String
-    let category: String
+    let category: NewsCategory
     let featured: Bool
     let publishedDate: Date
 
-    init(title: String, imageUrl: String, url: String, source: String, category: String, featured: Bool, publishedDate: Date) {
+    init(title: String, imageUrl: String, url: String, source: String, category: NewsCategory, featured: Bool, publishedDate: Date) {
         self.title = title
         self.imageUrl = imageUrl
         self.url = url
@@ -34,7 +34,7 @@ extension NewsItem {
               let imageUrl = dict["image"] as? String,
               let url = dict["url"] as? String,
               let source = dict["periodico"] as? String,
-              let category = dict["categoria"] as? String,
+              let categoryString = dict["categoria"] as? String,
               let featured = dict["destacada"] as? Bool,
               let timestamp = dict["fecha"] as? Timestamp else {
             return nil
@@ -44,7 +44,7 @@ extension NewsItem {
         self.imageUrl = imageUrl
         self.url = url
         self.source = source
-        self.category = category
+        self.category = NewsCategory(rawValue: categoryString)
         self.featured = featured
         self.publishedDate = timestamp.dateValue()
     }

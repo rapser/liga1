@@ -14,7 +14,7 @@ class NewsViewModel {
     // MARK: - Published Properties
 
     @Published private(set) var featuredNews: [NewsItem] = []
-    @Published private(set) var groupedNews: [String: [NewsItem]] = [:]
+    @Published private(set) var groupedNews: [NewsCategory: [NewsItem]] = [:]
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: Error?
 

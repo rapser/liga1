@@ -80,8 +80,8 @@ class CategoryHeaderView: UITableViewHeaderFooterView {
             .pinBottom(constant: Spacing.small)
     }
 
-    func configure(with title: String) {
-        label.text = title.uppercased()
+    func configure(with category: NewsCategory) {
+        label.text = category.displayName.uppercased()
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }

@@ -30,12 +30,12 @@ class RegistrarPartidosViewModel {
     // MARK: - Public Methods
 
     /// Registra un solo partido
-    func registerMatch(partido: Partido) {
+    func registerMatch(match: Match, jornadaId: String) {
         isLoading = true
         error = nil
         successMessage = nil
 
-        registerMatchesUseCase.registerMatch(partido: partido)
+        registerMatchesUseCase.registerMatch(match: match, jornadaId: jornadaId)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -50,8 +50,8 @@ class RegistrarPartidosViewModel {
     }
 
     /// Registra múltiples partidos
-    func registerMultipleMatches(partidos: [Partido]) {
-        guard !partidos.isEmpty else {
+    func registerMultipleMatches(matches: [Match], jornadaId: String) {
+        guard !matches.isEmpty else {
             Logger.shared.warning("Attempted to register empty matches array")
             return
         }
@@ -60,7 +60,7 @@ class RegistrarPartidosViewModel {
         error = nil
         successMessage = nil
 
-        registerMatchesUseCase.registerMultipleMatches(partidos: partidos)
+        registerMatchesUseCase.registerMultipleMatches(matches: matches, jornadaId: jornadaId)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -69,23 +69,22 @@ class RegistrarPartidosViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] _ in
-                self?.successMessage = "\(partidos.count) partidos registrados exitosamente"
+                self?.successMessage = "\(matches.count) partidos registrados exitosamente"
             }
             .store(in: &cancellables)
     }
 
     /// Actualiza un partido en vivo
-    func updateLiveMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) {
+    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) {
         isLoading = true
         error = nil
         successMessage = nil
 
         registerMatchesUseCase.updateLiveMatch(
-            teamAId: teamAId,
-            teamBId: teamBId,
-            fecha: fecha,
-            teamAScore: teamAScore,
-            teamBScore: teamBScore
+            matchId: matchId,
+            jornadaId: jornadaId,
+            localScore: localScore,
+            visitorScore: visitorScore
         )
         .receive(on: DispatchQueue.main)
         .sink { [weak self] completion in
@@ -101,15 +100,14 @@ class RegistrarPartidosViewModel {
     }
 
     /// Finaliza un partido
-    func finalizeMatch(teamAId: String, teamBId: String, fecha: String) {
+    func finalizeMatch(matchId: String, jornadaId: String) {
         isLoading = true
         error = nil
         successMessage = nil
 
         registerMatchesUseCase.finalizeMatch(
-            teamAId: teamAId,
-            teamBId: teamBId,
-            fecha: fecha
+            matchId: matchId,
+            jornadaId: jornadaId
         )
         .receive(on: DispatchQueue.main)
         .sink { [weak self] completion in

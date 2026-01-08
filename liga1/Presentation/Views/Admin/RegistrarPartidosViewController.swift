@@ -176,13 +176,14 @@ class RegistrarPartidosViewController: UIViewController {
         // IMPORTANTE: El jornadaId debe coincidir con un documento existente en Firestore
         // Formato del jornadaId: "{torneo}_{numero}" ejemplo: "apertura_01", "clausura_10"
 
-        // Los partidos se registrarán en: jornadas/{jornadaId}/matches/{teamAId}_{teamBId}
-        let partidosARegistrar: [Partido] = [
-            Partido(teamAId: "com", teamBId: "gra", fecha: "03", jornadaId: "apertura_01", torneo: "apertura", golesTeamA: 1, golesTeamB: 2),
-            Partido(teamAId: "mel", teamBId: "cou", fecha: "06", jornadaId: "apertura_01", torneo: "apertura", golesTeamA: 3, golesTeamB: 0)
+        // Los partidos se registrarán en: jornadas/{jornadaId}/matches/{equipoLocalId}_{equipoVisitanteId}
+        let jornadaId = "apertura_01"
+        let matchesToRegister: [Match] = [
+            Match(id: "com_gra", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
+            Match(id: "mel_cou", fecha: Date(), golesEquipoLocal: 3, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false)
         ]
 
-        viewModel.registerMultipleMatches(partidos: partidosARegistrar)
+        viewModel.registerMultipleMatches(matches: matchesToRegister, jornadaId: jornadaId)
     }
 
     private func showSuccess(_ message: String) {
@@ -200,24 +201,26 @@ class RegistrarPartidosViewController: UIViewController {
     /*
      EJEMPLO DE USO PARA 2026:
 
-     Para registrar partidos de una jornada específica, modifica el array partidosARegistrar:
+     Para registrar partidos de una jornada específica, modifica el array matchesToRegister:
 
-     let partidosARegistrar: [Partido] = [
+     let jornadaId = "apertura_10"
+     let matchesToRegister: [Match] = [
          // Jornada 10 - Apertura 2026
-         Partido(teamAId: "utc", teamBId: "cie", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 2),
-         Partido(teamAId: "gar", teamBId: "adt", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 0),
-         Partido(teamAId: "val", teamBId: "com", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 0),
-         Partido(teamAId: "cus", teamBId: "cou", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 2, golesTeamB: 1),
-         Partido(teamAId: "sba", teamBId: "gra", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 0, golesTeamB: 0),
-         Partido(teamAId: "hua", teamBId: "cri", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 2),
-         Partido(teamAId: "ali", teamBId: "man", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 1, golesTeamB: 0),
-         Partido(teamAId: "atl", teamBId: "uni", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 0, golesTeamB: 3),
-         Partido(teamAId: "mel", teamBId: "cha", fecha: "10", jornadaId: "apertura_10", torneo: "apertura", golesTeamA: 2, golesTeamB: 0)
+         Match(id: "utc_cie", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
+         Match(id: "gar_adt", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "val_com", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "cus_cou", fecha: Date(), golesEquipoLocal: 2, golesEquipoVisitante: 1, estado: .pendiente, suspendido: false),
+         Match(id: "sba_gra", fecha: Date(), golesEquipoLocal: 0, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "hua_cri", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
+         Match(id: "ali_man", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "atl_uni", fecha: Date(), golesEquipoLocal: 0, golesEquipoVisitante: 3, estado: .pendiente, suspendido: false),
+         Match(id: "mel_cha", fecha: Date(), golesEquipoLocal: 2, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false)
      ]
 
      IMPORTANTE:
      - jornadaId: Debe coincidir con un documento existente en Firestore (formato: "{torneo}_{numero}")
-     - Estructura en Firestore: jornadas/{jornadaId}/matches/{teamAId}_{teamBId}
+     - Estructura en Firestore: jornadas/{jornadaId}/matches/{equipoLocalId}_{equipoVisitanteId}
+     - Match ID format: "{equipoLocalId}_{equipoVisitanteId}" (ej: "utc_cie")
      - Antes de usar, asegúrate de que el documento jornada ya existe en Firestore
 
      Códigos de equipos:

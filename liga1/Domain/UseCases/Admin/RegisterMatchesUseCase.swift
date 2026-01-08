@@ -9,10 +9,10 @@ import Foundation
 import Combine
 
 protocol RegisterMatchesUseCaseProtocol {
-    func registerMatch(partido: Partido) -> AnyPublisher<Void, Error>
-    func registerMultipleMatches(partidos: [Partido]) -> AnyPublisher<Void, Error>
-    func updateLiveMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error>
-    func finalizeMatch(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error>
+    func registerMatch(match: Match, jornadaId: String) -> AnyPublisher<Void, Error>
+    func registerMultipleMatches(matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error>
+    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error>
+    func finalizeMatch(matchId: String, jornadaId: String) -> AnyPublisher<Void, Error>
 }
 
 final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
@@ -23,120 +23,94 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
         self.adminMatchRepository = adminMatchRepository
     }
 
-    func registerMatch(partido: Partido) -> AnyPublisher<Void, Error> {
+    func registerMatch(match: Match, jornadaId: String) -> AnyPublisher<Void, Error> {
         // Validaciones de negocio
-        if let validationError = validatePartido(partido) {
+        if let validationError = validateMatch(match, jornadaId: jornadaId) {
             Logger.shared.error("RegisterMatchesUseCase: Validation failed for single match", error: validationError)
             return Fail(error: validationError).eraseToAnyPublisher()
         }
 
-        Logger.shared.debug("RegisterMatchesUseCase: Registering single match - \(partido.equipoA) vs \(partido.equipoB)")
-
-        return adminMatchRepository.registerMatch(partido: partido)
+        return adminMatchRepository.registerMatch(match: match, jornadaId: jornadaId)
             .handleEvents(
-                receiveOutput: { _ in
-                    Logger.shared.info("RegisterMatchesUseCase: Successfully registered match - \(partido.equipoA) vs \(partido.equipoB)")
-                },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("RegisterMatchesUseCase: Failed to register match - \(partido.equipoA) vs \(partido.equipoB)", error: error)
+                        Logger.shared.error("RegisterMatchesUseCase: Failed to register match", error: error)
                     }
                 }
             )
             .eraseToAnyPublisher()
     }
 
-    func registerMultipleMatches(partidos: [Partido]) -> AnyPublisher<Void, Error> {
+    func registerMultipleMatches(matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error> {
         // Validaciones de negocio
-        guard !partidos.isEmpty else {
+        guard !matches.isEmpty else {
             let error = NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -1,
                 userInfo: [NSLocalizedDescriptionKey: "La lista de partidos no puede estar vacía"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: Empty partidos array", error: nil)
+            Logger.shared.error("RegisterMatchesUseCase: Empty matches array", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
         // Validar cada partido
-        for (index, partido) in partidos.enumerated() {
-            if let validationError = validatePartido(partido) {
+        for (index, match) in matches.enumerated() {
+            if let validationError = validateMatch(match, jornadaId: jornadaId) {
                 Logger.shared.error("RegisterMatchesUseCase: Validation failed for match at index \(index)", error: validationError)
                 return Fail(error: validationError).eraseToAnyPublisher()
             }
         }
 
-        Logger.shared.debug("RegisterMatchesUseCase: Registering \(partidos.count) matches")
-
-        return adminMatchRepository.registerMultipleMatches(partidos: partidos)
+        return adminMatchRepository.registerMultipleMatches(matches: matches, jornadaId: jornadaId)
             .handleEvents(
-                receiveOutput: { _ in
-                    Logger.shared.info("RegisterMatchesUseCase: Successfully registered \(partidos.count) matches")
-                },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("RegisterMatchesUseCase: Failed to register \(partidos.count) matches", error: error)
+                        Logger.shared.error("RegisterMatchesUseCase: Failed to register \(matches.count) matches", error: error)
                     }
                 }
             )
             .eraseToAnyPublisher()
     }
 
-    func updateLiveMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error> {
+    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error> {
         // Validaciones de negocio
-        guard !teamAId.isEmpty else {
+        guard !matchId.isEmpty else {
             let error = NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -2,
-                userInfo: [NSLocalizedDescriptionKey: "El ID del equipo A no puede estar vacío"]
+                userInfo: [NSLocalizedDescriptionKey: "El ID del partido no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: teamAId is empty", error: nil)
+            Logger.shared.error("RegisterMatchesUseCase: matchId is empty", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
-        guard !teamBId.isEmpty else {
-            let error = NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -3,
-                userInfo: [NSLocalizedDescriptionKey: "El ID del equipo B no puede estar vacío"]
-            )
-            Logger.shared.error("RegisterMatchesUseCase: teamBId is empty", error: nil)
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        guard !fecha.isEmpty else {
+        guard !jornadaId.isEmpty else {
             let error = NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -4,
-                userInfo: [NSLocalizedDescriptionKey: "La fecha no puede estar vacía"]
+                userInfo: [NSLocalizedDescriptionKey: "El ID de la jornada no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: fecha is empty", error: nil)
+            Logger.shared.error("RegisterMatchesUseCase: jornadaId is empty", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
-        guard teamAScore >= 0 && teamBScore >= 0 else {
+        guard localScore >= 0 && visitorScore >= 0 else {
             let error = NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -5,
                 userInfo: [NSLocalizedDescriptionKey: "Los puntajes no pueden ser negativos"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: Invalid scores - teamA: \(teamAScore), teamB: \(teamBScore)", error: nil)
+            Logger.shared.error("RegisterMatchesUseCase: Invalid scores - local: \(localScore), visitor: \(visitorScore)", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
-        Logger.shared.debug("RegisterMatchesUseCase: Updating live match - Score: \(teamAScore)-\(teamBScore)")
-
         return adminMatchRepository.updateLiveMatch(
-            teamAId: teamAId,
-            teamBId: teamBId,
-            fecha: fecha,
-            teamAScore: teamAScore,
-            teamBScore: teamBScore
+            matchId: matchId,
+            jornadaId: jornadaId,
+            localScore: localScore,
+            visitorScore: visitorScore
         )
         .handleEvents(
-            receiveOutput: { _ in
-                Logger.shared.info("RegisterMatchesUseCase: Successfully updated live match - Score: \(teamAScore)-\(teamBScore)")
-            },
             receiveCompletion: { completion in
                 if case .failure(let error) = completion {
                     Logger.shared.error("RegisterMatchesUseCase: Failed to update live match", error: error)
@@ -146,49 +120,33 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
         .eraseToAnyPublisher()
     }
 
-    func finalizeMatch(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error> {
+    func finalizeMatch(matchId: String, jornadaId: String) -> AnyPublisher<Void, Error> {
         // Validaciones de negocio
-        guard !teamAId.isEmpty else {
+        guard !matchId.isEmpty else {
             let error = NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -6,
-                userInfo: [NSLocalizedDescriptionKey: "El ID del equipo A no puede estar vacío"]
+                userInfo: [NSLocalizedDescriptionKey: "El ID del partido no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: teamAId is empty for finalization", error: nil)
+            Logger.shared.error("RegisterMatchesUseCase: matchId is empty for finalization", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
-        guard !teamBId.isEmpty else {
-            let error = NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -7,
-                userInfo: [NSLocalizedDescriptionKey: "El ID del equipo B no puede estar vacío"]
-            )
-            Logger.shared.error("RegisterMatchesUseCase: teamBId is empty for finalization", error: nil)
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        guard !fecha.isEmpty else {
+        guard !jornadaId.isEmpty else {
             let error = NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -8,
-                userInfo: [NSLocalizedDescriptionKey: "La fecha no puede estar vacía"]
+                userInfo: [NSLocalizedDescriptionKey: "El ID de la jornada no puede estar vacío"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: fecha is empty for finalization", error: nil)
+            Logger.shared.error("RegisterMatchesUseCase: jornadaId is empty for finalization", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
 
-        Logger.shared.debug("RegisterMatchesUseCase: Finalizing match")
-
         return adminMatchRepository.finalizeMatch(
-            teamAId: teamAId,
-            teamBId: teamBId,
-            fecha: fecha
+            matchId: matchId,
+            jornadaId: jornadaId
         )
         .handleEvents(
-            receiveOutput: { _ in
-                Logger.shared.info("RegisterMatchesUseCase: Successfully finalized match")
-            },
             receiveCompletion: { completion in
                 if case .failure(let error) = completion {
                     Logger.shared.error("RegisterMatchesUseCase: Failed to finalize match", error: error)
@@ -200,32 +158,16 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
 
     // MARK: - Private Helpers
 
-    private func validatePartido(_ partido: Partido) -> NSError? {
-        guard !partido.equipoA.isEmpty else {
+    private func validateMatch(_ match: Match, jornadaId: String) -> NSError? {
+        guard let matchId = match.id, !matchId.isEmpty else {
             return NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -9,
-                userInfo: [NSLocalizedDescriptionKey: "El nombre del equipo A no puede estar vacío"]
+                userInfo: [NSLocalizedDescriptionKey: "El ID del partido no puede estar vacío"]
             )
         }
 
-        guard !partido.equipoB.isEmpty else {
-            return NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -10,
-                userInfo: [NSLocalizedDescriptionKey: "El nombre del equipo B no puede estar vacío"]
-            )
-        }
-
-        guard !partido.fecha.isEmpty else {
-            return NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -11,
-                userInfo: [NSLocalizedDescriptionKey: "La fecha no puede estar vacía"]
-            )
-        }
-
-        guard !partido.jornadaId.isEmpty else {
+        guard !jornadaId.isEmpty else {
             return NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -12,
@@ -233,7 +175,23 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
             )
         }
 
-        guard partido.equipoA != partido.equipoB else {
+        guard let equipoLocalId = match.equipoLocalId, !equipoLocalId.isEmpty else {
+            return NSError(
+                domain: "RegisterMatchesUseCase",
+                code: -10,
+                userInfo: [NSLocalizedDescriptionKey: "El ID del equipo local no puede estar vacío"]
+            )
+        }
+
+        guard let equipoVisitanteId = match.equipoVisitanteId, !equipoVisitanteId.isEmpty else {
+            return NSError(
+                domain: "RegisterMatchesUseCase",
+                code: -11,
+                userInfo: [NSLocalizedDescriptionKey: "El ID del equipo visitante no puede estar vacío"]
+            )
+        }
+
+        guard equipoLocalId != equipoVisitanteId else {
             return NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -13,

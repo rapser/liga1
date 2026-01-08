@@ -10,13 +10,13 @@ import FirebaseFirestore
 import Combine
 
 protocol AdminMatchRepositoryProtocol {
-    func registerMatch(partido: Partido) -> AnyPublisher<Void, Error>
-    func registerMultipleMatches(partidos: [Partido]) -> AnyPublisher<Void, Error>
-    func updateMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error>
-    func updateLiveMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error>
-    func finalizeMatch(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error>
+    func registerMatch(match: Match, jornadaId: String) -> AnyPublisher<Void, Error>
+    func registerMultipleMatches(matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error>
+    func updateMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error>
+    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error>
+    func finalizeMatch(matchId: String, jornadaId: String) -> AnyPublisher<Void, Error>
     func finalizeAllMatches() -> AnyPublisher<Void, Error>
-    func saveMatches(_ matches: [Match]) -> AnyPublisher<Void, Error>
+    func saveMatches(_ matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error>
 }
 
 class AdminMatchRepository: AdminMatchRepositoryProtocol {
@@ -31,7 +31,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
         database.db
     }
 
-    func registerMatch(partido: Partido) -> AnyPublisher<Void, Error> {
+    func registerMatch(match: Match, jornadaId: String) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
@@ -40,23 +40,16 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
 
             // Estructura: jornadas/{jornadaId}/matches/{matchId}
             // matchId: adt_utc (código de 3 letras de cada equipo)
-            let matchId = "\(partido.teamAId)_\(partido.teamBId)"
-
-            let matchData: [String: Any] = [
-                FirestoreConstants.MatchField.equipoLocalId: partido.teamAId,
-                FirestoreConstants.MatchField.equipoVisitanteId: partido.teamBId,
-                FirestoreConstants.MatchField.golesTeamA: partido.golesTeamA,
-                FirestoreConstants.MatchField.golesTeamB: partido.golesTeamB,
-                FirestoreConstants.MatchField.estado: partido.estado.rawValue,
-                FirestoreConstants.MatchField.suspendido: false,
-                FirestoreConstants.MatchField.fecha: Timestamp(date: Date()) // Puedes ajustar esto según necesites
-            ]
+            guard let matchId = match.id else {
+                promise(.failure(NSError(domain: "AdminMatchRepository", code: -2, userInfo: [NSLocalizedDescriptionKey: "Match ID is required"])))
+                return
+            }
 
             self.db.collection(FirestoreConstants.Collection.jornadas)
-                .document(partido.jornadaId)
+                .document(jornadaId)
                 .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
-                .setData(matchData) { error in
+                .setData(match.toDictionary()) { error in
                     if let error = error {
                         promise(.failure(error))
                     } else {
@@ -67,8 +60,8 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
-    func registerMultipleMatches(partidos: [Partido]) -> AnyPublisher<Void, Error> {
-        let publishers = partidos.map { registerMatch(partido: $0) }
+    func registerMultipleMatches(matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error> {
+        let publishers = matches.map { registerMatch(match: $0, jornadaId: jornadaId) }
 
         return Publishers.MergeMany(publishers)
             .collect()
@@ -76,23 +69,20 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             .eraseToAnyPublisher()
     }
 
-    func updateMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error> {
+    func updateMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
                 return
             }
 
-            // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
-            let matchId = "\(teamAId)_\(teamBId)"
-
             self.db.collection(FirestoreConstants.Collection.jornadas)
-                .document(fecha)
+                .document(jornadaId)
                 .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
                 .updateData([
-                    FirestoreConstants.MatchField.golesTeamA: teamAScore,
-                    FirestoreConstants.MatchField.golesTeamB: teamBScore
+                    FirestoreConstants.MatchField.golesTeamA: localScore,
+                    FirestoreConstants.MatchField.golesTeamB: visitorScore
                 ]) { error in
                     if let error = error {
                         promise(.failure(error))
@@ -104,23 +94,20 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
-    func updateLiveMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error> {
+    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
                 return
             }
 
-            // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
-            let matchId = "\(teamAId)_\(teamBId)"
-
             self.db.collection(FirestoreConstants.Collection.jornadas)
-                .document(fecha)
+                .document(jornadaId)
                 .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
                 .updateData([
-                    FirestoreConstants.MatchField.golesTeamA: teamAScore,
-                    FirestoreConstants.MatchField.golesTeamB: teamBScore,
+                    FirestoreConstants.MatchField.golesTeamA: localScore,
+                    FirestoreConstants.MatchField.golesTeamB: visitorScore,
                     FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.playing
                 ]) { error in
                     if let error = error {
@@ -133,18 +120,15 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
-    func finalizeMatch(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error> {
+    func finalizeMatch(matchId: String, jornadaId: String) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
                 return
             }
 
-            // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
-            let matchId = "\(teamAId)_\(teamBId)"
-
             self.db.collection(FirestoreConstants.Collection.jornadas)
-                .document(fecha)
+                .document(jornadaId)
                 .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
                 .updateData([
@@ -197,7 +181,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
-    func saveMatches(_ matches: [Match]) -> AnyPublisher<Void, Error> {
+    func saveMatches(_ matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
@@ -207,8 +191,11 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             let batch = self.db.batch()
 
             for match in matches {
-                let matchId = match.id ?? "\(match.equipoLocalId ?? "")_\(match.equipoVisitanteId ?? "")"
-                let docRef = self.db.collection(FirestoreConstants.Collection.matches).document(matchId)
+                guard let matchId = match.id else { continue }
+                let docRef = self.db.collection(FirestoreConstants.Collection.jornadas)
+                    .document(jornadaId)
+                    .collection(FirestoreConstants.Collection.matches)
+                    .document(matchId)
                 batch.setData(match.toDictionary(), forDocument: docRef)
             }
 
