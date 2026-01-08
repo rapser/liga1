@@ -2,7 +2,7 @@
 //  MatchMapper.swift
 //  liga1
 //
-//  Created by Claude Code on 02/01/26.
+//  Created by miguel tomairo on 02/01/26.
 //
 
 import Foundation
@@ -27,8 +27,7 @@ struct MatchMapper {
             golesEquipoLocal: dto.golesTeamA ?? 0,
             golesEquipoVisitante: dto.golesTeamB ?? 0,
             estado: estadoMatch,
-            suspendido: dto.suspendido ?? false,
-            isFavorite: false
+            suspendido: dto.suspendido ?? false
         )
     }
 

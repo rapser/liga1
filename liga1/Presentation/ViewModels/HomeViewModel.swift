@@ -91,12 +91,7 @@ class HomeViewModel {
 
     private func loadMatchesForJornadas(_ jornadas: [Jornada]) {
         let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
-            guard let jornadaId = jornada.id else {
-                return Fail(error: NSError(domain: "HomeViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Jornada sin ID"]))
-                    .eraseToAnyPublisher()
-            }
-
-            return fetchMatchesUseCase.execute(for: jornadaId)
+            return fetchMatchesUseCase.execute(for: jornada.id)
                 .map { matches in (jornada, matches) }
                 .eraseToAnyPublisher()
         }
@@ -119,24 +114,20 @@ class HomeViewModel {
         var tempSections: [JornadaSection] = []
 
         for (jornada, matches) in results {
-            guard let jornadaId = jornada.id,
-                  let numero = jornada.numero,
-                  let torneo = jornada.torneo else { continue }
-
             // Convertir Match a MatchPresentationModel
             let presentationMatches = matches.map { match in
                 MatchPresentationModel(
                     match: match,
                     isFavorite: false, // Se actualizará con updateMatchesFavoriteStatus()
-                    jornadaNumero: numero,
-                    torneoNombre: torneo
+                    jornadaNumero: jornada.numero,
+                    torneoNombre: jornada.torneo
                 )
             }
 
             let section = JornadaSection(
-                jornadaId: jornadaId,
-                numero: numero,
-                torneo: torneo,
+                jornadaId: jornada.id,
+                numero: jornada.numero,
+                torneo: jornada.torneo,
                 matches: presentationMatches
             )
             tempSections.append(section)

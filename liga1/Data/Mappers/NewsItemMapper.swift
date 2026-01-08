@@ -2,7 +2,7 @@
 //  NewsItemMapper.swift
 //  liga1
 //
-//  Created by Claude Code on 02/01/26.
+//  Created by miguel tomairo on 02/01/26.
 //
 
 import Foundation
@@ -13,14 +13,17 @@ struct NewsItemMapper {
 
     /// Convierte NewsItemDTO a NewsItem (Domain Model)
     static func toDomain(from dto: NewsItemDTO) -> NewsItem {
+        let categoryString = dto.categoria ?? ""
+        let category = NewsCategory(rawValue: categoryString)
+
         return NewsItem(
             title: dto.title ?? "",
             imageUrl: dto.image ?? "",
             url: dto.url ?? "",
-            periodico: dto.periodico ?? "",
-            categoria: dto.categoria ?? "",
-            destacada: dto.destacada ?? false,
-            fecha: dto.fecha?.dateValue() ?? Date()
+            source: dto.periodico ?? "",
+            category: category,
+            featured: dto.destacada ?? false,
+            publishedDate: dto.fecha?.dateValue() ?? Date()
         )
     }
 
@@ -31,15 +34,15 @@ struct NewsItemMapper {
             title: domain.title,
             image: domain.imageUrl,
             url: domain.url,
-            periodico: domain.periodico,
-            categoria: domain.categoria,
-            destacada: domain.destacada,
-            fecha: Timestamp(date: domain.fecha)
+            periodico: domain.source,
+            categoria: domain.category.rawValue,
+            destacada: domain.featured,
+            fecha: Timestamp(date: domain.publishedDate)
         )
     }
 
     /// Convierte array de NewsItemDTO a array de NewsItem
-    static func toDomainArray(from dtos: [NewsItemDTO]) -> [NewsItem] {
+    static func toDomain(from dtos: [NewsItemDTO]) -> [NewsItem] {
         return dtos.map { toDomain(from: $0) }
     }
 }

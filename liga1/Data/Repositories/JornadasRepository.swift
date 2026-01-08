@@ -2,7 +2,7 @@
 //  JornadasRepository.swift
 //  liga1
 //
-//  Created by Claude Code on 01/01/26.
+//  Created by miguel tomairo on 01/01/26.
 //
 
 import Foundation
@@ -46,9 +46,13 @@ class JornadasRepository: JornadasRepositoryProtocol {
                         return
                     }
 
-                    let jornadas = documents.compactMap { doc -> Jornada? in
-                        try? doc.data(as: Jornada.self)
+                    // Decodificar DTOs desde Firestore
+                    let dtos = documents.compactMap { doc -> JornadaDTO? in
+                        try? doc.data(as: JornadaDTO.self)
                     }
+
+                    // Convertir DTOs a entidades de dominio usando el mapper
+                    let jornadas = JornadaMapper.toDomain(from: dtos)
 
                     promise(.success(jornadas))
                 }
