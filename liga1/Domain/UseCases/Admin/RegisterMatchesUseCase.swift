@@ -180,7 +180,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
 
         Logger.shared.debug("RegisterMatchesUseCase: Finalizing match")
 
-        return adminMatchRepository.finalizarPartido(
+        return adminMatchRepository.finalizeMatch(
             teamAId: teamAId,
             teamBId: teamBId,
             fecha: fecha

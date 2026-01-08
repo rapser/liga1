@@ -50,8 +50,6 @@ class HomeViewModel {
         isLoading = true
         error = nil
 
-        Logger.shared.debug("Fetching active jornadas")
-
         fetchActiveJornadasUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -61,15 +59,12 @@ class HomeViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] jornadas in
-                Logger.shared.info("Successfully fetched \(jornadas.count) active jornadas")
                 self?.loadMatchesForJornadas(jornadas)
             }
             .store(in: &cancellables)
     }
 
     func toggleFavorite(matchId: String) {
-        Logger.shared.debug("HomeViewModel: Toggling favorite for matchId: \(matchId)")
-
         toggleFavoriteUseCase.execute(matchId: matchId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
@@ -77,7 +72,7 @@ class HomeViewModel {
                     Logger.shared.error("HomeViewModel: Failed to toggle favorite for match: \(matchId)", error: error)
                 }
             } receiveValue: { _ in
-                Logger.shared.debug("HomeViewModel: Favorite toggled successfully for match: \(matchId)")
+                // Favorite toggled successfully
             }
             .store(in: &cancellables)
     }
@@ -88,8 +83,6 @@ class HomeViewModel {
         observeFavoritesUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] favoriteIds in
-                Logger.shared.debug("HomeViewModel: Observed favorites updated, count: \(favoriteIds.count)")
-                Logger.shared.debug("HomeViewModel: Favorite IDs: \(favoriteIds)")
                 self?.favoriteMatchIds = favoriteIds
                 self?.updateMatchesFavoriteStatus()
             }
@@ -97,8 +90,6 @@ class HomeViewModel {
     }
 
     private func loadMatchesForJornadas(_ jornadas: [Jornada]) {
-        Logger.shared.debug("Loading matches for \(jornadas.count) jornadas")
-
         let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
             guard let jornadaId = jornada.id else {
                 return Fail(error: NSError(domain: "HomeViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Jornada sin ID"]))
@@ -119,7 +110,6 @@ class HomeViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] results in
-                Logger.shared.info("Successfully loaded matches for all jornadas")
                 self?.processJornadasWithMatches(results)
             }
             .store(in: &cancellables)
@@ -157,8 +147,6 @@ class HomeViewModel {
     }
 
     private func updateMatchesFavoriteStatus() {
-        Logger.shared.debug("HomeViewModel: Updating matches favorite status")
-
         // Actualizar el estado de favoritos en cada sección
         for (index, section) in jornadaSections.enumerated() {
             var updatedMatches = section.matches
@@ -168,7 +156,6 @@ class HomeViewModel {
                     let fullMatchId = "\(section.jornadaId)_\(matchId)"
                     let isFav = favoriteMatchIds.contains(fullMatchId)
                     updatedMatches[matchIndex].isFavorite = isFav
-                    Logger.shared.debug("HomeViewModel: Match \(fullMatchId) isFavorite: \(isFav)")
                 }
             }
             jornadaSections[index].matches = updatedMatches

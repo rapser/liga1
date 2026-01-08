@@ -14,8 +14,8 @@ protocol AdminMatchRepositoryProtocol {
     func registerMultipleMatches(partidos: [Partido]) -> AnyPublisher<Void, Error>
     func updateMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error>
     func updateLiveMatch(teamAId: String, teamBId: String, fecha: String, teamAScore: Int, teamBScore: Int) -> AnyPublisher<Void, Error>
-    func finalizarPartido(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error>
-    func finalizarTodosLosPartidos() -> AnyPublisher<Void, Error>
+    func finalizeMatch(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error>
+    func finalizeAllMatches() -> AnyPublisher<Void, Error>
     func saveMatches(_ matches: [Match]) -> AnyPublisher<Void, Error>
 }
 
@@ -133,7 +133,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
-    func finalizarPartido(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error> {
+    func finalizeMatch(teamAId: String, teamBId: String, fecha: String) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
@@ -160,7 +160,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
-    func finalizarTodosLosPartidos() -> AnyPublisher<Void, Error> {
+    func finalizeAllMatches() -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -1, userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))

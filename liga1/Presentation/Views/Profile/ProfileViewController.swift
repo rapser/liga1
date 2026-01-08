@@ -87,21 +87,27 @@ class ProfileViewController: UIViewController {
     func handleAction(_ action: ProfileViewModel.ProfileAction) {
         switch action {
         case .notification:
-            Logger.shared.debug("Abrir ajustes de notificaciones")
+            // TODO: Implementar ajustes de notificaciones
+            break
         case .editUsername:
-            Logger.shared.debug("Editar nombre de usuario")
+            // TODO: Implementar edición de nombre de usuario
+            break
         case .logout:
             showLogoutConfirmation()
         case .theme:
             showThemeBottomSheet()
         case .feedback:
-            Logger.shared.debug("Enviar feedback")
+            // TODO: Implementar envío de feedback
+            break
         case .terms:
-            Logger.shared.debug("Mostrar condiciones de uso")
+            // TODO: Implementar vista de condiciones de uso
+            break
         case .privacy:
-            Logger.shared.debug("Mostrar políticas de privacidad")
+            // TODO: Implementar vista de políticas de privacidad
+            break
         case .privacySettings:
-            Logger.shared.debug("Abrir ajustes de privacidad")
+            // TODO: Implementar ajustes de privacidad
+            break
         case .registrarPartidos:
             navigateToRegistrarPartidos()
         case .none:

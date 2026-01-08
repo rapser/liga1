@@ -14,7 +14,10 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "EquipoCell", for: indexPath) as! EquipoTableViewCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "EquipoCell", for: indexPath) as? EquipoTableViewCell else {
+            return UITableViewCell()
+        }
+
         let equipo = viewModel.displayedTeams[indexPath.row]
 
         let position = determinePosition(for: indexPath.row)

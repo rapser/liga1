@@ -15,13 +15,30 @@ protocol FetchMatchesRepositoryProtocol {
     func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error>
 }
 
-/// Protocolo para observar partidos en tiempo real (futuro)
-protocol ObserveMatchRepositoryProtocol {
-    func observeMatch(id: String) -> AnyPublisher<Match, Error>
-}
-
 /// Alias para compatibilidad con código existente
 typealias MatchesRepositoryProtocol = FetchMatchesRepositoryProtocol
+
+/// Helper para parsear IDs compuestos de partidos
+private struct MatchIdComponents {
+    let jornadaId: String
+    let matchId: String
+
+    /// Parsea un fullMatchId con formato "torneo_numero_equipoA_equipoB" (ej: "apertura_01_atl_uni")
+    /// - Returns: MatchIdComponents o nil si el formato es inválido
+    static func parse(_ fullMatchId: String) -> MatchIdComponents? {
+        let components = fullMatchId.split(separator: "_", maxSplits: 2)
+        guard components.count == 3 else {
+            return nil
+        }
+
+        let torneo = String(components[0])      // "apertura" o "clausura"
+        let numero = String(components[1])       // "01"
+        let matchId = String(components[2])      // "atl_uni"
+        let jornadaId = "\(torneo)_\(numero)"   // "apertura_01"
+
+        return MatchIdComponents(jornadaId: jornadaId, matchId: matchId)
+    }
+}
 
 class MatchesRepository: MatchesRepositoryProtocol {
 
@@ -79,9 +96,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 return
             }
 
-            Logger.shared.debug("MatchesRepository: Fetching \(matchIds.count) favorite matches")
-            Logger.shared.debug("MatchesRepository: Match IDs: \(matchIds)")
-
             // Los matchIds tienen formato: "apertura_01_atl_uni" donde:
             // - apertura_01 es el jornadaId
             // - atl_uni es el matchId dentro de esa jornada
@@ -92,24 +106,16 @@ class MatchesRepository: MatchesRepositoryProtocol {
             var fetchError: Error?
 
             for fullMatchId in matchIds {
-                // Separar el jornadaId del matchId
-                let components = fullMatchId.split(separator: "_", maxSplits: 2)
-                guard components.count == 3 else {
-                    Logger.shared.debug("MatchesRepository: Invalid match ID format: \(fullMatchId)")
+                guard let idComponents = MatchIdComponents.parse(fullMatchId) else {
                     continue
                 }
-
-                let torneo = String(components[0])      // "apertura" o "clausura"
-                let numero = String(components[1])       // "01"
-                let matchId = String(components[2])      // "atl_uni"
-                let jornadaId = "\(torneo)_\(numero)"   // "apertura_01"
 
                 dispatchGroup.enter()
 
                 self.db.collection(FirestoreConstants.Collection.jornadas)
-                    .document(jornadaId)
+                    .document(idComponents.jornadaId)
                     .collection(FirestoreConstants.Collection.matches)
-                    .document(matchId)
+                    .document(idComponents.matchId)
                     .getDocument { snapshot, error in
                         defer { dispatchGroup.leave() }
 
@@ -120,15 +126,11 @@ class MatchesRepository: MatchesRepositoryProtocol {
                         }
 
                         guard let snapshot = snapshot, snapshot.exists else {
-                            Logger.shared.debug("MatchesRepository: Match \(fullMatchId) not found")
                             return
                         }
 
                         if let match = try? snapshot.data(as: Match.self) {
                             allMatches.append(match)
-                            Logger.shared.debug("MatchesRepository: Successfully fetched match \(fullMatchId)")
-                        } else {
-                            Logger.shared.debug("MatchesRepository: Failed to decode match \(fullMatchId)")
                         }
                     }
             }
@@ -137,7 +139,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 if let error = fetchError {
                     promise(.failure(error))
                 } else {
-                    Logger.shared.debug("MatchesRepository: Successfully fetched \(allMatches.count) matches")
                     promise(.success(allMatches))
                 }
             }
