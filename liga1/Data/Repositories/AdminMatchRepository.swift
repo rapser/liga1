@@ -43,18 +43,18 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             let matchId = "\(partido.teamAId)_\(partido.teamBId)"
 
             let matchData: [String: Any] = [
-                "equipoLocalId": partido.teamAId,
-                "equipoVisitanteId": partido.teamBId,
-                "golesTeamA": partido.golesTeamA,
-                "golesTeamB": partido.golesTeamB,
-                "estado": partido.estado.rawValue,
-                "suspendido": false,
-                "fecha": Timestamp(date: Date()) // Puedes ajustar esto según necesites
+                FirestoreConstants.MatchField.equipoLocalId: partido.teamAId,
+                FirestoreConstants.MatchField.equipoVisitanteId: partido.teamBId,
+                FirestoreConstants.MatchField.golesTeamA: partido.golesTeamA,
+                FirestoreConstants.MatchField.golesTeamB: partido.golesTeamB,
+                FirestoreConstants.MatchField.estado: partido.estado.rawValue,
+                FirestoreConstants.MatchField.suspendido: false,
+                FirestoreConstants.MatchField.fecha: Timestamp(date: Date()) // Puedes ajustar esto según necesites
             ]
 
-            self.db.collection("jornadas")
+            self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(partido.jornadaId)
-                .collection("matches")
+                .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
                 .setData(matchData) { error in
                     if let error = error {
@@ -86,13 +86,13 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
             let matchId = "\(teamAId)_\(teamBId)"
 
-            self.db.collection("jornadas")
+            self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(fecha)
-                .collection("matches")
+                .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
                 .updateData([
-                    "golesTeamA": teamAScore,
-                    "golesTeamB": teamBScore
+                    FirestoreConstants.MatchField.golesTeamA: teamAScore,
+                    FirestoreConstants.MatchField.golesTeamB: teamBScore
                 ]) { error in
                     if let error = error {
                         promise(.failure(error))
@@ -114,14 +114,14 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
             let matchId = "\(teamAId)_\(teamBId)"
 
-            self.db.collection("jornadas")
+            self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(fecha)
-                .collection("matches")
+                .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
                 .updateData([
-                    "golesTeamA": teamAScore,
-                    "golesTeamB": teamBScore,
-                    "estado": "enJuego"
+                    FirestoreConstants.MatchField.golesTeamA: teamAScore,
+                    FirestoreConstants.MatchField.golesTeamB: teamBScore,
+                    FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.playing
                 ]) { error in
                     if let error = error {
                         promise(.failure(error))
@@ -143,12 +143,12 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             // El parámetro 'fecha' ahora representa el jornadaId completo (ej: "clausura_01")
             let matchId = "\(teamAId)_\(teamBId)"
 
-            self.db.collection("jornadas")
+            self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(fecha)
-                .collection("matches")
+                .collection(FirestoreConstants.Collection.matches)
                 .document(matchId)
                 .updateData([
-                    "estado": "finalizado"
+                    FirestoreConstants.MatchField.estado: FirestoreConstants.MatchState.finished
                 ]) { error in
                     if let error = error {
                         promise(.failure(error))

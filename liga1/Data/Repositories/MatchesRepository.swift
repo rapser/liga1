@@ -145,12 +145,3 @@ class MatchesRepository: MatchesRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 }
-
-// MARK: - Future: ObserveMatchRepositoryProtocol implementation
-// Cuando se implemente observación en tiempo real, descomentar:
-//
-// extension MatchesRepository: ObserveMatchRepositoryProtocol {
-//     func observeMatch(id: String) -> AnyPublisher<Match, Error> {
-//         // Real-time implementation here
-//     }
-// }

@@ -24,14 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         return true
     }
-    
-    // Google Sign-In (modo antiguo, si no usas `scene(_:openURLContexts:)`)
-    func application(_ app: UIApplication,
-                     open url: URL,
-                     options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        return GIDSignIn.sharedInstance.handle(url)
-    }
-    
+
     // MARK: - UISceneSession Lifecycle
     func application(_ application: UIApplication,
                      configurationForConnecting connectingSceneSession: UISceneSession,

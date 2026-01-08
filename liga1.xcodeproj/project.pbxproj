@@ -123,14 +123,6 @@
 		4640019A2F08853F00A8C905 /* NewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewModel.swift; sourceTree = "<group>"; };
 		4640019B2F08853F00A8C905 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		4640019C2F08853F00A8C905 /* TorneoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorneoViewModel.swift; sourceTree = "<group>"; };
-		4640099F2F098CD100A8C905 /* JornadaDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaDTO.swift; sourceTree = "<group>"; };
-		464009A02F098CD100A8C905 /* MatchDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDTO.swift; sourceTree = "<group>"; };
-		464009A12F098CD100A8C905 /* NewsItemDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemDTO.swift; sourceTree = "<group>"; };
-		464009A22F098CD100A8C905 /* TeamDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamDTO.swift; sourceTree = "<group>"; };
-		464009A42F098CD100A8C905 /* JornadaMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaMapper.swift; sourceTree = "<group>"; };
-		464009A52F098CD100A8C905 /* MatchMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchMapper.swift; sourceTree = "<group>"; };
-		464009A62F098CD100A8C905 /* NewsItemMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemMapper.swift; sourceTree = "<group>"; };
-		464009A72F098CD100A8C905 /* TeamMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamMapper.swift; sourceTree = "<group>"; };
 		464009B32F098D2000A8C905 /* UIViewController+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
 		464009B52F098D4F00A8C905 /* FirestoreConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConstants.swift; sourceTree = "<group>"; };
 		464009B72F098D4F00A8C905 /* FirestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreManager.swift; sourceTree = "<group>"; };
@@ -235,8 +227,6 @@
 		464001822F08853F00A8C905 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				464009A32F098CD100A8C905 /* DTOs */,
-				464009A82F098CD100A8C905 /* Mappers */,
 				4640017D2F08853F00A8C905 /* AdminMatchRepository.swift */,
 				4640017E2F08853F00A8C905 /* JornadasRepository.swift */,
 				4640017F2F08853F00A8C905 /* MatchesRepository.swift */,
@@ -365,28 +355,6 @@
 				464001B32F08853F00A8C905 /* Views */,
 			);
 			path = Presentation;
-			sourceTree = "<group>";
-		};
-		464009A32F098CD100A8C905 /* DTOs */ = {
-			isa = PBXGroup;
-			children = (
-				4640099F2F098CD100A8C905 /* JornadaDTO.swift */,
-				464009A02F098CD100A8C905 /* MatchDTO.swift */,
-				464009A12F098CD100A8C905 /* NewsItemDTO.swift */,
-				464009A22F098CD100A8C905 /* TeamDTO.swift */,
-			);
-			path = DTOs;
-			sourceTree = "<group>";
-		};
-		464009A82F098CD100A8C905 /* Mappers */ = {
-			isa = PBXGroup;
-			children = (
-				464009A42F098CD100A8C905 /* JornadaMapper.swift */,
-				464009A52F098CD100A8C905 /* MatchMapper.swift */,
-				464009A62F098CD100A8C905 /* NewsItemMapper.swift */,
-				464009A72F098CD100A8C905 /* TeamMapper.swift */,
-			);
-			path = Mappers;
 			sourceTree = "<group>";
 		};
 		464009B62F098D4F00A8C905 /* Constants */ = {
