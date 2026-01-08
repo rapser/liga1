@@ -80,7 +80,6 @@ class TorneoViewModel {
                 }
             } receiveValue: { [weak self] teams in
                 guard let self = self else { return }
-                Logger.shared.info("Fetched \(teams.count) teams for \(torneo)")
                 self.displayedTeams = teams
 
                 switch torneo {
@@ -112,7 +111,6 @@ class TorneoViewModel {
                 }
             } receiveValue: { [weak self] (aperturaTeams, clausuraTeams) in
                 guard let self = self else { return }
-                Logger.shared.info("Calculating acumulado from \(aperturaTeams.count) apertura and \(clausuraTeams.count) clausura teams")
 
                 var teamsDict: [String: Team] = [:]
 

@@ -48,7 +48,6 @@ class ProfileViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] _ in
-                Logger.shared.info("User logged out successfully")
                 self?.logoutSuccessful = true
             }
             .store(in: &cancellables)

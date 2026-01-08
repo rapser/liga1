@@ -52,7 +52,7 @@ class FavoritosViewModel {
                     Logger.shared.error("Failed to toggle favorite for match: \(matchId)", error: error)
                 }
             } receiveValue: { _ in
-                Logger.shared.debug("Favorite toggled successfully for match: \(matchId)")
+                // Favorite toggled successfully
             }
             .store(in: &cancellables)
     }
@@ -78,8 +78,6 @@ class FavoritosViewModel {
         isLoading = true
         error = nil
 
-        Logger.shared.debug("Fetching \(favoriteMatchIds.count) favorite matches")
-
         fetchFavoriteMatchesUseCase.execute(favoriteMatchIds: favoriteMatchIds)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -89,7 +87,6 @@ class FavoritosViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] matches in
-                Logger.shared.info("Successfully fetched \(matches.count) favorite matches")
                 // Convertir Match a MatchPresentationModel
                 let presentationMatches = matches.map { match in
                     MatchPresentationModel(match: match, isFavorite: true)

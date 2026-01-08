@@ -44,7 +44,6 @@ class RegistrarPartidosViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] _ in
-                Logger.shared.info("Match registered successfully")
                 self?.successMessage = "Partido registrado exitosamente"
             }
             .store(in: &cancellables)
@@ -70,7 +69,6 @@ class RegistrarPartidosViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] _ in
-                Logger.shared.info("Successfully registered \(partidos.count) matches")
                 self?.successMessage = "\(partidos.count) partidos registrados exitosamente"
             }
             .store(in: &cancellables)
@@ -97,7 +95,6 @@ class RegistrarPartidosViewModel {
                 self?.error = error
             }
         } receiveValue: { [weak self] _ in
-            Logger.shared.info("Live match updated: \(teamAId) vs \(teamBId)")
             self?.successMessage = "Partido actualizado exitosamente"
         }
         .store(in: &cancellables)
@@ -122,7 +119,6 @@ class RegistrarPartidosViewModel {
                 self?.error = error
             }
         } receiveValue: { [weak self] _ in
-            Logger.shared.info("Match finalized: \(teamAId) vs \(teamBId)")
             self?.successMessage = "Partido finalizado exitosamente"
         }
         .store(in: &cancellables)

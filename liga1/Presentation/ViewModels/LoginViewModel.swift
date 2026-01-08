@@ -53,8 +53,6 @@ class LoginViewModel {
         isLoading = true
         error = nil
 
-        Logger.shared.debug("Attempting login for email: \(email)")
-
         loginUseCase.execute(email: email, password: password)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -64,7 +62,6 @@ class LoginViewModel {
                     self?.error = error.localizedDescription
                 }
             } receiveValue: { [weak self] _ in
-                Logger.shared.info("User logged in successfully with email: \(email)")
                 guard let self = self else { return }
                 self.coordinatorDelegate?.loginViewModelDidLogin(self)
             }
@@ -72,15 +69,12 @@ class LoginViewModel {
     }
 
     func signInWithGoogle() {
-        Logger.shared.debug("Requesting Google Sign In presentation")
         delegate?.loginViewModelNeedsGoogleSignInPresentation(self)
     }
 
     func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
-
-        Logger.shared.debug("Attempting Google Sign In")
 
         loginUseCase.executeWithGoogle(presentingViewController: presentingViewController)
             .receive(on: DispatchQueue.main)
@@ -91,7 +85,6 @@ class LoginViewModel {
                     self?.error = error.localizedDescription
                 }
             } receiveValue: { [weak self] _ in
-                Logger.shared.info("User logged in successfully with Google")
                 guard let self = self else { return }
                 self.coordinatorDelegate?.loginViewModelDidLogin(self)
             }

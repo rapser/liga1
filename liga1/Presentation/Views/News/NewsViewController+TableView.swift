@@ -29,12 +29,16 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         // Sección 0: Header "NOTICIA DESTACADA"
         if section == 0 {
-            let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: FeaturedNewsTitleHeaderView.reuseIdentifier) as! FeaturedNewsTitleHeaderView
+            guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: FeaturedNewsTitleHeaderView.reuseIdentifier) as? FeaturedNewsTitleHeaderView else {
+                return nil
+            }
             return header
         }
 
         // Otras secciones: Header de categoría (Liga 1, etc.)
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CategoryHeaderView.reuseIdentifier) as! CategoryHeaderView
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CategoryHeaderView.reuseIdentifier) as? CategoryHeaderView else {
+            return nil
+        }
         let categorias = Array(viewModel.groupedNews.keys)
         let categoria = categorias[section - 1]
         header.configure(with: categoria)
@@ -48,8 +52,10 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Sección 0: celda de noticia destacada
         if indexPath.section == 0 {
-            guard let featuredItem = viewModel.featuredNews.first else { return UITableViewCell() }
-            let cell = tableView.dequeueReusableCell(withIdentifier: FeaturedNewsContentCell.reuseIdentifier, for: indexPath) as! FeaturedNewsContentCell
+            guard let featuredItem = viewModel.featuredNews.first,
+                  let cell = tableView.dequeueReusableCell(withIdentifier: FeaturedNewsContentCell.reuseIdentifier, for: indexPath) as? FeaturedNewsContentCell else {
+                return UITableViewCell()
+            }
             cell.configure(with: featuredItem)
             return cell
         }
@@ -57,8 +63,10 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         // Otras secciones: celdas normales de noticias
         let categorias = Array(viewModel.groupedNews.keys)
         let categoria = categorias[indexPath.section - 1]
-        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row] else { return UITableViewCell() }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "NewsCell", for: indexPath) as! NewsCell
+        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row],
+              let cell = tableView.dequeueReusableCell(withIdentifier: "NewsCell", for: indexPath) as? NewsCell else {
+            return UITableViewCell()
+        }
         cell.configure(with: newsItem)
         return cell
     }
