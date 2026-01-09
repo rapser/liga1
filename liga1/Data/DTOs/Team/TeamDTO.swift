@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 /// Data Transfer Object para Team desde Firestore
 struct TeamDTO: Codable {
-    @DocumentID var id: String?
+    let id: String?
     let name: String?
     let city: String?
     let stadium: String?

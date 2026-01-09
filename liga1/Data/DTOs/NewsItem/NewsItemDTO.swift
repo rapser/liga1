@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 /// Data Transfer Object para NewsItem desde Firestore
 struct NewsItemDTO: Codable {
-    @DocumentID var id: String?
+    let id: String?
     let title: String?
     let image: String?
     let url: String?

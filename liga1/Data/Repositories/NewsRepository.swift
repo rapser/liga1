@@ -48,13 +48,26 @@ class NewsRepository: NewsRepositoryProtocol {
 
                     Logger.shared.debug("NewsRepository: Found \(documents.count) documents")
 
-                    // Decodificar DTOs desde Firestore
+                    // Decodificar DTOs desde Firestore y asignar documentID manualmente
                     let newsDTOs = documents.compactMap { doc -> NewsItemDTO? in
                         Logger.shared.debug("NewsRepository: Processing document: \(doc.documentID)")
                         Logger.shared.debug("NewsRepository: Document data: \(doc.data())")
-                        let dto = try? doc.data(as: NewsItemDTO.self)
-                        if dto == nil {
+                        guard var dto = try? doc.data(as: NewsItemDTO.self) else {
                             Logger.shared.debug("NewsRepository: Failed to parse document \(doc.documentID)")
+                            return nil
+                        }
+                        // Asignar el documentID si no está presente
+                        if dto.id == nil || dto.id?.isEmpty == true {
+                            dto = NewsItemDTO(
+                                id: doc.documentID,
+                                title: dto.title,
+                                image: dto.image,
+                                url: dto.url,
+                                periodico: dto.periodico,
+                                categoria: dto.categoria,
+                                destacada: dto.destacada,
+                                fecha: dto.fecha
+                            )
                         }
                         return dto
                     }

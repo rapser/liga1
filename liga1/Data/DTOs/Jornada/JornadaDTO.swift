@@ -10,15 +10,14 @@ import FirebaseFirestore
 
 /// Data Transfer Object para Jornada desde Firestore
 struct JornadaDTO: Codable {
-    @DocumentID var id: String?
+    let id: String?
     let mostrar: Bool?
     let numero: Int?
     let torneo: String?
     let fechaInicio: Timestamp?
 
     enum CodingKeys: String, CodingKey {
-        // Nota: 'id' no está en CodingKeys porque @DocumentID lo maneja automáticamente
-        // Si el documento tiene un campo 'id' explícito, se puede agregar aquí
+        case id
         case mostrar
         case numero
         case torneo

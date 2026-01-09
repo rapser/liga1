@@ -213,9 +213,41 @@ class MatchesRepository: MatchesRepositoryProtocol {
                             return
                         }
 
+                        // Crear MatchDTO manualmente desde los datos del documento
+                        let documentID = snapshot.documentID
+                        let data = snapshot.data() ?? [:]
+                        
+                        // Extraer equipoLocalId y equipoVisitanteId del documentID
+                        let (equipoLocalId, equipoVisitanteId): (String?, String?) = {
+                            if let local = data["equipoLocalId"] as? String,
+                               let visitante = data["equipoVisitanteId"] as? String {
+                                return (local, visitante)
+                            }
+                            
+                            let components = documentID.split(separator: "_")
+                            if components.count >= 2 {
+                                return (String(components[0]), String(components[1]))
+                            }
+                            return (nil, nil)
+                        }()
+                        
+                        // Mapear campos de goles
+                        let golesTeamA = data["golesTeamA"] as? Int ?? data["golesEquipoLocal"] as? Int
+                        let golesTeamB = data["golesTeamB"] as? Int ?? data["golesEquipoVisitante"] as? Int
+                        
+                        let matchDTO = MatchDTO(
+                            id: documentID,
+                            equipoLocalId: equipoLocalId,
+                            equipoVisitanteId: equipoVisitanteId,
+                            fecha: data["fecha"] as? Timestamp,
+                            golesTeamA: golesTeamA,
+                            golesTeamB: golesTeamB,
+                            estado: data["estado"] as? String,
+                            suspendido: data["suspendido"] as? Bool
+                        )
+                        
                         // Convertir MatchDTO a Match usando el mapper
-                        if let matchDTO = try? snapshot.data(as: MatchDTO.self),
-                           let match = MatchMapper.toDomain(from: matchDTO) {
+                        if let match = MatchMapper.toDomain(from: matchDTO) {
                             allMatches.append(match)
                         }
                     }
