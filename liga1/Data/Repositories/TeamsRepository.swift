@@ -50,12 +50,15 @@ class TeamsRepository: TeamsRepositoryProtocol {
                         }
                         // Asignar el ID del documento y el nombre completo si no viene
                         let nombreCompleto = dto.name ?? EquipoPeruano.obtenerNombreCompleto(paraId: doc.documentID)
+                        // Usar el logo del DTO o el documentID como fallback
+                        let logo = dto.logo ?? doc.documentID
                         
                         return TeamDTO(
                             id: doc.documentID,
                             name: nombreCompleto,
                             city: dto.city,
                             stadium: dto.stadium,
+                            logo: logo,
                             matchesPlayed: dto.matchesPlayed,
                             matchesWon: dto.matchesWon,
                             matchesDrawn: dto.matchesDrawn,
@@ -68,7 +71,29 @@ class TeamsRepository: TeamsRepositoryProtocol {
                     }
 
                     // Convertir DTOs a entidades de dominio usando el mapper
-                    let teams = TeamMapper.toDomainArray(from: teamDTOs)
+                    // Pasar los documentIDs para usar como fallback del logo
+                    let documentIDs = documents.map { $0.documentID }
+                    var teams = TeamMapper.toDomainArray(from: teamDTOs, documentIDs: documentIDs)
+
+                    // Si todos los equipos tienen 0 puntos, ordenar alfabéticamente por nombre
+                    // Esto es el caso inicial cuando el torneo aún no ha empezado
+                    let allHaveZeroPoints = teams.allSatisfy { $0.puntos == 0 }
+                    
+                    if allHaveZeroPoints {
+                        // Ordenar alfabéticamente por nombre
+                        teams.sort { $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending }
+                        Logger.shared.debug("TeamsRepository: All teams have 0 points, sorting alphabetically")
+                    } else {
+                        // Ordenar por puntos (descendente) y diferencia de goles (descendente)
+                        // Este es el ordenamiento estándar que ya estaba funcionando
+                        teams.sort {
+                            if $0.puntos == $1.puntos {
+                                return $0.diferenciaGoles > $1.diferenciaGoles
+                            }
+                            return $0.puntos > $1.puntos
+                        }
+                        Logger.shared.debug("TeamsRepository: Teams have points, sorting by points and goal difference")
+                    }
 
                     promise(.success(teams))
                 }

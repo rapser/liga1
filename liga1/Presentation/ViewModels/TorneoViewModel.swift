@@ -140,11 +140,26 @@ class TorneoViewModel {
                     }
                 }
 
-                let acumuladoTeams = Array(teamsDict.values).sorted {
-                    if $0.puntos == $1.puntos {
-                        return $0.diferenciaGoles > $1.diferenciaGoles
+                let acumuladoTeamsArray = Array(teamsDict.values)
+                
+                // Si todos los equipos tienen 0 puntos, ordenar alfabéticamente
+                let allHaveZeroPoints = acumuladoTeamsArray.allSatisfy { $0.puntos == 0 }
+                
+                let acumuladoTeams: [Team]
+                if allHaveZeroPoints {
+                    // Ordenar alfabéticamente por nombre
+                    acumuladoTeams = acumuladoTeamsArray.sorted {
+                        $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending
                     }
-                    return $0.puntos > $1.puntos
+                } else {
+                    // Ordenar por puntos (descendente) y diferencia de goles (descendente)
+                    // Este es el ordenamiento estándar que ya estaba funcionando
+                    acumuladoTeams = acumuladoTeamsArray.sorted {
+                        if $0.puntos == $1.puntos {
+                            return $0.diferenciaGoles > $1.diferenciaGoles
+                        }
+                        return $0.puntos > $1.puntos
+                    }
                 }
 
                 self.cachedAcumulado = acumuladoTeams

@@ -41,8 +41,8 @@ class TorneoViewController: UIViewController {
     // MARK: - Private methods
 
     private func loadInitialData() {
-        segmentedControl.selectedSegmentIndex = 1
-        viewModel.loadTeams(for: .clausura)
+        segmentedControl.selectedSegmentIndex = 0
+        viewModel.loadTeams(for: .apertura)
     }
 
     private func bindViewModel() {

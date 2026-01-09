@@ -86,7 +86,12 @@ class EquipoTableViewCell: UITableViewCell {
             posicionLabel.font = UIFont.systemFont(ofSize: 12)
         }
 
-        logoImageView.image = UIImage(named: model.logo)
+        // Cargar logo solo si el nombre no está vacío para evitar el error de CUICatalog
+        if !model.logo.isEmpty {
+            logoImageView.image = UIImage(named: model.logo)
+        } else {
+            logoImageView.image = nil
+        }
         nombreLabel.text = model.nombre
         partidosJugadosLabel.text = "\(model.partidosJugados)"
         golesLabel.text = "\(model.golesFavor) - \(model.golesContra)"
