@@ -2,7 +2,7 @@
 //  Coordinator.swift
 //  liga1
 //
-//  Created by Claude Code on 03/01/26.
+//  Created by miguel tomairo on 03/01/26.
 //
 
 import UIKit

@@ -2,7 +2,7 @@
 //  TorneoViewModel.swift
 //  liga1
 //
-//  Created by Claude Code on 01/01/26.
+//  Created by miguel tomairo on 01/01/26.
 //  Refactored on 03/01/26.
 //
 

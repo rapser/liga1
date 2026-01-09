@@ -2,7 +2,7 @@
 //  UIView+Layout.swift
 //  liga1
 //
-//  Created by Claude Code on 01/01/26.
+//  Created by Miguel Tomairo on 01/01/26.
 //
 
 import UIKit

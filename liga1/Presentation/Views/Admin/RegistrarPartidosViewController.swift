@@ -3,7 +3,7 @@
 //  liga1
 //
 //  Created by miguel tomairo on 15/08/24.
-//  Refactored by Claude Code on 03/01/26.
+//  Refactored by miguel tomairo on 03/01/26.
 //
 
 import UIKit
