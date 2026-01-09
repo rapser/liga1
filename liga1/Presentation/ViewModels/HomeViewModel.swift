@@ -114,40 +114,35 @@ class HomeViewModel {
         var tempSections: [JornadaSection] = []
 
         for (jornada, matches) in results {
-            // Convertir Match a MatchPresentationModel
-            let presentationMatches = matches.map { match in
-                MatchPresentationModel(
-                    match: match,
-                    isFavorite: false, // Se actualizará con updateMatchesFavoriteStatus()
-                    jornadaNumero: jornada.numero,
-                    torneoNombre: jornada.torneo
-                )
-            }
+            // Convertir Match a MatchUI usando el mapper
+            // Primero convertir sin favoriteIds, luego actualizar en updateMatchesFavoriteStatus
+            let matchUIs = MatchUIMapper.toUI(from: matches)
 
             let section = JornadaSection(
                 jornadaId: jornada.id,
                 numero: jornada.numero,
                 torneo: jornada.torneo,
-                matches: presentationMatches
+                matches: matchUIs
             )
             tempSections.append(section)
         }
 
         // Ordenar secciones por número de jornada descendente
         jornadaSections = tempSections.sorted { $0.numero > $1.numero }
+        
+        // Actualizar el estado de favoritos después de crear las secciones
+        updateMatchesFavoriteStatus()
     }
 
     private func updateMatchesFavoriteStatus() {
         // Actualizar el estado de favoritos en cada sección
         for (index, section) in jornadaSections.enumerated() {
             var updatedMatches = section.matches
-            for (matchIndex, presentationMatch) in updatedMatches.enumerated() {
-                if let matchId = presentationMatch.id {
-                    // El ID completo incluye la jornada
-                    let fullMatchId = "\(section.jornadaId)_\(matchId)"
-                    let isFav = favoriteMatchIds.contains(fullMatchId)
-                    updatedMatches[matchIndex].isFavorite = isFav
-                }
+            for (matchIndex, matchUI) in updatedMatches.enumerated() {
+                // El ID completo incluye la jornada
+                let fullMatchId = "\(section.jornadaId)_\(matchUI.id)"
+                let isFav = favoriteMatchIds.contains(fullMatchId)
+                updatedMatches[matchIndex].isFavorite = isFav
             }
             jornadaSections[index].matches = updatedMatches
         }
@@ -159,6 +154,6 @@ class HomeViewModel {
         let jornadaId: String
         let numero: Int
         let torneo: String
-        var matches: [MatchPresentationModel]
+        var matches: [MatchUI]
     }
 }

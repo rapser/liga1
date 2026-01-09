@@ -1,5 +1,5 @@
 //
-//  Equipo.swift
+//  Team.swift
 //  liga1
 //
 //  Created by miguel tomairo on 15/08/24.
@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct Team: Codable {
+/// Entidad de dominio pura que representa un equipo de la liga
+/// No tiene dependencias de Firebase ni de ninguna capa externa
+struct Team {
     var nombre: String
     var ciudad: String
     var estadio: String
@@ -45,5 +47,21 @@ struct Team: Codable {
         self.golesContra = golesContra
         self.diferenciaGoles = diferenciaGoles
         self.puntos = puntos
+    }
+}
+
+// MARK: - Equatable
+extension Team: Equatable {
+    static func == (lhs: Team, rhs: Team) -> Bool {
+        return lhs.nombre == rhs.nombre &&
+               lhs.ciudad == rhs.ciudad
+    }
+}
+
+// MARK: - Hashable
+extension Team: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(nombre)
+        hasher.combine(ciudad)
     }
 }

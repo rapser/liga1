@@ -127,10 +127,8 @@ extension HomeTableViewAdapter: MatchTableViewCellDelegate {
         let jornadaSection = sections[indexPath.section]
         let match = jornadaSection.matches[indexPath.row]
 
-        guard let matchId = match.id else { return }
-
         // El ID completo incluye la jornada: "clausura_01_adt_utc"
-        let fullMatchId = "\(jornadaSection.jornadaId)_\(matchId)"
+        let fullMatchId = "\(jornadaSection.jornadaId)_\(match.id)"
 
         delegate?.didTapFavorite(matchId: fullMatchId, in: jornadaSection.jornadaId)
     }

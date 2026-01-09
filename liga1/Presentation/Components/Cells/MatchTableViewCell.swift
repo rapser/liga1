@@ -125,26 +125,26 @@ class MatchTableViewCell: UITableViewCell {
     }
     
     // MARK: - Config
-    func configure(with presentationMatch: MatchPresentationModel, logoLocal: UIImage?, logoVisitante: UIImage?) {
-        nombreLocalLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: presentationMatch.equipoLocalId ?? "shield.fill")
-        nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: presentationMatch.equipoVisitanteId ?? "shield.fill")
+    func configure(with matchUI: MatchUI, logoLocal: UIImage?, logoVisitante: UIImage?) {
+        nombreLocalLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: matchUI.equipoLocalId ?? "shield.fill")
+        nombreVisitanteLabel.text = EquipoPeruano.obtenerNombreCompleto(paraId: matchUI.equipoVisitanteId ?? "shield.fill")
         logoLocalImageView.image = logoLocal
         logoVisitanteImageView.image = logoVisitante
 
         // Actualizar estrella de favorito
-        let starImage = presentationMatch.isFavorite ? "star.fill" : "star"
+        let starImage = matchUI.isFavorite ? "star.fill" : "star"
         estrellaButton.setImage(UIImage(systemName: starImage), for: .normal)
 
         // Mostrar marcadores según el estado del partido
-        switch presentationMatch.estado {
+        switch matchUI.estado {
         case .pendiente:
             marcadorLocalLabel.text = "-"
             marcadorVisitanteLabel.text = "-"
             marcadorLocalLabel.textColor = .secondaryLabel
             marcadorVisitanteLabel.textColor = .secondaryLabel
         case .enJuego, .finalizado:
-            marcadorLocalLabel.text = "\(presentationMatch.golesEquipoLocal)"
-            marcadorVisitanteLabel.text = "\(presentationMatch.golesEquipoVisitante)"
+            marcadorLocalLabel.text = "\(matchUI.golesEquipoLocal)"
+            marcadorVisitanteLabel.text = "\(matchUI.golesEquipoVisitante)"
             marcadorLocalLabel.textColor = .label
             marcadorVisitanteLabel.textColor = .label
         case .anulado, .suspendido:

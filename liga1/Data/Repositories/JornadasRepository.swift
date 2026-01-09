@@ -9,10 +9,7 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-protocol JornadasRepositoryProtocol {
-    func fetchActiveJornadas() -> AnyPublisher<[Jornada], Error>
-}
-
+/// Implementación del protocolo JornadasRepositoryProtocol
 class JornadasRepository: JornadasRepositoryProtocol {
 
     private let database: DatabaseProtocol

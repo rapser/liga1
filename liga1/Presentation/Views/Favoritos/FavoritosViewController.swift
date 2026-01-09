@@ -85,16 +85,16 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let match = viewModel.matches[indexPath.row]
+        let matchUI = viewModel.matches[indexPath.row]
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
             return UITableViewCell()
         }
 
-        let logoLocal = UIImage(named: match.equipoLocalId ?? "shield.fill")
-        let logoVisitante = UIImage(named: match.equipoVisitanteId ?? "shield.fill")
+        let logoLocal = UIImage(named: matchUI.equipoLocalId ?? "shield.fill")
+        let logoVisitante = UIImage(named: matchUI.equipoVisitanteId ?? "shield.fill")
 
         cell.delegate = self
-        cell.configure(with: match, logoLocal: logoLocal, logoVisitante: logoVisitante)
+        cell.configure(with: matchUI, logoLocal: logoLocal, logoVisitante: logoVisitante)
         return cell
     }
 
@@ -121,10 +121,8 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
 extension FavoritosViewController: MatchTableViewCellDelegate {
     func didTapFavorite(cell: MatchTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let match = viewModel.matches[indexPath.row]
+        let matchUI = viewModel.matches[indexPath.row]
 
-        guard let matchId = match.id else { return }
-
-        viewModel.toggleFavorite(matchId: matchId)
+        viewModel.toggleFavorite(matchId: matchUI.id)
     }
 }

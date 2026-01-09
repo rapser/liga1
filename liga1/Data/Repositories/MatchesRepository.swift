@@ -9,15 +9,6 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-/// Protocolo para obtener partidos
-protocol FetchMatchesRepositoryProtocol {
-    func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error>
-    func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error>
-}
-
-/// Alias para compatibilidad con código existente
-typealias MatchesRepositoryProtocol = FetchMatchesRepositoryProtocol
-
 /// Helper para parsear IDs compuestos de partidos
 private struct MatchIdComponents {
     let jornadaId: String
@@ -40,6 +31,7 @@ private struct MatchIdComponents {
     }
 }
 
+/// Implementación del protocolo MatchesRepositoryProtocol
 class MatchesRepository: MatchesRepositoryProtocol {
 
     private let database: DatabaseProtocol
@@ -74,9 +66,12 @@ class MatchesRepository: MatchesRepositoryProtocol {
                         return
                     }
 
-                    let matches = documents.compactMap { doc -> Match? in
-                        try? doc.data(as: Match.self)
+                    // Convertir MatchDTO a Match usando el mapper
+                    let matchDTOs = documents.compactMap { doc -> MatchDTO? in
+                        try? doc.data(as: MatchDTO.self)
                     }
+                    
+                    let matches = MatchMapper.toDomain(from: matchDTOs)
 
                     promise(.success(matches))
                 }
@@ -129,7 +124,9 @@ class MatchesRepository: MatchesRepositoryProtocol {
                             return
                         }
 
-                        if let match = try? snapshot.data(as: Match.self) {
+                        // Convertir MatchDTO a Match usando el mapper
+                        if let matchDTO = try? snapshot.data(as: MatchDTO.self),
+                           let match = MatchMapper.toDomain(from: matchDTO) {
                             allMatches.append(match)
                         }
                     }

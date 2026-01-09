@@ -13,7 +13,7 @@ class FavoritosViewModel {
 
     // MARK: - Published Properties
 
-    @Published private(set) var matches: [MatchPresentationModel] = []
+    @Published private(set) var matches: [MatchUI] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: Error?
     @Published private(set) var favoriteMatchIds: Set<String> = []
@@ -87,11 +87,15 @@ class FavoritosViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] matches in
-                // Convertir Match a MatchPresentationModel
-                let presentationMatches = matches.map { match in
-                    MatchPresentationModel(match: match, isFavorite: true)
+                guard let self = self else { return }
+                // Convertir Match a MatchUI usando el mapper
+                var matchUIs = MatchUIMapper.toUI(from: matches)
+                // Actualizar el estado de favorito basado en favoriteMatchIds
+                for index in matchUIs.indices {
+                    let fullMatchId = matchUIs[index].id
+                    matchUIs[index].isFavorite = self.favoriteMatchIds.contains(fullMatchId)
                 }
-                self?.matches = presentationMatches
+                self.matches = matchUIs
             }
             .store(in: &cancellables)
     }

@@ -159,7 +159,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
     // MARK: - Private Helpers
 
     private func validateMatch(_ match: Match, jornadaId: String) -> NSError? {
-        guard let matchId = match.id, !matchId.isEmpty else {
+        guard !match.id.isEmpty else {
             return NSError(
                 domain: "RegisterMatchesUseCase",
                 code: -9,

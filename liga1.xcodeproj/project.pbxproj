@@ -19,13 +19,11 @@
 		464001BA2F08853F00A8C905 /* FavoritosViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001972F08853F00A8C905 /* FavoritosViewModel.swift */; };
 		464001BB2F08853F00A8C905 /* TeamsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001812F08853F00A8C905 /* TeamsRepository.swift */; };
 		464001BD2F08853F00A8C905 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640016F2F08853F00A8C905 /* Color+Extension.swift */; };
-		464001BF2F08853F00A8C905 /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001882F08853F00A8C905 /* Match.swift */; };
 		464001C02F08853F00A8C905 /* JornadasRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640017E2F08853F00A8C905 /* JornadasRepository.swift */; };
 		464001C12F08853F00A8C905 /* EquipoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640018F2F08853F00A8C905 /* EquipoTableViewCell.swift */; };
 		464001C22F08853F00A8C905 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001902F08853F00A8C905 /* HeaderView.swift */; };
 		464001C32F08853F00A8C905 /* TorneoType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001782F08853F00A8C905 /* TorneoType.swift */; };
 		464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001742F08853F00A8C905 /* EquipoPeruano.swift */; };
-		464001C72F08853F00A8C905 /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640018B2F08853F00A8C905 /* Team.swift */; };
 		464001C92F08853F00A8C905 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640019B2F08853F00A8C905 /* ProfileViewModel.swift */; };
 		464001CD2F08853F00A8C905 /* MatchesRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4640017F2F08853F00A8C905 /* MatchesRepository.swift */; };
 		464001CE2F08853F00A8C905 /* UIStackView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001702F08853F00A8C905 /* UIStackView+Builder.swift */; };
@@ -40,7 +38,6 @@
 		464001DB2F08853F00A8C905 /* MatchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001912F08853F00A8C905 /* MatchTableViewCell.swift */; };
 		464001DD2F08853F00A8C905 /* TablePosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001772F08853F00A8C905 /* TablePosition.swift */; };
 		464001DE2F08853F00A8C905 /* NewsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001932F08853F00A8C905 /* NewsHeaderView.swift */; };
-		464001DF2F08853F00A8C905 /* NewsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001892F08853F00A8C905 /* NewsItem.swift */; };
 		464001E12F08853F00A8C905 /* FavoritesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464001842F08853F00A8C905 /* FavoritesService.swift */; };
 		464009B42F098D2000A8C905 /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009B32F098D2000A8C905 /* UIViewController+Alert.swift */; };
 		464009BB2F098D4F00A8C905 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009B92F098D4F00A8C905 /* Logger.swift */; };
@@ -80,13 +77,26 @@
 		46CDF4852F1061FC00F280E6 /* TeamDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4802F1061FC00F280E6 /* TeamDTO.swift */; };
 		46CDF4882F10623000F280E6 /* JornadaUIMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4862F10623000F280E6 /* JornadaUIMapper.swift */; };
 		46CDF48E2F10625B00F280E6 /* JornadaUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4892F10625B00F280E6 /* JornadaUI.swift */; };
-		46CDF4942F1063DD00F280E6 /* TeamMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4922F1063DD00F280E6 /* TeamMapper.swift */; };
-		46CDF4952F1063DD00F280E6 /* JornadaMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF48F2F1063DD00F280E6 /* JornadaMapper.swift */; };
-		46CDF4962F1063DD00F280E6 /* MatchMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4902F1063DD00F280E6 /* MatchMapper.swift */; };
-		46CDF4972F1063DD00F280E6 /* NewsItemMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4912F1063DD00F280E6 /* NewsItemMapper.swift */; };
+		46CDF4992F10685700F280E6 /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4982F10685700F280E6 /* Match.swift */; };
+		46CDF49B2F10686F00F280E6 /* MatchUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF49A2F10686F00F280E6 /* MatchUI.swift */; };
+		46CDF4A12F1068A300F280E6 /* TeamMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF49F2F1068A300F280E6 /* TeamMapper.swift */; };
+		46CDF4A22F1068A300F280E6 /* JornadaMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF49C2F1068A300F280E6 /* JornadaMapper.swift */; };
+		46CDF4A32F1068A300F280E6 /* NewsItemMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF49E2F1068A300F280E6 /* NewsItemMapper.swift */; };
+		46CDF4A42F1068A300F280E6 /* MatchMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF49D2F1068A300F280E6 /* MatchMapper.swift */; };
+		46CDF4AB2F1086F100F280E6 /* NewsRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4A82F1086F100F280E6 /* NewsRepositoryProtocol.swift */; };
+		46CDF4AC2F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4A52F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift */; };
+		46CDF4AD2F1086F100F280E6 /* MatchesRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4A72F1086F100F280E6 /* MatchesRepositoryProtocol.swift */; };
+		46CDF4AE2F1086F100F280E6 /* JornadasRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4A62F1086F100F280E6 /* JornadasRepositoryProtocol.swift */; };
+		46CDF4AF2F1086F100F280E6 /* TeamsRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4A92F1086F100F280E6 /* TeamsRepositoryProtocol.swift */; };
+		46CDF4B12F10877B00F280E6 /* NewsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4B02F10877B00F280E6 /* NewsItem.swift */; };
+		46CDF4B32F10878400F280E6 /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4B22F10878400F280E6 /* Team.swift */; };
+		46CDF4B72F10882800F280E6 /* MatchUIMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4B42F10882800F280E6 /* MatchUIMapper.swift */; };
+		46CDF4B82F10882800F280E6 /* NewsItemUIMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4B52F10882800F280E6 /* NewsItemUIMapper.swift */; };
+		46CDF4B92F10882800F280E6 /* TeamUIMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4B62F10882800F280E6 /* TeamUIMapper.swift */; };
+		46CDF4BB2F10884600F280E6 /* NewsItemUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4BA2F10884600F280E6 /* NewsItemUI.swift */; };
+		46CDF4BD2F10885000F280E6 /* TeamUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4BC2F10885000F280E6 /* TeamUI.swift */; };
 		46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */; };
 		46D8209E2F09D71600FAA836 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209C2F09D71600FAA836 /* AuthProvider.swift */; };
-		46D820A12F09D72A00FAA836 /* MatchPresentationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */; };
 		46D820A62F09DD0500FAA836 /* LoginCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D820A42F09DD0500FAA836 /* LoginCoordinator.swift */; };
 		46D820A72F09DD0500FAA836 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D820A22F09DD0500FAA836 /* AppCoordinator.swift */; };
 		46D820A82F09DD0500FAA836 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D820A32F09DD0500FAA836 /* Coordinator.swift */; };
@@ -117,9 +127,6 @@
 		464001812F08853F00A8C905 /* TeamsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsRepository.swift; sourceTree = "<group>"; };
 		464001832F08853F00A8C905 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		464001842F08853F00A8C905 /* FavoritesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesService.swift; sourceTree = "<group>"; };
-		464001882F08853F00A8C905 /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
-		464001892F08853F00A8C905 /* NewsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItem.swift; sourceTree = "<group>"; };
-		4640018B2F08853F00A8C905 /* Team.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
 		4640018F2F08853F00A8C905 /* EquipoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquipoTableViewCell.swift; sourceTree = "<group>"; };
 		464001902F08853F00A8C905 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		464001912F08853F00A8C905 /* MatchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchTableViewCell.swift; sourceTree = "<group>"; };
@@ -168,13 +175,26 @@
 		46CDF4802F1061FC00F280E6 /* TeamDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamDTO.swift; sourceTree = "<group>"; };
 		46CDF4862F10623000F280E6 /* JornadaUIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaUIMapper.swift; sourceTree = "<group>"; };
 		46CDF4892F10625B00F280E6 /* JornadaUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaUI.swift; sourceTree = "<group>"; };
-		46CDF48F2F1063DD00F280E6 /* JornadaMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaMapper.swift; sourceTree = "<group>"; };
-		46CDF4902F1063DD00F280E6 /* MatchMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchMapper.swift; sourceTree = "<group>"; };
-		46CDF4912F1063DD00F280E6 /* NewsItemMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemMapper.swift; sourceTree = "<group>"; };
-		46CDF4922F1063DD00F280E6 /* TeamMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamMapper.swift; sourceTree = "<group>"; };
+		46CDF4982F10685700F280E6 /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
+		46CDF49A2F10686F00F280E6 /* MatchUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchUI.swift; sourceTree = "<group>"; };
+		46CDF49C2F1068A300F280E6 /* JornadaMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaMapper.swift; sourceTree = "<group>"; };
+		46CDF49D2F1068A300F280E6 /* MatchMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchMapper.swift; sourceTree = "<group>"; };
+		46CDF49E2F1068A300F280E6 /* NewsItemMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemMapper.swift; sourceTree = "<group>"; };
+		46CDF49F2F1068A300F280E6 /* TeamMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamMapper.swift; sourceTree = "<group>"; };
+		46CDF4A52F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminMatchRepositoryProtocol.swift; sourceTree = "<group>"; };
+		46CDF4A62F1086F100F280E6 /* JornadasRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadasRepositoryProtocol.swift; sourceTree = "<group>"; };
+		46CDF4A72F1086F100F280E6 /* MatchesRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesRepositoryProtocol.swift; sourceTree = "<group>"; };
+		46CDF4A82F1086F100F280E6 /* NewsRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRepositoryProtocol.swift; sourceTree = "<group>"; };
+		46CDF4A92F1086F100F280E6 /* TeamsRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsRepositoryProtocol.swift; sourceTree = "<group>"; };
+		46CDF4B02F10877B00F280E6 /* NewsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItem.swift; sourceTree = "<group>"; };
+		46CDF4B22F10878400F280E6 /* Team.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Team.swift; sourceTree = "<group>"; };
+		46CDF4B42F10882800F280E6 /* MatchUIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchUIMapper.swift; sourceTree = "<group>"; };
+		46CDF4B52F10882800F280E6 /* NewsItemUIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemUIMapper.swift; sourceTree = "<group>"; };
+		46CDF4B62F10882800F280E6 /* TeamUIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamUIMapper.swift; sourceTree = "<group>"; };
+		46CDF4BA2F10884600F280E6 /* NewsItemUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemUI.swift; sourceTree = "<group>"; };
+		46CDF4BC2F10885000F280E6 /* TeamUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamUI.swift; sourceTree = "<group>"; };
 		46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseProtocol.swift; sourceTree = "<group>"; };
 		46D8209C2F09D71600FAA836 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
-		46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPresentationModel.swift; sourceTree = "<group>"; };
 		46D820A22F09DD0500FAA836 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		46D820A32F09DD0500FAA836 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		46D820A42F09DD0500FAA836 /* LoginCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginCoordinator.swift; sourceTree = "<group>"; };
@@ -269,21 +289,12 @@
 		464001862F08853F00A8C905 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4A02F1068A300F280E6 /* Mappers */,
 				46CDF4812F1061FC00F280E6 /* DTOs */,
 				464001822F08853F00A8C905 /* Repositories */,
 				464001852F08853F00A8C905 /* Services */,
 			);
 			path = Data;
-			sourceTree = "<group>";
-		};
-		4640018C2F08853F00A8C905 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				464001882F08853F00A8C905 /* Match.swift */,
-				464001892F08853F00A8C905 /* NewsItem.swift */,
-				4640018B2F08853F00A8C905 /* Team.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		4640018D2F08853F00A8C905 /* UseCases */ = {
@@ -303,8 +314,8 @@
 		4640018E2F08853F00A8C905 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4AA2F1086F100F280E6 /* Repositories */,
 				46CDF4772F1061E600F280E6 /* Entities */,
-				4640018C2F08853F00A8C905 /* Models */,
 				4640018D2F08853F00A8C905 /* UseCases */,
 			);
 			path = Domain;
@@ -551,6 +562,7 @@
 		46CDF4742F1061E600F280E6 /* Match */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4982F10685700F280E6 /* Match.swift */,
 			);
 			path = Match;
 			sourceTree = "<group>";
@@ -558,6 +570,7 @@
 		46CDF4752F1061E600F280E6 /* NewsItem */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4B02F10877B00F280E6 /* NewsItem.swift */,
 			);
 			path = NewsItem;
 			sourceTree = "<group>";
@@ -565,6 +578,7 @@
 		46CDF4762F1061E600F280E6 /* Team */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4B22F10878400F280E6 /* Team.swift */,
 			);
 			path = Team;
 			sourceTree = "<group>";
@@ -615,7 +629,6 @@
 		46CDF4812F1061FC00F280E6 /* DTOs */ = {
 			isa = PBXGroup;
 			children = (
-				46CDF4932F1063DD00F280E6 /* Mappers */,
 				46CDF47A2F1061FC00F280E6 /* Jornada */,
 				46CDF47B2F1061FC00F280E6 /* Match */,
 				46CDF47C2F1061FC00F280E6 /* NewsItem */,
@@ -627,6 +640,9 @@
 		46CDF4872F10623000F280E6 /* Mappers */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4B42F10882800F280E6 /* MatchUIMapper.swift */,
+				46CDF4B52F10882800F280E6 /* NewsItemUIMapper.swift */,
+				46CDF4B62F10882800F280E6 /* TeamUIMapper.swift */,
 				46CDF4862F10623000F280E6 /* JornadaUIMapper.swift */,
 			);
 			path = Mappers;
@@ -643,6 +659,7 @@
 		46CDF48B2F10625B00F280E6 /* Match */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF49A2F10686F00F280E6 /* MatchUI.swift */,
 			);
 			path = Match;
 			sourceTree = "<group>";
@@ -650,6 +667,7 @@
 		46CDF48C2F10625B00F280E6 /* NewsItem */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4BA2F10884600F280E6 /* NewsItemUI.swift */,
 			);
 			path = NewsItem;
 			sourceTree = "<group>";
@@ -657,19 +675,32 @@
 		46CDF48D2F10625B00F280E6 /* Team */ = {
 			isa = PBXGroup;
 			children = (
+				46CDF4BC2F10885000F280E6 /* TeamUI.swift */,
 			);
 			path = Team;
 			sourceTree = "<group>";
 		};
-		46CDF4932F1063DD00F280E6 /* Mappers */ = {
+		46CDF4A02F1068A300F280E6 /* Mappers */ = {
 			isa = PBXGroup;
 			children = (
-				46CDF48F2F1063DD00F280E6 /* JornadaMapper.swift */,
-				46CDF4902F1063DD00F280E6 /* MatchMapper.swift */,
-				46CDF4912F1063DD00F280E6 /* NewsItemMapper.swift */,
-				46CDF4922F1063DD00F280E6 /* TeamMapper.swift */,
+				46CDF49C2F1068A300F280E6 /* JornadaMapper.swift */,
+				46CDF49D2F1068A300F280E6 /* MatchMapper.swift */,
+				46CDF49E2F1068A300F280E6 /* NewsItemMapper.swift */,
+				46CDF49F2F1068A300F280E6 /* TeamMapper.swift */,
 			);
 			path = Mappers;
+			sourceTree = "<group>";
+		};
+		46CDF4AA2F1086F100F280E6 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				46CDF4A52F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift */,
+				46CDF4A62F1086F100F280E6 /* JornadasRepositoryProtocol.swift */,
+				46CDF4A72F1086F100F280E6 /* MatchesRepositoryProtocol.swift */,
+				46CDF4A82F1086F100F280E6 /* NewsRepositoryProtocol.swift */,
+				46CDF4A92F1086F100F280E6 /* TeamsRepositoryProtocol.swift */,
+			);
+			path = Repositories;
 			sourceTree = "<group>";
 		};
 		46D8209D2F09D71600FAA836 /* Auth */ = {
@@ -687,7 +718,6 @@
 				46CDF48B2F10625B00F280E6 /* Match */,
 				46CDF48C2F10625B00F280E6 /* NewsItem */,
 				46CDF48D2F10625B00F280E6 /* Team */,
-				46D8209F2F09D72A00FAA836 /* MatchPresentationModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -866,24 +896,37 @@
 				464009D62F098D8D00A8C905 /* RegisterMatchesUseCase.swift in Sources */,
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
+				46CDF4B72F10882800F280E6 /* MatchUIMapper.swift in Sources */,
+				46CDF4B82F10882800F280E6 /* NewsItemUIMapper.swift in Sources */,
+				46CDF4B92F10882800F280E6 /* TeamUIMapper.swift in Sources */,
+				46CDF4992F10685700F280E6 /* Match.swift in Sources */,
 				464001BB2F08853F00A8C905 /* TeamsRepository.swift in Sources */,
+				46CDF4BD2F10885000F280E6 /* TeamUI.swift in Sources */,
 				46CDF4712F1058A100F280E6 /* NewsCategory.swift in Sources */,
 				464001BD2F08853F00A8C905 /* Color+Extension.swift in Sources */,
-				464001BF2F08853F00A8C905 /* Match.swift in Sources */,
 				464001C02F08853F00A8C905 /* JornadasRepository.swift in Sources */,
 				464001C12F08853F00A8C905 /* EquipoTableViewCell.swift in Sources */,
 				46CDF48E2F10625B00F280E6 /* JornadaUI.swift in Sources */,
 				464001C22F08853F00A8C905 /* HeaderView.swift in Sources */,
 				46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */,
 				464001C32F08853F00A8C905 /* TorneoType.swift in Sources */,
+				46CDF4B12F10877B00F280E6 /* NewsItem.swift in Sources */,
 				464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */,
-				464001C72F08853F00A8C905 /* Team.swift in Sources */,
+				46CDF4A12F1068A300F280E6 /* TeamMapper.swift in Sources */,
+				46CDF4A22F1068A300F280E6 /* JornadaMapper.swift in Sources */,
+				46CDF4A32F1068A300F280E6 /* NewsItemMapper.swift in Sources */,
+				46CDF4A42F1068A300F280E6 /* MatchMapper.swift in Sources */,
 				464001C92F08853F00A8C905 /* ProfileViewModel.swift in Sources */,
 				464001CD2F08853F00A8C905 /* MatchesRepository.swift in Sources */,
-				46D820A12F09D72A00FAA836 /* MatchPresentationModel.swift in Sources */,
 				464001CE2F08853F00A8C905 /* UIStackView+Builder.swift in Sources */,
 				464001D02F08853F00A8C905 /* LoginViewModel.swift in Sources */,
 				464001D12F08853F00A8C905 /* AdminMatchRepository.swift in Sources */,
+				46CDF4AB2F1086F100F280E6 /* NewsRepositoryProtocol.swift in Sources */,
+				46CDF4AC2F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift in Sources */,
+				46CDF4AD2F1086F100F280E6 /* MatchesRepositoryProtocol.swift in Sources */,
+				46CDF4AE2F1086F100F280E6 /* JornadasRepositoryProtocol.swift in Sources */,
+				46CDF4AF2F1086F100F280E6 /* TeamsRepositoryProtocol.swift in Sources */,
+				46CDF4BB2F10884600F280E6 /* NewsItemUI.swift in Sources */,
 				46D820A62F09DD0500FAA836 /* LoginCoordinator.swift in Sources */,
 				46D820A72F09DD0500FAA836 /* AppCoordinator.swift in Sources */,
 				46D820A82F09DD0500FAA836 /* Coordinator.swift in Sources */,
@@ -893,13 +936,10 @@
 				464001D52F08853F00A8C905 /* HomeViewModel.swift in Sources */,
 				464009F12F098DF600A8C905 /* NewsViewController.swift in Sources */,
 				464009F32F098DF600A8C905 /* LoginViewController.swift in Sources */,
+				46CDF49B2F10686F00F280E6 /* MatchUI.swift in Sources */,
 				464009F42F098DF600A8C905 /* HomeViewController.swift in Sources */,
 				464009F52F098DF600A8C905 /* MainTabBarController.swift in Sources */,
 				464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */,
-				46CDF4942F1063DD00F280E6 /* TeamMapper.swift in Sources */,
-				46CDF4952F1063DD00F280E6 /* JornadaMapper.swift in Sources */,
-				46CDF4962F1063DD00F280E6 /* MatchMapper.swift in Sources */,
-				46CDF4972F1063DD00F280E6 /* NewsItemMapper.swift in Sources */,
 				46400A002F098EB800A8C905 /* DIContainer.swift in Sources */,
 				464009F72F098DF600A8C905 /* NewsHeaderWrapperCell.swift in Sources */,
 				464009F82F098DF600A8C905 /* TorneoViewController.swift in Sources */,
@@ -909,6 +949,7 @@
 				464009FC2F098DF600A8C905 /* NewsViewController+TableView.swift in Sources */,
 				464009FD2F098DF600A8C905 /* FavoritosViewController.swift in Sources */,
 				464001D72F08853F00A8C905 /* NewsRepository.swift in Sources */,
+				46CDF4B32F10878400F280E6 /* Team.swift in Sources */,
 				464001D92F08853F00A8C905 /* NewsCell.swift in Sources */,
 				464001DA2F08853F00A8C905 /* TorneoViewModel.swift in Sources */,
 				464001DB2F08853F00A8C905 /* MatchTableViewCell.swift in Sources */,
@@ -917,7 +958,6 @@
 				464001DE2F08853F00A8C905 /* NewsHeaderView.swift in Sources */,
 				46CDF4782F1061E600F280E6 /* Jornada.swift in Sources */,
 				46CDF4882F10623000F280E6 /* JornadaUIMapper.swift in Sources */,
-				464001DF2F08853F00A8C905 /* NewsItem.swift in Sources */,
 				464001E12F08853F00A8C905 /* FavoritesService.swift in Sources */,
 				46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */,
 				464009B42F098D2000A8C905 /* UIViewController+Alert.swift in Sources */,

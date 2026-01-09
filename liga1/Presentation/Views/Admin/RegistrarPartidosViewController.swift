@@ -179,8 +179,8 @@ class RegistrarPartidosViewController: UIViewController {
         // Los partidos se registrarán en: jornadas/{jornadaId}/matches/{equipoLocalId}_{equipoVisitanteId}
         let jornadaId = "apertura_01"
         let matchesToRegister: [Match] = [
-            Match(id: "com_gra", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
-            Match(id: "mel_cou", fecha: Date(), golesEquipoLocal: 3, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false)
+            Match(id: "com_gra", equipoLocalId: "com", equipoVisitanteId: "gra", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
+            Match(id: "mel_cou", equipoLocalId: "mel", equipoVisitanteId: "cou", fecha: Date(), golesEquipoLocal: 3, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false)
         ]
 
         viewModel.registerMultipleMatches(matches: matchesToRegister, jornadaId: jornadaId)
@@ -206,15 +206,15 @@ class RegistrarPartidosViewController: UIViewController {
      let jornadaId = "apertura_10"
      let matchesToRegister: [Match] = [
          // Jornada 10 - Apertura 2026
-         Match(id: "utc_cie", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
-         Match(id: "gar_adt", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
-         Match(id: "val_com", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
-         Match(id: "cus_cou", fecha: Date(), golesEquipoLocal: 2, golesEquipoVisitante: 1, estado: .pendiente, suspendido: false),
-         Match(id: "sba_gra", fecha: Date(), golesEquipoLocal: 0, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
-         Match(id: "hua_cri", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
-         Match(id: "ali_man", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
-         Match(id: "atl_uni", fecha: Date(), golesEquipoLocal: 0, golesEquipoVisitante: 3, estado: .pendiente, suspendido: false),
-         Match(id: "mel_cha", fecha: Date(), golesEquipoLocal: 2, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false)
+         Match(id: "utc_cie", equipoLocalId: "utc", equipoVisitanteId: "cie", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
+         Match(id: "gar_adt", equipoLocalId: "gar", equipoVisitanteId: "adt", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "val_com", equipoLocalId: "val", equipoVisitanteId: "com", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "cus_cou", equipoLocalId: "cus", equipoVisitanteId: "cou", fecha: Date(), golesEquipoLocal: 2, golesEquipoVisitante: 1, estado: .pendiente, suspendido: false),
+         Match(id: "sba_gra", equipoLocalId: "sba", equipoVisitanteId: "gra", fecha: Date(), golesEquipoLocal: 0, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "hua_cri", equipoLocalId: "hua", equipoVisitanteId: "cri", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 2, estado: .pendiente, suspendido: false),
+         Match(id: "ali_man", equipoLocalId: "ali", equipoVisitanteId: "man", fecha: Date(), golesEquipoLocal: 1, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false),
+         Match(id: "atl_uni", equipoLocalId: "atl", equipoVisitanteId: "uni", fecha: Date(), golesEquipoLocal: 0, golesEquipoVisitante: 3, estado: .pendiente, suspendido: false),
+         Match(id: "mel_cha", equipoLocalId: "mel", equipoVisitanteId: "cha", fecha: Date(), golesEquipoLocal: 2, golesEquipoVisitante: 0, estado: .pendiente, suspendido: false)
      ]
 
      IMPORTANTE:

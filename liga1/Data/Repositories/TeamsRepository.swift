@@ -9,10 +9,7 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-protocol TeamsRepositoryProtocol {
-    func fetchTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Error>
-}
-
+/// Implementación del protocolo TeamsRepositoryProtocol
 class TeamsRepository: TeamsRepositoryProtocol {
 
     private let database: DatabaseProtocol
@@ -46,23 +43,32 @@ class TeamsRepository: TeamsRepositoryProtocol {
                         return
                     }
 
-                    let teams = documents.map { doc -> Team in
-                        let data = doc.data()
-                        return Team(
-                            nombre: EquipoPeruano.obtenerNombreCompleto(paraId: doc.documentID),
-                            ciudad: data[FirestoreConstants.TeamField.city] as? String ?? "Sin ciudad",
-                            estadio: data[FirestoreConstants.TeamField.stadium] as? String ?? "Sin estadio",
-                            logo: data["logo"] as? String ?? "Sin logo",
-                            partidosJugados: data[FirestoreConstants.TeamField.matchesPlayed] as? Int ?? 0,
-                            partidosGanados: data[FirestoreConstants.TeamField.matchesWon] as? Int ?? 0,
-                            partidosEmpatados: data[FirestoreConstants.TeamField.matchesDrawn] as? Int ?? 0,
-                            partidosPerdidos: data[FirestoreConstants.TeamField.matchesLost] as? Int ?? 0,
-                            golesFavor: data[FirestoreConstants.TeamField.goalsScored] as? Int ?? 0,
-                            golesContra: data[FirestoreConstants.TeamField.goalsAgainst] as? Int ?? 0,
-                            diferenciaGoles: data[FirestoreConstants.TeamField.goalDifference] as? Int ?? 0,
-                            puntos: data[FirestoreConstants.TeamField.points] as? Int ?? 0
+                    // Decodificar DTOs desde Firestore
+                    let teamDTOs = documents.compactMap { doc -> TeamDTO? in
+                        guard let dto = try? doc.data(as: TeamDTO.self) else {
+                            return nil
+                        }
+                        // Asignar el ID del documento y el nombre completo si no viene
+                        let nombreCompleto = dto.name ?? EquipoPeruano.obtenerNombreCompleto(paraId: doc.documentID)
+                        
+                        return TeamDTO(
+                            id: doc.documentID,
+                            name: nombreCompleto,
+                            city: dto.city,
+                            stadium: dto.stadium,
+                            matchesPlayed: dto.matchesPlayed,
+                            matchesWon: dto.matchesWon,
+                            matchesDrawn: dto.matchesDrawn,
+                            matchesLost: dto.matchesLost,
+                            goalsScored: dto.goalsScored,
+                            goalsAgainst: dto.goalsAgainst,
+                            goalDifference: dto.goalDifference,
+                            points: dto.points
                         )
                     }
+
+                    // Convertir DTOs a entidades de dominio usando el mapper
+                    let teams = TeamMapper.toDomainArray(from: teamDTOs)
 
                     promise(.success(teams))
                 }

@@ -9,16 +9,7 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-protocol AdminMatchRepositoryProtocol {
-    func registerMatch(match: Match, jornadaId: String) -> AnyPublisher<Void, Error>
-    func registerMultipleMatches(matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error>
-    func updateMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error>
-    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error>
-    func finalizeMatch(matchId: String, jornadaId: String) -> AnyPublisher<Void, Error>
-    func finalizeAllMatches() -> AnyPublisher<Void, Error>
-    func saveMatches(_ matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error>
-}
-
+/// Implementación del protocolo AdminMatchRepositoryProtocol
 class AdminMatchRepository: AdminMatchRepositoryProtocol {
 
     private let database: DatabaseProtocol
@@ -40,22 +31,33 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
 
             // Estructura: jornadas/{jornadaId}/matches/{matchId}
             // matchId: adt_utc (código de 3 letras de cada equipo)
-            guard let matchId = match.id else {
+            guard !match.id.isEmpty else {
                 promise(.failure(NSError(domain: "AdminMatchRepository", code: -2, userInfo: [NSLocalizedDescriptionKey: "Match ID is required"])))
                 return
             }
 
-            self.db.collection(FirestoreConstants.Collection.jornadas)
-                .document(jornadaId)
-                .collection(FirestoreConstants.Collection.matches)
-                .document(matchId)
-                .setData(match.toDictionary()) { error in
-                    if let error = error {
-                        promise(.failure(error))
-                    } else {
-                        promise(.success(()))
+            // Convertir Match (Domain) a MatchDTO (Data) usando el mapper
+            let matchDTO = MatchMapper.toDTO(from: match)
+            
+            // Convertir MatchDTO a diccionario para Firestore
+            do {
+                let encoder = Firestore.Encoder()
+                let data = try encoder.encode(matchDTO)
+                
+                self.db.collection(FirestoreConstants.Collection.jornadas)
+                    .document(jornadaId)
+                    .collection(FirestoreConstants.Collection.matches)
+                    .document(match.id)
+                    .setData(data) { error in
+                        if let error = error {
+                            promise(.failure(error))
+                        } else {
+                            promise(.success(()))
+                        }
                     }
-                }
+            } catch {
+                promise(.failure(error))
+            }
         }
         .eraseToAnyPublisher()
     }
@@ -189,14 +191,26 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             }
 
             let batch = self.db.batch()
+            let encoder = Firestore.Encoder()
 
             for match in matches {
-                guard let matchId = match.id else { continue }
-                let docRef = self.db.collection(FirestoreConstants.Collection.jornadas)
-                    .document(jornadaId)
-                    .collection(FirestoreConstants.Collection.matches)
-                    .document(matchId)
-                batch.setData(match.toDictionary(), forDocument: docRef)
+                guard !match.id.isEmpty else { continue }
+                
+                // Convertir Match (Domain) a MatchDTO (Data) usando el mapper
+                let matchDTO = MatchMapper.toDTO(from: match)
+                
+                // Convertir MatchDTO a diccionario para Firestore
+                do {
+                    let data = try encoder.encode(matchDTO)
+                    let docRef = self.db.collection(FirestoreConstants.Collection.jornadas)
+                        .document(jornadaId)
+                        .collection(FirestoreConstants.Collection.matches)
+                        .document(match.id)
+                    batch.setData(data, forDocument: docRef)
+                } catch {
+                    Logger.shared.error("AdminMatchRepository: Failed to encode match \(match.id)", error: error)
+                    // Continuar con el siguiente match
+                }
             }
 
             batch.commit { error in

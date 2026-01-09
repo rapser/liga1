@@ -2,7 +2,7 @@
 //  MatchDTO.swift
 //  liga1
 //
-//  Created by Claude Code on 02/01/26.
+//  Created by miguel tomairo on 02/01/26.
 //
 
 import Foundation

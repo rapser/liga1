@@ -9,10 +9,7 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-protocol NewsRepositoryProtocol {
-    func fetchNews() -> AnyPublisher<[NewsItem], Error>
-}
-
+/// Implementación del protocolo NewsRepositoryProtocol
 class NewsRepository: NewsRepositoryProtocol {
 
     private let database: DatabaseProtocol
@@ -51,15 +48,19 @@ class NewsRepository: NewsRepositoryProtocol {
 
                     Logger.shared.debug("NewsRepository: Found \(documents.count) documents")
 
-                    let newsItems = documents.compactMap { document -> NewsItem? in
-                        Logger.shared.debug("NewsRepository: Processing document: \(document.documentID)")
-                        Logger.shared.debug("NewsRepository: Document data: \(document.data())")
-                        let item = NewsItem(from: document.data())
-                        if item == nil {
-                            Logger.shared.debug("NewsRepository: Failed to parse document \(document.documentID)")
+                    // Decodificar DTOs desde Firestore
+                    let newsDTOs = documents.compactMap { doc -> NewsItemDTO? in
+                        Logger.shared.debug("NewsRepository: Processing document: \(doc.documentID)")
+                        Logger.shared.debug("NewsRepository: Document data: \(doc.data())")
+                        let dto = try? doc.data(as: NewsItemDTO.self)
+                        if dto == nil {
+                            Logger.shared.debug("NewsRepository: Failed to parse document \(doc.documentID)")
                         }
-                        return item
+                        return dto
                     }
+
+                    // Convertir DTOs a entidades de dominio usando el mapper
+                    let newsItems = NewsItemMapper.toDomain(from: newsDTOs)
 
                     Logger.shared.debug("NewsRepository: Successfully parsed \(newsItems.count) news items")
                     promise(.success(newsItems))

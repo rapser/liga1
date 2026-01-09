@@ -12,7 +12,24 @@ import FirebaseFirestore
 struct MatchMapper {
 
     /// Convierte MatchDTO a Match (Domain Model)
-    static func toDomain(from dto: MatchDTO) -> Match {
+    static func toDomain(from dto: MatchDTO) -> Match? {
+        guard let fecha = dto.fecha?.dateValue() else {
+            return nil
+        }
+
+        // Construir el id: si viene en el DTO lo usamos, sino lo construimos desde equipoLocalId y equipoVisitanteId
+        let matchId: String
+        if let id = dto.id, !id.isEmpty {
+            matchId = id
+        } else if let equipoLocalId = dto.equipoLocalId,
+                  let equipoVisitanteId = dto.equipoVisitanteId,
+                  !equipoLocalId.isEmpty,
+                  !equipoVisitanteId.isEmpty {
+            matchId = "\(equipoLocalId)_\(equipoVisitanteId)"
+        } else {
+            return nil
+        }
+
         // Convertir estado de String a EstadoMatch enum
         let estadoMatch: Match.EstadoMatch
         if let estadoString = dto.estado {
@@ -22,8 +39,10 @@ struct MatchMapper {
         }
 
         return Match(
-            id: dto.id,
-            fecha: dto.fecha?.dateValue() ?? Date(),
+            id: matchId,
+            equipoLocalId: dto.equipoLocalId,
+            equipoVisitanteId: dto.equipoVisitanteId,
+            fecha: fecha,
             golesEquipoLocal: dto.golesTeamA ?? 0,
             golesEquipoVisitante: dto.golesTeamB ?? 0,
             estado: estadoMatch,
@@ -46,7 +65,7 @@ struct MatchMapper {
     }
 
     /// Convierte array de MatchDTO a array de Match
-    static func toDomainArray(from dtos: [MatchDTO]) -> [Match] {
-        return dtos.map { toDomain(from: $0) }
+    static func toDomain(from dtos: [MatchDTO]) -> [Match] {
+        return dtos.compactMap { toDomain(from: $0) }
     }
 }
