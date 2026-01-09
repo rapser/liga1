@@ -39,18 +39,63 @@ class JornadasRepository: JornadasRepositoryProtocol {
                     }
 
                     guard let documents = snapshot?.documents else {
+                        Logger.shared.warning("JornadasRepository: No documents found")
                         promise(.success([]))
                         return
                     }
 
-                    // Decodificar DTOs desde Firestore
-                    let dtos = documents.compactMap { doc -> JornadaDTO? in
-                        try? doc.data(as: JornadaDTO.self)
+                    Logger.shared.debug("JornadasRepository: Found \(documents.count) documents")
+
+                    // Decodificar DTOs desde Firestore y convertir usando el mapper
+                    // Pasamos el documentID para extraer torneo y numero si no están en el documento
+                    var jornadas: [Jornada] = []
+                    for doc in documents {
+                        do {
+                            var dto = try doc.data(as: JornadaDTO.self)
+                            
+                            // Si el DTO no tiene id, usar el documentID
+                            if dto.id == nil || dto.id?.isEmpty == true {
+                                dto = JornadaDTO(
+                                    id: doc.documentID,
+                                    mostrar: dto.mostrar,
+                                    numero: dto.numero,
+                                    torneo: dto.torneo,
+                                    fechaInicio: dto.fechaInicio
+                                )
+                            }
+                            
+                            Logger.shared.debug("JornadasRepository: Processing document \(doc.documentID)")
+                            Logger.shared.debug("JornadasRepository: DTO - id: \(dto.id ?? "nil"), mostrar: \(dto.mostrar ?? false), numero: \(dto.numero?.description ?? "nil"), torneo: \(dto.torneo ?? "nil")")
+                            
+                            // Convertir DTO a entidad de dominio, pasando el documentID por si falta
+                            if let jornada = JornadaMapper.toDomain(from: dto, documentID: doc.documentID) {
+                                Logger.shared.debug("JornadasRepository: Successfully mapped jornada: \(jornada.id) - \(jornada.torneo) \(jornada.numero)")
+                                jornadas.append(jornada)
+                            } else {
+                                Logger.shared.warning("JornadasRepository: Failed to map jornada from document \(doc.documentID)")
+                            }
+                        } catch {
+                            Logger.shared.error("JornadasRepository: Failed to decode JornadaDTO for document \(doc.documentID)", error: error)
+                            // Intentar crear jornada manualmente desde el documentID si la decodificación falla
+                            if let data = doc.data() as? [String: Any],
+                               let mostrar = data[FirestoreConstants.JornadaField.mostrar] as? Bool,
+                               mostrar {
+                                // Intentar extraer torneo y numero del documentID
+                                if let jornada = JornadaMapper.toDomain(from: JornadaDTO(
+                                    id: doc.documentID,
+                                    mostrar: mostrar,
+                                    numero: nil,
+                                    torneo: nil,
+                                    fechaInicio: data[FirestoreConstants.JornadaField.fechaInicio] as? Timestamp
+                                ), documentID: doc.documentID) {
+                                    jornadas.append(jornada)
+                                    Logger.shared.debug("JornadasRepository: Created jornada manually from documentID: \(doc.documentID)")
+                                }
+                            }
+                        }
                     }
 
-                    // Convertir DTOs a entidades de dominio usando el mapper
-                    let jornadas = JornadaMapper.toDomain(from: dtos)
-
+                    Logger.shared.info("JornadasRepository: Successfully mapped \(jornadas.count) jornadas from \(documents.count) documents")
                     promise(.success(jornadas))
                 }
         }

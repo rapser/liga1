@@ -121,6 +121,41 @@ public struct LayoutPresets {
         return button
     }
 
+    /// Crea un botón de Google Sign In con logo y texto
+    public static func googleSignInButton(
+        title: String = "Continuar con Google",
+        logoImageName: String = "g-logo",
+        cornerRadius: CGFloat = 12,
+        height: CGFloat = 52
+    ) -> UIButton {
+        let button = UIButton(type: .system)
+        button.prepareForAutoLayout()
+        button.backgroundColor = .secondarySystemBackground
+        button.layer.cornerRadius = cornerRadius
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.separator.cgColor
+        button.heightAnchor.constraint(equalToConstant: height).isActive = true
+
+        let logoImageView = UIImageView(image: UIImage(named: logoImageName))
+            .contentMode(.scaleAspectFit)
+            .square(32)
+
+        let label = UILabel()
+            .text(title)
+            .font(.systemFont(ofSize: 17, weight: .medium))
+            .textColor(.label)
+
+        logoImageView.addTo(button)
+            .pinLeading(constant: Spacing.standard)
+            .centerY()
+
+        label.addTo(button)
+            .centerX()
+            .centerY()
+
+        return button
+    }
+
     // MARK: - Label Presets
 
     /// Crea un label de título
@@ -232,6 +267,13 @@ public struct LayoutPresets {
         ])
 
         return (overlay, activityIndicator)
+    }
+
+    // MARK: - Divider View
+
+    /// Crea un divider view con texto centrado entre dos líneas
+    static func dividerView(text: String = "o continuar con") -> DividerView {
+        return DividerView(text: text)
     }
 
     // MARK: - Segmented Control

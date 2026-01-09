@@ -17,7 +17,8 @@ struct JornadaDTO: Codable {
     let fechaInicio: Timestamp?
 
     enum CodingKeys: String, CodingKey {
-        case id
+        // Nota: 'id' no está en CodingKeys porque @DocumentID lo maneja automáticamente
+        // Si el documento tiene un campo 'id' explícito, se puede agregar aquí
         case mostrar
         case numero
         case torneo

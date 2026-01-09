@@ -14,6 +14,7 @@ struct MatchMapper {
     /// Convierte MatchDTO a Match (Domain Model)
     static func toDomain(from dto: MatchDTO) -> Match? {
         guard let fecha = dto.fecha?.dateValue() else {
+            Logger.shared.warning("MatchMapper: Missing fecha in MatchDTO with id: \(dto.id ?? "unknown")")
             return nil
         }
 
@@ -27,6 +28,7 @@ struct MatchMapper {
                   !equipoVisitanteId.isEmpty {
             matchId = "\(equipoLocalId)_\(equipoVisitanteId)"
         } else {
+            Logger.shared.warning("MatchMapper: Cannot construct matchId - missing id, equipoLocalId (\(dto.equipoLocalId ?? "nil")), or equipoVisitanteId (\(dto.equipoVisitanteId ?? "nil"))")
             return nil
         }
 

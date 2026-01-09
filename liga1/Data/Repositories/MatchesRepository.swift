@@ -51,32 +51,121 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 return
             }
 
-            self.db.collection(FirestoreConstants.Collection.jornadas)
+            Logger.shared.debug("MatchesRepository: Fetching matches for jornada: \(jornadaId)")
+            
+            let query = self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(jornadaId)
                 .collection(FirestoreConstants.Collection.matches)
+            
+            // Intentar ordenar por fecha, pero si falla, obtener sin ordenar
+            query
                 .order(by: FirestoreConstants.MatchField.fecha)
-                .getDocuments(source: .default) { snapshot, error in
+                .getDocuments(source: .default) { [weak self] snapshot, error in
+                    // Si hay un error relacionado con índice faltante, intentar sin ordenar
+                    if let error = error as NSError?,
+                       error.domain == "FIRFirestoreErrorDomain",
+                       error.code == 9 { // Error de índice faltante
+                        Logger.shared.warning("MatchesRepository: Index missing for fecha field, fetching without order")
+                        self?.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
+                        return
+                    }
+                    
                     if let error = error {
+                        Logger.shared.error("MatchesRepository: Error fetching matches for jornada \(jornadaId)", error: error)
                         promise(.failure(error))
                         return
                     }
-
-                    guard let documents = snapshot?.documents else {
-                        promise(.success([]))
-                        return
-                    }
-
-                    // Convertir MatchDTO a Match usando el mapper
-                    let matchDTOs = documents.compactMap { doc -> MatchDTO? in
-                        try? doc.data(as: MatchDTO.self)
-                    }
                     
-                    let matches = MatchMapper.toDomain(from: matchDTOs)
-
-                    promise(.success(matches))
+                    self?.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
                 }
         }
         .eraseToAnyPublisher()
+    }
+    
+    private func fetchMatchesWithoutOrder(query: Query, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
+        query.getDocuments(source: .default) { [weak self] snapshot, error in
+            if let error = error {
+                Logger.shared.error("MatchesRepository: Error fetching matches without order for jornada \(jornadaId)", error: error)
+                promise(.failure(error))
+                return
+            }
+            
+            self?.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
+        }
+    }
+    
+    private func processMatches(snapshot: QuerySnapshot?, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
+        guard let documents = snapshot?.documents else {
+            Logger.shared.warning("MatchesRepository: No documents found for jornada \(jornadaId)")
+            promise(.success([]))
+            return
+        }
+
+        Logger.shared.debug("MatchesRepository: Found \(documents.count) documents for jornada \(jornadaId)")
+
+        // Convertir MatchDTO a Match usando el mapper
+        var matchDTOs: [MatchDTO] = []
+        for doc in documents {
+            Logger.shared.debug("MatchesRepository: Processing document \(doc.documentID)")
+            Logger.shared.debug("MatchesRepository: Document data keys: \(doc.data().keys.joined(separator: ", "))")
+            
+            let documentID = doc.documentID
+            let data = doc.data()
+            
+            // Extraer equipoLocalId y equipoVisitanteId del documentID
+            // Format: "equipoLocal_equipoVisitante" (ej: "adt_utc", "atl_uni")
+            let (equipoLocalId, equipoVisitanteId): (String?, String?) = {
+                // Primero intentar obtener desde el documento
+                if let local = data["equipoLocalId"] as? String,
+                   let visitante = data["equipoVisitanteId"] as? String {
+                    return (local, visitante)
+                }
+                
+                // Si no están en el documento, extraer del documentID
+                let components = documentID.split(separator: "_")
+                if components.count >= 2 {
+                    let local = String(components[0])
+                    let visitante = String(components[1])
+                    Logger.shared.debug("MatchesRepository: Extracted equipoLocalId=\(local), equipoVisitanteId=\(visitante) from documentID: \(documentID)")
+                    return (local, visitante)
+                }
+                
+                Logger.shared.warning("MatchesRepository: Cannot extract equipoLocalId and equipoVisitanteId from documentID: \(documentID)")
+                return (nil, nil)
+            }()
+            
+            // Mapear campos alternativos de goles desde Firestore
+            // Los documentos tienen "golesEquipoLocal" y "golesEquipoVisitante"
+            // pero el DTO espera "golesTeamA" y "golesTeamB"
+            let golesTeamA = data["golesTeamA"] as? Int ?? data["golesEquipoLocal"] as? Int
+            let golesTeamB = data["golesTeamB"] as? Int ?? data["golesEquipoVisitante"] as? Int
+            
+            // Crear DTO manualmente desde los datos
+            // Esto evita problemas con @DocumentID y maneja correctamente los campos alternativos
+            let dto = MatchDTO(
+                id: documentID,
+                equipoLocalId: equipoLocalId,
+                equipoVisitanteId: equipoVisitanteId,
+                fecha: data["fecha"] as? Timestamp,
+                golesTeamA: golesTeamA,
+                golesTeamB: golesTeamB,
+                estado: data["estado"] as? String,
+                suspendido: data["suspendido"] as? Bool
+            )
+            
+            Logger.shared.debug("MatchesRepository: Successfully created MatchDTO: id=\(dto.id ?? "nil"), equipoLocal=\(dto.equipoLocalId ?? "nil"), equipoVisitante=\(dto.equipoVisitanteId ?? "nil"), fecha=\(dto.fecha?.dateValue().description ?? "nil"), golesA=\(dto.golesTeamA ?? 0), golesB=\(dto.golesTeamB ?? 0)")
+            matchDTOs.append(dto)
+        }
+        
+        Logger.shared.debug("MatchesRepository: Successfully decoded \(matchDTOs.count) MatchDTOs for jornada \(jornadaId) out of \(documents.count) documents")
+        
+        let matches = MatchMapper.toDomain(from: matchDTOs)
+        
+        // Ordenar manualmente por fecha si no se ordenó en Firestore
+        let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
+        
+        Logger.shared.info("MatchesRepository: Successfully mapped \(sortedMatches.count) matches for jornada \(jornadaId) from \(matchDTOs.count) DTOs")
+        promise(.success(sortedMatches))
     }
 
     func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error> {

@@ -10,7 +10,7 @@ import FirebaseFirestore
 
 /// Data Transfer Object para Match desde Firestore
 struct MatchDTO: Codable {
-    @DocumentID var id: String?
+    let id: String?
     let equipoLocalId: String?
     let equipoVisitanteId: String?
     let fecha: Timestamp?

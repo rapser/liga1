@@ -202,9 +202,17 @@ extension UIView {
     /// Pin al trailing del superview
     @discardableResult
     func pinTrailing(to anchor: NSLayoutXAxisAnchor? = nil, constant: CGFloat = 0) -> Self {
-        guard let superview = superview else { return self }
-        let targetAnchor = anchor ?? superview.trailingAnchor
-        trailingAnchor.constraint(equalTo: targetAnchor, constant: -constant).isActive = true
+        if let anchor = anchor {
+            // Si se proporciona un anchor específico, usarlo directamente
+            trailingAnchor.constraint(equalTo: anchor, constant: -constant).isActive = true
+        } else {
+            // Si no se proporciona anchor, usar el superview
+            guard let superview = superview else {
+                assertionFailure("pinTrailing called without anchor and without superview")
+                return self
+            }
+            trailingAnchor.constraint(equalTo: superview.trailingAnchor, constant: -constant).isActive = true
+        }
         return self
     }
 

@@ -70,9 +70,9 @@ class LoginViewController: UIViewController {
         backgroundColor: .liga1Red
     )
 
-    private lazy var dividerView = createDividerView()
+    private lazy var dividerView = LayoutPresets.dividerView()
 
-    private lazy var googleSignInButton = createGoogleButton()
+    private lazy var googleSignInButton = LayoutPresets.googleSignInButton()
 
     private var loadingComponents: (overlay: UIView, indicator: UIActivityIndicatorView)!
 
@@ -162,67 +162,6 @@ class LoginViewController: UIViewController {
 
         // Loading overlay
         loadingComponents = LayoutPresets.loadingOverlay(in: view, activityIndicatorColor: .liga1Red)
-    }
-
-    private func createDividerView() -> UIView {
-        let container = UIView()
-
-        let leftLine = UIView()
-            .background(.separator)
-            .height(1)
-
-        let label = UILabel()
-            .text("o continuar con")
-            .font(.systemFont(ofSize: 14))
-            .textColor(.secondaryLabel)
-
-        let rightLine = UIView()
-            .background(.separator)
-            .height(1)
-
-        leftLine.addTo(container)
-            .pinLeading()
-            .centerY()
-            .pinTrailing(to: label.leadingAnchor, constant: Spacing.small)
-
-        label.addTo(container)
-            .centerInSuperview()
-
-        rightLine.addTo(container)
-            .pinLeading(to: label.trailingAnchor, constant: Spacing.small)
-            .pinTrailing()
-            .centerY()
-
-        return container
-    }
-
-    private func createGoogleButton() -> UIButton {
-        let button = UIButton(type: .system)
-        button.prepareForAutoLayout()
-        button.backgroundColor = .secondarySystemBackground
-        button.layer.cornerRadius = 12
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.separator.cgColor
-        button.heightAnchor.constraint(equalToConstant: 52).isActive = true
-
-        let logoImageView = UIImageView(image: UIImage(named: "g-logo"))
-            .contentMode(.scaleAspectFit)
-            .square(32)
-
-        let label = UILabel()
-            .text("Continuar con Google")
-            .font(.systemFont(ofSize: 17, weight: .medium))
-            .textColor(.label)
-
-        logoImageView.addTo(button)
-            .pinLeading(constant: Spacing.standard)
-            .centerY()
-
-        label.addTo(button)
-            .centerX()
-            .centerY()
-
-        return button
     }
 
     private func setupActions() {

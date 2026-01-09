@@ -90,9 +90,21 @@ class HomeViewModel {
     }
 
     private func loadMatchesForJornadas(_ jornadas: [Jornada]) {
+        guard !jornadas.isEmpty else {
+            Logger.shared.warning("HomeViewModel: No jornadas to load matches for")
+            jornadaSections = []
+            return
+        }
+
+        Logger.shared.debug("HomeViewModel: Loading matches for \(jornadas.count) jornadas")
+        
         let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
+            Logger.shared.debug("HomeViewModel: Creating publisher for jornada: \(jornada.id)")
             return fetchMatchesUseCase.execute(for: jornada.id)
-                .map { matches in (jornada, matches) }
+                .map { matches in
+                    Logger.shared.debug("HomeViewModel: Received \(matches.count) matches for jornada \(jornada.id)")
+                    return (jornada, matches)
+                }
                 .eraseToAnyPublisher()
         }
 
@@ -101,22 +113,29 @@ class HomeViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to load matches for jornadas", error: error)
+                    Logger.shared.error("HomeViewModel: Failed to load matches for jornadas", error: error)
                     self?.error = error
+                } else {
+                    Logger.shared.debug("HomeViewModel: Successfully loaded all matches")
                 }
             } receiveValue: { [weak self] results in
+                Logger.shared.info("HomeViewModel: Processing \(results.count) jornada results")
                 self?.processJornadasWithMatches(results)
             }
             .store(in: &cancellables)
     }
 
     private func processJornadasWithMatches(_ results: [(Jornada, [Match])]) {
+        Logger.shared.debug("HomeViewModel: Processing \(results.count) jornada results")
         var tempSections: [JornadaSection] = []
 
         for (jornada, matches) in results {
+            Logger.shared.debug("HomeViewModel: Processing jornada \(jornada.id) with \(matches.count) matches")
+            
             // Convertir Match a MatchUI usando el mapper
             // Primero convertir sin favoriteIds, luego actualizar en updateMatchesFavoriteStatus
             let matchUIs = MatchUIMapper.toUI(from: matches)
+            Logger.shared.debug("HomeViewModel: Converted \(matchUIs.count) matches to MatchUI for jornada \(jornada.id)")
 
             let section = JornadaSection(
                 jornadaId: jornada.id,
@@ -129,6 +148,7 @@ class HomeViewModel {
 
         // Ordenar secciones por número de jornada descendente
         jornadaSections = tempSections.sorted { $0.numero > $1.numero }
+        Logger.shared.info("HomeViewModel: Created \(jornadaSections.count) sections with total \(jornadaSections.reduce(0) { $0 + $1.matches.count }) matches")
         
         // Actualizar el estado de favoritos después de crear las secciones
         updateMatchesFavoriteStatus()
