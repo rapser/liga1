@@ -45,8 +45,10 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private func determinePosition(for row: Int) -> TablePosition {
-        let totalRows = viewModel.displayedTeams.count
+        // let totalRows = viewModel.displayedTeams.count
         
+        // MARK: - Segmented Control Logic (Comentado temporalmente - solo mostramos Apertura)
+        /*
         switch segmentedControl.selectedSegmentIndex {
         case 2: // Acumulado
             switch row {
@@ -67,6 +69,10 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
         default: // Apertura o Clausura (torneos regulares)
             return row == 0 ? .campeon : .normal
         }
+        */
+        
+        // Solo mostramos Apertura, así que siempre usamos la lógica de torneos regulares
+        return row == 0 ? .campeon : .normal
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
