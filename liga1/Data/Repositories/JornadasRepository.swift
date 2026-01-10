@@ -77,8 +77,8 @@ class JornadasRepository: JornadasRepositoryProtocol {
                         } catch {
                             Logger.shared.error("JornadasRepository: Failed to decode JornadaDTO for document \(doc.documentID)", error: error)
                             // Intentar crear jornada manualmente desde el documentID si la decodificación falla
-                            if let data = doc.data() as? [String: Any],
-                               let mostrar = data[FirestoreConstants.JornadaField.mostrar] as? Bool,
+                            let data = doc.data()
+                            if let mostrar = data[FirestoreConstants.JornadaField.mostrar] as? Bool,
                                mostrar {
                                 // Intentar extraer torneo y numero del documentID
                                 if let jornada = JornadaMapper.toDomain(from: JornadaDTO(
