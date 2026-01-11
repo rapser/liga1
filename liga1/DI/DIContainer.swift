@@ -150,7 +150,6 @@ final class DIContainer {
             fetchActiveJornadasUseCase: makeFetchActiveJornadasUseCase(),
             observeActiveJornadasUseCase: makeObserveActiveJornadasUseCase(),
             fetchMatchesUseCase: makeFetchMatchesUseCase(),
-            observeMatchesUseCase: makeObserveMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
             observeFavoritesUseCase: makeObserveFavoritesUseCase()
         )
