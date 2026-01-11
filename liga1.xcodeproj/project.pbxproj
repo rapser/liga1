@@ -111,6 +111,7 @@
 		46D995AC2C6E925600D4951C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AB2C6E925600D4951C /* FirebaseMessaging */; };
 		46D995AE2C6E925600D4951C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AD2C6E925600D4951C /* FirebaseStorage */; };
 		46EC8E1A2F1325EC006A838D /* AperturaFixtureData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */; };
+		46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -209,6 +210,7 @@
 		46D9959E2C6E90EE00D4951C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		46D995A02C6E90EE00D4951C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AperturaFixtureData.swift; sourceTree = "<group>"; };
+		46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveActiveJornadasUseCase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -451,6 +453,7 @@
 		464009C82F098D8D00A8C905 /* Jornadas */ = {
 			isa = PBXGroup;
 			children = (
+				46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */,
 				464009C72F098D8D00A8C905 /* FetchActiveJornadasUseCase.swift */,
 			);
 			path = Jornadas;
@@ -910,6 +913,7 @@
 				464009D42F098D8D00A8C905 /* FetchNewsUseCase.swift in Sources */,
 				464009D52F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift in Sources */,
 				464009D62F098D8D00A8C905 /* RegisterMatchesUseCase.swift in Sources */,
+				46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */,
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
 				46CDF4B72F10882800F280E6 /* MatchUIMapper.swift in Sources */,

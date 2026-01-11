@@ -65,6 +65,12 @@ final class DIContainer {
         )
     }
 
+    func makeObserveActiveJornadasUseCase() -> ObserveActiveJornadasUseCaseProtocol {
+        return ObserveActiveJornadasUseCase(
+            repository: makeJornadasRepository()
+        )
+    }
+
     // MARK: - Use Cases - Matches
 
     func makeFetchMatchesUseCase() -> FetchMatchesUseCaseProtocol {
@@ -136,6 +142,7 @@ final class DIContainer {
     func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(
             fetchActiveJornadasUseCase: makeFetchActiveJornadasUseCase(),
+            observeActiveJornadasUseCase: makeObserveActiveJornadasUseCase(),
             fetchMatchesUseCase: makeFetchMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
             observeFavoritesUseCase: makeObserveFavoritesUseCase()

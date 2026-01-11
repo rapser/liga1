@@ -20,6 +20,7 @@ class HomeViewModel {
     // MARK: - Dependencies
 
     private let fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol
+    private let observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol
     private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
     private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
     private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
@@ -32,15 +33,18 @@ class HomeViewModel {
 
     init(
         fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol,
+        observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol,
         fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
         toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
         observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
     ) {
         self.fetchActiveJornadasUseCase = fetchActiveJornadasUseCase
+        self.observeActiveJornadasUseCase = observeActiveJornadasUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
         self.observeFavoritesUseCase = observeFavoritesUseCase
 
+        observeActiveJornadas()
         observeFavorites()
     }
 
@@ -78,6 +82,15 @@ class HomeViewModel {
     }
 
     // MARK: - Private Methods
+
+    private func observeActiveJornadas() {
+        observeActiveJornadasUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] jornadas in
+                self?.loadMatchesForJornadas(jornadas)
+            }
+            .store(in: &cancellables)
+    }
 
     private func observeFavorites() {
         observeFavoritesUseCase.execute()

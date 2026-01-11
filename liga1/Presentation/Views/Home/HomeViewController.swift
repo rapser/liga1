@@ -36,7 +36,7 @@ class HomeViewController: UIViewController {
         setupUI()
         setupAdapter()
         bindViewModel()
-        viewModel.fetchActiveJornadas()
+        // No es necesario llamar fetchActiveJornadas() porque el observer se activa automáticamente en init del ViewModel
     }
 
     // MARK: - Setup
