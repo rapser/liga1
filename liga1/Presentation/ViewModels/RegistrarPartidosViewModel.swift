@@ -29,97 +29,53 @@ class RegistrarPartidosViewModel {
 
     // MARK: - Public Methods
 
-    /// Registra un solo partido
-    func registerMatch(match: Match, jornadaId: String) {
+    /// Registra una jornada individual
+    func registerJornada(numero: Int) {
         isLoading = true
         error = nil
         successMessage = nil
-
-        registerMatchesUseCase.registerMatch(match: match, jornadaId: jornadaId)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to register match", error: error)
-                    self?.error = error
-                }
-            } receiveValue: { [weak self] _ in
-                self?.successMessage = "Partido registrado exitosamente"
-            }
-            .store(in: &cancellables)
-    }
-
-    /// Registra múltiples partidos
-    func registerMultipleMatches(matches: [Match], jornadaId: String) {
-        guard !matches.isEmpty else {
-            Logger.shared.warning("Attempted to register empty matches array")
-            return
-        }
-
-        isLoading = true
-        error = nil
-        successMessage = nil
-
-        registerMatchesUseCase.registerMultipleMatches(matches: matches, jornadaId: jornadaId)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to register multiple matches", error: error)
-                    self?.error = error
-                }
-            } receiveValue: { [weak self] _ in
-                self?.successMessage = "\(matches.count) partidos registrados exitosamente"
-            }
-            .store(in: &cancellables)
-    }
-
-    /// Actualiza un partido en vivo
-    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) {
-        isLoading = true
-        error = nil
-        successMessage = nil
-
-        registerMatchesUseCase.updateLiveMatch(
-            matchId: matchId,
+        
+        let jornadaId = String(format: "apertura_%02d", numero)
+        let fechaBase = AperturaFixtureData.fechaBase
+        let matches = AperturaFixtureData.crearMatchesParaJornada(numero, fecha: fechaBase)
+        
+        registerMatchesUseCase.registerJornadaWithMatches(
             jornadaId: jornadaId,
-            localScore: localScore,
-            visitorScore: visitorScore
+            mostrar: false,
+            fechaInicio: fechaBase,
+            matches: matches
         )
         .receive(on: DispatchQueue.main)
         .sink { [weak self] completion in
             self?.isLoading = false
             if case .failure(let error) = completion {
-                Logger.shared.error("Failed to update live match", error: error)
+                Logger.shared.error("Failed to register jornada \(jornadaId)", error: error)
                 self?.error = error
             }
         } receiveValue: { [weak self] _ in
-            self?.successMessage = "Partido actualizado exitosamente"
+            self?.successMessage = "Jornada \(numero) registrada exitosamente con \(matches.count) partidos"
         }
         .store(in: &cancellables)
     }
 
-    /// Finaliza un partido
-    func finalizeMatch(matchId: String, jornadaId: String) {
+    /// Registra todas las jornadas del Torneo Apertura
+    func registerAllAperturaJornadas() {
         isLoading = true
         error = nil
         successMessage = nil
-
-        registerMatchesUseCase.finalizeMatch(
-            matchId: matchId,
-            jornadaId: jornadaId
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] completion in
-            self?.isLoading = false
-            if case .failure(let error) = completion {
-                Logger.shared.error("Failed to finalize match", error: error)
-                self?.error = error
+        
+        registerMatchesUseCase.registerAllAperturaJornadas()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                self?.isLoading = false
+                if case .failure(let error) = completion {
+                    Logger.shared.error("Failed to register all Apertura jornadas", error: error)
+                    self?.error = error
+                }
+            } receiveValue: { [weak self] _ in
+                self?.successMessage = "Todas las 17 jornadas del Torneo Apertura registradas exitosamente"
             }
-        } receiveValue: { [weak self] _ in
-            self?.successMessage = "Partido finalizado exitosamente"
-        }
-        .store(in: &cancellables)
+            .store(in: &cancellables)
     }
 
     /// Resetea el mensaje de éxito

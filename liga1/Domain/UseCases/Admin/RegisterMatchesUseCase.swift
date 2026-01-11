@@ -9,10 +9,11 @@ import Foundation
 import Combine
 
 protocol RegisterMatchesUseCaseProtocol {
-    func registerMatch(match: Match, jornadaId: String) -> AnyPublisher<Void, Error>
-    func registerMultipleMatches(matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error>
-    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error>
-    func finalizeMatch(matchId: String, jornadaId: String) -> AnyPublisher<Void, Error>
+    /// Registra una jornada individual con sus partidos
+    func registerJornadaWithMatches(jornadaId: String, mostrar: Bool, fechaInicio: Date, matches: [Match]) -> AnyPublisher<Void, Error>
+    
+    /// Registra todas las 17 jornadas del torneo Apertura
+    func registerAllAperturaJornadas() -> AnyPublisher<Void, Error>
 }
 
 final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
@@ -23,137 +24,58 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
         self.adminMatchRepository = adminMatchRepository
     }
 
-    func registerMatch(match: Match, jornadaId: String) -> AnyPublisher<Void, Error> {
-        // Validaciones de negocio
-        if let validationError = validateMatch(match, jornadaId: jornadaId) {
-            Logger.shared.error("RegisterMatchesUseCase: Validation failed for single match", error: validationError)
-            return Fail(error: validationError).eraseToAnyPublisher()
-        }
-
-        return adminMatchRepository.registerMatch(match: match, jornadaId: jornadaId)
-            .handleEvents(
-                receiveCompletion: { completion in
-                    if case .failure(let error) = completion {
-                        Logger.shared.error("RegisterMatchesUseCase: Failed to register match", error: error)
-                    }
-                }
-            )
-            .eraseToAnyPublisher()
-    }
-
-    func registerMultipleMatches(matches: [Match], jornadaId: String) -> AnyPublisher<Void, Error> {
-        // Validaciones de negocio
+    func registerJornadaWithMatches(jornadaId: String, mostrar: Bool, fechaInicio: Date, matches: [Match]) -> AnyPublisher<Void, Error> {
         guard !matches.isEmpty else {
             let error = NSError(
                 domain: "RegisterMatchesUseCase",
-                code: -1,
+                code: -14,
                 userInfo: [NSLocalizedDescriptionKey: "La lista de partidos no puede estar vacía"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: Empty matches array", error: nil)
+            Logger.shared.error("RegisterMatchesUseCase: Empty matches array for jornada", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
-
+        
         // Validar cada partido
         for (index, match) in matches.enumerated() {
             if let validationError = validateMatch(match, jornadaId: jornadaId) {
-                Logger.shared.error("RegisterMatchesUseCase: Validation failed for match at index \(index)", error: validationError)
+                Logger.shared.error("RegisterMatchesUseCase: Validation failed for match at index \(index) in jornada \(jornadaId)", error: validationError)
                 return Fail(error: validationError).eraseToAnyPublisher()
             }
         }
+        
+        return adminMatchRepository.registerJornadaWithMatches(
+            jornadaId: jornadaId,
+            mostrar: mostrar,
+            fechaInicio: fechaInicio,
+            matches: matches
+        )
+        .handleEvents(
+            receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    Logger.shared.error("RegisterMatchesUseCase: Failed to register jornada \(jornadaId)", error: error)
+                } else {
+                    Logger.shared.info("RegisterMatchesUseCase: Successfully registered jornada \(jornadaId) with \(matches.count) matches")
+                }
+            }
+        )
+        .eraseToAnyPublisher()
+    }
 
-        return adminMatchRepository.registerMultipleMatches(matches: matches, jornadaId: jornadaId)
+    func registerAllAperturaJornadas() -> AnyPublisher<Void, Error> {
+        Logger.shared.info("RegisterMatchesUseCase: Starting registration of all 17 Apertura jornadas")
+        
+        return adminMatchRepository.registerAllAperturaJornadas()
             .handleEvents(
                 receiveCompletion: { completion in
-                    if case .failure(let error) = completion {
-                        Logger.shared.error("RegisterMatchesUseCase: Failed to register \(matches.count) matches", error: error)
+                    switch completion {
+                    case .failure(let error):
+                        Logger.shared.error("RegisterMatchesUseCase: Failed to register all Apertura jornadas", error: error)
+                    case .finished:
+                        Logger.shared.info("RegisterMatchesUseCase: Successfully registered all 17 Apertura jornadas")
                     }
                 }
             )
             .eraseToAnyPublisher()
-    }
-
-    func updateLiveMatch(matchId: String, jornadaId: String, localScore: Int, visitorScore: Int) -> AnyPublisher<Void, Error> {
-        // Validaciones de negocio
-        guard !matchId.isEmpty else {
-            let error = NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -2,
-                userInfo: [NSLocalizedDescriptionKey: "El ID del partido no puede estar vacío"]
-            )
-            Logger.shared.error("RegisterMatchesUseCase: matchId is empty", error: nil)
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        guard !jornadaId.isEmpty else {
-            let error = NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -4,
-                userInfo: [NSLocalizedDescriptionKey: "El ID de la jornada no puede estar vacío"]
-            )
-            Logger.shared.error("RegisterMatchesUseCase: jornadaId is empty", error: nil)
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        guard localScore >= 0 && visitorScore >= 0 else {
-            let error = NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -5,
-                userInfo: [NSLocalizedDescriptionKey: "Los puntajes no pueden ser negativos"]
-            )
-            Logger.shared.error("RegisterMatchesUseCase: Invalid scores - local: \(localScore), visitor: \(visitorScore)", error: nil)
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        return adminMatchRepository.updateLiveMatch(
-            matchId: matchId,
-            jornadaId: jornadaId,
-            localScore: localScore,
-            visitorScore: visitorScore
-        )
-        .handleEvents(
-            receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    Logger.shared.error("RegisterMatchesUseCase: Failed to update live match", error: error)
-                }
-            }
-        )
-        .eraseToAnyPublisher()
-    }
-
-    func finalizeMatch(matchId: String, jornadaId: String) -> AnyPublisher<Void, Error> {
-        // Validaciones de negocio
-        guard !matchId.isEmpty else {
-            let error = NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -6,
-                userInfo: [NSLocalizedDescriptionKey: "El ID del partido no puede estar vacío"]
-            )
-            Logger.shared.error("RegisterMatchesUseCase: matchId is empty for finalization", error: nil)
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        guard !jornadaId.isEmpty else {
-            let error = NSError(
-                domain: "RegisterMatchesUseCase",
-                code: -8,
-                userInfo: [NSLocalizedDescriptionKey: "El ID de la jornada no puede estar vacío"]
-            )
-            Logger.shared.error("RegisterMatchesUseCase: jornadaId is empty for finalization", error: nil)
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        return adminMatchRepository.finalizeMatch(
-            matchId: matchId,
-            jornadaId: jornadaId
-        )
-        .handleEvents(
-            receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    Logger.shared.error("RegisterMatchesUseCase: Failed to finalize match", error: error)
-                }
-            }
-        )
-        .eraseToAnyPublisher()
     }
 
     // MARK: - Private Helpers

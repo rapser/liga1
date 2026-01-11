@@ -110,6 +110,7 @@
 		46D995AA2C6E925600D4951C /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995A92C6E925600D4951C /* FirebaseFirestore */; };
 		46D995AC2C6E925600D4951C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AB2C6E925600D4951C /* FirebaseMessaging */; };
 		46D995AE2C6E925600D4951C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AD2C6E925600D4951C /* FirebaseStorage */; };
+		46EC8E1A2F1325EC006A838D /* AperturaFixtureData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -207,6 +208,7 @@
 		46D9959B2C6E90EE00D4951C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		46D9959E2C6E90EE00D4951C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		46D995A02C6E90EE00D4951C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AperturaFixtureData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +293,7 @@
 		464001862F08853F00A8C905 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				46EC8E192F1325EC006A838D /* Helpers */,
 				46CDF4A02F1068A300F280E6 /* Mappers */,
 				46CDF4812F1061FC00F280E6 /* DTOs */,
 				464001822F08853F00A8C905 /* Repositories */,
@@ -787,6 +790,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		46EC8E192F1325EC006A838D /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -885,6 +896,7 @@
 				464001BA2F08853F00A8C905 /* FavoritosViewModel.swift in Sources */,
 				464009BB2F098D4F00A8C905 /* Logger.swift in Sources */,
 				464009BC2F098D4F00A8C905 /* FirestoreConstants.swift in Sources */,
+				46EC8E1A2F1325EC006A838D /* AperturaFixtureData.swift in Sources */,
 				464009BD2F098D4F00A8C905 /* FirestoreManager.swift in Sources */,
 				464009CF2F098D8D00A8C905 /* LogoutUseCase.swift in Sources */,
 				464009D02F098D8D00A8C905 /* LoginUseCase.swift in Sources */,
