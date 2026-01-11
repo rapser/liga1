@@ -79,6 +79,12 @@ final class DIContainer {
         )
     }
 
+    func makeObserveMatchesUseCase() -> ObserveMatchesUseCaseProtocol {
+        return ObserveMatchesUseCase(
+            repository: makeMatchesRepository()
+        )
+    }
+
     // MARK: - Use Cases - Teams
 
     func makeFetchTeamsUseCase() -> FetchTeamsUseCaseProtocol {
@@ -144,6 +150,7 @@ final class DIContainer {
             fetchActiveJornadasUseCase: makeFetchActiveJornadasUseCase(),
             observeActiveJornadasUseCase: makeObserveActiveJornadasUseCase(),
             fetchMatchesUseCase: makeFetchMatchesUseCase(),
+            observeMatchesUseCase: makeObserveMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
             observeFavoritesUseCase: makeObserveFavoritesUseCase()
         )

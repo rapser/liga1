@@ -42,12 +42,12 @@ class MatchTableViewCell: UITableViewCell {
 
     private lazy var marcadorLocalLabel = UILabel()
         .prepareForAutoLayout()
-        .font(.systemFont(ofSize: 16, weight: .bold))
+        .font(.systemFont(ofSize: 16))
         .alignment(.center)
 
     private lazy var marcadorVisitanteLabel = UILabel()
         .prepareForAutoLayout()
-        .font(.systemFont(ofSize: 16, weight: .bold))
+        .font(.systemFont(ofSize: 16))
         .alignment(.center)
     
     // MARK: - Init

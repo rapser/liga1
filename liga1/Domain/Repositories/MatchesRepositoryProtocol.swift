@@ -12,6 +12,7 @@ import Combine
 protocol FetchMatchesRepositoryProtocol {
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error>
     func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error>
+    func observeMatches(for jornadaId: String) -> AnyPublisher<[Match], Never>
 }
 
 /// Alias para compatibilidad con código existente

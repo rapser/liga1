@@ -22,12 +22,16 @@ class HomeViewModel {
     private let fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol
     private let observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol
     private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
+    private let observeMatchesUseCase: ObserveMatchesUseCaseProtocol
     private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
     private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
 
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
+    private var matchCancellables: [String: AnyCancellable] = [:]
+    private var activeJornadas: [Jornada] = []
+    private var jornadaMatches: [String: [Match]] = [:]
 
     // MARK: - Initialization
 
@@ -35,12 +39,14 @@ class HomeViewModel {
         fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol,
         observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol,
         fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
+        observeMatchesUseCase: ObserveMatchesUseCaseProtocol,
         toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
         observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
     ) {
         self.fetchActiveJornadasUseCase = fetchActiveJornadasUseCase
         self.observeActiveJornadasUseCase = observeActiveJornadasUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase
+        self.observeMatchesUseCase = observeMatchesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
         self.observeFavoritesUseCase = observeFavoritesUseCase
 
@@ -106,36 +112,73 @@ class HomeViewModel {
         guard !jornadas.isEmpty else {
             Logger.shared.warning("HomeViewModel: No jornadas to load matches for")
             jornadaSections = []
+            // Cancelar todos los listeners de matches cuando no hay jornadas
+            matchCancellables.values.forEach { $0.cancel() }
+            matchCancellables.removeAll()
+            activeJornadas = []
+            jornadaMatches.removeAll()
             return
         }
 
-        Logger.shared.debug("HomeViewModel: Loading matches for \(jornadas.count) jornadas")
+        Logger.shared.debug("HomeViewModel: Observing matches for \(jornadas.count) jornadas")
         
-        let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
-            Logger.shared.debug("HomeViewModel: Creating publisher for jornada: \(jornada.id)")
-            return fetchMatchesUseCase.execute(for: jornada.id)
-                .map { matches in
-                    Logger.shared.debug("HomeViewModel: Received \(matches.count) matches for jornada \(jornada.id)")
-                    return (jornada, matches)
-                }
-                .eraseToAnyPublisher()
+        // Guardar jornadas activas
+        activeJornadas = jornadas
+        
+        // Obtener IDs de jornadas activas
+        let activeJornadaIds = Set(jornadas.map { $0.id })
+        
+        // Cancelar listeners de jornadas que ya no están activas
+        let jornadaIdsToRemove = matchCancellables.keys.filter { !activeJornadaIds.contains($0) }
+        for jornadaId in jornadaIdsToRemove {
+            Logger.shared.debug("HomeViewModel: Canceling observer for jornada: \(jornadaId)")
+            matchCancellables[jornadaId]?.cancel()
+            matchCancellables.removeValue(forKey: jornadaId)
+            jornadaMatches.removeValue(forKey: jornadaId)
         }
-
-        Publishers.MergeMany(publishers)
-            .collect()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    Logger.shared.error("HomeViewModel: Failed to load matches for jornadas", error: error)
-                    self?.error = error
-                } else {
-                    Logger.shared.debug("HomeViewModel: Successfully loaded all matches")
-                }
-            } receiveValue: { [weak self] results in
-                Logger.shared.info("HomeViewModel: Processing \(results.count) jornada results")
-                self?.processJornadasWithMatches(results)
+        
+        // Observar matches para cada jornada activa
+        for jornada in jornadas {
+            // Si ya existe un cancellable para esta jornada, saltarla (ya está observando)
+            if matchCancellables[jornada.id] != nil {
+                Logger.shared.debug("HomeViewModel: Already observing jornada: \(jornada.id)")
+                continue
             }
-            .store(in: &cancellables)
+            
+            Logger.shared.debug("HomeViewModel: Starting to observe matches for jornada: \(jornada.id)")
+            
+            let cancellable = observeMatchesUseCase.execute(for: jornada.id)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] matches in
+                    guard let self = self else { return }
+                    Logger.shared.debug("HomeViewModel: Received \(matches.count) matches for jornada \(jornada.id)")
+                    self.jornadaMatches[jornada.id] = matches
+                    self.updateJornadaSections()
+                }
+            
+            matchCancellables[jornada.id] = cancellable
+        }
+        
+        // Procesar inmediatamente si ya tenemos datos para todas las jornadas
+        updateJornadaSections()
+    }
+    
+    private func updateJornadaSections() {
+        // Procesar solo si tenemos datos para todas las jornadas activas
+        guard !activeJornadas.isEmpty else { return }
+        
+        let hasAllData = activeJornadas.allSatisfy { jornadaMatches[$0.id] != nil }
+        guard hasAllData else {
+            Logger.shared.debug("HomeViewModel: Waiting for all jornadas data")
+            return
+        }
+        
+        let results = activeJornadas.compactMap { jornada -> (Jornada, [Match])? in
+            guard let matches = jornadaMatches[jornada.id] else { return nil }
+            return (jornada, matches)
+        }
+        
+        processJornadasWithMatches(results)
     }
 
     private func processJornadasWithMatches(_ results: [(Jornada, [Match])]) {

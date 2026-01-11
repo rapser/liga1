@@ -112,6 +112,7 @@
 		46D995AE2C6E925600D4951C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AD2C6E925600D4951C /* FirebaseStorage */; };
 		46EC8E1A2F1325EC006A838D /* AperturaFixtureData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */; };
 		46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */; };
+		46EC8E1E2F133DA0006A838D /* ObserveMatchesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -211,6 +212,7 @@
 		46D995A02C6E90EE00D4951C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AperturaFixtureData.swift; sourceTree = "<group>"; };
 		46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveActiveJornadasUseCase.swift; sourceTree = "<group>"; };
+		46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveMatchesUseCase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -462,6 +464,7 @@
 		464009CA2F098D8D00A8C905 /* Matches */ = {
 			isa = PBXGroup;
 			children = (
+				46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */,
 				464009C92F098D8D00A8C905 /* FetchMatchesUseCase.swift */,
 			);
 			path = Matches;
@@ -900,6 +903,7 @@
 				464009BB2F098D4F00A8C905 /* Logger.swift in Sources */,
 				464009BC2F098D4F00A8C905 /* FirestoreConstants.swift in Sources */,
 				46EC8E1A2F1325EC006A838D /* AperturaFixtureData.swift in Sources */,
+				46EC8E1E2F133DA0006A838D /* ObserveMatchesUseCase.swift in Sources */,
 				464009BD2F098D4F00A8C905 /* FirestoreManager.swift in Sources */,
 				464009CF2F098D8D00A8C905 /* LogoutUseCase.swift in Sources */,
 				464009D02F098D8D00A8C905 /* LoginUseCase.swift in Sources */,
