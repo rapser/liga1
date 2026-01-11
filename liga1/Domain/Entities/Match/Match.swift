@@ -56,7 +56,7 @@ struct Match {
     // Enum para estado del partido
     enum EstadoMatch: String, Codable {
         case pendiente
-        case enJuego
+        case envivo
         case finalizado
         case anulado
         case suspendido

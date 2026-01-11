@@ -142,7 +142,7 @@ class MatchTableViewCell: UITableViewCell {
             marcadorVisitanteLabel.text = "-"
             marcadorLocalLabel.textColor = .secondaryLabel
             marcadorVisitanteLabel.textColor = .secondaryLabel
-        case .enJuego, .finalizado:
+        case .envivo, .finalizado:
             marcadorLocalLabel.text = "\(matchUI.golesEquipoLocal)"
             marcadorVisitanteLabel.text = "\(matchUI.golesEquipoVisitante)"
             marcadorLocalLabel.textColor = .label

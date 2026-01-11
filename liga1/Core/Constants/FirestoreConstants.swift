@@ -44,7 +44,7 @@ public enum FirestoreConstants {
 
     public enum MatchState {
         public static let pending = "pendiente"
-        public static let playing = "enJuego"
+        public static let playing = "envivo"
         public static let finished = "finalizado"
         public static let cancelled = "anulado"
         public static let suspended = "suspendido"

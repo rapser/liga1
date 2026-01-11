@@ -70,8 +70,8 @@ struct MatchUI {
         switch estado {
         case .pendiente:
             return "Próximo"
-        case .enJuego:
-            return "En Juego"
+        case .envivo:
+            return "En Vivo"
         case .finalizado:
             return "Finalizado"
         case .anulado:
@@ -82,7 +82,7 @@ struct MatchUI {
     }
 
     var estaEnJuego: Bool {
-        return estado == .enJuego
+        return estado == .envivo
     }
 
     var haFinalizado: Bool {
