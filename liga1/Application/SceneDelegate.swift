@@ -10,8 +10,9 @@ import FirebaseAuth
 import GoogleSignIn
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    
+
     var window: UIWindow?
+    var appCoordinator: AppCoordinator?
     
     func scene(_ scene: UIScene,
                willConnectTo session: UISceneSession,
@@ -28,12 +29,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let savedStyle = UserDefaults.standard.integer(forKey: "userInterfaceStyle")
         window.overrideUserInterfaceStyle = UIUserInterfaceStyle(rawValue: savedStyle) ?? .unspecified
 
-        // Configurar singletons
-        AppRouter.shared.configure(window: window)
-        SessionManager.shared.configure(with: window)
+        // Crear DIContainer
+        let container = DIContainer.shared
 
-        // Mostrar pantalla inicial
-        AppRouter.shared.setInitialViewController()
+        // Configurar SessionManager
+        SessionManager.shared.configure(with: window, container: container)
+
+        // Iniciar AppCoordinator
+        let appCoordinator = container.makeAppCoordinator(window: window)
+        self.appCoordinator = appCoordinator
+        appCoordinator.start()
+
         window.makeKeyAndVisible()
     }
     
