@@ -5,317 +5,262 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
-## [2.0.0] - 2026-01-02
+## [1.0.0(3)] - 2026-01-03
 
-### 🏗️ REFACTORIZACIÓN MAYOR - Clean Architecture
+### 📱 Aplicación iOS - Liga 1 del Perú
 
-#### Arquitectura
-- **🎯 Migración a Clean Architecture**: Reorganización completa del proyecto en 4 capas principales
-  - **Presentation Layer**: Views, ViewModels, Components
-  - **Domain Layer**: Models, Use Cases
-  - **Data Layer**: Repositories, Services, Managers
-  - **Core Layer**: Extensions, Utils, Resources
+Aplicación iOS nativa desarrollada con Swift y UIKit para seguir la Liga 1 de Fútbol Profesional del Perú.
 
-- **📱 Nueva estructura de carpetas**:
-  ```
-  liga1/
-  ├── Presentation/     # Capa de presentación
-  │   ├── Views/        # ViewControllers
-  │   ├── ViewModels/   # Lógica de presentación
-  │   └── Components/   # Componentes UI reutilizables
-  ├── Domain/           # Capa de dominio
-  │   ├── Models/       # Entidades de negocio
-  │   └── UseCases/     # Casos de uso
-  ├── Data/             # Capa de datos
-  │   ├── Repositories/ # Acceso a datos
-  │   ├── Services/     # Servicios transversales
-  │   └── Managers/     # Gestión de persistencia
-  └── Core/             # Capa central
-      ├── Extensions/   # Extensions de UIKit
-      ├── Utils/        # Utilidades generales
-      └── Resources/    # Recursos compartidos
-  ```
+#### ✨ Características Principales
 
-#### ✨ Patrón MVVM + Combine
-
-- **ViewModels implementados**:
-  - ✅ `HomeViewModel` - Gestión de jornadas activas
-  - ✅ `NewsViewModel` - Gestión de noticias
-  - ✅ `TorneoViewModel` - Gestión de tabla de posiciones
-  - ✅ `FavoritosViewModel` - Gestión de favoritos
-  - ✅ `ProfileViewModel` - Gestión de perfil y configuración
-  - ✅ `LoginViewModel` - Gestión de autenticación
-
-- **Características de ViewModels**:
-  - `@Published` properties para reactive updates
-  - Dependency injection con protocolos
-  - Separación clara de lógica de presentación
-  - Sin referencias a UIKit
-  - Testing-friendly
-
-#### 📦 Repositories Pattern
-
-- **Nuevos Repositories**:
-  - `JornadasRepository` - Obtención de jornadas desde Firestore
-  - `MatchesRepository` - Obtención de partidos
-  - `TeamsRepository` - Obtención de equipos
-  - `NewsRepository` - Obtención de noticias
-  - `AdminMatchRepository` - Operaciones administrativas
-
-- **Características**:
-  - Retornan `AnyPublisher<T, Error>` usando Combine
-  - Implementan protocolos para facilitar testing
-  - Abstracción de la fuente de datos
-  - Cache-first strategy
-
-#### 🔧 Services Layer
-
-- **Nuevos Services**:
-  - `AuthService` - Servicio de autenticación con Firebase
-  - `FavoritesService` - Gestión de favoritos con Combine
-
-- **Características**:
-  - Protocolos para dependency injection
-  - Operaciones asíncronas con Combine
-  - Manejo centralizado de lógica transversal
-
-#### 🎨 UI Programático - 100% Código
-
-- **Refactorización de ViewControllers**:
-  - `HomeViewController` - Ahora usa HomeViewModel + Combine
-  - `NewsViewController` - Usa NewsViewModel
-  - `TorneoViewController` - Usa TorneoViewModel
-  - `FavoritosViewController` - Usa FavoritosViewModel
-  - `ProfileViewController` - Usa ProfileViewModel
-  - `LoginViewController` - Usa LoginViewModel
-
-- **Características**:
-  - Layout 100% programático (sin Storyboards)
-  - Extensions para TableView delegates en archivos separados
-  - Binding reactivo con Combine
-  - Manejo de errores centralizado
-
-#### 🔄 Reactive Programming
-
-- **Combine Framework**:
-  - Publishers para todas las operaciones asíncronas
-  - `@Published` properties en ViewModels
-  - `sink` y `store(in:)` para subscripciones
-  - `AnyCancellable` para gestión de memoria
-  - Operadores: `map`, `filter`, `compactMap`, `receive(on:)`
-
-#### 📐 Custom Extensions
-
-- **Layout Extensions**:
-  - `UIView+Layout.swift` - DSL para Auto Layout
-  - `UIStackView+Builder.swift` - Builder pattern
-  - `Color+Extension.swift` - Colores custom
-
-- **Layout Helpers**:
-  - `LayoutPresets.swift` - Componentes reutilizables
-  - `LayoutExamples.swift` - Ejemplos de uso
-
-### 📝 Documentación
-
-- **Nuevos archivos de documentación**:
-  - `ARCHITECTURE.md` - Documentación completa de arquitectura
-    - Diagramas de capas
-    - Flujo de datos
-    - Estructura del proyecto
-    - Mejores prácticas
-    - Convenciones de nombres
-    - Guía de migración
-
-- **README.md actualizado**:
-  - Nueva sección de arquitectura
-  - Diagramas de Clean Architecture
-  - Ejemplos de código con Combine
-  - Roadmap actualizado
-  - Guías de contribución
-
-### 🔧 Mejoras Técnicas
-
-- **Dependency Injection**: Inyección de dependencias en ViewModels
-- **Protocol-Oriented**: Abstracciones con protocolos
-- **Memory Management**: Uso correcto de `[weak self]`
-- **Error Handling**: Manejo centralizado de errores
-- **Loading States**: Estados de carga reactivos
-
-### 🎯 Beneficios de la Refactorización
-
-1. ✅ **Separación clara de responsabilidades**
-2. ✅ **Mayor testabilidad** (cada capa es independiente)
-3. ✅ **Código más mantenible** y escalable
-4. ✅ **Reutilización de código** mejorada
-5. ✅ **Flujo de datos reactivo** con Combine
-6. ✅ **Preparado para crecimiento** del equipo
-7. ✅ **Sigue principios SOLID**
-
-### 📊 Estadísticas de Migración
-
-- 📁 **40+ archivos** reorganizados
-- 🎯 **6 ViewModels** creados
-- 📦 **5 Repositories** implementados
-- 🔧 **2 Services** nuevos
-- 📐 **3 Extension files** para UI
-- 📝 **2 archivos** de documentación
-
-### ⚠️ Breaking Changes
-
-- **Estructura de carpetas completamente reorganizada**
-- **Migración de MVC a MVVM + Clean Architecture**
-- **Requiere actualización del proyecto en Xcode**:
-  1. Eliminar referencias antiguas (View/, ViewModel/, Cell/, etc.)
-  2. Agregar nuevas carpetas (Presentation/, Domain/, Data/, Core/)
-  3. Agregar nuevos archivos al target
-
-### 🔄 Migration Guide
-
-Ver `ARCHITECTURE.md` para la guía completa de migración:
-
-```
-Estructura Anterior → Nueva
-View/              → Presentation/Views/
-ViewModel/         → Presentation/ViewModels/
-Cell/              → Presentation/Components/Cells/
-Model/             → Domain/Models/
-Repository/        → Data/Repositories/
-Service/           → Data/Services/
-Manager/           → Data/Managers/
-Extensions/        → Core/Extensions/
-Util/              → Core/Utils/
-```
-
----
-
-## [1.0.0] - 2025-12-25
-
-### ✨ Características Principales
-
-#### 🏠 Home - Visualización de Partidos
+##### 🏠 Home - Visualización de Partidos por Jornada
+- Visualización de jornadas activas con sus partidos correspondientes
 - Sistema de jornadas con estructura anidada en Firestore (`jornadas/{jornadaId}/matches/{matchId}`)
-- Visualización de múltiples jornadas simultáneas con header personalizado
-- Cache-first loading: carga instantánea desde caché con actualización en background
-- Headers de sección mostrando "Fecha X" y torneo (Apertura/Clausura 2026)
+- Pull-to-refresh para actualizar datos manualmente
+- Headers de sección mostrando número de jornada y torneo
 - IDs de partidos compuestos que codifican equipos (`equipoLocal_equipoVisitante`)
-- Propiedades computadas para extraer IDs de equipos desde el documento ID
-- Estados de partido: pendiente, enJuego, finalizado, anulado, suspendido
+- Estados de partido: pendiente, envivo, finalizado, anulado, suspendido
 - Integración con sistema de favoritos en tiempo real
+- Actualización reactiva de jornadas activas mediante listeners de Firestore
 
-#### ⭐ Sistema de Favoritos
+##### ⭐ Sistema de Favoritos
 - Marcado de partidos favoritos con persistencia en Firestore
 - Sincronización en tiempo real con listeners de Firestore
 - ID completo de favoritos: `{jornadaId}_{matchId}` (ej: "apertura_01_adt_utc")
-- FavoritesManager compartido para gestión centralizada
-- Actualización automática de UI mediante listeners
+- Actualización automática de UI mediante Combine
 - Persistencia por usuario en colección `users/{userId}/favorites`
 
-#### 📊 Tabla de Posiciones
-- Vista de tabla con segmented control (Apertura/Clausura)
+##### 📊 Tabla de Posiciones
+- Vista de tabla con torneo Apertura (Clausura y Acumulado preparados para futuro)
 - Códigos de color por posición:
   - 🟢 Zona de clasificación directa
   - 🟡 Zona de playoffs
   - 🔴 Zona de descenso
-- Modo oscuro optimizado: colores solo en posiciones importantes
-- Estadísticas completas: PJ, GF, GC, Pts
-- Logos de equipos (20x20 pts)
-- Header personalizado con columnas: Equipo, PJ, GF-GC, Pts
+- Modo oscuro optimizado
+- Estadísticas completas: PJ, GF, GC, DG, Pts
+- Logos de equipos desde Assets
+- Ordenamiento inteligente: alfabético cuando todos tienen 0 puntos, luego por puntos y diferencia de goles
+- Header personalizado con columnas: Equipo, PJ, GF-GC, DG, Pts
 
-#### 📰 Sección de Noticias
+##### 📰 Sección de Noticias
 - Visualización de noticias con imágenes
 - Marcado de noticias destacadas
 - Integración con Firestore
 - Formato de fecha en español
+- Agrupación por categorías
 
-#### 🔐 Autenticación
+##### 🔐 Autenticación
 - Login con Google Sign-In (OAuth 2.0)
 - Login con Email/Password de Firebase
-- Pantalla de login moderna con:
-  - Logo de Liga 1
-  - Campos de email y contraseña
-  - Botón de Google Sign-In
-  - Loading overlay con activity indicator
-  - Manejo de errores con alerts
+- Pantalla de login moderna con logo de Liga 1
+- Loading overlay durante autenticación
+- Manejo de errores con alerts
 - Navegación automática al MainTabBar después del login
 - Persistencia de sesión con Firebase Auth
 
-#### 👤 Perfil de Usuario
+##### 👤 Perfil de Usuario
 - Visualización de información del usuario autenticado
-- Selector de tema (Claro/Oscuro/Automático)
 - Opción de cerrar sesión
 - Navegación de vuelta al login después de logout
 
-### 🏗 Arquitectura y Optimizaciones
+##### 🛠 Panel de Administración
+- Pantalla para registro masivo de jornadas y partidos
+- Registro de 17 jornadas del torneo Apertura
+- Generación automática de fixture completo
+- Validación de datos antes de registro
+- Feedback visual de éxito/error
 
-#### Estructura de Datos
-- **Modelo Match**:
-  - IDs de equipos como propiedades computadas (no almacenadas)
-  - Campo `suspendido` con valor por defecto para retrocompatibilidad
-  - Propiedades UI: `jornadaNumero`, `torneoNombre`, `isFavorite`
-  - Función `toDictionary()` para serialización a Firestore
+#### 🏗 Arquitectura
 
-- **Modelo Jornada**:
-  - Campo `mostrar` para controlar visibilidad en home
-  - Propiedades computadas: `torneo` y `numero` extraídas del ID
-  - Ordenamiento por `fechaInicio` descendente
+##### Clean Architecture + MVVM + Combine
 
-#### Rendimiento
-- **Cache-first Strategy**:
-  - Primera consulta desde `.cache` (instantánea)
-  - Segunda consulta desde `.server` (actualización en background)
-  - Aplicado a jornadas y partidos
-- **DispatchGroup**: Coordinación de cargas paralelas de múltiples jornadas
-- **Listeners eficientes**: Un solo listener de favoritos para toda la app
-- **Logging diagnóstico**: Mensajes de depuración para tracking de cargas
+La aplicación sigue **Clean Architecture** con separación en 4 capas:
 
-#### UI/UX
-- Soporte completo para Dark Mode
-- Navegación con UITabBarController (5 tabs)
-- Safe area handling optimizado
-- Constraints responsivos
-- Colores personalizados: `.liga1Red`
-- Separación de concerns: ViewControllers + Extensions para TableView
+1. **Presentation Layer**
+   - ViewControllers construidos programáticamente
+   - ViewModels con `@Published` properties para actualización reactiva
+   - Componentes UI reutilizables (Cells, Headers)
+   - Modelos específicos de UI (MatchUI, TeamUI, NewsItemUI, JornadaUI)
+   - Mappers de Domain Entities a UI Models
 
-### 🔧 Mejoras Técnicas
+2. **Domain Layer**
+   - Entidades de negocio (Match, Jornada, Team, NewsItem)
+   - Use Cases (lógica de negocio pura)
+   - Protocolos de Repositories (contratos)
 
-#### Eliminación de Redundancia
-- Removidos campos `equipoLocalId` y `equipoVisitanteId` almacenados
-- Implementación de propiedades computadas basadas en document ID
-- Reducción de espacio en Firestore y sincronización más rápida
+3. **Data Layer**
+   - Implementaciones de Repositories
+   - DTOs (Data Transfer Objects) para Firestore
+   - Mappers de DTOs a Domain Entities
+   - Services (AuthService, FavoritesService)
 
-#### Compatibilidad con Datos Legacy
-- Campo `suspendido` con valor por defecto `false`
-- Manejo graceful de documentos sin campos nuevos
-- Logging para identificar documentos con problemas
+4. **Core Layer**
+   - FirestoreManager (abstracción de Firebase)
+   - Extensions de UIKit para layout programático
+   - Utilidades compartidas
+   - Constantes
+   - Logger centralizado
+   - Dependency Injection Container (DIContainer)
 
-#### Clean Code
-- Eliminación de archivos no utilizados (`MatchesViewController`)
-- Organización clara de extensiones
-- Comentarios descriptivos en código crítico
-- Uso de `@DocumentID` property wrapper de Firebase
+##### Patrón MVVM
 
-### 🐛 Correcciones de Bugs
+- **ViewModels**: Contienen `@Published` properties, ejecutan Use Cases, no conocen UIKit
+- **Views**: Se suscriben a ViewModels usando Combine, actualizan UI reactivamente
+- **Separación de responsabilidades**: View solo presenta, ViewModel coordina, Use Case ejecuta lógica
 
-- **Fix**: Error de decodificación por tipos incorrectos (goles como String vs Int)
-- **Fix**: Crash al intentar modificar array `let` en `JornadaSection`
-- **Fix**: Uso incorrecto de método `documentID()` deprecado
-- **Fix**: Optional unwrapping en carga de logos de equipos
-- **Fix**: Missing `suspendido` field en documentos legacy
+##### Dependency Injection
 
-### 📦 Dependencias
+- Contenedor centralizado (`DIContainer`) para creación de dependencias
+- Inyección de dependencias mediante protocolos
+- Facilita testing y reduce acoplamiento
 
-- Firebase/Firestore
-- Firebase/Auth
-- Firebase/Storage
-- GoogleSignIn
-- FirebaseFirestoreSwift (para @DocumentID)
+##### Reactive Programming
 
-### 🎨 Assets y Recursos
+- **Combine Framework** para todas las operaciones asíncronas
+- Publishers para flujo de datos
+- `@Published` properties en ViewModels
+- `sink` y `store(in:)` para subscripciones
+- Operadores: `map`, `filter`, `compactMap`, `receive(on:)`, `collect()`, `MergeMany`
 
-- Logos de 18 equipos de Liga 1
-- Logo de Google para sign-in (g-logo)
+#### 📦 Use Cases Implementados
+
+##### Jornadas
+- `FetchActiveJornadasUseCase` - Obtener jornadas activas
+- `ObserveActiveJornadasUseCase` - Observar cambios en jornadas activas
+
+##### Partidos (Matches)
+- `FetchMatchesUseCase` - Obtener partidos de una jornada
+- `ObserveMatchesUseCase` - Observar cambios en partidos (disponible para uso futuro)
+
+##### Equipos (Teams)
+- `FetchTeamsUseCase` - Obtener equipos de un torneo
+
+##### Noticias (News)
+- `FetchNewsUseCase` - Obtener noticias
+
+##### Favoritos
+- `ToggleFavoriteUseCase` - Marcar/desmarcar favorito
+- `ObserveFavoritesUseCase` - Observar cambios en favoritos
+- `FetchFavoriteMatchesUseCase` - Obtener partidos favoritos
+
+##### Autenticación
+- `LoginUseCase` - Iniciar sesión
+- `LogoutUseCase` - Cerrar sesión
+
+##### Administración
+- `RegisterMatchesUseCase` - Registro masivo de jornadas y partidos
+
+#### 📦 Repositories Implementados
+
+- `JornadasRepository` - Acceso a jornadas en Firestore
+- `MatchesRepository` - Acceso a partidos en Firestore
+- `TeamsRepository` - Acceso a equipos en Firestore
+- `NewsRepository` - Acceso a noticias en Firestore
+- `AdminMatchRepository` - Operaciones administrativas de partidos
+
+Todos los repositories:
+- Implementan protocolos definidos en Domain Layer
+- Retornan `AnyPublisher<T, Error>` usando Combine
+- Transforman DTOs a Domain Entities
+- Manejan errores de forma consistente
+
+#### 🔧 Services
+
+- `AuthService` - Autenticación con Firebase (Google Sign-In, Email/Password)
+- `FavoritesService` - Gestión de favoritos con sincronización en tiempo real
+
+#### 🎨 UI Programático
+
+- **100% código**: Sin Storyboards, todo construido programáticamente
+- **Auto Layout**: Constraints mediante código con extensions personalizadas
+- **Custom Extensions**:
+  - `UIView+Layout` - DSL para Auto Layout
+  - `UIStackView+Builder` - Builder pattern para stack views
+  - `Color+Extension` - Colores personalizados (`.liga1Red`)
+  - `UIViewController+Alert` - Helpers para mostrar alerts
+- **LayoutPresets**: Componentes reutilizables (botones, labels, etc.)
+- **Dark Mode**: Soporte completo para modo claro y oscuro
+
+#### 🔄 Gestión de Datos
+
+- **Firestore**: Base de datos NoSQL para almacenamiento
+- **Estructura de datos**:
+  - Jornadas como documentos con subcolecciones de matches
+  - IDs compuestos para identificar partidos (`equipoLocal_equipoVisitante`)
+  - Extracción de `torneo` y `numero` desde `documentID`
+- **Listeners reactivos**: Para jornadas activas y favoritos
+- **Pull-to-refresh**: Para actualización manual de partidos
+- **Cache de Firestore**: Datos disponibles offline
+
+#### 🛠 Utilidades y Helpers
+
+- `EquipoPeruano` - Enum con códigos y nombres de todos los equipos
+- `TorneoType` - Enum para tipos de torneo (Apertura, Clausura, Acumulado)
+- `TablePosition` - Cálculo de zonas de clasificación
+- `NewsCategory` - Categorías de noticias
+- `LayoutPresets` - Componentes UI reutilizables
+- `AperturaFixtureData` - Datos del fixture completo del torneo Apertura (17 jornadas)
+- `Logger` - Sistema de logging centralizado con niveles (debug, info, warning, error)
+- `FirestoreConstants` - Constantes para nombres de colecciones y campos
+
+#### 📱 Navegación
+
+- **UITabBarController**: Navegación principal con 5 pestañas
+  - Home (Partidos por Jornada)
+  - Favoritos
+  - Tabla de Posiciones
+  - Noticias
+  - Perfil
+- **Coordinator Pattern**: Gestión de navegación mediante coordinadores
+- **Session Management**: Gestión de sesión de usuario
+
+#### 🔐 Seguridad y Autenticación
+
+- Firebase Authentication
+- Google Sign-In SDK
+- Persistencia de sesión
+- Validación de usuarios autenticados
+- Protección de datos por usuario (favoritos)
+
+#### 📊 Estructura de Datos
+
+- **Jornadas**: Documentos con ID `{torneo}_{numero}` (ej: `apertura_01`)
+- **Matches**: Subcolecciones dentro de jornadas, ID `{equipoLocal}_{equipoVisitante}`
+- **Teams**: Documentos con códigos de 3 letras (ej: `ali` para Alianza Lima)
+- **News**: Documentos con información de noticias
+- **Users/Favorites**: Subcolección por usuario con IDs de partidos completos
+
+#### 🎯 Características Técnicas
+
+- **Swift 5.0+**
+- **iOS 18.0+**
+- **UIKit Programático**
+- **Combine Framework**
+- **Firebase/Firestore**
+- **Firebase/Auth**
+- **Firebase/Storage**
+- **GoogleSignIn SDK**
+- **Swift Package Manager (SPM)**
+- **Protocol-Oriented Programming**
+- **Dependency Injection**
+- **Clean Architecture**
+- **MVVM Pattern**
+- **Reactive Programming**
+
+#### 🎨 Assets y Recursos
+
+- Logos de 18 equipos de Liga 1 en Assets
+- Logo de Google para sign-in
 - Logo de Liga 1 para pantalla de login
-- Colores brand personalizados
+- Colores brand personalizados (liga1Red)
+- Soporte para Dark Mode en todos los assets
+
+#### 📝 Logging y Debugging
+
+- Sistema de logging centralizado (`Logger`)
+- Niveles de log: debug, info, warning, error
+- Logging en todas las capas (Repositories, Use Cases, ViewModels)
+- Mensajes descriptivos para debugging
 
 ---
 
