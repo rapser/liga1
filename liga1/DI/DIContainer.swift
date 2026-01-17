@@ -57,6 +57,14 @@ final class DIContainer {
         return FavoritesService(database: makeDatabase(), authProvider: authService)
     }
 
+    private lazy var notificationService: NotificationServiceProtocol = {
+        return NotificationService()
+    }()
+
+    func makeNotificationService() -> NotificationServiceProtocol {
+        return notificationService
+    }
+
     // MARK: - Use Cases - Jornadas
 
     func makeFetchActiveJornadasUseCase() -> FetchActiveJornadasUseCaseProtocol {

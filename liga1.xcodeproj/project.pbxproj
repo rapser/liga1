@@ -69,6 +69,7 @@
 		46400A002F098EB800A8C905 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009FE2F098EB800A8C905 /* DIContainer.swift */; };
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
+		46C874542F1B6C26008C3619 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874532F1B6C26008C3619 /* NotificationService.swift */; };
 		46CDF4712F1058A100F280E6 /* NewsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4702F1058A100F280E6 /* NewsCategory.swift */; };
 		46CDF4782F1061E600F280E6 /* Jornada.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4722F1061E600F280E6 /* Jornada.swift */; };
 		46CDF4822F1061FC00F280E6 /* JornadaDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4792F1061FC00F280E6 /* JornadaDTO.swift */; };
@@ -172,6 +173,7 @@
 		464009FE2F098EB800A8C905 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		46C874522F1B68B8008C3619 /* liga1.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = liga1.entitlements; sourceTree = "<group>"; };
+		46C874532F1B6C26008C3619 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		46CDF4702F1058A100F280E6 /* NewsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCategory.swift; sourceTree = "<group>"; };
 		46CDF4722F1061E600F280E6 /* Jornada.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jornada.swift; sourceTree = "<group>"; };
 		46CDF4792F1061FC00F280E6 /* JornadaDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaDTO.swift; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 		464009B82F098D4F00A8C905 /* Firebase */ = {
 			isa = PBXGroup;
 			children = (
+				46C874532F1B6C26008C3619 /* NotificationService.swift */,
 				46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */,
 				464009B72F098D4F00A8C905 /* FirestoreManager.swift */,
 			);
@@ -902,6 +905,7 @@
 				46CDF4BF2F10A09D00F280E6 /* DividerView.swift in Sources */,
 				464001B72F08853F00A8C905 /* UIView+Layout.swift in Sources */,
 				464001BA2F08853F00A8C905 /* FavoritosViewModel.swift in Sources */,
+				46C874542F1B6C26008C3619 /* NotificationService.swift in Sources */,
 				464009BB2F098D4F00A8C905 /* Logger.swift in Sources */,
 				464009BC2F098D4F00A8C905 /* FirestoreConstants.swift in Sources */,
 				46EC8E1A2F1325EC006A838D /* AperturaFixtureData.swift in Sources */,
