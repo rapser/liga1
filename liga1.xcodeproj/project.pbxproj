@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -74,6 +74,7 @@
 		46C874582F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874562F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift */; };
 		46C8745B2F1C055D008C3619 /* TeamTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874592F1C055D008C3619 /* TeamTableViewCell.swift */; };
 		46C8745D2F1C0576008C3619 /* TeamSearchModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C8745C2F1C0576008C3619 /* TeamSearchModalViewController.swift */; };
+		46C8746A2F1C2BC7008C3619 /* PushServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 46C874632F1C2BC6008C3619 /* PushServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		46CDF4712F1058A100F280E6 /* NewsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4702F1058A100F280E6 /* NewsCategory.swift */; };
 		46CDF4782F1061E600F280E6 /* Jornada.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4722F1061E600F280E6 /* Jornada.swift */; };
 		46CDF4822F1061FC00F280E6 /* JornadaDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4792F1061FC00F280E6 /* JornadaDTO.swift */; };
@@ -119,6 +120,30 @@
 		46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */; };
 		46EC8E1E2F133DA0006A838D /* ObserveMatchesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		46C874682F1C2BC7008C3619 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46D995872C6E90EC00D4951C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 46C874622F1C2BC6008C3619;
+			remoteInfo = PushServiceExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		46C8746F2F1C2BC7008C3619 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				46C8746A2F1C2BC7008C3619 /* PushServiceExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4635E3682EFDEF93004A541C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -182,6 +207,7 @@
 		46C874562F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleFavoriteTeamUseCase.swift; sourceTree = "<group>"; };
 		46C874592F1C055D008C3619 /* TeamTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamTableViewCell.swift; sourceTree = "<group>"; };
 		46C8745C2F1C0576008C3619 /* TeamSearchModalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamSearchModalViewController.swift; sourceTree = "<group>"; };
+		46C874632F1C2BC6008C3619 /* PushServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PushServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		46CDF4702F1058A100F280E6 /* NewsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCategory.swift; sourceTree = "<group>"; };
 		46CDF4722F1061E600F280E6 /* Jornada.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jornada.swift; sourceTree = "<group>"; };
 		46CDF4792F1061FC00F280E6 /* JornadaDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaDTO.swift; sourceTree = "<group>"; };
@@ -226,7 +252,28 @@
 		46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveMatchesUseCase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		46C8746B2F1C2BC7008C3619 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 46C874622F1C2BC6008C3619 /* PushServiceExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		46C874642F1C2BC6008C3619 /* PushServiceExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (46C8746B2F1C2BC7008C3619 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = PushServiceExtension; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		46C874602F1C2BC6008C3619 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		46D9958C2C6E90EC00D4951C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -764,6 +811,7 @@
 			isa = PBXGroup;
 			children = (
 				46D995912C6E90EC00D4951C /* liga1 */,
+				46C874642F1C2BC6008C3619 /* PushServiceExtension */,
 				46D995902C6E90EC00D4951C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -772,6 +820,7 @@
 			isa = PBXGroup;
 			children = (
 				46D9958F2C6E90EC00D4951C /* liga1.app */,
+				46C874632F1C2BC6008C3619 /* PushServiceExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -824,6 +873,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		46C874622F1C2BC6008C3619 /* PushServiceExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 46C8746C2F1C2BC7008C3619 /* Build configuration list for PBXNativeTarget "PushServiceExtension" */;
+			buildPhases = (
+				46C8745F2F1C2BC6008C3619 /* Sources */,
+				46C874602F1C2BC6008C3619 /* Frameworks */,
+				46C874612F1C2BC6008C3619 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				46C874642F1C2BC6008C3619 /* PushServiceExtension */,
+			);
+			name = PushServiceExtension;
+			packageProductDependencies = (
+			);
+			productName = PushServiceExtension;
+			productReference = 46C874632F1C2BC6008C3619 /* PushServiceExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		46D9958E2C6E90EC00D4951C /* liga1 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 46D995A32C6E90EE00D4951C /* Build configuration list for PBXNativeTarget "liga1" */;
@@ -831,10 +902,12 @@
 				46D9958B2C6E90EC00D4951C /* Sources */,
 				46D9958C2C6E90EC00D4951C /* Frameworks */,
 				46D9958D2C6E90EC00D4951C /* Resources */,
+				46C8746F2F1C2BC7008C3619 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				46C874692F1C2BC7008C3619 /* PBXTargetDependency */,
 			);
 			name = liga1;
 			packageProductDependencies = (
@@ -861,9 +934,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					46C874622F1C2BC6008C3619 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 					46D9958E2C6E90EC00D4951C = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -888,11 +964,19 @@
 			projectRoot = "";
 			targets = (
 				46D9958E2C6E90EC00D4951C /* liga1 */,
+				46C874622F1C2BC6008C3619 /* PushServiceExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		46C874612F1C2BC6008C3619 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		46D9958D2C6E90EC00D4951C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -906,6 +990,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		46C8745F2F1C2BC6008C3619 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		46D9958B2C6E90EC00D4951C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1012,6 +1103,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		46C874692F1C2BC7008C3619 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 46C874622F1C2BC6008C3619 /* PushServiceExtension */;
+			targetProxy = 46C874682F1C2BC7008C3619 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		46D9959D2C6E90EE00D4951C /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -1024,6 +1123,60 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		46C8746D2F1C2BC7008C3619 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = 8AJBS923B3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PushServiceExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PushServiceExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rapser.liga1.PushServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		46C8746E2F1C2BC7008C3619 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = 8AJBS923B3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PushServiceExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PushServiceExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rapser.liga1.PushServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		46D995A12C6E90EE00D4951C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1214,6 +1367,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		46C8746C2F1C2BC7008C3619 /* Build configuration list for PBXNativeTarget "PushServiceExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				46C8746D2F1C2BC7008C3619 /* Debug */,
+				46C8746E2F1C2BC7008C3619 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		46D9958A2C6E90EC00D4951C /* Build configuration list for PBXProject "liga1" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
