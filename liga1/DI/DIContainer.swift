@@ -129,6 +129,18 @@ final class DIContainer {
         )
     }
 
+    func makeToggleFavoriteTeamUseCase() -> ToggleFavoriteTeamUseCaseProtocol {
+        return ToggleFavoriteTeamUseCase(
+            service: makeFavoritesService()
+        )
+    }
+
+    func makeObserveFavoriteTeamsUseCase() -> ObserveFavoriteTeamsUseCaseProtocol {
+        return ObserveFavoriteTeamsUseCase(
+            service: makeFavoritesService()
+        )
+    }
+
     // MARK: - Use Cases - Auth
 
     func makeLoginUseCase() -> LoginUseCaseProtocol {
@@ -179,7 +191,10 @@ final class DIContainer {
         return FavoritosViewModel(
             fetchFavoriteMatchesUseCase: makeFetchFavoriteMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
-            observeFavoritesUseCase: makeObserveFavoritesUseCase()
+            observeFavoritesUseCase: makeObserveFavoritesUseCase(),
+            fetchTeamsUseCase: makeFetchTeamsUseCase(),
+            toggleFavoriteTeamUseCase: makeToggleFavoriteTeamUseCase(),
+            observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase()
         )
     }
 

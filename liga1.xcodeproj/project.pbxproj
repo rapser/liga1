@@ -70,6 +70,10 @@
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
 		46C874542F1B6C26008C3619 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874532F1B6C26008C3619 /* NotificationService.swift */; };
+		46C874572F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874552F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift */; };
+		46C874582F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874562F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift */; };
+		46C8745B2F1C055D008C3619 /* TeamTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874592F1C055D008C3619 /* TeamTableViewCell.swift */; };
+		46C8745D2F1C0576008C3619 /* TeamSearchModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C8745C2F1C0576008C3619 /* TeamSearchModalViewController.swift */; };
 		46CDF4712F1058A100F280E6 /* NewsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4702F1058A100F280E6 /* NewsCategory.swift */; };
 		46CDF4782F1061E600F280E6 /* Jornada.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4722F1061E600F280E6 /* Jornada.swift */; };
 		46CDF4822F1061FC00F280E6 /* JornadaDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4792F1061FC00F280E6 /* JornadaDTO.swift */; };
@@ -174,6 +178,10 @@
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		46C874522F1B68B8008C3619 /* liga1.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = liga1.entitlements; sourceTree = "<group>"; };
 		46C874532F1B6C26008C3619 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		46C874552F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveFavoriteTeamsUseCase.swift; sourceTree = "<group>"; };
+		46C874562F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleFavoriteTeamUseCase.swift; sourceTree = "<group>"; };
+		46C874592F1C055D008C3619 /* TeamTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamTableViewCell.swift; sourceTree = "<group>"; };
+		46C8745C2F1C0576008C3619 /* TeamSearchModalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamSearchModalViewController.swift; sourceTree = "<group>"; };
 		46CDF4702F1058A100F280E6 /* NewsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCategory.swift; sourceTree = "<group>"; };
 		46CDF4722F1061E600F280E6 /* Jornada.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jornada.swift; sourceTree = "<group>"; };
 		46CDF4792F1061FC00F280E6 /* JornadaDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaDTO.swift; sourceTree = "<group>"; };
@@ -379,6 +387,7 @@
 		464001B32F08853F00A8C905 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				46C8745A2F1C055D008C3619 /* Cells */,
 				464009DC2F098DF600A8C905 /* Admin */,
 				464009DE2F098DF600A8C905 /* Favoritos */,
 				464009E12F098DF600A8C905 /* Home */,
@@ -449,6 +458,8 @@
 		464009C62F098D8D00A8C905 /* Favorites */ = {
 			isa = PBXGroup;
 			children = (
+				46C874552F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift */,
+				46C874562F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift */,
 				464009C32F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift */,
 				464009C42F098D8D00A8C905 /* ObserveFavoritesUseCase.swift */,
 				464009C52F098D8D00A8C905 /* ToggleFavoriteUseCase.swift */,
@@ -501,6 +512,7 @@
 		464009DE2F098DF600A8C905 /* Favoritos */ = {
 			isa = PBXGroup;
 			children = (
+				46C8745C2F1C0576008C3619 /* TeamSearchModalViewController.swift */,
 				464009DD2F098DF600A8C905 /* FavoritosViewController.swift */,
 			);
 			path = Favoritos;
@@ -565,6 +577,14 @@
 				464009FE2F098EB800A8C905 /* DIContainer.swift */,
 			);
 			path = DI;
+			sourceTree = "<group>";
+		};
+		46C8745A2F1C055D008C3619 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				46C874592F1C055D008C3619 /* TeamTableViewCell.swift */,
+			);
+			path = Cells;
 			sourceTree = "<group>";
 		};
 		46CDF4732F1061E600F280E6 /* Jornada */ = {
@@ -926,6 +946,7 @@
 				46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */,
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
+				46C8745B2F1C055D008C3619 /* TeamTableViewCell.swift in Sources */,
 				46CDF4B72F10882800F280E6 /* MatchUIMapper.swift in Sources */,
 				46CDF4B82F10882800F280E6 /* NewsItemUIMapper.swift in Sources */,
 				46CDF4B92F10882800F280E6 /* TeamUIMapper.swift in Sources */,
@@ -943,6 +964,8 @@
 				46CDF4B12F10877B00F280E6 /* NewsItem.swift in Sources */,
 				464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */,
 				46CDF4A12F1068A300F280E6 /* TeamMapper.swift in Sources */,
+				46C874572F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift in Sources */,
+				46C874582F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift in Sources */,
 				46CDF4A22F1068A300F280E6 /* JornadaMapper.swift in Sources */,
 				46CDF4A32F1068A300F280E6 /* NewsItemMapper.swift in Sources */,
 				46CDF4A42F1068A300F280E6 /* MatchMapper.swift in Sources */,
@@ -954,6 +977,7 @@
 				46CDF4AB2F1086F100F280E6 /* NewsRepositoryProtocol.swift in Sources */,
 				46CDF4AC2F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift in Sources */,
 				46CDF4AD2F1086F100F280E6 /* MatchesRepositoryProtocol.swift in Sources */,
+				46C8745D2F1C0576008C3619 /* TeamSearchModalViewController.swift in Sources */,
 				46CDF4AE2F1086F100F280E6 /* JornadasRepositoryProtocol.swift in Sources */,
 				46CDF4AF2F1086F100F280E6 /* TeamsRepositoryProtocol.swift in Sources */,
 				46CDF4BB2F10884600F280E6 /* NewsItemUI.swift in Sources */,
