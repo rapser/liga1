@@ -18,8 +18,7 @@ class FavoritosViewController: UIViewController {
     // MARK: - UI Components
 
     private lazy var segmentedControl: UISegmentedControl = {
-        let items = ["Partidos", "Equipos"]
-        let control = UISegmentedControl(items: items)
+        let control = UISegmentedControl(items: ["Partidos", "Equipos"])
         control.selectedSegmentIndex = 0
         control.selectedSegmentTintColor = .liga1Red
         control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
@@ -30,91 +29,37 @@ class FavoritosViewController: UIViewController {
 
     // MARK: - Empty States
 
-    // Empty State for Matches
-    private lazy var emptyMatchesView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemBackground
-        return view
-    }()
+    private lazy var emptyMatchesView = UIView().background(.systemBackground)
+    private lazy var emptyMatchesStack = createEmptyStateStack()
+    private lazy var emptyMatchesIcon = createStarIcon()
+    private lazy var emptyMatchesTitleLabel = UILabel()
+        .text("Agrega tu primer partido")
+        .font(.systemFont(ofSize: 18, weight: .bold))
+        .textColor(.label)
+        .alignment(.center)
 
-    private lazy var emptyMatchesStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = 16
-        return stack
-    }()
+    private lazy var emptyMatchesDescLabel = UILabel()
+        .text("Ten todos los partidos importantes\nen un solo lugar")
+        .font(.systemFont(ofSize: 14, weight: .regular))
+        .textColor(.secondaryLabel)
+        .alignment(.center)
+        .lines(0)
 
-    private lazy var emptyMatchesIconView: UIImageView = {
-        let imageView = UIImageView()
-        let config = UIImage.SymbolConfiguration(pointSize: 80, weight: .light)
-        imageView.image = UIImage(systemName: "star", withConfiguration: config)
-        imageView.tintColor = .systemGray3
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
+    private lazy var emptyTeamsView = UIView().background(.systemBackground)
+    private lazy var emptyTeamsStack = createEmptyStateStack()
+    private lazy var emptyTeamsIcon = createStarIcon()
+    private lazy var emptyTeamsTitleLabel = UILabel()
+        .text("Agrega tu primer equipo")
+        .font(.systemFont(ofSize: 18, weight: .bold))
+        .textColor(.label)
+        .alignment(.center)
 
-    private lazy var emptyMatchesTitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Agrega tu primer partido"
-        label.font = .systemFont(ofSize: 18, weight: .bold)
-        label.textColor = .label
-        label.textAlignment = .center
-        return label
-    }()
-
-    private lazy var emptyMatchesDescriptionLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Ten todos los partidos importantes\nen un solo lugar"
-        label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .secondaryLabel
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        return label
-    }()
-
-    // Empty State for Teams
-    private lazy var emptyTeamsView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemBackground
-        return view
-    }()
-
-    private lazy var emptyTeamsStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = 16
-        return stack
-    }()
-
-    private lazy var emptyTeamsIconView: UIImageView = {
-        let imageView = UIImageView()
-        let config = UIImage.SymbolConfiguration(pointSize: 80, weight: .light)
-        imageView.image = UIImage(systemName: "star", withConfiguration: config)
-        imageView.tintColor = .systemGray3
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-
-    private lazy var emptyTeamsTitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Agrega tu primer equipo"
-        label.font = .systemFont(ofSize: 18, weight: .bold)
-        label.textColor = .label
-        label.textAlignment = .center
-        return label
-    }()
-
-    private lazy var emptyTeamsDescriptionLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Ten todos los partidos y las noticias importantes\nde tus equipos favoritos en un solo lugar"
-        label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .secondaryLabel
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        return label
-    }()
+    private lazy var emptyTeamsDescLabel = UILabel()
+        .text("Ten todos los partidos y las noticias importantes\nde tus equipos favoritos en un solo lugar")
+        .font(.systemFont(ofSize: 14, weight: .regular))
+        .textColor(.secondaryLabel)
+        .alignment(.center)
+        .lines(0)
 
     private lazy var searchTeamButton: UIButton = {
         var config = UIButton.Configuration.filled()
@@ -123,7 +68,6 @@ class FavoritosViewController: UIViewController {
         config.baseBackgroundColor = .black
         config.baseForegroundColor = .white
         config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 24, bottom: 12, trailing: 24)
-
         let button = UIButton(configuration: config)
         button.addTarget(self, action: #selector(searchTeamTapped), for: .touchUpInside)
         return button
@@ -154,16 +98,28 @@ class FavoritosViewController: UIViewController {
 
     // MARK: - Setup UI
 
-    private func setupSegmentedControl() {
-        view.addSubview(segmentedControl)
-        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
+    private func createStarIcon() -> UIImageView {
+        let config = UIImage.SymbolConfiguration(pointSize: 80, weight: .light)
+        return UIImageView()
+            .image(UIImage(systemName: "star", withConfiguration: config))
+            .tintColor(.systemGray3)
+            .contentMode(.scaleAspectFit)
+    }
 
-        NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
-            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            segmentedControl.heightAnchor.constraint(equalToConstant: 32)
-        ])
+    private func createEmptyStateStack() -> UIStackView {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = 16
+        return stack
+    }
+
+    private func setupSegmentedControl() {
+        segmentedControl
+            .addTo(view)
+            .pinTop(constant: Spacing.medium, useSafeArea: true)
+            .pinHorizontal(padding: Spacing.standard)
+            .height(32)
     }
 
     private func setupTableView() {
@@ -171,78 +127,57 @@ class FavoritosViewController: UIViewController {
         tableView.register(TeamTableViewCell.self, forCellReuseIdentifier: TeamTableViewCell.identifier)
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.backgroundColor = .systemBackground
 
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 12),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        tableView
+            .addTo(view)
+            .pinTop(to: segmentedControl.bottomAnchor, constant: Spacing.medium)
+            .pinLeading()
+            .pinTrailing()
+            .pinBottom()
     }
 
     private func setupEmptyStates() {
-        // Setup Empty Matches View
-        view.addSubview(emptyMatchesView)
-        emptyMatchesView.addSubview(emptyMatchesStackView)
+        // Setup Empty Matches
+        emptyMatchesView
+            .addTo(view)
+            .pinTop(to: segmentedControl.bottomAnchor, constant: Spacing.medium)
+            .pinLeading()
+            .pinTrailing()
+            .pinBottom()
+            .hidden()
 
-        emptyMatchesStackView.addArrangedSubview(emptyMatchesIconView)
-        emptyMatchesStackView.addArrangedSubview(emptyMatchesTitleLabel)
-        emptyMatchesStackView.addArrangedSubview(emptyMatchesDescriptionLabel)
+        emptyMatchesStack
+            .addTo(emptyMatchesView)
+            .centerInSuperview()
+            .pinHorizontal(padding: Spacing.extraLarge)
 
-        emptyMatchesView.translatesAutoresizingMaskIntoConstraints = false
-        emptyMatchesStackView.translatesAutoresizingMaskIntoConstraints = false
-        emptyMatchesIconView.translatesAutoresizingMaskIntoConstraints = false
+        emptyMatchesIcon.square(80)
 
-        NSLayoutConstraint.activate([
-            emptyMatchesView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 12),
-            emptyMatchesView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emptyMatchesView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            emptyMatchesView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        emptyMatchesStack.addArrangedSubview(emptyMatchesIcon)
+        emptyMatchesStack.addArrangedSubview(emptyMatchesTitleLabel)
+        emptyMatchesStack.addArrangedSubview(emptyMatchesDescLabel)
 
-            emptyMatchesStackView.centerXAnchor.constraint(equalTo: emptyMatchesView.centerXAnchor),
-            emptyMatchesStackView.centerYAnchor.constraint(equalTo: emptyMatchesView.centerYAnchor),
-            emptyMatchesStackView.leadingAnchor.constraint(greaterThanOrEqualTo: emptyMatchesView.leadingAnchor, constant: 32),
-            emptyMatchesStackView.trailingAnchor.constraint(lessThanOrEqualTo: emptyMatchesView.trailingAnchor, constant: -32),
+        // Setup Empty Teams
+        emptyTeamsView
+            .addTo(view)
+            .pinTop(to: segmentedControl.bottomAnchor, constant: Spacing.medium)
+            .pinLeading()
+            .pinTrailing()
+            .pinBottom()
+            .hidden()
 
-            emptyMatchesIconView.widthAnchor.constraint(equalToConstant: 80),
-            emptyMatchesIconView.heightAnchor.constraint(equalToConstant: 80)
-        ])
+        emptyTeamsStack
+            .addTo(emptyTeamsView)
+            .centerInSuperview()
+            .pinHorizontal(padding: Spacing.extraLarge)
 
-        // Setup Empty Teams View
-        view.addSubview(emptyTeamsView)
-        emptyTeamsView.addSubview(emptyTeamsStackView)
+        emptyTeamsIcon.square(80)
+        searchTeamButton.prepareForAutoLayout()
 
-        emptyTeamsStackView.addArrangedSubview(emptyTeamsIconView)
-        emptyTeamsStackView.addArrangedSubview(emptyTeamsTitleLabel)
-        emptyTeamsStackView.addArrangedSubview(emptyTeamsDescriptionLabel)
-        emptyTeamsStackView.addArrangedSubview(searchTeamButton)
-
-        emptyTeamsView.translatesAutoresizingMaskIntoConstraints = false
-        emptyTeamsStackView.translatesAutoresizingMaskIntoConstraints = false
-        emptyTeamsIconView.translatesAutoresizingMaskIntoConstraints = false
-        searchTeamButton.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            emptyTeamsView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 12),
-            emptyTeamsView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emptyTeamsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            emptyTeamsView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-
-            emptyTeamsStackView.centerXAnchor.constraint(equalTo: emptyTeamsView.centerXAnchor),
-            emptyTeamsStackView.centerYAnchor.constraint(equalTo: emptyTeamsView.centerYAnchor),
-            emptyTeamsStackView.leadingAnchor.constraint(greaterThanOrEqualTo: emptyTeamsView.leadingAnchor, constant: 32),
-            emptyTeamsStackView.trailingAnchor.constraint(lessThanOrEqualTo: emptyTeamsView.trailingAnchor, constant: -32),
-
-            emptyTeamsIconView.widthAnchor.constraint(equalToConstant: 80),
-            emptyTeamsIconView.heightAnchor.constraint(equalToConstant: 80)
-        ])
-
-        emptyMatchesView.isHidden = true
-        emptyTeamsView.isHidden = true
+        emptyTeamsStack.addArrangedSubview(emptyTeamsIcon)
+        emptyTeamsStack.addArrangedSubview(emptyTeamsTitleLabel)
+        emptyTeamsStack.addArrangedSubview(emptyTeamsDescLabel)
+        emptyTeamsStack.addArrangedSubview(searchTeamButton)
     }
 
     private func bindViewModel() {
@@ -309,7 +244,6 @@ class FavoritosViewController: UIViewController {
         modal.modalTransitionStyle = .crossDissolve
         present(modal, animated: true)
 
-        // Observe changes in favorite teams to update modal
         viewModel.$favoriteTeamIds
             .receive(on: DispatchQueue.main)
             .sink { [weak modal] favoriteTeamIds in
@@ -371,12 +305,10 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
             return nil
         }
 
-        let containerView = UIView()
-        containerView.backgroundColor = .systemBackground
-
+        let containerView = UIView().background(.systemBackground)
         let titleText = viewModel.selectedSegment == .matches ? "Mis Partidos Favoritos" : "Mis Equipos Favoritos"
-        let titleLabel = LayoutPresets.titleLabel(text: titleText, fontSize: 18)
-        titleLabel
+
+        LayoutPresets.titleLabel(text: titleText, fontSize: 18)
             .addTo(containerView)
             .pinLeading(constant: Spacing.standard)
             .pinTop(constant: Spacing.small)

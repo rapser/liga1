@@ -349,6 +349,7 @@
 				464001912F08853F00A8C905 /* MatchTableViewCell.swift */,
 				464001922F08853F00A8C905 /* NewsCell.swift */,
 				464001932F08853F00A8C905 /* NewsHeaderView.swift */,
+				46C874592F1C055D008C3619 /* TeamTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -387,7 +388,6 @@
 		464001B32F08853F00A8C905 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				46C8745A2F1C055D008C3619 /* Cells */,
 				464009DC2F098DF600A8C905 /* Admin */,
 				464009DE2F098DF600A8C905 /* Favoritos */,
 				464009E12F098DF600A8C905 /* Home */,
@@ -577,14 +577,6 @@
 				464009FE2F098EB800A8C905 /* DIContainer.swift */,
 			);
 			path = DI;
-			sourceTree = "<group>";
-		};
-		46C8745A2F1C055D008C3619 /* Cells */ = {
-			isa = PBXGroup;
-			children = (
-				46C874592F1C055D008C3619 /* TeamTableViewCell.swift */,
-			);
-			path = Cells;
 			sourceTree = "<group>";
 		};
 		46CDF4732F1061E600F280E6 /* Jornada */ = {
