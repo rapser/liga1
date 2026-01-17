@@ -171,6 +171,7 @@
 		464009EF2F098DF600A8C905 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
 		464009FE2F098EB800A8C905 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		46C874522F1B68B8008C3619 /* liga1.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = liga1.entitlements; sourceTree = "<group>"; };
 		46CDF4702F1058A100F280E6 /* NewsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCategory.swift; sourceTree = "<group>"; };
 		46CDF4722F1061E600F280E6 /* Jornada.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jornada.swift; sourceTree = "<group>"; };
 		46CDF4792F1061FC00F280E6 /* JornadaDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaDTO.swift; sourceTree = "<group>"; };
@@ -763,6 +764,7 @@
 		46D995912C6E90EC00D4951C /* liga1 */ = {
 			isa = PBXGroup;
 			children = (
+				46C874522F1B68B8008C3619 /* liga1.entitlements */,
 				46D995C62C6EC90700D4951C /* Application */,
 				4640017A2F08853F00A8C905 /* Core */,
 				464009FF2F098EB800A8C905 /* DI */,
@@ -1128,12 +1130,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
@@ -1159,12 +1163,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
