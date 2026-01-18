@@ -95,8 +95,8 @@ class HomeViewController: UIViewController {
     }
     
     private func registerForTraitChanges() {
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (self: HomeViewController, previousTraitCollection: UITraitCollection) in
-            // Actualizar color del spinner cuando cambia el modo
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) {
+            (self: HomeViewController, previousTraitCollection: UITraitCollection) in
             self.configureRefreshControlColor()
         }
     }

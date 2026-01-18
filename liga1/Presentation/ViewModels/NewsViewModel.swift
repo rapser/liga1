@@ -48,9 +48,20 @@ class NewsViewModel {
                 }
             } receiveValue: { [weak self] newsItems in
                 guard let self = self else { return }
-                self.featuredNews = newsItems.filter { $0.featured }
-                let regularNews = newsItems.filter { !$0.featured }
-                self.groupedNews = Dictionary(grouping: regularNews, by: { $0.category })
+                
+                // Ordenar todas las noticias por fecha descendente (más reciente primero)
+                // Esto asegura que las noticias más frescas aparezcan de arriba hacia abajo
+                let sortedNewsItems = newsItems.sorted { $0.publishedDate > $1.publishedDate }
+                
+                // Filtrar noticias destacadas (ya están ordenadas por fecha descendente)
+                self.featuredNews = sortedNewsItems.filter { $0.featured }
+                
+                // Filtrar noticias regulares y agrupar por categoría
+                let regularNews = sortedNewsItems.filter { !$0.featured }
+                
+                // Agrupar por categoría (cada grupo ya está ordenado por fecha descendente)
+                let grouped = Dictionary(grouping: regularNews, by: { $0.category })
+                self.groupedNews = grouped
             }
             .store(in: &cancellables)
     }

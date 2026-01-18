@@ -9,6 +9,11 @@ import UIKit
 import SafariServices
 
 extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    // Helper para obtener las categorías ordenadas alfabéticamente
+    private var sortedCategories: [NewsCategory] {
+        return viewModel.groupedNews.keys.sorted { $0.rawValue.localizedCaseInsensitiveCompare($1.rawValue) == .orderedAscending }
+    }
 
     func numberOfSections(in tableView: UITableView) -> Int {
         // Sección 0: destacada (1 celda con imagen+título)
@@ -21,7 +26,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
             return viewModel.featuredNews.isEmpty ? 0 : 1 // 1 celda para la noticia destacada
         }
 
-        let categorias = Array(viewModel.groupedNews.keys)
+        let categorias = sortedCategories
         let categoria = categorias[section - 1]
         return viewModel.groupedNews[categoria]?.count ?? 0
     }
@@ -39,7 +44,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CategoryHeaderView.reuseIdentifier) as? CategoryHeaderView else {
             return nil
         }
-        let categorias = Array(viewModel.groupedNews.keys)
+        let categorias = sortedCategories
         let categoria = categorias[section - 1]
         header.configure(with: categoria)
         return header
@@ -61,7 +66,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         }
 
         // Otras secciones: celdas normales de noticias
-        let categorias = Array(viewModel.groupedNews.keys)
+        let categorias = sortedCategories
         let categoria = categorias[indexPath.section - 1]
         guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row],
               let cell = tableView.dequeueReusableCell(withIdentifier: "NewsCell", for: indexPath) as? NewsCell else {
@@ -79,7 +84,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
             guard let item = viewModel.featuredNews.first else { return }
             newsItem = item
         } else {
-            let categorias = Array(viewModel.groupedNews.keys)
+            let categorias = sortedCategories
             let categoria = categorias[indexPath.section - 1]
             guard let item = viewModel.groupedNews[categoria]?[indexPath.row] else { return }
             newsItem = item
