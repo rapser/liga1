@@ -51,6 +51,10 @@ class HomeViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
+        // Configurar tableView para eliminar espacio entre header y nav bar
+        // sectionHeaderTopPadding elimina el padding automático de iOS 15+
+        tableView.sectionHeaderTopPadding = 0
+        
         // Agregar tableView a la vista primero
         tableView.prepareForAutoLayout()
         tableView.addTo(view).fillSuperview()
