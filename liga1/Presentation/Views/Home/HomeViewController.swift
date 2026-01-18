@@ -36,7 +36,14 @@ class HomeViewController: UIViewController {
         setupUI()
         setupAdapter()
         bindViewModel()
+        registerForTraitChanges()
         // No es necesario llamar fetchActiveJornadas() porque el observer se activa automáticamente en init del ViewModel
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Asegurar que el color esté actualizado cuando aparece la vista
+        configureRefreshControlColor()
     }
 
     // MARK: - Setup
@@ -44,13 +51,54 @@ class HomeViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
-        // Configurar refresh control
-        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
-        tableView.refreshControl = refreshControl
-
-        // Agregar tableView a la vista
+        // Agregar tableView a la vista primero
         tableView.prepareForAutoLayout()
         tableView.addTo(view).fillSuperview()
+        
+        // Configurar refresh control después de agregar el tableView
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        
+        // Asegurar que el refresh control esté visible
+        refreshControl.layer.zPosition = 1000
+        
+        configureRefreshControlColor()
+    }
+    
+    private func configureRefreshControlColor() {
+        // Configurar color del spinner según el modo (claro/oscuro)
+        let isDarkMode = traitCollection.userInterfaceStyle == .dark
+        let color = isDarkMode ? UIColor.white : UIColor.systemBlue
+        
+        // En modo oscuro usar blanco para mejor visibilidad, en modo claro usar azul del sistema
+        refreshControl.tintColor = color
+        
+        // Buscar y configurar el activity indicator en todas las subvistas del refresh control
+        func findAndConfigureActivityIndicator(in view: UIView) {
+            if let activityIndicator = view as? UIActivityIndicatorView {
+                activityIndicator.color = color
+                activityIndicator.style = .medium
+                // Asegurar que esté en la parte superior
+                activityIndicator.layer.zPosition = 1000
+                activityIndicator.superview?.bringSubviewToFront(activityIndicator)
+            }
+            for subview in view.subviews {
+                findAndConfigureActivityIndicator(in: subview)
+            }
+        }
+        
+        // Buscar en el refresh control y en el scroll view del tableView
+        findAndConfigureActivityIndicator(in: refreshControl)
+        if let scrollView = tableView.subviews.first(where: { $0 is UIScrollView }) {
+            findAndConfigureActivityIndicator(in: scrollView)
+        }
+    }
+    
+    private func registerForTraitChanges() {
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (self: HomeViewController, previousTraitCollection: UITraitCollection) in
+            // Actualizar color del spinner cuando cambia el modo
+            self.configureRefreshControlColor()
+        }
     }
 
     private func setupAdapter() {
@@ -58,6 +106,15 @@ class HomeViewController: UIViewController {
     }
 
     @objc private func handleRefresh() {
+        // Asegurar que el color esté actualizado cuando se activa el refresh
+        configureRefreshControlColor()
+        // Forzar actualización del color después de pequeños delays para que el refresh control esté visible
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            self?.configureRefreshControlColor()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+            self?.configureRefreshControlColor()
+        }
         viewModel.fetchActiveJornadas()
     }
 

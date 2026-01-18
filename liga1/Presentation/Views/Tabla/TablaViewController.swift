@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class TorneoViewController: UIViewController {
+class TablaViewController: UIViewController {
 
     // MARK: - Properties
     private let tableView = UITableView()
@@ -44,6 +44,12 @@ class TorneoViewController: UIViewController {
         configureTableView()
         bindViewModel()
         loadInitialData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Recargar datos cada vez que se entra a esta tab
+        viewModel.reloadTeams(for: .apertura)
     }
 
     // MARK: - Private methods

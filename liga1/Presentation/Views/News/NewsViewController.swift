@@ -34,6 +34,12 @@ class NewsViewController: UIViewController {
         bindViewModel()
         viewModel.fetchNews()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Recargar noticias cada vez que se entra a esta tab
+        viewModel.fetchNews()
+    }
 
     private func setupTableView() {
         tableView.register(NewsCell.self, forCellReuseIdentifier: "NewsCell")

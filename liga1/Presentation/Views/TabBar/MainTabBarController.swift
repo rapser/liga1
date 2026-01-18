@@ -28,10 +28,10 @@ class MainTabBarController: UITabBarController {
 
         // Configuración de los tabs
         let homeVC = container.makeHomeViewController()
-        homeVC.title = "Home"
+        homeVC.title = "Inicio"
 
-        let torneoVC = container.makeTorneoViewController()
-        torneoVC.title = "Torneo"
+        let torneoVC = container.makeTablaViewController()
+        torneoVC.title = "Tabla"
 
         let favoritosVC = container.makeFavoritosViewController()
         favoritosVC.title = "Favoritos"
@@ -45,13 +45,13 @@ class MainTabBarController: UITabBarController {
         // Crear NavControllers con estilo Large Title
         let homeNav = createNavController(
             rootViewController: homeVC,
-            title: "home",
+            title: "inicio",
             imageSystemName: "house"
         )
 
         let torneoNav = createNavController(
             rootViewController: torneoVC,
-            title: "torneo",
+            title: "tabla",
             imageSystemName: "chart.bar.doc.horizontal"
         )
 

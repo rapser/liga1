@@ -36,8 +36,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
 
         // Registrar para notificaciones remotas
         application.registerForRemoteNotifications()
+        
+        // Limpiar badge al abrir la app
+        clearBadge()
 
         return true
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        // Limpiar badge cuando la app se vuelve activa
+        clearBadge()
+    }
+    
+    // MARK: - Badge Management
+    
+    private func clearBadge() {
+        Task {
+            do {
+                try await UNUserNotificationCenter.current().setBadgeCount(0)
+            } catch {
+                Logger.shared.error("Error al limpiar badge", error: error)
+            }
+        }
     }
 
     // MARK: - UISceneSession Lifecycle

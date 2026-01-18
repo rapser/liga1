@@ -222,8 +222,8 @@ final class DIContainer {
         return HomeViewController(viewModel: makeHomeViewModel())
     }
 
-    func makeTorneoViewController() -> TorneoViewController {
-        return TorneoViewController(viewModel: makeTorneoViewModel())
+    func makeTablaViewController() -> TablaViewController {
+        return TablaViewController(viewModel: makeTorneoViewModel())
     }
 
     func makeFavoritosViewController() -> FavoritosViewController {

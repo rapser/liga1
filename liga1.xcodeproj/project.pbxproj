@@ -60,7 +60,7 @@
 		464009F52F098DF600A8C905 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009EC2F098DF600A8C905 /* MainTabBarController.swift */; };
 		464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009E92F098DF600A8C905 /* ProfileViewController.swift */; };
 		464009F72F098DF600A8C905 /* NewsHeaderWrapperCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009E52F098DF600A8C905 /* NewsHeaderWrapperCell.swift */; };
-		464009F82F098DF600A8C905 /* TorneoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009EE2F098DF600A8C905 /* TorneoViewController.swift */; };
+		464009F82F098DF600A8C905 /* TablaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009EE2F098DF600A8C905 /* TablaViewController.swift */; };
 		464009F92F098DF600A8C905 /* TorneoViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009EF2F098DF600A8C905 /* TorneoViewController+TableView.swift */; };
 		464009FA2F098DF600A8C905 /* RegistrarPartidosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009DB2F098DF600A8C905 /* RegistrarPartidosViewController.swift */; };
 		464009FB2F098DF600A8C905 /* ProfileViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009EA2F098DF600A8C905 /* ProfileViewController+TableView.swift */; };
@@ -197,7 +197,7 @@
 		464009E92F098DF600A8C905 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		464009EA2F098DF600A8C905 /* ProfileViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewController+TableView.swift"; sourceTree = "<group>"; };
 		464009EC2F098DF600A8C905 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
-		464009EE2F098DF600A8C905 /* TorneoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorneoViewController.swift; sourceTree = "<group>"; };
+		464009EE2F098DF600A8C905 /* TablaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TablaViewController.swift; sourceTree = "<group>"; };
 		464009EF2F098DF600A8C905 /* TorneoViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorneoViewController+TableView.swift"; sourceTree = "<group>"; };
 		464009FE2F098EB800A8C905 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
@@ -612,7 +612,7 @@
 		464009F02F098DF600A8C905 /* Tabla */ = {
 			isa = PBXGroup;
 			children = (
-				464009EE2F098DF600A8C905 /* TorneoViewController.swift */,
+				464009EE2F098DF600A8C905 /* TablaViewController.swift */,
 				464009EF2F098DF600A8C905 /* TorneoViewController+TableView.swift */,
 			);
 			path = Tabla;
@@ -1079,7 +1079,7 @@
 				464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */,
 				46400A002F098EB800A8C905 /* DIContainer.swift in Sources */,
 				464009F72F098DF600A8C905 /* NewsHeaderWrapperCell.swift in Sources */,
-				464009F82F098DF600A8C905 /* TorneoViewController.swift in Sources */,
+				464009F82F098DF600A8C905 /* TablaViewController.swift in Sources */,
 				464009F92F098DF600A8C905 /* TorneoViewController+TableView.swift in Sources */,
 				464009FA2F098DF600A8C905 /* RegistrarPartidosViewController.swift in Sources */,
 				464009FB2F098DF600A8C905 /* ProfileViewController+TableView.swift in Sources */,
