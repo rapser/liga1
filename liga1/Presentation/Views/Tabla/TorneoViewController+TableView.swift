@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
+extension TablaViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.displayedTeams.count
@@ -22,14 +22,15 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
 
         let position = determinePosition(for: indexPath.row)
         let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark
+        let isChampion = position == .campeon
 
         // En modo oscuro, solo colorear posiciones importantes (no las normales)
         var positionColor: UIColor? = nil
-        if isDarkMode && position != .normal {
+        if isDarkMode && position != .normal && !isChampion {
             positionColor = position.backgroundColor
         }
 
-        cell.configure(with: equipo, position: indexPath.row + 1, positionColor: positionColor)
+        cell.configure(with: equipo, position: indexPath.row + 1, positionColor: positionColor, isChampion: isChampion)
         cell.backgroundColor = backgroundColorForPosition(at: indexPath)
         return cell
     }
@@ -41,6 +42,10 @@ extension TorneoViewController: UITableViewDataSource, UITableViewDelegate {
         }
 
         let position = determinePosition(for: indexPath.row)
+        // Si es campeón, no aplicar fondo amarillo a toda la celda (solo al número)
+        if position == .campeon {
+            return .systemBackground
+        }
         return position.backgroundColor
     }
     

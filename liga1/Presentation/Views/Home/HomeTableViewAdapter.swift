@@ -79,8 +79,53 @@ extension HomeTableViewAdapter: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let jornadaSection = sections[section]
-        let view = UIView()
-        view.backgroundColor = .systemBackground
+        let containerView = UIView()
+        containerView.backgroundColor = .systemBackground
+
+        // Header superior: Fecha del día con icono de calendario
+        let dateHeaderView = UIView()
+        dateHeaderView.backgroundColor = .systemBackground
+        dateHeaderView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let fechaDiaLabel = UILabel()
+        fechaDiaLabel.font = .systemFont(ofSize: 16)
+        fechaDiaLabel.textColor = .label
+        fechaDiaLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Obtener la fecha del primer partido
+        let fechaPartido: Date
+        if let primerPartido = jornadaSection.matches.first {
+            fechaPartido = primerPartido.fecha
+        } else {
+            fechaPartido = Date() // Fallback si no hay partidos
+        }
+        
+        // Formatear la fecha
+        fechaDiaLabel.text = formatDateForHeader(fechaPartido)
+        
+        let calendarIcon = UIImageView(image: UIImage(systemName: "calendar"))
+        calendarIcon.tintColor = .secondaryLabel
+        calendarIcon.contentMode = .scaleAspectFit
+        calendarIcon.translatesAutoresizingMaskIntoConstraints = false
+        
+        dateHeaderView.addSubview(fechaDiaLabel)
+        dateHeaderView.addSubview(calendarIcon)
+        
+        NSLayoutConstraint.activate([
+            fechaDiaLabel.leadingAnchor.constraint(equalTo: dateHeaderView.leadingAnchor, constant: 16),
+            fechaDiaLabel.centerYAnchor.constraint(equalTo: dateHeaderView.centerYAnchor),
+            
+            calendarIcon.trailingAnchor.constraint(equalTo: dateHeaderView.trailingAnchor, constant: -16),
+            calendarIcon.centerYAnchor.constraint(equalTo: dateHeaderView.centerYAnchor),
+            calendarIcon.widthAnchor.constraint(equalToConstant: 20),
+            calendarIcon.heightAnchor.constraint(equalToConstant: 20)
+        ])
+
+        // Header inferior: Fecha de jornada y torneo
+        let jornadaHeaderView = UIView()
+        // Fondo sutil para diferenciar del header superior (se adapta a modo claro/oscuro)
+        jornadaHeaderView.backgroundColor = .secondarySystemBackground
+        jornadaHeaderView.translatesAutoresizingMaskIntoConstraints = false
 
         let fechaLabel = UILabel()
         fechaLabel.font = .boldSystemFont(ofSize: 18)
@@ -97,23 +142,59 @@ extension HomeTableViewAdapter: UITableViewDelegate {
         let torneoCapitalizado = jornadaSection.torneo.capitalized
         torneoLabel.text = "Liga 1 - \(torneoCapitalizado) 2026"
 
-        view.addSubview(fechaLabel)
-        view.addSubview(torneoLabel)
+        jornadaHeaderView.addSubview(fechaLabel)
+        jornadaHeaderView.addSubview(torneoLabel)
 
         NSLayoutConstraint.activate([
-            fechaLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            fechaLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 8),
+            fechaLabel.leadingAnchor.constraint(equalTo: jornadaHeaderView.leadingAnchor, constant: 16),
+            fechaLabel.topAnchor.constraint(equalTo: jornadaHeaderView.topAnchor, constant: 8),
 
             torneoLabel.leadingAnchor.constraint(equalTo: fechaLabel.leadingAnchor),
             torneoLabel.topAnchor.constraint(equalTo: fechaLabel.bottomAnchor, constant: 4),
-            torneoLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -8)
+            torneoLabel.bottomAnchor.constraint(equalTo: jornadaHeaderView.bottomAnchor, constant: -8)
         ])
 
-        return view
+        // Agregar ambos headers al contenedor
+        containerView.addSubview(dateHeaderView)
+        containerView.addSubview(jornadaHeaderView)
+
+        NSLayoutConstraint.activate([
+            dateHeaderView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            dateHeaderView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            dateHeaderView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            dateHeaderView.heightAnchor.constraint(equalToConstant: 44),
+            
+            jornadaHeaderView.topAnchor.constraint(equalTo: dateHeaderView.bottomAnchor),
+            jornadaHeaderView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            jornadaHeaderView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            jornadaHeaderView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ])
+
+        return containerView
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 60
+        return 104 // 44 (header fecha) + 60 (header jornada)
+    }
+    
+    // Helper para formatear la fecha del header
+    private func formatDateForHeader(_ date: Date) -> String {
+        let calendar = Calendar.current
+        
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "es_PE")
+        
+        // Si es hoy, mostrar "Hoy"
+        if calendar.isDateInToday(date) {
+            formatter.dateFormat = "dd.MM"
+            return "Hoy \(formatter.string(from: date))"
+        } else {
+            // Mostrar día de la semana + fecha
+            formatter.dateFormat = "EEEE dd.MM"
+            let fechaString = formatter.string(from: date)
+            // Capitalizar primera letra
+            return fechaString.capitalized
+        }
     }
 }
 

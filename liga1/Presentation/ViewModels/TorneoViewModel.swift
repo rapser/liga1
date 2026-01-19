@@ -63,6 +63,25 @@ class TorneoViewModel {
             }
         }
     }
+    
+    /// Fuerza la recarga de los equipos sin usar caché
+    func reloadTeams(for torneo: TorneoType) {
+        selectedTorneo = torneo
+        
+        switch torneo {
+        case .apertura:
+            cachedApertura = [] // Limpiar caché
+            fetchTeams(for: torneo)
+        case .clausura:
+            cachedClausura = [] // Limpiar caché
+            fetchTeams(for: torneo)
+        case .acumulado:
+            cachedAcumulado = [] // Limpiar caché
+            cachedApertura = [] // También limpiar los cachés de apertura y clausura
+            cachedClausura = []
+            fetchAcumulado()
+        }
+    }
 
     // MARK: - Private Methods
 

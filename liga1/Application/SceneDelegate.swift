@@ -8,6 +8,7 @@
 import UIKit
 import FirebaseAuth
 import GoogleSignIn
+import UserNotifications
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -41,6 +42,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         appCoordinator.start()
 
         window.makeKeyAndVisible()
+    }
+    
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        // Limpiar badge cuando la escena se vuelve activa
+        Task {
+            do {
+                try await UNUserNotificationCenter.current().setBadgeCount(0)
+            } catch {
+                Logger.shared.error("Error al limpiar badge", error: error)
+            }
+        }
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

@@ -57,6 +57,14 @@ final class DIContainer {
         return FavoritesService(database: makeDatabase(), authProvider: authService)
     }
 
+    private lazy var notificationService: NotificationServiceProtocol = {
+        return NotificationService()
+    }()
+
+    func makeNotificationService() -> NotificationServiceProtocol {
+        return notificationService
+    }
+
     // MARK: - Use Cases - Jornadas
 
     func makeFetchActiveJornadasUseCase() -> FetchActiveJornadasUseCaseProtocol {
@@ -121,6 +129,18 @@ final class DIContainer {
         )
     }
 
+    func makeToggleFavoriteTeamUseCase() -> ToggleFavoriteTeamUseCaseProtocol {
+        return ToggleFavoriteTeamUseCase(
+            service: makeFavoritesService()
+        )
+    }
+
+    func makeObserveFavoriteTeamsUseCase() -> ObserveFavoriteTeamsUseCaseProtocol {
+        return ObserveFavoriteTeamsUseCase(
+            service: makeFavoritesService()
+        )
+    }
+
     // MARK: - Use Cases - Auth
 
     func makeLoginUseCase() -> LoginUseCaseProtocol {
@@ -171,7 +191,10 @@ final class DIContainer {
         return FavoritosViewModel(
             fetchFavoriteMatchesUseCase: makeFetchFavoriteMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
-            observeFavoritesUseCase: makeObserveFavoritesUseCase()
+            observeFavoritesUseCase: makeObserveFavoritesUseCase(),
+            fetchTeamsUseCase: makeFetchTeamsUseCase(),
+            toggleFavoriteTeamUseCase: makeToggleFavoriteTeamUseCase(),
+            observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase()
         )
     }
 
@@ -199,8 +222,8 @@ final class DIContainer {
         return HomeViewController(viewModel: makeHomeViewModel())
     }
 
-    func makeTorneoViewController() -> TorneoViewController {
-        return TorneoViewController(viewModel: makeTorneoViewModel())
+    func makeTablaViewController() -> TablaViewController {
+        return TablaViewController(viewModel: makeTorneoViewModel())
     }
 
     func makeFavoritosViewController() -> FavoritosViewController {
