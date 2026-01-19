@@ -9,10 +9,12 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Favoritos**: Marca tus partidos favoritos para seguimiento rápido con sincronización en tiempo real
 - **Noticias**: Mantente informado con las últimas noticias del fútbol peruano, agrupadas por categoría con ordenamiento inteligente por fecha de noticia destacada
 - **Autenticación**: Ingresa con Google o correo electrónico para sincronizar tus favoritos
-- **Modo Oscuro**: Soporte completo para Dark Mode con ajustes visuales optimizados
+- **Modo Oscuro**: Soporte completo para Dark Mode que sigue automáticamente la configuración del sistema
 - **UI Programático**: Interfaz construida 100% con código (sin Storyboards) usando APIs modernas de iOS 18
 - **Recarga Automática**: Datos se actualizan automáticamente al entrar a las tabs de Torneo y Noticias
 - **Gestión de Notificaciones**: Badge de notificaciones se limpia automáticamente al abrir la app
+- **Historial de Notificaciones**: Visualiza y gestiona todas las notificaciones recibidas en el dispositivo
+- **Configuración Mejorada**: Tab de Configuración con opciones de notificaciones, historial y gestión de cuenta
 
 ## ⚙️ Features Detalladas
 
@@ -92,13 +94,18 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **SessionManager**: Gestión de timeout de inactividad (5 días)
 - **Cierre Automático**: Cierra sesión automáticamente después de inactividad prolongada
 
-### 👤 Perfil
+### ⚙️ Configuración
 
 #### Opciones Disponibles
-- **Información del Usuario**: Email y nombre de usuario
-- **Ajustes de Notificaciones**: Acceso a configuración de push notifications
-- **Cambio de Tema**: Alternar entre modo claro, oscuro y automático
-- **Cerrar Sesión**: Botón para cerrar sesión y volver al login
+- **Notificaciones Push**:
+  - **Ajustes de Notificaciones**: Pantalla dedicada que muestra el estado de las notificaciones y permite abrir Configuración del sistema
+  - **Historial de Notificaciones**: Visualiza todas las notificaciones entregadas al dispositivo con posibilidad de eliminarlas
+- **Usuario**: Información del usuario y nombre de usuario
+- **Administración**: Herramientas para registro masivo de partidos
+- **Otros**: Comentarios, términos, políticas de privacidad y versión
+- **Cerrar Sesión**: Opción al final de todas las secciones con estilo destructivo (rojo)
+
+**Nota**: El tema de la app (modo claro/oscuro) sigue automáticamente la configuración del sistema del dispositivo del usuario.
 
 ### 🛠 Panel de Administración
 
@@ -115,7 +122,12 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **FCM Integration**: Integración con Firebase Cloud Messaging
 - **Badge Management**: Limpieza automática de badge al abrir la app (API moderna iOS 18)
 - **Topics**: Suscripción a topics (ej: "live_matches")
-- **Extension**: PushServiceExtension para modificar notificaciones antes de mostrar
+- **Pantalla de Ajustes**: Pantalla dedicada que muestra el estado de las notificaciones y permite abrir Configuración del sistema
+- **Historial de Notificaciones**: Visualización de todas las notificaciones entregadas al dispositivo
+  - Tabla plana con celdas de mayor altura para mejor legibilidad
+  - Posibilidad de eliminar notificaciones mediante swipe
+  - Ordenadas por fecha (más recientes primero)
+  - Muestra título, cuerpo y fecha de cada notificación
 
 ## 🛠 Tecnologías y Frameworks
 
@@ -220,7 +232,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `News/` - Lista de noticias
   - `Tabla/` - Tabla de posiciones (Apertura/Clausura/Acumulado)
   - `Favoritos/` - Partidos favoritos del usuario
-  - `Profile/` - Perfil y configuración
+  - `Profile/` - Configuración y gestión de cuenta
   - `Login/` - Autenticación
   - `TabBar/` - Navegación principal
   - `Admin/` - Registro de partidos (administradores)
@@ -230,7 +242,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `NewsViewModel` - Gestión de noticias
   - `TorneoViewModel` - Gestión de tabla de posiciones
   - `FavoritosViewModel` - Gestión de favoritos
-  - `ProfileViewModel` - Gestión de perfil
+  - `ProfileViewModel` - Gestión de configuración
   - `LoginViewModel` - Gestión de autenticación
   - `RegistrarPartidosViewModel` - Registro masivo de partidos
 
@@ -456,8 +468,10 @@ liga1/
 │   │   │   ├── FavoritosViewController.swift # ViewController de favoritos
 │   │   │   └── TeamSearchModalViewController.swift # Modal de búsqueda de equipos
 │   │   ├── Profile/
-│   │   │   ├── ProfileViewController.swift  # ViewController de perfil
-│   │   │   └── ProfileViewController+TableView.swift # Extension con opciones de perfil
+│   │   │   ├── ProfileViewController.swift  # ViewController de configuración
+│   │   │   ├── ProfileViewController+TableView.swift # Extension con opciones de configuración
+│   │   │   ├── NotificationHistoryViewController.swift # Historial de notificaciones
+│   │   │   └── NotificationSettingsViewController.swift # Ajustes de notificaciones
 │   │   ├── Login/
 │   │   │   └── LoginViewController.swift    # Pantalla de autenticación
 │   │   ├── TabBar/
@@ -470,7 +484,7 @@ liga1/
 │   │   ├── NewsViewModel.swift              # Estado y lógica de Noticias (agrupación por categoría)
 │   │   ├── TorneoViewModel.swift            # Estado y lógica de Tabla (cache de posiciones)
 │   │   ├── FavoritosViewModel.swift         # Estado y lógica de Favoritos
-│   │   ├── ProfileViewModel.swift           # Estado y lógica de Perfil
+│   │   ├── ProfileViewModel.swift           # Estado y lógica de Configuración
 │   │   ├── LoginViewModel.swift             # Estado y lógica de Login
 │   │   └── RegistrarPartidosViewModel.swift # Estado y lógica de registro masivo
 │   │

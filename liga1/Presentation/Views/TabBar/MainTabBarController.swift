@@ -40,7 +40,7 @@ class MainTabBarController: UITabBarController {
         newsVC.title = "Noticias"
 
         let perfilVC = container.makeProfileViewController()
-        perfilVC.title = "Mi Perfil"
+        perfilVC.title = "Configuración"
 
         // Crear NavControllers con estilo Large Title
         let homeNav = createNavController(
@@ -68,8 +68,8 @@ class MainTabBarController: UITabBarController {
 
         let perfilNav = createNavController(
             rootViewController: perfilVC,
-            title: "perfil",
-            imageSystemName: "person"
+            title: "configuración",
+            imageSystemName: "gearshape"
         )
 
         viewControllers = [homeNav, torneoNav, favoritosNav, newsNav, perfilNav]
