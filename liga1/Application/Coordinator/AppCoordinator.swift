@@ -20,6 +20,51 @@ final class AppCoordinator: Coordinator {
         self.window = window
         self.container = container
         self.navigationController = UINavigationController()
+        
+        // Suscribirse a notificaciones de login y logout
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLoginSuccessfulNotification),
+            name: NSNotification.Name("LoginSuccessful"),
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLogoutSuccessfulNotification),
+            name: NSNotification.Name("LogoutSuccessful"),
+            object: nil
+        )
+    }
+    
+    @objc private func handleLogoutSuccessfulNotification(_ notification: Notification) {
+        Logger.shared.info("📢 AppCoordinator: Recibida notificación de logout exitoso")
+        
+        // Limpiar todos los child coordinators
+        childCoordinators.removeAll()
+        
+        // Verificar que NO haya un usuario autenticado
+        if Auth.auth().currentUser != nil {
+            Logger.shared.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
+            // Intentar cerrar sesión nuevamente
+            do {
+                try Auth.auth().signOut()
+                Logger.shared.info("✅ AppCoordinator: Sesión cerrada forzadamente")
+            } catch {
+                Logger.shared.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
+            }
+        }
+        
+        // Navegar al LoginFlow
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            Logger.shared.info("🚪 AppCoordinator: Navegando al LoginFlow desde notificación")
+            self.showLoginFlow()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     func start() {
@@ -30,13 +75,39 @@ final class AppCoordinator: Coordinator {
             showLoginFlow()
         }
     }
+    
+    @objc private func handleLoginSuccessfulNotification(_ notification: Notification) {
+        let source = notification.userInfo?["source"] as? String ?? "unknown"
+        Logger.shared.info("📢 AppCoordinator: Recibida notificación de login exitoso (source: \(source))")
+        
+        // Verificar que realmente haya un usuario autenticado
+        guard Auth.auth().currentUser != nil else {
+            Logger.shared.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
+            return
+        }
+        
+        // Navegar al MainFlow directamente
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            Logger.shared.info("🏠 AppCoordinator: Navegando al MainFlow desde notificación")
+            self.showMainFlow()
+        }
+    }
 
     func showLoginFlow() {
+        Logger.shared.info("🚪 AppCoordinator: Mostrando LoginFlow")
+        
+        // Limpiar cualquier child coordinator previo
+        childCoordinators.removeAll()
+        
         let loginCoordinator = container.makeLoginCoordinator(navigationController: navigationController)
         loginCoordinator.delegate = self
         addChildCoordinator(loginCoordinator)
         window.rootViewController = navigationController
+        window.makeKeyAndVisible()
         loginCoordinator.start()
+        
+        Logger.shared.info("✅ AppCoordinator: LoginFlow configurado")
     }
 
     func showMainFlow() {
@@ -54,6 +125,15 @@ extension AppCoordinator: LoginCoordinatorDelegate {
     func loginCoordinatorDidFinish(_ coordinator: LoginCoordinator) {
         Logger.shared.info("✅ AppCoordinator: LoginCoordinator finalizó, navegando al MainFlow")
         removeChildCoordinator(coordinator)
-        showMainFlow()
+        
+        // Verificar que haya un usuario autenticado antes de navegar
+        guard Auth.auth().currentUser != nil else {
+            Logger.shared.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.showMainFlow()
+        }
     }
 }

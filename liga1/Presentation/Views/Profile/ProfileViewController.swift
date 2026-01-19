@@ -127,14 +127,29 @@ class ProfileViewController: UIViewController {
     }
 
     private func navigateToLogin() {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            let loginViewController = container.makeLoginViewController()
-
-            window.rootViewController = loginViewController
-            window.makeKeyAndVisible()
-
-            UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
+        Logger.shared.info("🚪 ProfileViewController: Navegando al login después de cerrar sesión")
+        
+        // Publicar notificación para que AppCoordinator maneje la navegación
+        NotificationCenter.default.post(
+            name: NSNotification.Name("LogoutSuccessful"),
+            object: nil
+        )
+        
+        // También navegar directamente como fallback
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                let loginCoordinator = self.container.makeLoginCoordinator(navigationController: UINavigationController())
+                loginCoordinator.delegate = nil // No necesitamos delegate para logout
+                loginCoordinator.start()
+                
+                window.rootViewController = loginCoordinator.navigationController
+                window.makeKeyAndVisible()
+                
+                UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
+                Logger.shared.info("✅ ProfileViewController: Navegación al login completada")
+            }
         }
     }
 

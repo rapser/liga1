@@ -225,6 +225,7 @@ class LoginViewController: UIViewController {
 
 extension LoginViewController: LoginViewModelDelegate {
     func loginViewModelNeedsGoogleSignInPresentation(_ viewModel: LoginViewModel) {
+        Logger.shared.info("📱 LoginViewController: Presentando Google Sign In")
         viewModel.performGoogleSignIn(presentingViewController: self)
     }
 }

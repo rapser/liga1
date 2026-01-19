@@ -73,15 +73,21 @@ class LoginViewModel {
                 guard let self = self else { return }
                 Logger.shared.info("✅ Login exitoso con email/password")
                 
-                // Asegurar que la navegación se haga en el hilo principal
+                // Usar NotificationCenter como mecanismo principal para la navegación
                 DispatchQueue.main.async {
+                    Logger.shared.info("📢 Publicando notificación de login exitoso")
+                    NotificationCenter.default.post(
+                        name: NSNotification.Name("LoginSuccessful"),
+                        object: nil,
+                        userInfo: ["source": "email"]
+                    )
+                    
+                    // También intentar usar el delegate si está disponible
                     if let delegate = self.coordinatorDelegate {
-                        Logger.shared.info("📱 Notificando al coordinator sobre login exitoso")
+                        Logger.shared.info("📱 También notificando al coordinator via delegate")
                         delegate.loginViewModelDidLogin(self)
                     } else {
-                        Logger.shared.error("❌ coordinatorDelegate es nil - no se puede navegar al home", error: nil)
-                        // Intentar navegar directamente si el delegate no está configurado
-                        Logger.shared.warning("⚠️ Intentando navegar sin delegate - esto no debería pasar")
+                        Logger.shared.warning("⚠️ coordinatorDelegate es nil, usando solo NotificationCenter")
                     }
                 }
             }
@@ -89,24 +95,53 @@ class LoginViewModel {
     }
 
     func signInWithGoogle() {
-        delegate?.loginViewModelNeedsGoogleSignInPresentation(self)
+        Logger.shared.info("🔐 LoginViewModel: signInWithGoogle llamado")
+        if let delegate = delegate {
+            Logger.shared.info("✅ LoginViewModel: Delegate configurado, solicitando presentación de Google Sign In")
+            delegate.loginViewModelNeedsGoogleSignInPresentation(self)
+        } else {
+            Logger.shared.error("❌ LoginViewModel: delegate es nil - no se puede presentar Google Sign In", error: nil)
+            error = "Error de configuración. Por favor intenta de nuevo."
+        }
     }
 
     func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
 
+        Logger.shared.info("🔐 Iniciando login con Google")
+        Logger.shared.info("🔗 Verificando coordinatorDelegate antes de iniciar: \(coordinatorDelegate != nil ? "✅ configurado" : "❌ nil")")
+        
         loginUseCase.executeWithGoogle(presentingViewController: presentingViewController)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Google Sign In failed", error: error)
+                    Logger.shared.error("❌ Google Sign In failed", error: error)
                     self?.error = error.localizedDescription
                 }
             } receiveValue: { [weak self] _ in
                 guard let self = self else { return }
-                self.coordinatorDelegate?.loginViewModelDidLogin(self)
+                Logger.shared.info("✅ Login exitoso con Google")
+                
+                // Usar NotificationCenter como mecanismo principal para la navegación
+                // Esto es más robusto que el delegate porque no depende de referencias débiles
+                DispatchQueue.main.async {
+                    Logger.shared.info("📢 Publicando notificación de login exitoso")
+                    NotificationCenter.default.post(
+                        name: NSNotification.Name("LoginSuccessful"),
+                        object: nil,
+                        userInfo: ["source": "google"]
+                    )
+                    
+                    // También intentar usar el delegate si está disponible
+                    if let delegate = self.coordinatorDelegate {
+                        Logger.shared.info("📱 También notificando al coordinator via delegate")
+                        delegate.loginViewModelDidLogin(self)
+                    } else {
+                        Logger.shared.warning("⚠️ coordinatorDelegate es nil, usando solo NotificationCenter")
+                    }
+                }
             }
             .store(in: &cancellables)
     }
