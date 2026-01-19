@@ -65,6 +65,12 @@ class ProfileViewModel {
                     icon: UIImage(systemName: "bell.fill"),
                     subtitle: nil,
                     action: .notification
+                ),
+                ProfileOption(
+                    title: "Historial de notificaciones",
+                    icon: UIImage(systemName: "clock.fill"),
+                    subtitle: nil,
+                    action: .notificationHistory
                 )
             ]),
             ProfileSection(title: "Usuario", options: [
@@ -142,6 +148,7 @@ class ProfileViewModel {
 
     enum ProfileAction {
         case notification
+        case notificationHistory
         case editUsername
         case logout
         case feedback

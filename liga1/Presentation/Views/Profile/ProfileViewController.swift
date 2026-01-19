@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import UserNotifications
 
 class ProfileViewController: UIViewController {
 
@@ -87,8 +88,9 @@ class ProfileViewController: UIViewController {
     func handleAction(_ action: ProfileViewModel.ProfileAction) {
         switch action {
         case .notification:
-            // TODO: Implementar ajustes de notificaciones
-            break
+            openNotificationSettings()
+        case .notificationHistory:
+            navigateToNotificationHistory()
         case .editUsername:
             // TODO: Implementar edición de nombre de usuario
             break
@@ -156,6 +158,16 @@ class ProfileViewController: UIViewController {
     private func navigateToRegistrarPartidos() {
         let registrarPartidosVC = container.makeRegistrarPartidosViewController()
         navigationController?.pushViewController(registrarPartidosVC, animated: true)
+    }
+    
+    private func navigateToNotificationHistory() {
+        let notificationHistoryVC = NotificationHistoryViewController()
+        navigationController?.pushViewController(notificationHistoryVC, animated: true)
+    }
+    
+    private func openNotificationSettings() {
+        let notificationSettingsVC = NotificationSettingsViewController()
+        navigationController?.pushViewController(notificationSettingsVC, animated: true)
     }
 
 }

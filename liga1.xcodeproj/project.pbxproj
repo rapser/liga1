@@ -10,6 +10,8 @@
 		4613A7F32CCF2A1F0070034C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 4613A7F22CCF2A1F0070034C /* FirebaseAuth */; };
 		4613A7F62CCF2A7E0070034C /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 4613A7F52CCF2A7E0070034C /* GoogleSignIn */; };
 		4613A7F82CCF2A7E0070034C /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4613A7F72CCF2A7E0070034C /* GoogleSignInSwift */; };
+		4614616E2F1EA08D00BBC929 /* NotificationHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4614616D2F1EA08D00BBC929 /* NotificationHistoryViewController.swift */; };
+		461461702F1EA4A700BBC929 /* NotificationSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4614616F2F1EA4A700BBC929 /* NotificationSettingsViewController.swift */; };
 		46222A532C712CBA001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A522C712CBA001678DF /* FirebaseDatabase */; };
 		46222A552C712D15001678DF /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A542C712D15001678DF /* FirebaseDatabase */; };
 		46222A572C712D15001678DF /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 46222A562C712D15001678DF /* FirebaseInstallations */; };
@@ -134,6 +136,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4614616D2F1EA08D00BBC929 /* NotificationHistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHistoryViewController.swift; sourceTree = "<group>"; };
+		4614616F2F1EA4A700BBC929 /* NotificationSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsViewController.swift; sourceTree = "<group>"; };
 		4635E3682EFDEF93004A541C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4640016F2F08853F00A8C905 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
 		464001702F08853F00A8C905 /* UIStackView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Builder.swift"; sourceTree = "<group>"; };
@@ -561,6 +565,8 @@
 		464009EB2F098DF600A8C905 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				4614616F2F1EA4A700BBC929 /* NotificationSettingsViewController.swift */,
+				4614616D2F1EA08D00BBC929 /* NotificationHistoryViewController.swift */,
 				464009E92F098DF600A8C905 /* ProfileViewController.swift */,
 				464009EA2F098DF600A8C905 /* ProfileViewController+TableView.swift */,
 			);
@@ -950,6 +956,7 @@
 				464009D52F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift in Sources */,
 				464009D62F098D8D00A8C905 /* RegisterMatchesUseCase.swift in Sources */,
 				46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */,
+				461461702F1EA4A700BBC929 /* NotificationSettingsViewController.swift in Sources */,
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
 				46C8745B2F1C055D008C3619 /* TeamTableViewCell.swift in Sources */,
@@ -1002,6 +1009,7 @@
 				464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */,
 				46400A002F098EB800A8C905 /* DIContainer.swift in Sources */,
 				464009F72F098DF600A8C905 /* NewsHeaderWrapperCell.swift in Sources */,
+				4614616E2F1EA08D00BBC929 /* NotificationHistoryViewController.swift in Sources */,
 				464009F82F098DF600A8C905 /* TablaViewController.swift in Sources */,
 				464009F92F098DF600A8C905 /* TorneoViewController+TableView.swift in Sources */,
 				464009FA2F098DF600A8C905 /* RegistrarPartidosViewController.swift in Sources */,
