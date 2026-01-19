@@ -53,14 +53,14 @@ class NewsViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        viewModel.$featuredNews
+        viewModel.$groupedNews
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.tableView.reloadData()
             }
             .store(in: &cancellables)
-
-        viewModel.$groupedNews
+        
+        viewModel.$sortedCategories
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.tableView.reloadData()
