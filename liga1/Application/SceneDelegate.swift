@@ -26,9 +26,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Configurar color de tint global de la app
         window.tintColor = .liga1Red
 
-        // Cargar preferencia de tema guardada (o usar automático por defecto)
-        let savedStyle = UserDefaults.standard.integer(forKey: "userInterfaceStyle")
-        window.overrideUserInterfaceStyle = UIUserInterfaceStyle(rawValue: savedStyle) ?? .unspecified
+        // El tema se maneja automáticamente según la configuración del sistema del usuario
+        // No se establece overrideUserInterfaceStyle para respetar el tema del dispositivo
 
         // Crear DIContainer
         let container = DIContainer.shared

@@ -5,6 +5,34 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.0.0 (5)] - 2026-01-XX
+
+### ✨ Added
+- **Historial de Notificaciones**: Nueva opción en Configuración para ver todas las notificaciones entregadas al dispositivo
+- **Pantalla de Ajustes de Notificaciones**: Pantalla dedicada que muestra el estado de las notificaciones y permite abrir Configuración del sistema
+- **Eliminación de notificaciones**: Posibilidad de eliminar notificaciones del historial mediante swipe
+
+### 🔧 Changed
+- **Tab "Perfil" renombrado a "Configuración"**: El tab ahora se llama "Configuración" con icono de engranaje (gearshape)
+- **Tema automático**: El tema de la app ahora sigue automáticamente la configuración del sistema del dispositivo (se eliminó la opción manual de seleccionar tema)
+- **Ubicación de "Cerrar Sesión"**: Movido al final de todas las secciones de configuración con estilo destructivo (rojo)
+- **Historial de notificaciones**: Tabla plana con mayor altura de celdas para mejor legibilidad
+
+### 🐛 Fixed
+- **Login con Email/Password**: Corregido problema de navegación después del login exitoso usando NotificationCenter como mecanismo principal
+- **Login con Google**: Corregido problema donde el coordinatorDelegate se perdía durante el flujo, ahora usa NotificationCenter para navegación robusta
+- **Logout**: Mejorado el flujo de logout para asegurar que cierra sesión correctamente en Firebase y navega al login
+
+### 🗑️ Removed
+- **Service Extension de notificaciones push rich**: Eliminado PushServiceExtension y todas sus referencias
+- **Opción de selección de tema**: Eliminada la opción manual de cambiar entre modo claro/oscuro/automático
+
+### 🏗️ Refactor
+- **Sistema de navegación post-login**: Refactorizado para usar NotificationCenter como mecanismo principal de comunicación entre ViewModels y Coordinators
+- **AppCoordinator**: Ahora escucha directamente notificaciones de login/logout para navegación más robusta
+
+---
+
 ## [1.0.0 (4)] - 2026-01-XX
 
 ### ✨ Added

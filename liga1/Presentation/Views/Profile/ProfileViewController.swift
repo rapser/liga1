@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import UserNotifications
 
 class ProfileViewController: UIViewController {
 
@@ -87,15 +88,14 @@ class ProfileViewController: UIViewController {
     func handleAction(_ action: ProfileViewModel.ProfileAction) {
         switch action {
         case .notification:
-            // TODO: Implementar ajustes de notificaciones
-            break
+            openNotificationSettings()
+        case .notificationHistory:
+            navigateToNotificationHistory()
         case .editUsername:
             // TODO: Implementar edición de nombre de usuario
             break
         case .logout:
             showLogoutConfirmation()
-        case .theme:
-            showThemeBottomSheet()
         case .feedback:
             // TODO: Implementar envío de feedback
             break
@@ -115,43 +115,6 @@ class ProfileViewController: UIViewController {
         }
     }
 
-    private func showThemeBottomSheet() {
-        let alertController = UIAlertController(title: "Selecciona un tema",
-                                                message: nil,
-                                                preferredStyle: .actionSheet)
-
-        alertController.addAction(UIAlertAction(title: "Claro", style: .default, handler: { [weak self] _ in
-            self?.setAppTheme(.light)
-        }))
-
-        alertController.addAction(UIAlertAction(title: "Oscuro", style: .default, handler: { [weak self] _ in
-            self?.setAppTheme(.dark)
-        }))
-
-        alertController.addAction(UIAlertAction(title: "Automático", style: .default, handler: { [weak self] _ in
-            self?.setAppTheme(.unspecified)
-        }))
-
-        alertController.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: nil))
-
-        if let sheet = alertController.sheetPresentationController {
-            sheet.detents = [.medium()]
-        }
-
-        present(alertController, animated: true, completion: nil)
-    }
-
-    private func setAppTheme(_ style: UIUserInterfaceStyle) {
-        viewModel.updateTheme(style)
-
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                window.overrideUserInterfaceStyle = style
-            }, completion: nil)
-        }
-    }
-
     private func showLogoutConfirmation() {
         let alert = UIAlertController(title: "Cerrar Sesión",
                                       message: "¿Estás seguro de que deseas cerrar sesión?",
@@ -166,20 +129,45 @@ class ProfileViewController: UIViewController {
     }
 
     private func navigateToLogin() {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            let loginViewController = container.makeLoginViewController()
-
-            window.rootViewController = loginViewController
-            window.makeKeyAndVisible()
-
-            UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
+        Logger.shared.info("🚪 ProfileViewController: Navegando al login después de cerrar sesión")
+        
+        // Publicar notificación para que AppCoordinator maneje la navegación
+        NotificationCenter.default.post(
+            name: NSNotification.Name("LogoutSuccessful"),
+            object: nil
+        )
+        
+        // También navegar directamente como fallback
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                let loginCoordinator = self.container.makeLoginCoordinator(navigationController: UINavigationController())
+                loginCoordinator.delegate = nil // No necesitamos delegate para logout
+                loginCoordinator.start()
+                
+                window.rootViewController = loginCoordinator.navigationController
+                window.makeKeyAndVisible()
+                
+                UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
+                Logger.shared.info("✅ ProfileViewController: Navegación al login completada")
+            }
         }
     }
 
     private func navigateToRegistrarPartidos() {
         let registrarPartidosVC = container.makeRegistrarPartidosViewController()
         navigationController?.pushViewController(registrarPartidosVC, animated: true)
+    }
+    
+    private func navigateToNotificationHistory() {
+        let notificationHistoryVC = NotificationHistoryViewController()
+        navigationController?.pushViewController(notificationHistoryVC, animated: true)
+    }
+    
+    private func openNotificationSettings() {
+        let notificationSettingsVC = NotificationSettingsViewController()
+        navigationController?.pushViewController(notificationSettingsVC, animated: true)
     }
 
 }

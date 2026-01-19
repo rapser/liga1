@@ -26,7 +26,34 @@ final class LoginCoordinator: Coordinator {
     func start() {
         let loginVC = container.makeLoginViewController()
         loginVC.viewModel.coordinatorDelegate = self
+        Logger.shared.info("🔗 LoginCoordinator: coordinatorDelegate configurado")
+        Logger.shared.info("🔗 LoginCoordinator: Verificando delegate después de configurar: \(loginVC.viewModel.coordinatorDelegate != nil ? "✅ configurado" : "❌ nil")")
+        
+        // Suscribirse a notificaciones como fallback
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLoginSuccessfulNotification),
+            name: NSNotification.Name("LoginSuccessful"),
+            object: nil
+        )
+        
         navigationController.setViewControllers([loginVC], animated: false)
+        
+        // Verificar nuevamente después de agregar al navigation controller
+        DispatchQueue.main.async {
+            Logger.shared.info("🔗 LoginCoordinator: Verificando delegate después de agregar al navigation: \(loginVC.viewModel.coordinatorDelegate != nil ? "✅ configurado" : "❌ nil")")
+        }
+    }
+    
+    @objc private func handleLoginSuccessfulNotification(_ notification: Notification) {
+        let source = notification.userInfo?["source"] as? String ?? "unknown"
+        Logger.shared.info("📢 LoginCoordinator: Recibida notificación de login exitoso (source: \(source))")
+        didFinishLogin()
+    }
+    
+    deinit {
+        Logger.shared.info("🗑️ LoginCoordinator: Deallocando")
+        NotificationCenter.default.removeObserver(self)
     }
 
     func didFinishLogin() {
@@ -44,7 +71,7 @@ extension LoginCoordinator: LoginViewModelCoordinatorDelegate {
     }
 
     func loginViewModelDidLogin(_ viewModel: LoginViewModel) {
-        Logger.shared.info("Login successful, finishing login flow")
+        Logger.shared.info("✅ LoginCoordinator: Login exitoso, finalizando flujo de login")
         didFinishLogin()
     }
 }
