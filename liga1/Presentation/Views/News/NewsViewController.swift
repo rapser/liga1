@@ -34,6 +34,12 @@ class NewsViewController: UIViewController {
         bindViewModel()
         viewModel.fetchNews()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Recargar noticias cada vez que se entra a esta tab
+        viewModel.fetchNews()
+    }
 
     private func setupTableView() {
         tableView.register(NewsCell.self, forCellReuseIdentifier: "NewsCell")
@@ -47,14 +53,14 @@ class NewsViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        viewModel.$featuredNews
+        viewModel.$groupedNews
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.tableView.reloadData()
             }
             .store(in: &cancellables)
-
-        viewModel.$groupedNews
+        
+        viewModel.$sortedCategories
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.tableView.reloadData()

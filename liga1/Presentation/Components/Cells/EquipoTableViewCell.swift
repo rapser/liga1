@@ -68,22 +68,37 @@ class EquipoTableViewCell: UITableViewCell {
 
         // Anchos específicos para cada elemento
         posicionLabel.width(25)
+        posicionLabel.height(25)
+        posicionLabel.clip(true)
         partidosJugadosLabel.width(30)
         golesLabel.width(60)
         puntosLabel.width(40)
         logoImageView.square(20)
     }
     
-    func configure(with model: Team, position: Int, positionColor: UIColor? = nil) {
+    func configure(with model: Team, position: Int, positionColor: UIColor? = nil, isChampion: Bool = false) {
         posicionLabel.text = "\(position)."
 
-        // Aplicar color a la posición si se proporciona (modo oscuro)
-        if let color = positionColor {
-            posicionLabel.textColor = color
-            posicionLabel.font = UIFont.boldSystemFont(ofSize: 14)
+        // Si es campeón (puesto 1), aplicar fondo amarillo solo al número
+        if isChampion {
+            posicionLabel.backgroundColor = .libertadoresGold
+            posicionLabel.textColor = .black
+            posicionLabel.font = UIFont.boldSystemFont(ofSize: 12)
+            posicionLabel.layer.cornerRadius = 4
+            posicionLabel.clip(true)
         } else {
-            posicionLabel.textColor = .label
-            posicionLabel.font = UIFont.systemFont(ofSize: 12)
+            // Resetear estilos si no es campeón
+            posicionLabel.backgroundColor = .clear
+            posicionLabel.layer.cornerRadius = 0
+            
+            // Aplicar color a la posición si se proporciona (modo oscuro)
+            if let color = positionColor {
+                posicionLabel.textColor = color
+                posicionLabel.font = UIFont.boldSystemFont(ofSize: 14)
+            } else {
+                posicionLabel.textColor = .label
+                posicionLabel.font = UIFont.systemFont(ofSize: 12)
+            }
         }
 
         // Cargar logo solo si el nombre no está vacío para evitar el error de CUICatalog

@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -11,6 +9,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>com.googleusercontent.apps.104695235046-1cg78cmthvjgbg563hlhun2e2vg86fmt</string>
 				<string>com.googleusercontent.apps.104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn</string>
 			</array>
 		</dict>
@@ -18,10 +17,11 @@
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>GIDClientID</key>
-	<string>104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn.apps.googleusercontent.com</string>
+	<string>104695235046-1cg78cmthvjgbg563hlhun2e2vg86fmt.apps.googleusercontent.com</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>google</string>
+		<string>com.googleusercontent.apps.104695235046-1cg78cmthvjgbg563hlhun2e2vg86fmt</string>
 		<string>com.googleusercontent.apps.104695235046-ojd444ac3p6jl9oee16b96htkvkb4qpn</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
@@ -41,5 +41,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
 </dict>
 </plist>

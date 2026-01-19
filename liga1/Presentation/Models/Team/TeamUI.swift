@@ -21,6 +21,7 @@ struct TeamUI {
     let golesContra: Int
     let diferenciaGoles: Int
     let puntos: Int
+    var isFavorite: Bool = false
 
     // MARK: - Computed Properties for UI
 

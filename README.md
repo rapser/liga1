@@ -4,33 +4,167 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 ## 📱 Características
 
-- **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real
-- **Tabla de Posiciones**: Consulta las tablas de Apertura, Clausura y Acumulado con estadísticas detalladas
+- **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario
+- **Tabla de Posiciones**: Consulta las tablas de Apertura, Clausura y Acumulado con estadísticas detalladas. Indicador visual especial (cuadrado amarillo) para el puesto 1 (campeón)
 - **Favoritos**: Marca tus partidos favoritos para seguimiento rápido con sincronización en tiempo real
-- **Noticias**: Mantente informado con las últimas noticias del fútbol peruano
+- **Noticias**: Mantente informado con las últimas noticias del fútbol peruano, agrupadas por categoría con ordenamiento inteligente por fecha de noticia destacada
 - **Autenticación**: Ingresa con Google o correo electrónico para sincronizar tus favoritos
-- **Modo Oscuro**: Soporte completo para Dark Mode
-- **UI Programático**: Interfaz construida 100% con código (sin Storyboards)
+- **Modo Oscuro**: Soporte completo para Dark Mode con ajustes visuales optimizados
+- **UI Programático**: Interfaz construida 100% con código (sin Storyboards) usando APIs modernas de iOS 18
+- **Recarga Automática**: Datos se actualizan automáticamente al entrar a las tabs de Torneo y Noticias
+- **Gestión de Notificaciones**: Badge de notificaciones se limpia automáticamente al abrir la app
+
+## ⚙️ Features Detalladas
+
+### 🏠 Home - Partidos por Jornada
+
+#### Visualización de Partidos
+- **Sistema de Jornadas**: Visualización de jornadas activas con estructura anidada en Firestore
+- **Headers Duales**:
+  - **Header de Fecha**: Muestra la fecha del próximo partido con formato inteligente
+    - Si es hoy: "Hoy 30.01"
+    - Si es futuro: "Viernes 30.01"
+    - Icono de calendario alineado a la derecha
+  - **Header de Jornada**: Muestra "Fecha X" y "Liga 1 - Torneo 2026" con fondo diferenciado
+- **Pull-to-Refresh**: Actualización manual con spinner visible en modo claro y oscuro (blanco en oscuro)
+- **Listado de Partidos**: Cada jornada muestra sus partidos con:
+  - Logos de equipos local y visitante
+  - Marcador en tiempo real (si está en vivo)
+  - Estado del partido (pendiente, envivo, finalizado)
+  - Botón de favorito por partido
+
+#### Gestión de Datos
+- **Actualización Reactiva**: Uso de listeners de Firestore para actualización automática
+- **Filtrado Inteligente**: Solo muestra partidos del día más próximo (hoy o futuro)
+- **Recarga Automática**: Al entrar a la tab se recargan los datos (`viewWillAppear`)
+
+### 📊 Tabla de Posiciones
+
+#### Características Visuales
+- **Indicador de Campeón**: Cuadrado amarillo dorado alrededor del número 1 (no fondo en toda la celda)
+- **Zonas de Clasificación** (modo claro):
+  - 🟡 **Puesto 1**: Cuadrado amarillo en el número de posición
+  - 🟢 **Zona Libertadores**: Fondo dorado (puestos 1-4 según torneo)
+  - 🔵 **Zona Sudamericana**: Fondo azul (puestos 5-8)
+  - 🔴 **Zona Descenso**: Fondo rojo (últimos 3 puestos)
+- **Modo Oscuro Optimizado**: Sin fondos de colores, solo indicador amarillo para campeón
+- **Header Personalizado**: Columnas "Equipo", "PJ", "GF-GC", "DG", "Pts"
+
+#### Lógica de Ordenamiento
+- **Orden Alfabético**: Cuando todos los equipos tienen 0 puntos
+- **Orden por Rendimiento**: Por puntos (descendente), luego diferencia de goles (descendente)
+- **Recarga Automática**: Al entrar a la tab se recargan los datos sin usar caché
+
+### 📰 Noticias
+
+#### Agrupación Inteligente
+- **Agrupación por Categoría**: Noticias agrupadas por categoría (Liga 1, General, etc.)
+- **Ordenamiento por Fecha**:
+  - **Entre categorías**: Ordenadas por fecha de noticia destacada más reciente (no alfabético)
+  - **Dentro de categoría**: Primero destacadas (ordenadas por fecha), luego normales (ordenadas por fecha)
+- **Tipos de Celdas**:
+  - **FeaturedNewsContentCell**: Para noticias destacadas (imagen grande + título)
+  - **NewsCell**: Para noticias normales (formato compacto)
+
+#### Características
+- **Noticias Destacadas**: Se muestran primero en su categoría con celda especial
+- **Navegación Web**: Al tocar una noticia se abre Safari (`SFSafariViewController`)
+- **Recarga Automática**: Al entrar a la tab se recargan las noticias
+
+### ⭐ Favoritos
+
+#### Gestión de Favoritos
+- **Marcado Visual**: Botón de corazón en cada partido
+- **Persistencia**: Favoritos guardados en Firestore bajo `users/{userId}/favorites`
+- **Sincronización en Tiempo Real**: Listeners de Firestore para actualización automática
+- **ID Completo**: `{jornadaId}_{matchId}` (ej: "apertura_01_adt_utc")
+- **Actualización Automática**: UI se actualiza reactivamente con Combine
+
+### 🔐 Autenticación
+
+#### Métodos de Login
+- **Google Sign-In**: Inicio de sesión con cuenta de Google (OAuth 2.0)
+- **Email/Password**: Autenticación tradicional con Firebase Auth
+- **Persistencia de Sesión**: Firebase Auth mantiene la sesión activa
+- **Navegación Automática**: Al iniciar sesión, navega automáticamente al MainTabBar
+
+#### Gestión de Sesión
+- **SessionManager**: Gestión de timeout de inactividad (5 días)
+- **Cierre Automático**: Cierra sesión automáticamente después de inactividad prolongada
+
+### 👤 Perfil
+
+#### Opciones Disponibles
+- **Información del Usuario**: Email y nombre de usuario
+- **Ajustes de Notificaciones**: Acceso a configuración de push notifications
+- **Cambio de Tema**: Alternar entre modo claro, oscuro y automático
+- **Cerrar Sesión**: Botón para cerrar sesión y volver al login
+
+### 🛠 Panel de Administración
+
+#### Registro Masivo
+- **Registro de Jornadas**: Crear múltiples jornadas de forma masiva
+- **Registro de Partidos**: Asignar partidos a jornadas con fixture completo
+- **Validación de Datos**: Validación antes de registrar en Firestore
+- **Feedback Visual**: Indicadores de éxito/error en las operaciones
+
+### 📱 Notificaciones Push
+
+#### Características
+- **Registro Automático**: Se registra automáticamente para notificaciones remotas
+- **FCM Integration**: Integración con Firebase Cloud Messaging
+- **Badge Management**: Limpieza automática de badge al abrir la app (API moderna iOS 18)
+- **Topics**: Suscripción a topics (ej: "live_matches")
+- **Extension**: PushServiceExtension para modificar notificaciones antes de mostrar
 
 ## 🛠 Tecnologías y Frameworks
 
-### Lenguaje
-- **Swift 5.0+**
-- **UIKit Programático** - Construcción de interfaces sin Storyboards
-- **Combine** - Framework reactivo para manejo de eventos y flujo de datos
+### Lenguaje y Runtime
+- **Swift 5.0+** - Lenguaje de programación principal
+- **iOS 18.0+** - Versión mínima del sistema operativo
+- **UIKit Programático** - Construcción de interfaces 100% con código (sin Storyboards)
+- **Combine Framework** - Framework reactivo para manejo de eventos y flujo de datos asíncronos
 
-### Backend & Servicios
-- **Firebase**
-  - **Firestore**: Base de datos NoSQL para almacenamiento de partidos, jornadas, equipos y noticias
-  - **Authentication**: Sistema de autenticación con Google Sign-In y Email/Password
-  - **Storage**: Almacenamiento de imágenes y recursos multimedia
+### Dependencias Principales (Swift Package Manager)
 
-### Autenticación
-- **Google Sign-In SDK**: Inicio de sesión con Google
-- **Firebase Auth**: Gestión de usuarios y sesiones
+#### Firebase SDK (v11.0.0)
+- **Firebase/Firestore**: Base de datos NoSQL en tiempo real
+  - Persistencia offline habilitada
+  - Listeners reactivos para actualización automática
+  - Estructura anidada: `jornadas/{jornadaId}/matches/{matchId}`
+  
+- **Firebase/Auth**: Sistema de autenticación
+  - Soporte para Google Sign-In (OAuth 2.0)
+  - Autenticación con Email/Password
+  - Gestión de sesiones persistente
+  
+- **Firebase/Storage**: Almacenamiento de recursos multimedia
+  - Imágenes de equipos
+  - Logos y assets
+
+- **Firebase/Messaging**: Notificaciones push
+  - FCM (Firebase Cloud Messaging)
+  - Gestión de tokens
+  - Notificaciones remotas
+
+#### Google Sign-In SDK (v8.0.0)
+- **GoogleSignIn-iOS**: SDK oficial para autenticación con Google
+  - OAuth 2.0 flow
+  - Gestión de sesiones de Google
+  - Integración con Firebase Auth
+
+#### Dependencias de Soporte
+- **AppAuth-iOS** (v1.7.5): Framework OAuth/OpenID Connect
+- **Promises** (v2.4.0): Manejo de promesas asíncronas
+- **Swift Protobuf** (v1.27.1): Serialización de protocol buffers
+- **LevelDB** (v1.22.5): Base de datos embebida para cache local de Firestore
+- **Nanopb** (v2.30910.0): Implementación ligera de protocol buffers
 
 ### Gestión de Dependencias
-- **Swift Package Manager (SPM)**: Manejo de dependencias externas
+- **Swift Package Manager (SPM)**: Gestión nativa de dependencias
+  - Todas las dependencias se resuelven automáticamente
+  - Sin necesidad de CocoaPods o Carthage
+  - Integración directa con Xcode
 
 ## 🏗 Arquitectura
 
@@ -291,124 +425,188 @@ class HomeViewController {
 }
 ```
 
-### Estructura del Proyecto
+## 📁 Estructura Detallada del Proyecto
+
+### Estructura de Directorios y Archivos
 
 ```
 liga1/
-├── Application/
-│   ├── AppDelegate.swift
-│   ├── SceneDelegate.swift
-│   ├── SessionManager.swift
-│   └── Coordinator/
-│       ├── AppCoordinator.swift
-│       ├── Coordinator.swift
-│       └── LoginCoordinator.swift
 │
-├── Presentation/
+├── 📱 Application/
+│   ├── AppDelegate.swift                    # Configuración inicial de la app, notificaciones push
+│   ├── SceneDelegate.swift                  # Gestión de escenas y ciclo de vida
+│   ├── SessionManager.swift                 # Gestión de sesión y timeout de inactividad
+│   └── Coordinator/
+│       ├── Coordinator.swift                # Protocolo base para coordinadores
+│       ├── AppCoordinator.swift             # Coordinador principal (Login/Main flow)
+│       └── LoginCoordinator.swift           # Coordinador de flujo de autenticación
+│
+├── 🎨 Presentation/ (Capa de Presentación)
 │   ├── Views/
 │   │   ├── Home/
+│   │   │   ├── HomeViewController.swift     # ViewController principal con tabla de jornadas
+│   │   │   └── HomeTableViewAdapter.swift   # Adapter para lógica de UITableView (headers, celdas)
 │   │   ├── News/
+│   │   │   ├── NewsViewController.swift     # ViewController de noticias
+│   │   │   └── NewsViewController+TableView.swift # Extension con dataSource/delegate
 │   │   ├── Tabla/
+│   │   │   ├── TablaViewController.swift    # ViewController de tabla de posiciones
+│   │   │   └── TorneoViewController+TableView.swift # Extension con lógica de tabla
 │   │   ├── Favoritos/
+│   │   │   ├── FavoritosViewController.swift # ViewController de favoritos
+│   │   │   └── TeamSearchModalViewController.swift # Modal de búsqueda de equipos
 │   │   ├── Profile/
+│   │   │   ├── ProfileViewController.swift  # ViewController de perfil
+│   │   │   └── ProfileViewController+TableView.swift # Extension con opciones de perfil
 │   │   ├── Login/
+│   │   │   └── LoginViewController.swift    # Pantalla de autenticación
 │   │   ├── TabBar/
+│   │   │   └── MainTabBarController.swift   # Tab bar principal con 5 tabs
 │   │   └── Admin/
+│   │       └── RegistrarPartidosViewController.swift # Panel de administración
+│   │
 │   ├── ViewModels/
-│   │   ├── HomeViewModel.swift
-│   │   ├── NewsViewModel.swift
-│   │   ├── TorneoViewModel.swift
-│   │   ├── FavoritosViewModel.swift
-│   │   ├── ProfileViewModel.swift
-│   │   ├── LoginViewModel.swift
-│   │   └── RegistrarPartidosViewModel.swift
-│   ├── Models/
+│   │   ├── HomeViewModel.swift              # Estado y lógica de Home (jornadas activas)
+│   │   ├── NewsViewModel.swift              # Estado y lógica de Noticias (agrupación por categoría)
+│   │   ├── TorneoViewModel.swift            # Estado y lógica de Tabla (cache de posiciones)
+│   │   ├── FavoritosViewModel.swift         # Estado y lógica de Favoritos
+│   │   ├── ProfileViewModel.swift           # Estado y lógica de Perfil
+│   │   ├── LoginViewModel.swift             # Estado y lógica de Login
+│   │   └── RegistrarPartidosViewModel.swift # Estado y lógica de registro masivo
+│   │
+│   ├── Models/ (Modelos específicos de UI)
 │   │   ├── Match/
+│   │   │   └── MatchUI.swift                # Modelo UI con propiedades formateadas
 │   │   ├── Team/
+│   │   │   └── TeamUI.swift                 # Modelo UI de equipo
 │   │   ├── NewsItem/
+│   │   │   └── NewsItemUI.swift             # Modelo UI con fecha formateada
 │   │   └── Jornada/
+│   │       └── JornadaUI.swift              # Modelo UI de jornada
+│   │
 │   ├── Mappers/
-│   │   ├── MatchUIMapper.swift
-│   │   ├── TeamUIMapper.swift
-│   │   ├── NewsItemUIMapper.swift
-│   │   └── JornadaUIMapper.swift
+│   │   ├── MatchUIMapper.swift              # Domain Entity → UI Model (Match)
+│   │   ├── TeamUIMapper.swift               # Domain Entity → UI Model (Team)
+│   │   ├── NewsItemUIMapper.swift           # Domain Entity → UI Model (NewsItem)
+│   │   └── JornadaUIMapper.swift            # Domain Entity → UI Model (Jornada)
+│   │
 │   └── Components/
 │       ├── Cells/
-│       └── Headers/
+│       │   ├── MatchTableViewCell.swift     # Celda de partido con logos y marcador
+│       │   ├── EquipoTableViewCell.swift    # Celda de equipo en tabla de posiciones
+│       │   ├── NewsCell.swift               # Celda estándar de noticia
+│       │   ├── FeaturedNewsContentCell.swift # Celda destacada de noticia (imagen grande)
+│       │   ├── HeaderView.swift             # Header de tabla de posiciones
+│       │   ├── CategoryHeaderView.swift     # Header de categoría de noticias
+│       │   └── FeaturedNewsTitleHeaderView.swift # Header "NOTICIA DESTACADA"
+│       └── DividerView.swift                # Separador visual reutilizable
 │
-├── Domain/
-│   ├── Entities/
+├── 🎯 Domain/ (Capa de Dominio - Lógica de Negocio)
+│   ├── Entities/ (Entidades puras, sin dependencias)
 │   │   ├── Match/
+│   │   │   └── Match.swift                  # Entidad: Partido (fecha, equipos, resultado, estado)
 │   │   ├── Jornada/
+│   │   │   └── Jornada.swift                # Entidad: Jornada (id, torneo, numero, fechaInicio)
 │   │   ├── Team/
+│   │   │   └── Team.swift                   # Entidad: Equipo (nombre, estadísticas, puntos)
 │   │   └── NewsItem/
-│   ├── Repositories/
-│   │   ├── JornadasRepositoryProtocol.swift
-│   │   ├── MatchesRepositoryProtocol.swift
-│   │   ├── TeamsRepositoryProtocol.swift
-│   │   ├── NewsRepositoryProtocol.swift
-│   │   └── AdminMatchRepositoryProtocol.swift
-│   └── UseCases/
+│   │       └── NewsItem.swift               # Entidad: Noticia (titulo, url, categoria, fecha)
+│   │
+│   ├── Repositories/ (Protocolos - Contratos)
+│   │   ├── JornadasRepositoryProtocol.swift # Protocolo: Operaciones con jornadas
+│   │   ├── MatchesRepositoryProtocol.swift  # Protocolo: Operaciones con partidos
+│   │   ├── TeamsRepositoryProtocol.swift    # Protocolo: Operaciones con equipos
+│   │   ├── NewsRepositoryProtocol.swift     # Protocolo: Operaciones con noticias
+│   │   └── AdminMatchRepositoryProtocol.swift # Protocolo: Operaciones admin
+│   │
+│   └── UseCases/ (Casos de Uso - Lógica de Negocio)
 │       ├── Jornadas/
+│       │   ├── FetchActiveJornadasUseCase.swift      # Obtener jornadas activas
+│       │   └── ObserveActiveJornadasUseCase.swift    # Observar cambios en jornadas
 │       ├── Matches/
+│       │   ├── FetchMatchesUseCase.swift             # Obtener partidos de una jornada
+│       │   └── ObserveMatchesUseCase.swift           # Observar cambios en partidos
 │       ├── Teams/
+│       │   └── FetchTeamsUseCase.swift               # Obtener equipos de un torneo
 │       ├── News/
+│       │   └── FetchNewsUseCase.swift                # Obtener todas las noticias
 │       ├── Favorites/
+│       │   ├── ToggleFavoriteUseCase.swift           # Marcar/desmarcar favorito
+│       │   ├── ObserveFavoritesUseCase.swift         # Observar cambios en favoritos
+│       │   └── FetchFavoriteMatchesUseCase.swift     # Obtener partidos favoritos
 │       ├── Auth/
+│       │   ├── LoginUseCase.swift                    # Iniciar sesión
+│       │   └── LogoutUseCase.swift                   # Cerrar sesión
 │       └── Admin/
+│           └── RegisterMatchesUseCase.swift          # Registro masivo de partidos
 │
-├── Data/
-│   ├── Repositories/
-│   │   ├── JornadasRepository.swift
-│   │   ├── MatchesRepository.swift
-│   │   ├── TeamsRepository.swift
-│   │   ├── NewsRepository.swift
-│   │   └── AdminMatchRepository.swift
-│   ├── DTOs/
+├── 💾 Data/ (Capa de Datos - Acceso a Firebase)
+│   ├── Repositories/ (Implementaciones)
+│   │   ├── JornadasRepository.swift         # Implementa JornadasRepositoryProtocol
+│   │   ├── MatchesRepository.swift          # Implementa MatchesRepositoryProtocol
+│   │   ├── TeamsRepository.swift            # Implementa TeamsRepositoryProtocol
+│   │   ├── NewsRepository.swift             # Implementa NewsRepositoryProtocol
+│   │   └── AdminMatchRepository.swift       # Implementa AdminMatchRepositoryProtocol
+│   │
+│   ├── DTOs/ (Data Transfer Objects - Firestore)
 │   │   ├── Match/
+│   │   │   └── MatchDTO.swift               # Estructura que coincide con Firestore
 │   │   ├── Jornada/
+│   │   │   └── JornadaDTO.swift             # Estructura que coincide con Firestore
 │   │   ├── Team/
+│   │   │   └── TeamDTO.swift                # Estructura que coincide con Firestore
 │   │   └── NewsItem/
+│   │       └── NewsItemDTO.swift            # Estructura que coincide con Firestore
+│   │
 │   ├── Mappers/
-│   │   ├── MatchMapper.swift
-│   │   ├── JornadaMapper.swift
-│   │   ├── TeamMapper.swift
-│   │   └── NewsItemMapper.swift
-│   ├── Services/
-│   │   ├── AuthService.swift
-│   │   └── FavoritesService.swift
+│   │   ├── MatchMapper.swift                # DTO → Domain Entity (Match)
+│   │   ├── JornadaMapper.swift              # DTO → Domain Entity (Jornada)
+│   │   ├── TeamMapper.swift                 # DTO → Domain Entity (Team)
+│   │   └── NewsItemMapper.swift             # DTO → Domain Entity (NewsItem)
+│   │
+│   ├── Services/ (Servicios transversales)
+│   │   ├── AuthService.swift                # Autenticación con Firebase Auth
+│   │   └── FavoritesService.swift           # Gestión de favoritos en Firestore
+│   │
 │   └── Helpers/
-│       └── AperturaFixtureData.swift
+│       └── AperturaFixtureData.swift        # Datos del fixture completo del torneo
 │
-├── Core/
+├── 🔧 Core/ (Capa Core - Utilidades y Configuración)
 │   ├── Firebase/
-│   │   ├── FirestoreManager.swift
-│   │   └── DatabaseProtocol.swift
+│   │   ├── FirestoreManager.swift           # Abstracción de Firestore (implementa DatabaseProtocol)
+│   │   ├── DatabaseProtocol.swift           # Protocolo para testing y abstracción
+│   │   └── NotificationService.swift        # Gestión de notificaciones push
+│   │
 │   ├── Extensions/
-│   │   ├── UIView+Layout.swift
-│   │   ├── UIStackView+Builder.swift
-│   │   ├── Color+Extension.swift
-│   │   └── UIViewController+Alert.swift
+│   │   ├── UIView+Layout.swift              # DSL para Auto Layout declarativo
+│   │   ├── UIStackView+Builder.swift        # Builder pattern para stack views
+│   │   ├── Color+Extension.swift            # Colores personalizados (.liga1Red, .libertadoresGold)
+│   │   └── UIViewController+Alert.swift     # Helpers para mostrar alerts
+│   │
 │   ├── Utils/
-│   │   ├── LayoutPresets.swift
-│   │   ├── EquipoPeruano.swift
-│   │   ├── TorneoType.swift
-│   │   ├── TablePosition.swift
-│   │   └── NewsCategory.swift
+│   │   ├── LayoutPresets.swift              # Componentes UI reutilizables (botones, labels, tables)
+│   │   ├── EquipoPeruano.swift              # Enum con códigos de 18 equipos (ali, utc, etc.)
+│   │   ├── TorneoType.swift                 # Enum: .apertura, .clausura, .acumulado
+│   │   ├── TablePosition.swift              # Enum y lógica de zonas (libertadores, sudamericana, descenso)
+│   │   └── NewsCategory.swift               # Enum: .liga1, .seleccion, .internacional, .other
+│   │
 │   ├── Constants/
-│   │   └── FirestoreConstants.swift
+│   │   └── FirestoreConstants.swift         # Nombres de colecciones y campos
+│   │
 │   ├── Logging/
-│   │   └── Logger.swift
+│   │   └── Logger.swift                     # Logger centralizado (debug, info, warning, error)
+│   │
 │   └── Auth/
-│       └── AuthProvider.swift
+│       └── AuthProvider.swift               # Protocolo de autenticación
 │
-├── DI/
-│   └── DIContainer.swift
+├── 🔌 DI/ (Dependency Injection)
+│   └── DIContainer.swift                    # Contenedor centralizado para inyección de dependencias
 │
-└── Resources/
-    ├── Assets.xcassets/
-    ├── GoogleService-Info.plist
-    └── Info.plist
+└── 📦 Resources/
+    ├── Assets.xcassets/                     # Imágenes, logos de 18 equipos, colores
+    ├── GoogleService-Info.plist             # Configuración de Firebase
+    ├── Info.plist                           # Configuración de la app (URL schemes, etc.)
+    └── [Archivos JSON de datos]             # Datos estáticos si los hay
 ```
 
 ## 🗄 Estructura de Datos en Firestore
@@ -470,11 +668,14 @@ news/
 
 - **Layout Programático**: 100% código con Auto Layout
 - **Diseño Adaptativo**: Soporte completo para modo claro y oscuro
-- **Pull-to-Refresh**: Actualización manual de datos
+- **Pull-to-Refresh**: Actualización manual de datos con spinner visible en ambos modos
 - **Loading States**: Indicadores de carga
 - **Error Handling**: Mensajes informativos para errores
 - **Custom Extensions**: Helpers para layout declarativo
 - **Reactive UI**: Actualización automática con Combine
+- **APIs Modernas**: Uso de APIs de iOS 17+ y iOS 18 sin deprecaciones
+- **Gestión de Badge**: Limpieza automática de badges de notificaciones al abrir la app
+- **Headers Inteligentes**: Headers con información contextual (fechas, iconos) adaptados al contenido
 
 ## 🚀 Instalación y Configuración
 
