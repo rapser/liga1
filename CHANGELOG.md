@@ -5,6 +5,31 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.0.0 (4)] - 2026-01-XX
+
+### ✨ Added
+- Header de fecha en Home: Muestra la fecha del próximo partido con icono de calendario antes del header de jornada
+- Formato inteligente de fecha: Muestra "Hoy" cuando el partido es el día actual, o el día de la semana con fecha (ej: "Viernes 30.01")
+- Fondo diferenciado en header de jornada: Uso de `.secondarySystemBackground` para distinguir visualmente el header de fecha del header de jornada
+
+### 🔧 Changed
+- **Tabla de Posiciones**: El puesto 1 (campeón) ahora muestra un cuadrado amarillo solo alrededor del número de posición en lugar de fondo amarillo en toda la celda
+- **Noticias - Ordenamiento**: Las categorías ahora se ordenan por fecha de la noticia destacada más reciente (no alfabético)
+- **Noticias - Estructura**: Refactorizado para agrupar todas las noticias por categoría, mostrando primero las destacadas y luego las normales dentro de cada categoría
+- **Spinner en Home**: Color blanco en modo oscuro para mejor visibilidad del refresh control
+- **Recarga automática**: Las tabs de Torneo y Noticias ahora recargan datos automáticamente al entrar (`viewWillAppear`)
+- **Badge de notificaciones**: Se limpia automáticamente al abrir la app usando la API moderna de iOS 18
+
+### 🏗️ Refactor
+- Migración a APIs modernas de iOS 17+: Uso de `registerForTraitChanges` en lugar de `traitCollectionDidChange` (deprecado)
+- Migración a APIs modernas de iOS 18: Uso de `UNUserNotificationCenter.setBadgeCount()` en lugar de `applicationIconBadgeNumber` (deprecado)
+- Refactor de noticias: Eliminada sección global de destacadas, ahora todas las noticias se agrupan por categoría con ordenamiento inteligente
+
+### 🐛 Fixed
+- Espacio entre header de tabla y navigation bar en Home eliminado mediante `sectionHeaderTopPadding = 0`
+
+---
+
 ## [1.0.0(3)] - 2026-01-03
 
 ### 📱 Aplicación iOS - Liga 1 del Perú
