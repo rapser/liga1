@@ -40,8 +40,11 @@ final class AppCoordinator: Coordinator {
     }
 
     func showMainFlow() {
+        Logger.shared.info("🏠 AppCoordinator: Mostrando MainFlow (TabBar)")
         let mainTabBar = MainTabBarController(container: container)
         window.rootViewController = mainTabBar
+        window.makeKeyAndVisible()
+        Logger.shared.info("✅ AppCoordinator: MainFlow configurado y visible")
     }
 }
 
@@ -49,6 +52,7 @@ final class AppCoordinator: Coordinator {
 
 extension AppCoordinator: LoginCoordinatorDelegate {
     func loginCoordinatorDidFinish(_ coordinator: LoginCoordinator) {
+        Logger.shared.info("✅ AppCoordinator: LoginCoordinator finalizó, navegando al MainFlow")
         removeChildCoordinator(coordinator)
         showMainFlow()
     }

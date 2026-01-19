@@ -31,6 +31,12 @@ extension ProfileViewController: UITableViewDelegate, UITableViewDataSource {
         cell.imageView?.image = option.icon
         cell.accessoryType = option.action != .none ? .disclosureIndicator : .none
         cell.selectionStyle = option.action != .none ? .default : .none
+        
+        // Estilo destructivo para "Cerrar Sesión"
+        if option.action == .logout {
+            cell.textLabel?.textColor = .systemRed
+            cell.imageView?.tintColor = .systemRed
+        }
 
         return cell
     }

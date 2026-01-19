@@ -50,20 +50,40 @@ class LoginViewModel {
     // MARK: - Public Methods
 
     func login(email: String, password: String) {
+        // Validación básica
+        guard !email.isEmpty, !password.isEmpty else {
+            error = "Por favor completa todos los campos"
+            return
+        }
+        
         isLoading = true
         error = nil
 
+        Logger.shared.info("🔐 Iniciando login con email: \(email)")
+        
         loginUseCase.execute(email: email, password: password)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Login failed for email: \(email)", error: error)
+                    Logger.shared.error("❌ Login failed for email: \(email)", error: error)
                     self?.error = error.localizedDescription
                 }
             } receiveValue: { [weak self] _ in
                 guard let self = self else { return }
-                self.coordinatorDelegate?.loginViewModelDidLogin(self)
+                Logger.shared.info("✅ Login exitoso con email/password")
+                
+                // Asegurar que la navegación se haga en el hilo principal
+                DispatchQueue.main.async {
+                    if let delegate = self.coordinatorDelegate {
+                        Logger.shared.info("📱 Notificando al coordinator sobre login exitoso")
+                        delegate.loginViewModelDidLogin(self)
+                    } else {
+                        Logger.shared.error("❌ coordinatorDelegate es nil - no se puede navegar al home", error: nil)
+                        // Intentar navegar directamente si el delegate no está configurado
+                        Logger.shared.warning("⚠️ Intentando navegar sin delegate - esto no debería pasar")
+                    }
+                }
             }
             .store(in: &cancellables)
     }

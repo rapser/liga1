@@ -26,6 +26,7 @@ final class LoginCoordinator: Coordinator {
     func start() {
         let loginVC = container.makeLoginViewController()
         loginVC.viewModel.coordinatorDelegate = self
+        Logger.shared.info("🔗 LoginCoordinator: coordinatorDelegate configurado")
         navigationController.setViewControllers([loginVC], animated: false)
     }
 
@@ -44,7 +45,7 @@ extension LoginCoordinator: LoginViewModelCoordinatorDelegate {
     }
 
     func loginViewModelDidLogin(_ viewModel: LoginViewModel) {
-        Logger.shared.info("Login successful, finishing login flow")
+        Logger.shared.info("✅ LoginCoordinator: Login exitoso, finalizando flujo de login")
         didFinishLogin()
     }
 }

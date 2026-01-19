@@ -94,8 +94,6 @@ class ProfileViewController: UIViewController {
             break
         case .logout:
             showLogoutConfirmation()
-        case .theme:
-            showThemeBottomSheet()
         case .feedback:
             // TODO: Implementar envío de feedback
             break
@@ -112,43 +110,6 @@ class ProfileViewController: UIViewController {
             navigateToRegistrarPartidos()
         case .none:
             break
-        }
-    }
-
-    private func showThemeBottomSheet() {
-        let alertController = UIAlertController(title: "Selecciona un tema",
-                                                message: nil,
-                                                preferredStyle: .actionSheet)
-
-        alertController.addAction(UIAlertAction(title: "Claro", style: .default, handler: { [weak self] _ in
-            self?.setAppTheme(.light)
-        }))
-
-        alertController.addAction(UIAlertAction(title: "Oscuro", style: .default, handler: { [weak self] _ in
-            self?.setAppTheme(.dark)
-        }))
-
-        alertController.addAction(UIAlertAction(title: "Automático", style: .default, handler: { [weak self] _ in
-            self?.setAppTheme(.unspecified)
-        }))
-
-        alertController.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: nil))
-
-        if let sheet = alertController.sheetPresentationController {
-            sheet.detents = [.medium()]
-        }
-
-        present(alertController, animated: true, completion: nil)
-    }
-
-    private func setAppTheme(_ style: UIUserInterfaceStyle) {
-        viewModel.updateTheme(style)
-
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                window.overrideUserInterfaceStyle = style
-            }, completion: nil)
         }
     }
 

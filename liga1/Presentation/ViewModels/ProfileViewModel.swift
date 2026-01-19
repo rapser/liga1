@@ -15,7 +15,6 @@ class ProfileViewModel {
     // MARK: - Published Properties
 
     @Published private(set) var sections: [ProfileSection] = []
-    @Published private(set) var currentTheme: UIUserInterfaceStyle = .unspecified
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: Error?
     @Published var logoutSuccessful: Bool = false
@@ -29,7 +28,6 @@ class ProfileViewModel {
 
     init(logoutUseCase: LogoutUseCaseProtocol) {
         self.logoutUseCase = logoutUseCase
-        loadCurrentTheme()
         setupSections()
     }
 
@@ -53,17 +51,7 @@ class ProfileViewModel {
             .store(in: &cancellables)
     }
 
-    func updateTheme(_ style: UIUserInterfaceStyle) {
-        UserDefaults.standard.set(style.rawValue, forKey: "userInterfaceStyle")
-        currentTheme = style
-    }
-
     // MARK: - Private Methods
-
-    private func loadCurrentTheme() {
-        let savedStyle = UserDefaults.standard.integer(forKey: "userInterfaceStyle")
-        currentTheme = UIUserInterfaceStyle(rawValue: savedStyle) ?? .unspecified
-    }
 
     private func setupSections() {
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "N/A"
@@ -85,20 +73,6 @@ class ProfileViewModel {
                     icon: UIImage(systemName: "person.fill"),
                     subtitle: nil,
                     action: .editUsername
-                ),
-                ProfileOption(
-                    title: "Cerrar Sesión",
-                    icon: UIImage(systemName: "arrow.backward.circle.fill"),
-                    subtitle: nil,
-                    action: .logout
-                )
-            ]),
-            ProfileSection(title: "Tema", options: [
-                ProfileOption(
-                    title: "Modo Claro / Modo Oscuro",
-                    icon: UIImage(systemName: "circle.lefthalf.fill"),
-                    subtitle: nil,
-                    action: .theme
                 )
             ]),
             ProfileSection(title: "Administración", options: [
@@ -140,6 +114,14 @@ class ProfileViewModel {
                     subtitle: versionString,
                     action: .none
                 )
+            ]),
+            ProfileSection(title: "", options: [
+                ProfileOption(
+                    title: "Cerrar Sesión",
+                    icon: UIImage(systemName: "arrow.backward.circle.fill"),
+                    subtitle: nil,
+                    action: .logout
+                )
             ])
         ]
     }
@@ -162,7 +144,6 @@ class ProfileViewModel {
         case notification
         case editUsername
         case logout
-        case theme
         case feedback
         case terms
         case privacy

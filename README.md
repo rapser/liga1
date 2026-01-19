@@ -97,8 +97,9 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 #### Opciones Disponibles
 - **Información del Usuario**: Email y nombre de usuario
 - **Ajustes de Notificaciones**: Acceso a configuración de push notifications
-- **Cambio de Tema**: Alternar entre modo claro, oscuro y automático
 - **Cerrar Sesión**: Botón para cerrar sesión y volver al login
+
+**Nota**: El tema de la app (modo claro/oscuro) sigue automáticamente la configuración del sistema del dispositivo del usuario.
 
 ### 🛠 Panel de Administración
 
