@@ -115,7 +115,6 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **FCM Integration**: Integración con Firebase Cloud Messaging
 - **Badge Management**: Limpieza automática de badge al abrir la app (API moderna iOS 18)
 - **Topics**: Suscripción a topics (ej: "live_matches")
-- **Extension**: PushServiceExtension para modificar notificaciones antes de mostrar
 
 ## 🛠 Tecnologías y Frameworks
 
