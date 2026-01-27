@@ -28,7 +28,7 @@ class MainTabBarController: UITabBarController {
 
         // Configuración de los tabs
         let homeVC = container.makeHomeViewController()
-        homeVC.title = "Inicio"
+        // El título se configura en el propio ViewController
 
         let torneoVC = container.makeTablaViewController()
         torneoVC.title = "Tabla"
@@ -77,14 +77,17 @@ class MainTabBarController: UITabBarController {
     
     private func configureNavigationBarAppearance() {
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithDefaultBackground()
+        appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .systemBackground
+        appearance.shadowColor = .clear
         appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
         appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
 
+        // Aplicar la misma apariencia a todos los estados para consistencia
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().compactScrollEdgeAppearance = appearance
         UINavigationBar.appearance().tintColor = .liga1Red
     }
 

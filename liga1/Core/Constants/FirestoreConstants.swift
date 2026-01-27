@@ -20,6 +20,7 @@ public enum FirestoreConstants {
         public static let favorites = "favoritos"
         public static let news = "news"
         public static let teams = "equipos"
+        public static let preferences = "preferences"
 
         // Tournaments
         public static let apertura = "apertura"
@@ -83,5 +84,17 @@ public enum FirestoreConstants {
         public static let imageUrl = "imageUrl"
         public static let fecha = "fecha"
         public static let destacado = "destacado"
+    }
+
+    // MARK: - User Preferences
+
+    public enum PreferencesDocument {
+        public static let notifications = "notifications"
+    }
+
+    public enum PreferencesField {
+        public static let pushNotificationsEnabled = "pushNotificationsEnabled"
+        public static let subscribedTopics = "subscribedTopics"
+        public static let updatedAt = "updatedAt"
     }
 }

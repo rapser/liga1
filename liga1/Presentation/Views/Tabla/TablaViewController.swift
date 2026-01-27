@@ -39,15 +39,17 @@ class TablaViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        title = "Tabla"
         // configureSegmentedControl() // Comentado temporalmente
         configureAperturaLabelView() // Nuevo: mostrar rectángulo rojo con "Apertura"
         configureTableView()
         bindViewModel()
         loadInitialData()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        title = "Tabla"
         // Recargar datos cada vez que se entra a esta tab
         viewModel.reloadTeams(for: .apertura)
     }
@@ -115,6 +117,7 @@ class TablaViewController: UIViewController {
     private func configureTableView() {
         tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
         tableView.allowsSelection = false
+
         // LayoutPresets.configureTableViewBelow(
         //     tableView,
         //     topView: segmentedControl, // Comentado temporalmente
@@ -122,7 +125,7 @@ class TablaViewController: UIViewController {
         //     delegate: self,
         //     dataSource: self
         // )
-        
+
         // Configurar tabla usando el aperturaLabelView como topView
         LayoutPresets.configureTableViewBelow(
             tableView,

@@ -7,11 +7,15 @@
 
 import UIKit
 import UserNotifications
+import Combine
 
 class NotificationSettingsViewController: UIViewController {
-    
+
     // MARK: - Properties
-    
+
+    private let viewModel: NotificationSettingsViewModel
+    private var cancellables = Set<AnyCancellable>()
+
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.prepareForAutoLayout()
@@ -74,14 +78,69 @@ class NotificationSettingsViewController: UIViewController {
         imageView.prepareForAutoLayout()
         return imageView
     }()
-    
+
+    // NUEVO: Card para toggle de notificaciones push
+    private lazy var notificationsCard: UIView = {
+        let view = UIView()
+        view.backgroundColor = .secondarySystemGroupedBackground
+        view.layer.cornerRadius = 12
+        view.prepareForAutoLayout()
+        return view
+    }()
+
+    private lazy var notificationsLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Recibir notificaciones"
+        label.font = .systemFont(ofSize: 17)
+        label.textColor = .label
+        label.prepareForAutoLayout()
+        return label
+    }()
+
+    private lazy var notificationsDescriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Activa para recibir notificaciones de tus equipos favoritos"
+        label.font = .systemFont(ofSize: 13)
+        label.textColor = .secondaryLabel
+        label.numberOfLines = 0
+        label.prepareForAutoLayout()
+        return label
+    }()
+
+    private lazy var notificationsSwitch: UISwitch = {
+        let toggle = UISwitch()
+        toggle.onTintColor = .liga1Red
+        toggle.prepareForAutoLayout()
+        toggle.addTarget(self, action: #selector(notificationsSwitchChanged), for: .valueChanged)
+        return toggle
+    }()
+
+    private lazy var separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.prepareForAutoLayout()
+        return view
+    }()
+
+    // MARK: - Initialization
+
+    init(viewModel: NotificationSettingsViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Notificaciones"
         setupUI()
+        bindViewModel()
         checkNotificationStatus()
     }
     
@@ -97,10 +156,10 @@ class NotificationSettingsViewController: UIViewController {
         scrollView
             .addTo(view)
             .fillSuperview()
-        
+
         // Content View
         contentView.addTo(scrollView)
-        
+
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -108,32 +167,66 @@ class NotificationSettingsViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
-        
+
+        // NUEVO: Card de notificaciones push
+        notificationsCard
+            .addTo(contentView)
+            .pinTop(constant: 20)
+            .pinHorizontal(padding: 16)
+
+        // Switch dentro de la card
+        notificationsSwitch
+            .addTo(notificationsCard)
+            .pinTop(constant: 16)
+            .pinTrailing(constant: 16)
+
+        // Label principal
+        notificationsLabel
+            .addTo(notificationsCard)
+            .pinTop(constant: 16)
+            .pinLeading(constant: 16)
+            .pinTrailing(to: notificationsSwitch.leadingAnchor, constant: 12)
+
+        // Label descriptivo
+        notificationsDescriptionLabel
+            .addTo(notificationsCard)
+            .pinTop(to: notificationsLabel.bottomAnchor, constant: 4)
+            .pinLeading(constant: 16)
+            .pinTrailing(to: notificationsSwitch.leadingAnchor, constant: 12)
+            .pinBottom(constant: 16)
+
+        // Separator
+        separatorView
+            .addTo(contentView)
+            .pinTop(to: notificationsCard.bottomAnchor, constant: 24)
+            .pinHorizontal(padding: 16)
+            .height(1)
+
         // Icon
         iconImageView
             .addTo(contentView)
             .centerX()
-            .pinTop(constant: 60)
+            .pinTop(to: separatorView.bottomAnchor, constant: 40)
             .square(80)
-        
+
         // Title
         titleLabel
             .addTo(contentView)
             .pinTop(to: iconImageView.bottomAnchor, constant: 24)
             .pinHorizontal(padding: 24)
-        
+
         // Description
         descriptionLabel
             .addTo(contentView)
             .pinTop(to: titleLabel.bottomAnchor, constant: 16)
             .pinHorizontal(padding: 24)
-        
+
         // Status
         statusLabel
             .addTo(contentView)
             .pinTop(to: descriptionLabel.bottomAnchor, constant: 24)
             .pinHorizontal(padding: 24)
-        
+
         // Button
         openSettingsButton
             .addTo(contentView)
@@ -143,8 +236,34 @@ class NotificationSettingsViewController: UIViewController {
             .pinBottom(constant: 40)
     }
     
+    // MARK: - Binding
+
+    private func bindViewModel() {
+        // Observar cambios en pushNotificationsEnabled
+        viewModel.$pushNotificationsEnabled
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] enabled in
+                self?.notificationsSwitch.isOn = enabled
+            }
+            .store(in: &cancellables)
+
+        // Observar errores
+        viewModel.$errorMessage
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] errorMessage in
+                self?.showError(title: "Error", message: errorMessage)
+            }
+            .store(in: &cancellables)
+    }
+
     // MARK: - Actions
-    
+
+    @objc private func notificationsSwitchChanged() {
+        let enabled = notificationsSwitch.isOn
+        viewModel.updatePushNotificationsEnabled(enabled)
+    }
+
     @objc private func openSettingsTapped() {
         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
             showError(title: "Error", message: "No se pudo abrir la configuración del sistema")

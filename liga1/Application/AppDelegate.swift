@@ -17,6 +17,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
                    UNUserNotificationCenterDelegate,
                    MessagingDelegate {
 
+    // MARK: - Properties
+
+    var notificationTopicManager: NotificationTopicManagerProtocol?
+
+    // MARK: - Lifecycle
+
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
@@ -36,7 +42,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
 
         // Registrar para notificaciones remotas
         application.registerForRemoteNotifications()
-        
+
+        // NUEVO: Inicializar NotificationTopicManager
+        let topicManager = DIContainer.shared.makeNotificationTopicManager()
+        topicManager.startObserving()
+        self.notificationTopicManager = topicManager
+
         // Limpiar badge al abrir la app
         clearBadge()
 
@@ -140,8 +151,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         let notificationService = DIContainer.shared.makeNotificationService()
         notificationService.handleNotificationToken(token)
 
-        // Suscribirse a topics de notificaciones
-        notificationService.subscribeToTopic("live_matches")
+        // Suscribirse a topic general de la liga (siempre activo)
+        notificationService.subscribeToTopic("liga1_all")
+
+        // Sincronizar topics con favoritos de equipos
+        let topicManager = DIContainer.shared.makeNotificationTopicManager()
+        topicManager.syncTopicsWithFavorites()
     }
 
     // MARK: - Private Helpers

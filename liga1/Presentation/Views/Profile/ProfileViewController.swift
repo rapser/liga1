@@ -40,14 +40,21 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        title = "Configuración"
         setupTableView()
         bindViewModel()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        title = "Configuración"
     }
 
     // MARK: - Setup
 
     private func setupTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+
         tableView
             .addTo(view)
             .pinTop(useSafeArea: true)
@@ -166,7 +173,8 @@ class ProfileViewController: UIViewController {
     }
     
     private func openNotificationSettings() {
-        let notificationSettingsVC = NotificationSettingsViewController()
+        let viewModel = container.makeNotificationSettingsViewModel()
+        let notificationSettingsVC = NotificationSettingsViewController(viewModel: viewModel)
         navigationController?.pushViewController(notificationSettingsVC, animated: true)
     }
 

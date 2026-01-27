@@ -33,15 +33,17 @@ class HomeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Inicio"
         setupUI()
         setupAdapter()
         bindViewModel()
         registerForTraitChanges()
         // No es necesario llamar fetchActiveJornadas() porque el observer se activa automáticamente en init del ViewModel
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        title = "Inicio"
         // Asegurar que el color esté actualizado cuando aparece la vista
         configureRefreshControlColor()
     }
@@ -54,18 +56,18 @@ class HomeViewController: UIViewController {
         // Configurar tableView para eliminar espacio entre header y nav bar
         // sectionHeaderTopPadding elimina el padding automático de iOS 15+
         tableView.sectionHeaderTopPadding = 0
-        
+
         // Agregar tableView a la vista primero
         tableView.prepareForAutoLayout()
         tableView.addTo(view).fillSuperview()
-        
+
         // Configurar refresh control después de agregar el tableView
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
-        
+
         // Asegurar que el refresh control esté visible
         refreshControl.layer.zPosition = 1000
-        
+
         configureRefreshControlColor()
     }
     
