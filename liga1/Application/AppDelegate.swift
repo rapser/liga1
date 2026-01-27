@@ -186,11 +186,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         notificationService.handleNotificationToken(token)
 
         // Suscribirse a topic general de la liga (siempre activo)
+        Logger.shared.info("📢 AppDelegate: Suscribiendo a topic liga1_all")
         notificationService.subscribeToTopic("liga1_all")
 
         // Sincronizar topics con favoritos de equipos
+        Logger.shared.info("🔄 AppDelegate: Sincronizando topics con favoritos")
         let topicManager = DIContainer.shared.makeNotificationTopicManager()
         topicManager.syncTopicsWithFavorites()
+        
+        // También re-suscribirse a topics guardados por si acaso
+        Logger.shared.info("🔄 AppDelegate: Re-suscribiendo a topics guardados")
+        topicManager.resubscribeToSavedTopics()
     }
 
     // MARK: - Private Helpers

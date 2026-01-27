@@ -161,7 +161,9 @@ class FavoritosViewModel {
                 guard let self = self else { return }
                 var teamUIs = TeamUIMapper.toUI(from: teams)
                 for index in teamUIs.indices {
-                    teamUIs[index].isFavorite = self.favoriteTeamIds.contains(teamUIs[index].nombre)
+                    // Usar logo (código corto) normalizado a minúsculas para comparar con favoritos
+                    let teamCode = teamUIs[index].logo.lowercased()
+                    teamUIs[index].isFavorite = self.favoriteTeamIds.contains(teamCode)
                 }
                 self.allTeams = teamUIs
                 self.updateFavoriteTeams()
@@ -173,7 +175,8 @@ class FavoritosViewModel {
         var favoriteTeamsArray: [TeamUI] = []
 
         for teamId in favoriteTeamIds {
-            if let team = allTeams.first(where: { $0.nombre == teamId }) {
+            // Buscar por logo (código corto) normalizado a minúsculas, no por nombre
+            if let team = allTeams.first(where: { $0.logo.lowercased() == teamId.lowercased() }) {
                 var updatedTeam = team
                 updatedTeam.isFavorite = true
                 favoriteTeamsArray.append(updatedTeam)

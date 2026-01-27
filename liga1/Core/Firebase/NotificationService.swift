@@ -49,21 +49,24 @@ final class NotificationService: NotificationServiceProtocol {
     }
 
     func subscribeToTopic(_ topic: String) {
+        Logger.shared.info("📡 NotificationService: Intentando suscribirse a topic: '\(topic)'")
         Messaging.messaging().subscribe(toTopic: topic) { error in
             if let error = error {
-                print("❌ Error suscribiéndose a topic \(topic): \(error.localizedDescription)")
+                Logger.shared.error("❌ NotificationService: Error suscribiéndose a topic '\(topic)'", error: error)
             } else {
-                print("✅ Suscrito exitosamente a topic: \(topic)")
+                Logger.shared.info("✅ NotificationService: ✅ SUSCRITO EXITOSAMENTE A TOPIC: '\(topic)'")
+                Logger.shared.info("   📱 El dispositivo ahora recibirá notificaciones push para este topic")
             }
         }
     }
 
     func unsubscribeFromTopic(_ topic: String) {
+        Logger.shared.info("📡 NotificationService: Intentando desuscribirse del topic: \(topic)")
         Messaging.messaging().unsubscribe(fromTopic: topic) { error in
             if let error = error {
-                print("❌ Error desuscribiéndose del topic \(topic): \(error.localizedDescription)")
+                Logger.shared.error("❌ Error desuscribiéndose del topic \(topic)", error: error)
             } else {
-                print("✅ Desuscrito exitosamente del topic: \(topic)")
+                Logger.shared.info("✅ NotificationService: Desuscrito exitosamente del topic: \(topic)")
             }
         }
     }

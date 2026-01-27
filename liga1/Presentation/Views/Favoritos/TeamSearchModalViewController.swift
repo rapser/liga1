@@ -133,7 +133,9 @@ class TeamSearchModalViewController: UIViewController {
     func configure(teams: [TeamUI], favoriteTeamIds: Set<String>) {
         var teamsWithFavorite = teams
         for index in teamsWithFavorite.indices {
-            teamsWithFavorite[index].isFavorite = favoriteTeamIds.contains(teamsWithFavorite[index].nombre)
+            // IMPORTANTE: Comparar usando logo (código corto) normalizado, no nombre
+            let teamCode = teamsWithFavorite[index].logo.lowercased()
+            teamsWithFavorite[index].isFavorite = favoriteTeamIds.contains(teamCode)
         }
         self.teams = teamsWithFavorite
         self.filteredTeams = teamsWithFavorite
@@ -143,7 +145,9 @@ class TeamSearchModalViewController: UIViewController {
     func updateFavorites(_ favoriteTeamIds: Set<String>) {
         self.favoriteTeamIds = favoriteTeamIds
         for index in filteredTeams.indices {
-            filteredTeams[index].isFavorite = favoriteTeamIds.contains(filteredTeams[index].nombre)
+            // IMPORTANTE: Comparar usando logo (código corto) normalizado, no nombre
+            let teamCode = filteredTeams[index].logo.lowercased()
+            filteredTeams[index].isFavorite = favoriteTeamIds.contains(teamCode)
         }
         tableView.reloadData()
     }
@@ -215,7 +219,30 @@ extension TeamSearchModalViewController: UITableViewDataSource, UITableViewDeleg
 extension TeamSearchModalViewController: TeamTableViewCellDelegate {
     func didTapFavorite(cell: TeamTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let team = filteredTeams[indexPath.row]
+        var team = filteredTeams[indexPath.row]
+        
+        // Actualizar inmediatamente el estado de la estrella antes de llamar al delegate
+        let teamCode = team.logo.lowercased()
+        let isCurrentlyFavorite = favoriteTeamIds.contains(teamCode)
+        team.isFavorite = !isCurrentlyFavorite
+        filteredTeams[indexPath.row] = team
+        
+        // También actualizar en el array principal si el equipo está ahí
+        if let mainIndex = teams.firstIndex(where: { $0.logo.lowercased() == teamCode }) {
+            teams[mainIndex].isFavorite = !isCurrentlyFavorite
+        }
+        
+        // Actualizar favoriteTeamIds localmente para reflejar el cambio inmediato
+        if isCurrentlyFavorite {
+            favoriteTeamIds.remove(teamCode)
+        } else {
+            favoriteTeamIds.insert(teamCode)
+        }
+        
+        // Recargar solo la celda afectada para actualizar la estrella visualmente
+        tableView.reloadRows(at: [indexPath], with: .none)
+        
+        // Llamar al delegate para que actualice en Firestore
         delegate?.didSelectTeam(team)
     }
 }

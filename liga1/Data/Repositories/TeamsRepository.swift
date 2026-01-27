@@ -50,8 +50,10 @@ class TeamsRepository: TeamsRepositoryProtocol {
                         }
                         // Asignar el ID del documento y el nombre completo si no viene
                         let nombreCompleto = dto.name ?? EquipoPeruano.obtenerNombreCompleto(paraId: doc.documentID)
-                        // Usar el logo del DTO o el documentID como fallback
-                        let logo = dto.logo ?? doc.documentID
+                        // IMPORTANTE: Siempre usar el documentID como logo (código corto del equipo)
+                        // El documentID es el código del equipo (ej: "ali", "uni", "cri")
+                        // Esto es necesario para los topics de notificaciones push
+                        let logo = doc.documentID
                         
                         return TeamDTO(
                             id: doc.documentID,

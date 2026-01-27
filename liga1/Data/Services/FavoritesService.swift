@@ -171,32 +171,43 @@ class FavoritesService: FavoritesServiceProtocol {
                 return
             }
 
-            let favRef = self.db.collection(FirestoreConstants.Collection.users).document(userId).collection("favoriteTeams").document(teamId)
+            // IMPORTANTE: Asegurar que el teamId esté normalizado a minúsculas
+            let normalizedTeamId = teamId.lowercased()
+            Logger.shared.info("💾 FavoritesService: Guardando equipo en favoritos - teamId recibido: '\(teamId)', normalizado: '\(normalizedTeamId)'")
+            
+            let favRef = self.db.collection(FirestoreConstants.Collection.users).document(userId).collection("favoriteTeams").document(normalizedTeamId)
 
             favRef.getDocument { snapshot, error in
                 if let error = error {
+                    Logger.shared.error("💾 FavoritesService: Error obteniendo documento", error: error)
                     promise(.failure(error))
                     return
                 }
 
                 if snapshot?.exists == true {
                     // Ya es favorito, eliminar
+                    Logger.shared.info("💾 FavoritesService: Eliminando equipo de favoritos: '\(normalizedTeamId)'")
                     favRef.delete { error in
                         if let error = error {
+                            Logger.shared.error("💾 FavoritesService: Error eliminando favorito", error: error)
                             promise(.failure(error))
                         } else {
+                            Logger.shared.info("💾 FavoritesService: Equipo eliminado exitosamente de favoritos")
                             promise(.success(false))
                         }
                     }
                 } else {
                     // No es favorito, agregar
+                    Logger.shared.info("💾 FavoritesService: Agregando equipo a favoritos: '\(normalizedTeamId)'")
                     favRef.setData([
-                        "teamId": teamId,
+                        "teamId": normalizedTeamId,
                         "timestamp": FieldValue.serverTimestamp()
                     ]) { error in
                         if let error = error {
+                            Logger.shared.error("💾 FavoritesService: Error agregando favorito", error: error)
                             promise(.failure(error))
                         } else {
+                            Logger.shared.info("💾 FavoritesService: Equipo agregado exitosamente a favoritos con teamId: '\(normalizedTeamId)'")
                             promise(.success(true))
                         }
                     }

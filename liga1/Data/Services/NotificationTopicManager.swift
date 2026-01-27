@@ -58,14 +58,16 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .sink { [weak self] favoriteTeamIds, preferences in
                 guard let self = self else { return }
 
-                Logger.shared.debug("🔄 Cambio detectado - Favoritos: \(favoriteTeamIds.count), Preferencias: \(preferences != nil)")
+                Logger.shared.info("🔄 NotificationTopicManager: Cambio detectado - Favoritos: \(favoriteTeamIds), Preferencias: \(preferences != nil)")
 
                 // Si preferencias no existen o notificaciones están desactivadas, no sincronizar
                 guard let preferences = preferences,
                       preferences.pushNotificationsEnabled else {
-                    Logger.shared.info("🔕 Notificaciones desactivadas - No sincronizando topics")
+                    Logger.shared.info("🔕 NotificationTopicManager: Notificaciones desactivadas - No sincronizando topics")
                     return
                 }
+
+                Logger.shared.info("🔄 NotificationTopicManager: Topics actuales en preferencias: \(preferences.subscribedTopics)")
 
                 // Sincronizar topics con favoritos actuales
                 self.syncTopics(
@@ -84,7 +86,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
     }
 
     func syncTopicsWithFavorites() {
-        Logger.shared.info("📋 Sincronizando topics con favoritos...")
+        Logger.shared.info("📋 NotificationTopicManager: Sincronizando topics con favoritos...")
 
         // Obtener favoritos y preferencias actuales de forma síncrona
         var favoriteTeamIds: Set<String> = []
@@ -94,6 +96,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .first()
             .sink { ids in
                 favoriteTeamIds = ids
+                Logger.shared.info("📋 NotificationTopicManager: Equipos favoritos obtenidos: \(ids)")
             }
             .store(in: &cancellables)
 
@@ -101,6 +104,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .first()
             .sink { prefs in
                 preferences = prefs
+                Logger.shared.info("📋 NotificationTopicManager: Preferencias obtenidas: \(prefs != nil)")
             }
             .store(in: &cancellables)
 
@@ -112,10 +116,12 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             let currentTopics = preferences?.subscribedTopics ?? []
             let isEnabled = preferences?.pushNotificationsEnabled ?? true
 
+            Logger.shared.info("📋 NotificationTopicManager: Topics actuales: \(currentTopics), Notificaciones habilitadas: \(isEnabled)")
+
             if isEnabled {
                 self.syncTopics(favoriteTeamIds: favoriteTeamIds, currentTopics: currentTopics)
             } else {
-                Logger.shared.info("🔕 Notificaciones desactivadas - Saltando sincronización")
+                Logger.shared.info("🔕 NotificationTopicManager: Notificaciones desactivadas - Saltando sincronización")
             }
         }
     }
@@ -151,7 +157,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
     }
 
     func resubscribeToSavedTopics() {
-        Logger.shared.info("🔄 Re-suscribiendo a topics guardados...")
+        Logger.shared.info("🔄 NotificationTopicManager: Re-suscribiendo a topics guardados...")
 
         userPreferencesService.getUserPreferences()
             .sink(
@@ -163,13 +169,15 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
                 receiveValue: { [weak self] preferences in
                     guard let self = self,
                           let preferences = preferences else {
+                        Logger.shared.warning("⚠️ NotificationTopicManager: No hay preferencias guardadas")
                         return
                     }
 
-                    Logger.shared.info("🔄 Re-suscribiendo a \(preferences.subscribedTopics.count) topics")
+                    Logger.shared.info("🔄 NotificationTopicManager: Re-suscribiendo a \(preferences.subscribedTopics.count) topics: \(preferences.subscribedTopics)")
 
                     // Re-suscribirse a todos los topics guardados
                     preferences.subscribedTopics.forEach { topic in
+                        Logger.shared.info("🔄 NotificationTopicManager: Re-suscribiendo a topic: \(topic)")
                         self.notificationService.subscribeToTopic(topic)
                     }
                 }
@@ -181,8 +189,13 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
 
     /// Sincroniza los topics FCM con los favoritos actuales
     private func syncTopics(favoriteTeamIds: Set<String>, currentTopics: Set<String>) {
+        Logger.shared.info("🔄 NotificationTopicManager: Sincronizando topics")
+        Logger.shared.info("🔄 NotificationTopicManager: Equipos favoritos: \(favoriteTeamIds)")
+        Logger.shared.info("🔄 NotificationTopicManager: Topics actuales: \(currentTopics)")
+        
         // Convertir favoritos a topics (normalizar nombres)
         let desiredTopics = Set(favoriteTeamIds.map { topicName(for: $0) })
+        Logger.shared.info("🔄 NotificationTopicManager: Topics deseados: \(desiredTopics)")
 
         // Calcular diferencias
         let toSubscribe = desiredTopics.subtracting(currentTopics)
@@ -190,26 +203,33 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .subtracting(desiredTopics)
             .filter { $0.starts(with: "team_") } // No remover liga1_all
 
-        Logger.shared.debug("📊 Sincronización - Subscribe: \(toSubscribe.count), Unsubscribe: \(toUnsubscribe.count)")
+        Logger.shared.info("📊 NotificationTopicManager: Sincronización - Subscribe: \(toSubscribe), Unsubscribe: \(toUnsubscribe)")
 
         // Aplicar cambios si hay diferencias
         if !toSubscribe.isEmpty || !toUnsubscribe.isEmpty {
             applyTopicChanges(subscribe: toSubscribe, unsubscribe: toUnsubscribe)
         } else {
-            Logger.shared.debug("✅ Topics ya sincronizados - Sin cambios necesarios")
+            Logger.shared.info("✅ NotificationTopicManager: Topics ya sincronizados - Sin cambios necesarios")
         }
     }
 
     /// Aplica cambios de suscripción/desuscripción a topics
     private func applyTopicChanges(subscribe: Set<String>, unsubscribe: Set<String>) {
+        Logger.shared.info("🔄 NotificationTopicManager: Aplicando cambios de suscripción")
+        Logger.shared.info("   ➕ Topics a suscribir: \(subscribe.isEmpty ? "ninguno" : subscribe.joined(separator: ", "))")
+        Logger.shared.info("   ➖ Topics a desuscribir: \(unsubscribe.isEmpty ? "ninguno" : unsubscribe.joined(separator: ", "))")
+        
         // Desuscribirse de topics que ya no son favoritos
         unsubscribe.forEach { topic in
+            Logger.shared.info("🔕 NotificationTopicManager: Desuscribiendo de topic: '\(topic)'")
             notificationService.unsubscribeFromTopic(topic)
             removeTopicFromPreferences(topic)
         }
 
         // Suscribirse a nuevos topics
         subscribe.forEach { topic in
+            Logger.shared.info("📢 NotificationTopicManager: Suscribiendo a topic: '\(topic)'")
+            Logger.shared.info("   🔔 El dispositivo recibirá notificaciones push para: '\(topic)'")
             notificationService.subscribeToTopic(topic)
             addTopicToPreferences(topic)
         }
@@ -249,8 +269,16 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
 
     /// Crea el topic name de FCM usando el código del equipo
     /// El teamId ya viene en formato corto (ej: "ali", "uni", "cri")
+    /// IMPORTANTE: Normalizar a minúsculas porque los topics de FCM son case-sensitive
     /// Solo se necesita agregar el prefijo "team_"
     private func topicName(for teamId: String) -> String {
-        return "team_\(teamId)"
+        // Normalizar a minúsculas para asegurar consistencia con el backend
+        let normalizedTeamId = teamId.lowercased()
+        let topic = "team_\(normalizedTeamId)"
+        Logger.shared.info("🏷️ NotificationTopicManager: Generando topic para equipo")
+        Logger.shared.info("   🏷️ TeamId recibido: '\(teamId)'")
+        Logger.shared.info("   🔑 TeamId normalizado: '\(normalizedTeamId)'")
+        Logger.shared.info("   📢 Topic generado: '\(topic)'")
+        return topic
     }
 }
