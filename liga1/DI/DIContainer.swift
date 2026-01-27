@@ -82,6 +82,16 @@ final class DIContainer {
         return notificationTopicManager
     }
 
+    // MARK: - Notification Deduplicator
+
+    private lazy var notificationDeduplicator: NotificationDeduplicatorProtocol = {
+        return NotificationDeduplicator()
+    }()
+
+    func makeNotificationDeduplicator() -> NotificationDeduplicatorProtocol {
+        return notificationDeduplicator
+    }
+
     // MARK: - Use Cases - Jornadas
 
     func makeFetchActiveJornadasUseCase() -> FetchActiveJornadasUseCaseProtocol {

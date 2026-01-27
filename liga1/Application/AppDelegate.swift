@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     // MARK: - Properties
 
     var notificationTopicManager: NotificationTopicManagerProtocol?
+    private lazy var notificationDeduplicator = DIContainer.shared.makeNotificationDeduplicator()
 
     // MARK: - Lifecycle
 
@@ -107,6 +108,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     ) {
         Logger.shared.info("📮 Notificación remota recibida en background: \(userInfo)")
 
+        // NUEVO: Verificar si es duplicado usando event_id
+        if let eventId = userInfo["event_id"] as? String {
+            guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
+                Logger.shared.debug("⚠️ Notificación duplicada ignorada (background): \(eventId)")
+                completionHandler(.noData)
+                return
+            }
+        }
+
+        // Procesar la notificación normalmente
+        Messaging.messaging().appDidReceiveMessage(userInfo)
+
         // Aquí puedes actualizar datos en background
         // Por ejemplo: sincronizar marcadores de partidos
 
@@ -123,6 +136,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         let userInfo = notification.request.content.userInfo
         Logger.shared.info("📬 Notificación recibida en foreground: \(userInfo)")
 
+        // NUEVO: Verificar si es duplicado usando event_id
+        if let eventId = userInfo["event_id"] as? String {
+            guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
+                Logger.shared.debug("⚠️ Notificación duplicada ignorada (foreground): \(eventId)")
+                completionHandler([])
+                return
+            }
+        }
+
+        // Procesar la notificación normalmente
+        Messaging.messaging().appDidReceiveMessage(userInfo)
+
         // Mostrar banner, sonido y badge incluso en foreground
         completionHandler([.banner, .sound, .badge])
     }
@@ -134,6 +159,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     ) {
         let userInfo = response.notification.request.content.userInfo
         Logger.shared.info("👆 Usuario tocó notificación: \(userInfo)")
+
+        // NUEVO: Verificar si es duplicado usando event_id
+        if let eventId = userInfo["event_id"] as? String {
+            guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
+                Logger.shared.debug("⚠️ Tap en notificación duplicada ignorado: \(eventId)")
+                completionHandler()
+                return
+            }
+        }
 
         // Manejar tap en notificación
         handleNotificationTap(userInfo: userInfo)

@@ -79,6 +79,7 @@
 		464B95B62F287624001C4049 /* NotificationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464B95B52F287624001C4049 /* NotificationSettingsViewModel.swift */; };
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
+		46C3EB082F2942BF00E9EA0C /* NotificationDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */; };
 		46C874542F1B6C26008C3619 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874532F1B6C26008C3619 /* NotificationService.swift */; };
 		46C874572F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874552F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift */; };
 		46C874582F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C874562F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift */; };
@@ -209,6 +210,7 @@
 		464B95B12F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePushNotificationsEnabledUseCase.swift; sourceTree = "<group>"; };
 		464B95B52F287624001C4049 /* NotificationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsViewModel.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeduplicator.swift; sourceTree = "<group>"; };
 		46C874522F1B68B8008C3619 /* liga1.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = liga1.entitlements; sourceTree = "<group>"; };
 		46C874532F1B6C26008C3619 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		46C874552F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveFavoriteTeamsUseCase.swift; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 		4640017A2F08853F00A8C905 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				46C3EB072F2942BF00E9EA0C /* Notifications */,
 				46D8209D2F09D71600FAA836 /* Auth */,
 				464009B62F098D4F00A8C905 /* Constants */,
 				464009B82F098D4F00A8C905 /* Firebase */,
@@ -639,6 +642,14 @@
 			children = (
 				464B95B02F287601001C4049 /* ObserveUserPreferencesUseCase.swift */,
 				464B95B12F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		46C3EB072F2942BF00E9EA0C /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */,
 			);
 			path = Notifications;
 			sourceTree = "<group>";
@@ -982,6 +993,7 @@
 				464B95AB2F2875D1001C4049 /* UserPreferencesService.swift in Sources */,
 				464B95AC2F2875D1001C4049 /* NotificationTopicManager.swift in Sources */,
 				46D995932C6E90EC00D4951C /* AppDelegate.swift in Sources */,
+				46C3EB082F2942BF00E9EA0C /* NotificationDeduplicator.swift in Sources */,
 				46D820AA2F09DD2F00FAA836 /* HomeTableViewAdapter.swift in Sources */,
 				464001B62F08853F00A8C905 /* NewsViewModel.swift in Sources */,
 				46CDF4BF2F10A09D00F280E6 /* DividerView.swift in Sources */,
@@ -1233,7 +1245,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
@@ -1266,7 +1278,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
