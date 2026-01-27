@@ -88,10 +88,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     ) {
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
-        Logger.shared.info("📱 Device Token APNs: \(token)")
+        Logger.shared.info("📱 Device Token APNs recibido: \(token)")
 
         // Pasar el token a Firebase Messaging
         Messaging.messaging().apnsToken = deviceToken
+        Logger.shared.info("✅ Token APNS configurado en Firebase Messaging")
+        
+        // Sincronizar topics ahora que el token APNS está disponible
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            Logger.shared.info("🔄 AppDelegate: Token APNS disponible - Sincronizando topics")
+            if let topicManager = self?.notificationTopicManager {
+                topicManager.syncTopicsWithFavorites()
+            }
+        }
     }
 
     func application(

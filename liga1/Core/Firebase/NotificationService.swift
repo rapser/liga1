@@ -50,9 +50,44 @@ final class NotificationService: NotificationServiceProtocol {
 
     func subscribeToTopic(_ topic: String) {
         Logger.shared.info("📡 NotificationService: Intentando suscribirse a topic: '\(topic)'")
+        
+        // Verificar si el token APNS está disponible
+        let apnsToken = Messaging.messaging().apnsToken
+        if apnsToken == nil {
+            #if targetEnvironment(simulator)
+            Logger.shared.info("⚠️ NotificationService: Token APNS no disponible (SIMULADOR)")
+            Logger.shared.info("   ℹ️ Los simuladores pueden tener limitaciones con notificaciones push")
+            Logger.shared.info("   ℹ️ Prueba en un dispositivo físico para verificar la funcionalidad completa")
+            #else
+            Logger.shared.info("⏳ NotificationService: Token APNS no disponible aún. Esperando...")
+            #endif
+            
+            // Esperar un momento y reintentar (máximo 3 intentos)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                self?.subscribeToTopic(topic)
+            }
+            return
+        }
+        
+        Logger.shared.info("✅ NotificationService: Token APNS disponible. Suscribiendo a topic: '\(topic)'")
         Messaging.messaging().subscribe(toTopic: topic) { error in
             if let error = error {
                 Logger.shared.error("❌ NotificationService: Error suscribiéndose a topic '\(topic)'", error: error)
+                
+                #if targetEnvironment(simulator)
+                Logger.shared.info("⚠️ NotificationService: Error en SIMULADOR")
+                Logger.shared.info("   ℹ️ Los simuladores pueden tener limitaciones con FCM topics")
+                Logger.shared.info("   ℹ️ Prueba en un dispositivo físico para verificar la funcionalidad completa")
+                #endif
+                
+                // Si el error es por falta de token APNS, reintentar después de un delay
+                let errorDescription = error.localizedDescription.lowercased()
+                if errorDescription.contains("apns") || errorDescription.contains("token") {
+                    Logger.shared.info("🔄 NotificationService: Reintentando suscripción después de 3 segundos...")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+                        self?.subscribeToTopic(topic)
+                    }
+                }
             } else {
                 Logger.shared.info("✅ NotificationService: ✅ SUSCRITO EXITOSAMENTE A TOPIC: '\(topic)'")
                 Logger.shared.info("   📱 El dispositivo ahora recibirá notificaciones push para este topic")

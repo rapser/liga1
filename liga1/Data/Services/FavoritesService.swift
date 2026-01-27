@@ -16,6 +16,7 @@ protocol FavoritesServiceProtocol {
     func isFavorite(matchId: String) -> AnyPublisher<Bool, Never>
     func getAllFavorites() -> AnyPublisher<[String], Never>
     func observeFavorites() -> AnyPublisher<Set<String>, Never>
+    func getCurrentFavoriteTeams() -> Set<String> // Obtener valor actual directamente
 
     // Teams
     func toggleFavoriteTeam(teamId: String) -> AnyPublisher<Bool, Error>
@@ -77,16 +78,25 @@ class FavoritesService: FavoritesServiceProtocol {
     private func startObservingFavoriteTeams() {
         guard let userId = getUserId() else { return }
 
+        Logger.shared.info("👂 FavoritesService: Iniciando observación de equipos favoritos para usuario: \(userId)")
+        
         favoriteTeamsListener = db.collection(FirestoreConstants.Collection.users)
             .document(userId)
             .collection("favoriteTeams")
             .addSnapshotListener { [weak self] snapshot, error in
                 if let error = error {
-                    Logger.shared.error("❌ Error listening to favorite teams", error: error)
+                    Logger.shared.error("❌ FavoritesService: Error listening to favorite teams", error: error)
                     return
                 }
 
                 let favoriteTeamIds = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
+                Logger.shared.info("👂 FavoritesService: Equipos favoritos actualizados desde Firestore")
+                Logger.shared.info("   📋 Documentos encontrados: \(snapshot?.documents.count ?? 0)")
+                Logger.shared.info("   🏷️ IDs de equipos favoritos: \(favoriteTeamIds)")
+                Logger.shared.info("   📝 Detalles de documentos:")
+                snapshot?.documents.forEach { doc in
+                    Logger.shared.info("      - DocumentID: '\(doc.documentID)', Data: \(doc.data())")
+                }
                 self?.favoriteTeamsSubject.send(favoriteTeamIds)
             }
     }
@@ -232,5 +242,9 @@ class FavoritesService: FavoritesServiceProtocol {
     func observeFavoriteTeams() -> AnyPublisher<Set<String>, Never> {
         return favoriteTeamsSubject
             .eraseToAnyPublisher()
+    }
+    
+    func getCurrentFavoriteTeams() -> Set<String> {
+        return favoriteTeamsSubject.value
     }
 }

@@ -81,14 +81,22 @@ class FavoritosViewModel {
     // MARK: - Public Methods - Teams
 
     func toggleFavoriteTeam(teamId: String) {
+        Logger.shared.info("🔄 FavoritosViewModel: Toggle favorite team iniciado - teamId: '\(teamId)'")
         toggleFavoriteTeamUseCase.execute(teamId: teamId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to toggle favorite for team: \(teamId)", error: error)
+                    Logger.shared.error("❌ FavoritosViewModel: Error al cambiar favorito para equipo: \(teamId)", error: error)
+                } else {
+                    Logger.shared.info("✅ FavoritosViewModel: Favorito cambiado exitosamente para equipo: '\(teamId)'")
+                    // Forzar sincronización de topics después de cambiar favorito
+                    // El delay ya está manejado dentro de syncTopicsWithFavorites()
+                    Logger.shared.info("🔄 FavoritosViewModel: Forzando sincronización de topics después de cambiar favorito")
+                    let topicManager = DIContainer.shared.makeNotificationTopicManager()
+                    topicManager.syncTopicsWithFavorites()
                 }
             } receiveValue: { _ in
-                // Favorite team toggled successfully
+                Logger.shared.info("✅ FavoritosViewModel: Toggle favorite team completado - teamId: '\(teamId)'")
             }
             .store(in: &cancellables)
     }
@@ -109,6 +117,7 @@ class FavoritosViewModel {
         observeFavoriteTeamsUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] favoriteTeamIds in
+                Logger.shared.info("🔄 FavoritosViewModel: Equipos favoritos actualizados - count: \(favoriteTeamIds.count), IDs: \(favoriteTeamIds)")
                 self?.favoriteTeamIds = favoriteTeamIds
                 self?.updateFavoriteTeams()
             }
