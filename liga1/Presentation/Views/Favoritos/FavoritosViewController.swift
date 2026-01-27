@@ -89,6 +89,7 @@ class FavoritosViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = "Favoritos"
 
+        setupNavigationBar()
         setupSegmentedControl()
         setupTableView()
         setupEmptyStates()
@@ -96,7 +97,26 @@ class FavoritosViewController: UIViewController {
         updateView()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        title = "Favoritos"
+    }
+
     // MARK: - Setup UI
+
+    private func setupNavigationBar() {
+        let addButton = UIBarButtonItem(
+            image: UIImage(systemName: "plus"),
+            style: .plain,
+            target: self,
+            action: #selector(addTeamTapped)
+        )
+        addButton.tintColor = .liga1Red
+        navigationItem.rightBarButtonItem = addButton
+
+        // Inicialmente oculto (solo visible en sección Equipos)
+        navigationItem.rightBarButtonItem?.isHidden = true
+    }
 
     private func createStarIcon() -> UIImageView {
         let config = UIImage.SymbolConfiguration(pointSize: 80, weight: .light)
@@ -218,6 +238,9 @@ class FavoritosViewController: UIViewController {
         let hasMatches = !viewModel.matches.isEmpty
         let hasTeams = !viewModel.teams.isEmpty
 
+        // Mostrar botón "+" solo en la sección de Equipos
+        navigationItem.rightBarButtonItem?.isHidden = isMatchesSegment
+
         if isMatchesSegment {
             emptyMatchesView.isHidden = hasMatches
             emptyTeamsView.isHidden = true
@@ -234,6 +257,10 @@ class FavoritosViewController: UIViewController {
     @objc private func segmentChanged() {
         viewModel.selectedSegment = FavoritesSegment(rawValue: segmentedControl.selectedSegmentIndex) ?? .matches
         updateView()
+    }
+
+    @objc private func addTeamTapped() {
+        searchTeamTapped()
     }
 
     @objc private func searchTeamTapped() {
