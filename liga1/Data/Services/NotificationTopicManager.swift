@@ -53,10 +53,11 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
         Logger.shared.info("🎯 NotificationTopicManager: Iniciando observación")
 
         // Observar cambios en favoritos de equipos + preferencias de usuario
-        // Usar dropFirst() para ignorar el valor inicial del CurrentValueSubject
-        // y esperar a que el listener de Firestore emita el primer valor real
+        // No usar dropFirst() porque necesitamos detectar el primer valor real del listener
+        // El CurrentValueSubject emite [] inicialmente, pero el listener de Firestore
+        // emitirá el valor real después, y ese es el que queremos procesar
         favoritesService.observeFavoriteTeams()
-            .dropFirst() // Ignorar el valor inicial [] del CurrentValueSubject
+            .removeDuplicates() // Evitar procesar el mismo valor múltiples veces
             .combineLatest(userPreferencesService.observePreferences())
             .sink { [weak self] favoriteTeamIds, preferences in
                 guard let self = self else { return }

@@ -34,11 +34,34 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
     init(database: DatabaseProtocol, authProvider: AuthProvider) {
         self.database = database
         self.authProvider = authProvider
-        startObservingPreferences()
+        
+        // Si el usuario ya está autenticado, iniciar listener inmediatamente
+        if getUserId() != nil {
+            startObservingPreferences()
+        } else {
+            // Si no está autenticado, observar cambios de autenticación
+            // y iniciar listener cuando el usuario se autentique
+            observeAuthState()
+        }
     }
 
     deinit {
         preferencesListener?.remove()
+    }
+    
+    // MARK: - Auth State Observation
+    
+    private func observeAuthState() {
+        // Observar cambios en el estado de autenticación
+        // Cuando el usuario se autentica, iniciar el listener
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("LoginSuccessful"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Logger.shared.info("👂 UserPreferencesService: Usuario autenticado - Iniciando listener")
+            self?.startObservingPreferences()
+        }
     }
 
     // MARK: - Private Helpers
@@ -56,8 +79,20 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
     }
 
     private func startObservingPreferences() {
-        guard let docRef = getPreferencesDocumentRef() else { return }
+        guard let userId = getUserId() else {
+            Logger.shared.info("👂 UserPreferencesService: No hay usuario autenticado - No iniciando listener de preferencias")
+            return
+        }
+        
+        guard let docRef = getPreferencesDocumentRef() else {
+            Logger.shared.info("👂 UserPreferencesService: No se pudo obtener referencia al documento de preferencias")
+            return
+        }
+        
+        // Remover listener anterior si existe
+        preferencesListener?.remove()
 
+        Logger.shared.info("👂 UserPreferencesService: Iniciando observación de preferencias para usuario: \(userId)")
         preferencesListener = docRef.addSnapshotListener { [weak self] snapshot, error in
             if let error = error {
                 Logger.shared.error("❌ Error listening to user preferences", error: error)
@@ -66,6 +101,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
 
             guard let data = snapshot?.data() else {
                 // No existen preferencias aún, usar valores por defecto
+                Logger.shared.info("👂 UserPreferencesService: No hay preferencias guardadas - Usando valores por defecto")
                 self?.preferencesSubject.send(UserPreferences())
                 return
             }
@@ -73,8 +109,8 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
             do {
                 let dto = try Firestore.Decoder().decode(UserPreferencesDTO.self, from: data)
                 let preferences = UserPreferencesMapper.toDomain(from: dto)
+                Logger.shared.info("👂 UserPreferencesService: Preferencias cargadas - pushEnabled=\(preferences.pushNotificationsEnabled), topics=\(preferences.subscribedTopics.count)")
                 self?.preferencesSubject.send(preferences)
-                Logger.shared.debug("📋 User preferences loaded: pushEnabled=\(preferences.pushNotificationsEnabled), topics=\(preferences.subscribedTopics.count)")
             } catch {
                 Logger.shared.error("❌ Error decoding user preferences", error: error)
                 self?.preferencesSubject.send(UserPreferences())

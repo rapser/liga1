@@ -52,9 +52,13 @@ final class DIContainer {
         return AuthService()
     }
 
-    func makeFavoritesService() -> FavoritesServiceProtocol {
+    private lazy var favoritesService: FavoritesServiceProtocol = {
         let authService = makeAuthService() as! AuthService
         return FavoritesService(database: makeDatabase(), authProvider: authService)
+    }()
+    
+    func makeFavoritesService() -> FavoritesServiceProtocol {
+        return favoritesService
     }
 
     private lazy var notificationService: NotificationServiceProtocol = {
@@ -65,9 +69,13 @@ final class DIContainer {
         return notificationService
     }
 
-    func makeUserPreferencesService() -> UserPreferencesServiceProtocol {
+    private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
         let authService = makeAuthService() as! AuthService
         return UserPreferencesService(database: makeDatabase(), authProvider: authService)
+    }()
+    
+    func makeUserPreferencesService() -> UserPreferencesServiceProtocol {
+        return userPreferencesService
     }
 
     private lazy var notificationTopicManager: NotificationTopicManagerProtocol = {

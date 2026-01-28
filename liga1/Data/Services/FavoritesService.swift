@@ -43,13 +43,37 @@ class FavoritesService: FavoritesServiceProtocol {
     init(database: DatabaseProtocol, authProvider: AuthProvider) {
         self.database = database
         self.authProvider = authProvider
-        startObservingFavorites()
-        startObservingFavoriteTeams()
+        
+        // Si el usuario ya está autenticado, iniciar listeners inmediatamente
+        if getUserId() != nil {
+            startObservingFavorites()
+            startObservingFavoriteTeams()
+        } else {
+            // Si no está autenticado, observar cambios de autenticación
+            // y iniciar listeners cuando el usuario se autentique
+            observeAuthState()
+        }
     }
 
     deinit {
         favoritesListener?.remove()
         favoriteTeamsListener?.remove()
+    }
+    
+    // MARK: - Auth State Observation
+    
+    private func observeAuthState() {
+        // Observar cambios en el estado de autenticación
+        // Cuando el usuario se autentica, iniciar los listeners
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("LoginSuccessful"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Logger.shared.info("👂 FavoritesService: Usuario autenticado - Iniciando listeners")
+            self?.startObservingFavorites()
+            self?.startObservingFavoriteTeams()
+        }
     }
 
     // MARK: - Private Helpers
@@ -59,8 +83,15 @@ class FavoritesService: FavoritesServiceProtocol {
     }
 
     private func startObservingFavorites() {
-        guard let userId = getUserId() else { return }
+        guard let userId = getUserId() else {
+            Logger.shared.info("👂 FavoritesService: No hay usuario autenticado - No iniciando listener de favoritos")
+            return
+        }
+        
+        // Remover listener anterior si existe
+        favoritesListener?.remove()
 
+        Logger.shared.info("👂 FavoritesService: Iniciando observación de favoritos para usuario: \(userId)")
         favoritesListener = db.collection(FirestoreConstants.Collection.users)
             .document(userId)
             .collection(FirestoreConstants.Collection.favorites)
@@ -71,12 +102,19 @@ class FavoritesService: FavoritesServiceProtocol {
                 }
 
                 let favoriteIds = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
+                Logger.shared.info("👂 FavoritesService: Favoritos actualizados desde Firestore: \(favoriteIds)")
                 self?.favoritesSubject.send(favoriteIds)
             }
     }
 
     private func startObservingFavoriteTeams() {
-        guard let userId = getUserId() else { return }
+        guard let userId = getUserId() else {
+            Logger.shared.info("👂 FavoritesService: No hay usuario autenticado - No iniciando listener de equipos favoritos")
+            return
+        }
+        
+        // Remover listener anterior si existe
+        favoriteTeamsListener?.remove()
 
         Logger.shared.info("👂 FavoritesService: Iniciando observación de equipos favoritos para usuario: \(userId)")
         
