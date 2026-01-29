@@ -52,9 +52,13 @@ final class DIContainer {
         return AuthService()
     }
 
-    func makeFavoritesService() -> FavoritesServiceProtocol {
+    private lazy var favoritesService: FavoritesServiceProtocol = {
         let authService = makeAuthService() as! AuthService
         return FavoritesService(database: makeDatabase(), authProvider: authService)
+    }()
+    
+    func makeFavoritesService() -> FavoritesServiceProtocol {
+        return favoritesService
     }
 
     private lazy var notificationService: NotificationServiceProtocol = {
@@ -63,6 +67,37 @@ final class DIContainer {
 
     func makeNotificationService() -> NotificationServiceProtocol {
         return notificationService
+    }
+
+    private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
+        let authService = makeAuthService() as! AuthService
+        return UserPreferencesService(database: makeDatabase(), authProvider: authService)
+    }()
+    
+    func makeUserPreferencesService() -> UserPreferencesServiceProtocol {
+        return userPreferencesService
+    }
+
+    private lazy var notificationTopicManager: NotificationTopicManagerProtocol = {
+        return NotificationTopicManager(
+            notificationService: makeNotificationService(),
+            favoritesService: makeFavoritesService(),
+            userPreferencesService: makeUserPreferencesService()
+        )
+    }()
+
+    func makeNotificationTopicManager() -> NotificationTopicManagerProtocol {
+        return notificationTopicManager
+    }
+
+    // MARK: - Notification Deduplicator
+
+    private lazy var notificationDeduplicator: NotificationDeduplicatorProtocol = {
+        return NotificationDeduplicator()
+    }()
+
+    func makeNotificationDeduplicator() -> NotificationDeduplicatorProtocol {
+        return notificationDeduplicator
     }
 
     // MARK: - Use Cases - Jornadas
@@ -163,6 +198,21 @@ final class DIContainer {
         )
     }
 
+    // MARK: - Use Cases - Notifications
+
+    func makeUpdatePushNotificationsEnabledUseCase() -> UpdatePushNotificationsEnabledUseCaseProtocol {
+        return UpdatePushNotificationsEnabledUseCase(
+            userPreferencesService: makeUserPreferencesService(),
+            notificationTopicManager: makeNotificationTopicManager()
+        )
+    }
+
+    func makeObserveUserPreferencesUseCase() -> ObserveUserPreferencesUseCaseProtocol {
+        return ObserveUserPreferencesUseCase(
+            userPreferencesService: makeUserPreferencesService()
+        )
+    }
+
     // MARK: - ViewModels
 
     func makeHomeViewModel() -> HomeViewModel {
@@ -213,6 +263,13 @@ final class DIContainer {
     func makeRegistrarPartidosViewModel() -> RegistrarPartidosViewModel {
         return RegistrarPartidosViewModel(
             registerMatchesUseCase: makeRegisterMatchesUseCase()
+        )
+    }
+
+    func makeNotificationSettingsViewModel() -> NotificationSettingsViewModel {
+        return NotificationSettingsViewModel(
+            updatePushNotificationsEnabledUseCase: makeUpdatePushNotificationsEnabledUseCase(),
+            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase()
         )
     }
 

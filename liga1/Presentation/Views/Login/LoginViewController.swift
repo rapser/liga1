@@ -28,14 +28,13 @@ class LoginViewController: UIViewController {
 
     // MARK: - UI Components
 
-    private lazy var scrollView = UIScrollView().prepareForAutoLayout()
+    private let containerView = ContainerView()
     private lazy var contentView = UIView().prepareForAutoLayout()
 
     private lazy var logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "liga1-logo")
         imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
 
@@ -80,7 +79,7 @@ class LoginViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
 
         viewModel.delegate = self
 
@@ -93,21 +92,10 @@ class LoginViewController: UIViewController {
     // MARK: - Setup
 
     private func setupLayout() {
-        // Add scroll view
-        scrollView
-            .addTo(view)
+        containerView.attachToSafeArea(in: view)
+        contentView
+            .addTo(containerView)
             .fillSuperview()
-
-        // Add content view to scroll view
-        contentView.addTo(scrollView)
-
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
-        ])
 
         // Logo
         logoImageView
@@ -225,7 +213,6 @@ class LoginViewController: UIViewController {
 
 extension LoginViewController: LoginViewModelDelegate {
     func loginViewModelNeedsGoogleSignInPresentation(_ viewModel: LoginViewModel) {
-        Logger.shared.info("📱 LoginViewController: Presentando Google Sign In")
         viewModel.performGoogleSignIn(presentingViewController: self)
     }
 }

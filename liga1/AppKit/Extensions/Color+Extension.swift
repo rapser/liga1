@@ -8,6 +8,19 @@
 import UIKit
 
 public extension UIColor {
+    /// Fondo principal de la app: negro en modo oscuro, blanco en modo claro.
+    static let appBackground: UIColor = UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark ? .black : .white
+    }
+
+    /// Fondo secundario (cards, agrupados): negro muy suave en oscuro, blanco en modo claro.
+    static let appSecondaryBackground: UIColor = UIColor { traitCollection in
+        if traitCollection.userInterfaceStyle == .dark {
+            return UIColor(white: 0.11, alpha: 1)
+        }
+        return .white
+    }
+
     static let libertadoresGold = UIColor(red: 1.0, green: 0.8, blue: 0.0, alpha: 1.0)        // #FFCC00
     static let libertadoresLightGold = UIColor(red: 1.0, green: 0.9, blue: 0.4, alpha: 1.0)   // #FFE666
     static let libertadoresLighterGold = UIColor(red: 1.0, green: 0.95, blue: 0.7, alpha: 1.0) // #FFF2B3

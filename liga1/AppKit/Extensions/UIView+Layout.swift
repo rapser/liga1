@@ -4,6 +4,13 @@
 //
 //  Created by Miguel Tomairo on 01/01/26.
 //
+//  Uso típico: vista.addTo(superview).pinTop().pinLeading().pinTrailing().height(50)
+//  - addTo(_) añade la vista y llama prepareForAutoLayout()
+//  - pinTop/Bottom/Leading/Trailing(to:constant:useSafeArea:) para anclar
+//  - fillSuperview(padding:) para llenar el superview
+//  - anchor(top:leading:bottom:trailing:padding:) para anclas explícitas
+//  - Usar Spacing.tiny / .small / .medium / .standard en lugar de números sueltos
+//
 
 import UIKit
 
@@ -236,6 +243,30 @@ extension UIView {
             .pinLeading(constant: padding.left)
             .pinTrailing(constant: padding.right)
             .pinBottom(constant: padding.bottom, useSafeArea: useSafeArea)
+    }
+
+    /// Ancla la vista a los anchors dados con padding opcional
+    @discardableResult
+    func anchor(
+        top: NSLayoutYAxisAnchor? = nil,
+        leading: NSLayoutXAxisAnchor? = nil,
+        bottom: NSLayoutYAxisAnchor? = nil,
+        trailing: NSLayoutXAxisAnchor? = nil,
+        padding: UIEdgeInsets = .zero
+    ) -> Self {
+        if let top = top {
+            topAnchor.constraint(equalTo: top, constant: padding.top).isActive = true
+        }
+        if let leading = leading {
+            leadingAnchor.constraint(equalTo: leading, constant: padding.left).isActive = true
+        }
+        if let bottom = bottom {
+            bottomAnchor.constraint(equalTo: bottom, constant: -padding.bottom).isActive = true
+        }
+        if let trailing = trailing {
+            trailingAnchor.constraint(equalTo: trailing, constant: -padding.right).isActive = true
+        }
+        return self
     }
 
     // MARK: - Style Helpers

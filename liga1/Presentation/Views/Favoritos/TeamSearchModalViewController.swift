@@ -76,42 +76,37 @@ class TeamSearchModalViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
 
-        view.addSubview(containerView)
-        containerView.addSubview(handleView)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(searchBar)
-        containerView.addSubview(tableView)
+        containerView
+            .addTo(view)
+            .pinLeading()
+            .pinTrailing()
+            .pinBottom()
+        containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.75).isActive = true
 
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        handleView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+        handleView
+            .addTo(containerView)
+            .pinTop(constant: Spacing.small)
+            .centerX()
+            .size(width: 40, height: 5)
 
-        NSLayoutConstraint.activate([
-            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            containerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.75),
+        titleLabel
+            .addTo(containerView)
+            .pinTop(to: handleView.bottomAnchor, constant: Spacing.medium)
+            .pinLeading(constant: Spacing.standard)
+            .pinTrailing(constant: Spacing.standard)
 
-            handleView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
-            handleView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            handleView.widthAnchor.constraint(equalToConstant: 40),
-            handleView.heightAnchor.constraint(equalToConstant: 5),
+        searchBar
+            .addTo(containerView)
+            .pinTop(to: titleLabel.bottomAnchor, constant: Spacing.medium)
+            .pinLeading(constant: Spacing.small)
+            .pinTrailing(constant: Spacing.small)
 
-            titleLabel.topAnchor.constraint(equalTo: handleView.bottomAnchor, constant: 12),
-            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-
-            searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
-            searchBar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
-            searchBar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
-
-            tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
-            tableView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
-        ])
+        tableView
+            .addTo(containerView)
+            .pinTop(to: searchBar.bottomAnchor, constant: Spacing.small)
+            .pinLeading()
+            .pinTrailing()
+            .pinBottom()
     }
 
     private func setupTableView() {
@@ -133,7 +128,9 @@ class TeamSearchModalViewController: UIViewController {
     func configure(teams: [TeamUI], favoriteTeamIds: Set<String>) {
         var teamsWithFavorite = teams
         for index in teamsWithFavorite.indices {
-            teamsWithFavorite[index].isFavorite = favoriteTeamIds.contains(teamsWithFavorite[index].nombre)
+            // IMPORTANTE: Comparar usando logo (código corto) normalizado, no nombre
+            let teamCode = teamsWithFavorite[index].logo.lowercased()
+            teamsWithFavorite[index].isFavorite = favoriteTeamIds.contains(teamCode)
         }
         self.teams = teamsWithFavorite
         self.filteredTeams = teamsWithFavorite
@@ -143,7 +140,9 @@ class TeamSearchModalViewController: UIViewController {
     func updateFavorites(_ favoriteTeamIds: Set<String>) {
         self.favoriteTeamIds = favoriteTeamIds
         for index in filteredTeams.indices {
-            filteredTeams[index].isFavorite = favoriteTeamIds.contains(filteredTeams[index].nombre)
+            // IMPORTANTE: Comparar usando logo (código corto) normalizado, no nombre
+            let teamCode = filteredTeams[index].logo.lowercased()
+            filteredTeams[index].isFavorite = favoriteTeamIds.contains(teamCode)
         }
         tableView.reloadData()
     }
@@ -215,7 +214,30 @@ extension TeamSearchModalViewController: UITableViewDataSource, UITableViewDeleg
 extension TeamSearchModalViewController: TeamTableViewCellDelegate {
     func didTapFavorite(cell: TeamTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let team = filteredTeams[indexPath.row]
+        var team = filteredTeams[indexPath.row]
+        
+        // Actualizar inmediatamente el estado de la estrella antes de llamar al delegate
+        let teamCode = team.logo.lowercased()
+        let isCurrentlyFavorite = favoriteTeamIds.contains(teamCode)
+        team.isFavorite = !isCurrentlyFavorite
+        filteredTeams[indexPath.row] = team
+        
+        // También actualizar en el array principal si el equipo está ahí
+        if let mainIndex = teams.firstIndex(where: { $0.logo.lowercased() == teamCode }) {
+            teams[mainIndex].isFavorite = !isCurrentlyFavorite
+        }
+        
+        // Actualizar favoriteTeamIds localmente para reflejar el cambio inmediato
+        if isCurrentlyFavorite {
+            favoriteTeamIds.remove(teamCode)
+        } else {
+            favoriteTeamIds.insert(teamCode)
+        }
+        
+        // Recargar solo la celda afectada para actualizar la estrella visualmente
+        tableView.reloadRows(at: [indexPath], with: .none)
+        
+        // Llamar al delegate para que actualice en Firestore
         delegate?.didSelectTeam(team)
     }
 }

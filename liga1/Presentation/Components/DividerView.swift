@@ -32,6 +32,14 @@ final class DividerView: UIView {
     private func setupUI(text: String) {
         prepareForAutoLayout()
 
+        // Configurar label primero para poder referenciarlo
+        label
+            .addTo(self)
+            .text(text)
+            .font(.systemFont(ofSize: 14))
+            .textColor(.secondaryLabel)
+            .centerInSuperview()
+
         // Configurar línea izquierda
         leftLine
             .addTo(self)
@@ -39,14 +47,7 @@ final class DividerView: UIView {
             .height(1)
             .pinLeading()
             .centerY()
-
-        // Configurar label
-        label
-            .addTo(self)
-            .text(text)
-            .font(.systemFont(ofSize: 14))
-            .textColor(.secondaryLabel)
-            .centerInSuperview()
+            .pinTrailing(to: label.leadingAnchor, constant: -Spacing.small)
 
         // Configurar línea derecha
         rightLine
@@ -55,12 +56,7 @@ final class DividerView: UIView {
             .height(1)
             .pinTrailing()
             .centerY()
-
-        // Crear restricciones entre vistas hermanas
-        NSLayoutConstraint.activate([
-            leftLine.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -Spacing.small),
-            rightLine.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: Spacing.small)
-        ])
+            .pinLeading(to: label.trailingAnchor, constant: Spacing.small)
     }
 
     // MARK: - Public Methods

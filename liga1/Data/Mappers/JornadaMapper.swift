@@ -31,7 +31,6 @@ struct JornadaMapper {
             // Si no están en el DTO, extraerlos del documentID
             torneo = parsed.torneo
             numero = parsed.numero
-            Logger.shared.debug("JornadaMapper: Extracted torneo=\(torneo), numero=\(numero) from documentID: \(id)")
         } else {
             Logger.shared.warning("JornadaMapper: Cannot extract torneo and numero from id: \(id)")
             return nil

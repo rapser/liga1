@@ -19,6 +19,10 @@ protocol NotificationServiceProtocol {
 
 final class NotificationService: NotificationServiceProtocol {
 
+    // MARK: - Private Properties
+    private var subscriptionRetryCount: [String: Int] = [:]
+    private let maxRetries = 3
+
     // MARK: - Initialization
     init() {}
 
@@ -49,11 +53,47 @@ final class NotificationService: NotificationServiceProtocol {
     }
 
     func subscribeToTopic(_ topic: String) {
-        Messaging.messaging().subscribe(toTopic: topic) { error in
+        let apnsToken = Messaging.messaging().apnsToken
+        if apnsToken == nil {
+            let retryCount = subscriptionRetryCount[topic] ?? 0
+
+            if retryCount >= maxRetries {
+                subscriptionRetryCount.removeValue(forKey: topic)
+                return
+            }
+
+            subscriptionRetryCount[topic] = retryCount + 1
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                self?.subscribeToTopic(topic)
+            }
+            return
+        }
+
+        subscriptionRetryCount.removeValue(forKey: topic)
+
+        Messaging.messaging().subscribe(toTopic: topic) { [weak self] error in
+            guard let self = self else { return }
+
             if let error = error {
-                print("❌ Error suscribiéndose a topic \(topic): \(error.localizedDescription)")
+                Logger.shared.error("Error suscribiéndose a topic '\(topic)'", error: error)
+
+                #if !targetEnvironment(simulator)
+                let retryCount = self.subscriptionRetryCount[topic] ?? 0
+                if retryCount < self.maxRetries {
+                    self.subscriptionRetryCount[topic] = retryCount + 1
+                    let errorDescription = error.localizedDescription.lowercased()
+                    if errorDescription.contains("apns") || errorDescription.contains("token") {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            self.subscribeToTopic(topic)
+                        }
+                    }
+                } else {
+                    self.subscriptionRetryCount.removeValue(forKey: topic)
+                }
+                #endif
             } else {
-                print("✅ Suscrito exitosamente a topic: \(topic)")
+                self.subscriptionRetryCount.removeValue(forKey: topic)
             }
         }
     }
@@ -61,9 +101,7 @@ final class NotificationService: NotificationServiceProtocol {
     func unsubscribeFromTopic(_ topic: String) {
         Messaging.messaging().unsubscribe(fromTopic: topic) { error in
             if let error = error {
-                print("❌ Error desuscribiéndose del topic \(topic): \(error.localizedDescription)")
-            } else {
-                print("✅ Desuscrito exitosamente del topic: \(topic)")
+                Logger.shared.error("Error desuscribiéndose del topic \(topic)", error: error)
             }
         }
     }

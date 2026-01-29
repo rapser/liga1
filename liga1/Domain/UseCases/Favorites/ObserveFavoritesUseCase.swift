@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 
-/// Use Case para observar cambios en favoritos
 protocol ObserveFavoritesUseCaseProtocol {
     func execute() -> AnyPublisher<Set<String>, Never>
 }
@@ -22,12 +21,10 @@ class ObserveFavoritesUseCase: ObserveFavoritesUseCaseProtocol {
     }
 
     func execute() -> AnyPublisher<Set<String>, Never> {
-        Logger.shared.debug("ObserveFavoritesUseCase: Starting to observe favorites")
 
         return service.observeFavorites()
             .handleEvents(
                 receiveOutput: { favoriteIds in
-                    Logger.shared.info("ObserveFavoritesUseCase: Favorites updated, count: \(favoriteIds.count)")
                 }
             )
             .eraseToAnyPublisher()

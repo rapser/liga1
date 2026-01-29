@@ -12,8 +12,11 @@ struct TeamMapper {
 
     /// Convierte TeamDTO a Team (Domain Model)
     static func toDomain(from dto: TeamDTO, documentID: String? = nil) -> Team {
-        // Usar el logo del DTO, o el documentID como fallback si no está presente
-        let logo = dto.logo ?? documentID ?? ""
+        // IMPORTANTE: Siempre usar el documentID como logo (código corto del equipo)
+        // El documentID es el código del equipo (ej: "ali", "uni", "cri")
+        // Esto es necesario para los topics de notificaciones push
+        // Ignorar dto.logo porque puede contener el nombre completo en lugar del código
+        let logo = documentID ?? dto.logo ?? ""
         
         return Team(
             nombre: dto.name ?? "",

@@ -29,7 +29,6 @@ class NewsRepository: NewsRepositoryProtocol {
                 return
             }
 
-            Logger.shared.debug("NewsRepository: Fetching from collection: \(FirestoreConstants.Collection.news)")
 
             self.db.collection(FirestoreConstants.Collection.news)
                 .order(by: FirestoreConstants.NewsField.fecha, descending: true)
@@ -41,19 +40,14 @@ class NewsRepository: NewsRepositoryProtocol {
                     }
 
                     guard let documents = snapshot?.documents else {
-                        Logger.shared.debug("NewsRepository: No documents found, returning empty array")
                         promise(.success([]))
                         return
                     }
 
-                    Logger.shared.debug("NewsRepository: Found \(documents.count) documents")
 
                     // Decodificar DTOs desde Firestore y asignar documentID manualmente
                     let newsDTOs = documents.compactMap { doc -> NewsItemDTO? in
-                        Logger.shared.debug("NewsRepository: Processing document: \(doc.documentID)")
-                        Logger.shared.debug("NewsRepository: Document data: \(doc.data())")
                         guard var dto = try? doc.data(as: NewsItemDTO.self) else {
-                            Logger.shared.debug("NewsRepository: Failed to parse document \(doc.documentID)")
                             return nil
                         }
                         // Asignar el documentID si no está presente
@@ -75,7 +69,6 @@ class NewsRepository: NewsRepositoryProtocol {
                     // Convertir DTOs a entidades de dominio usando el mapper
                     let newsItems = NewsItemMapper.toDomain(from: newsDTOs)
 
-                    Logger.shared.debug("NewsRepository: Successfully parsed \(newsItems.count) news items")
                     promise(.success(newsItems))
                 }
         }

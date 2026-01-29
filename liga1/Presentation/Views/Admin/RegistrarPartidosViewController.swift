@@ -19,11 +19,7 @@ class RegistrarPartidosViewController: UIViewController {
 
     // MARK: - UI Components
 
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.prepareForAutoLayout()
-        return scrollView
-    }()
+    private let containerView = ContainerView()
 
     private lazy var contentStackView: UIStackView = {
         let stackView = UIStackView()
@@ -109,33 +105,23 @@ class RegistrarPartidosViewController: UIViewController {
 
     private func setupUI() {
         title = "Registrar Partidos"
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         navigationItem.largeTitleDisplayMode = .never
     }
 
     private func setupConstraints() {
-        view.addSubview(scrollView)
-        scrollView.addSubview(contentStackView)
-        view.addSubview(activityIndicator)
+        containerView.attachToSafeArea(in: view)
 
-        NSLayoutConstraint.activate([
-            // ScrollView
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        contentStackView
+            .addTo(containerView)
+            .pinTop(constant: Spacing.extraLarge, useSafeArea: false)
+            .pinLeading(constant: Spacing.standard)
+            .pinTrailing(constant: Spacing.standard)
+            .pinBottom(constant: Spacing.extraLarge, useSafeArea: false)
 
-            // ContentStackView
-            contentStackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: Spacing.extraLarge),
-            contentStackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: Spacing.standard),
-            contentStackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -Spacing.standard),
-            contentStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -Spacing.extraLarge),
-            contentStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -Spacing.standard * 2),
-
-            // ActivityIndicator
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
+        activityIndicator
+            .addTo(view)
+            .centerInSuperview()
 
         contentStackView.addArrangedSubview(titleLabel)
         contentStackView.addArrangedSubview(descriptionLabel)
