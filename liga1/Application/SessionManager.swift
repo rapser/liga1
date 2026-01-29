@@ -51,7 +51,6 @@ final class SessionManager {
             let loginVC = container.makeLoginViewController()
             let nav = UINavigationController(rootViewController: loginVC)
             window?.rootViewController = nav
-            Logger.shared.info("✅ Usuario cerrado sesión automáticamente por inactividad.")
         } catch let error {
             Logger.shared.error("❌ Error al cerrar sesión", error: error)
         }

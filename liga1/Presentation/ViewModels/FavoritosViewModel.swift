@@ -80,15 +80,26 @@ class FavoritosViewModel {
 
     // MARK: - Public Methods - Teams
 
+    func refreshFavoriteTeamsIfNeeded() {
+        observeFavoriteTeamsUseCase.refreshFavoriteTeams()
+            .receive(on: DispatchQueue.main)
+            .sink { _ in } receiveValue: { _ in }
+            .store(in: &cancellables)
+    }
+
     func toggleFavoriteTeam(teamId: String) {
         toggleFavoriteTeamUseCase.execute(teamId: teamId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to toggle favorite for team: \(teamId)", error: error)
+                    Logger.shared.error("❌ FavoritosViewModel: Error al cambiar favorito para equipo: \(teamId)", error: error)
+                } else {
+                    // Forzar sincronización de topics después de cambiar favorito
+                    // El delay ya está manejado dentro de syncTopicsWithFavorites()
+                    let topicManager = DIContainer.shared.makeNotificationTopicManager()
+                    topicManager.syncTopicsWithFavorites()
                 }
             } receiveValue: { _ in
-                // Favorite team toggled successfully
             }
             .store(in: &cancellables)
     }
@@ -161,7 +172,9 @@ class FavoritosViewModel {
                 guard let self = self else { return }
                 var teamUIs = TeamUIMapper.toUI(from: teams)
                 for index in teamUIs.indices {
-                    teamUIs[index].isFavorite = self.favoriteTeamIds.contains(teamUIs[index].nombre)
+                    // Usar logo (código corto) normalizado a minúsculas para comparar con favoritos
+                    let teamCode = teamUIs[index].logo.lowercased()
+                    teamUIs[index].isFavorite = self.favoriteTeamIds.contains(teamCode)
                 }
                 self.allTeams = teamUIs
                 self.updateFavoriteTeams()
@@ -173,7 +186,8 @@ class FavoritosViewModel {
         var favoriteTeamsArray: [TeamUI] = []
 
         for teamId in favoriteTeamIds {
-            if let team = allTeams.first(where: { $0.nombre == teamId }) {
+            // Buscar por logo (código corto) normalizado a minúsculas, no por nombre
+            if let team = allTeams.first(where: { $0.logo.lowercased() == teamId.lowercased() }) {
                 var updatedTeam = team
                 updatedTeam.isFavorite = true
                 favoriteTeamsArray.append(updatedTeam)
@@ -181,5 +195,10 @@ class FavoritosViewModel {
         }
 
         self.teams = favoriteTeamsArray
+
+        // Si hay favoritos en Firestore pero no pudimos emparejar (p. ej. allTeams aún vacío), volver a cargar el catálogo
+        if !favoriteTeamIds.isEmpty && favoriteTeamsArray.isEmpty && allTeams.isEmpty {
+            fetchAllTeams()
+        }
     }
 }

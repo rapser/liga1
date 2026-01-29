@@ -22,12 +22,10 @@ class FetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol {
     }
 
     func execute() -> AnyPublisher<[Jornada], Error> {
-        Logger.shared.debug("FetchActiveJornadasUseCase: Fetching active jornadas")
 
         return repository.fetchActiveJornadas()
             .handleEvents(
                 receiveOutput: { jornadas in
-                    Logger.shared.info("FetchActiveJornadasUseCase: Successfully fetched \(jornadas.count) active jornadas")
                 },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {

@@ -1,8 +1,9 @@
 //
-//  ViewController.swift
+//  TablaViewController.swift
 //  liga1
 //
 //  Created by miguel tomairo on 15/08/24.
+//  Refactored with AppKit on 2026-01-28
 //
 
 import UIKit
@@ -10,21 +11,17 @@ import Combine
 
 class TablaViewController: UIViewController {
 
-    // MARK: - Properties
-    private let tableView = UITableView()
-    
-    // MARK: - Segmented Control (Comentado temporalmente - mostrar solo al concluir apertura)
-    // let segmentedControl = UISegmentedControl(items: ["Apertura", "Clausura", "Acumulado"])
-    
-    // Rectángulo rojo que reemplaza al segmented control mostrando "Apertura"
+    // MARK: - UI Components
+    private let containerView = ContainerView()
     private let aperturaLabelView = UIView()
     private let aperturaLabel = UILabel()
-    
+    private let tableView = UITableView()
+
+    // MARK: - Properties
     let viewModel: TorneoViewModel
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
-
     init(viewModel: TorneoViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -35,27 +32,101 @@ class TablaViewController: UIViewController {
     }
 
     // MARK: - LifeCycle
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        // configureSegmentedControl() // Comentado temporalmente
-        configureAperturaLabelView() // Nuevo: mostrar rectángulo rojo con "Apertura"
-        configureTableView()
+        configureNavigationBar()
+        setupUI()
         bindViewModel()
         loadInitialData()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Recargar datos cada vez que se entra a esta tab
         viewModel.reloadTeams(for: .apertura)
     }
 
-    // MARK: - Private methods
+    // MARK: - Setup Methods
+    private func configureNavigationBar() {
+        view.backgroundColor = .appBackground
+        title = "Tabla"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+    }
 
+    private func setupUI() {
+        // Container principal
+        containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
+
+        // Label "Apertura" (view rojo)
+        setupAperturaLabel()
+
+        // TableView
+        setupTableView()
+    }
+
+    private func setupAperturaLabel() {
+        // Configurar el view rojo
+        aperturaLabelView.backgroundColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
+        aperturaLabelView.layer.cornerRadius = 5.0
+        aperturaLabelView.prepareForAutoLayout()
+
+        // Configurar el label
+        aperturaLabel.text = "Apertura"
+        aperturaLabel.textColor = .white
+        aperturaLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        aperturaLabel.textAlignment = .center
+        aperturaLabel.prepareForAutoLayout()
+
+        // Agregar al container
+        containerView.addSubview(aperturaLabelView)
+        aperturaLabelView.addSubview(aperturaLabel)
+
+        // Constraints del view rojo
+        aperturaLabelView.anchor(
+            top: containerView.topAnchor,
+            leading: containerView.leadingAnchor,
+            trailing: containerView.trailingAnchor,
+            padding: UIEdgeInsets(
+                top: Spacing.standard,
+                left: Spacing.standard,
+                bottom: 0,
+                right: Spacing.standard
+            )
+        )
+        aperturaLabelView.height(30)
+
+        // Constraints del label dentro del view
+        aperturaLabel.centerInSuperview()
+    }
+
+    private func setupTableView() {
+        // Configurar tableView
+        tableView.prepareForAutoLayout()
+        tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
+        tableView.allowsSelection = false
+        tableView.delegate = self
+        tableView.dataSource = self
+
+        // Agregar al container
+        containerView.addSubview(tableView)
+
+        // Constraints: debajo del aperturaLabelView, pegado a los bordes
+        tableView.anchor(
+            top: aperturaLabelView.bottomAnchor,
+            leading: containerView.leadingAnchor,
+            bottom: containerView.bottomAnchor,
+            trailing: containerView.trailingAnchor,
+            padding: UIEdgeInsets(
+                top: Spacing.small,
+                left: 0,
+                bottom: 0,
+                right: 0
+            )
+        )
+    }
+
+    // MARK: - Data & Binding
     private func loadInitialData() {
-        // segmentedControl.selectedSegmentIndex = 0 // Comentado temporalmente
         viewModel.loadTeams(for: .apertura)
     }
 
@@ -75,77 +146,4 @@ class TablaViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-
-    // MARK: - Segmented Control Configuration (Comentado temporalmente)
-    /*
-    private func configureSegmentedControl() {
-        segmentedControl.addTarget(self, action: #selector(segmentedControlChanged(_:)), for: .valueChanged)
-        LayoutPresets.configureSegmentedControl(segmentedControl, in: view)
-    }
-    */
-    
-    // MARK: - Apertura Label View Configuration
-    private func configureAperturaLabelView() {
-        aperturaLabelView.backgroundColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0) // Rojo
-        aperturaLabelView.layer.cornerRadius = 5.0
-        aperturaLabelView.prepareForAutoLayout()
-        
-        aperturaLabel.text = "Apertura"
-        aperturaLabel.textColor = .white
-        aperturaLabel.font = .systemFont(ofSize: 14, weight: .bold)
-        aperturaLabel.textAlignment = .center
-        aperturaLabel.prepareForAutoLayout()
-        
-        aperturaLabelView.addSubview(aperturaLabel)
-        view.addSubview(aperturaLabelView)
-        
-        NSLayoutConstraint.activate([
-            // Posicionar el rectángulo donde estaría el segmented control
-            aperturaLabelView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Spacing.standard),
-            aperturaLabelView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Spacing.standard),
-            aperturaLabelView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Spacing.standard),
-            aperturaLabelView.heightAnchor.constraint(equalToConstant: 30), // Mismo height que el segmented control
-            
-            // Centrar el label dentro del rectángulo
-            aperturaLabel.centerXAnchor.constraint(equalTo: aperturaLabelView.centerXAnchor),
-            aperturaLabel.centerYAnchor.constraint(equalTo: aperturaLabelView.centerYAnchor)
-        ])
-    }
-
-    private func configureTableView() {
-        tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
-        tableView.allowsSelection = false
-        // LayoutPresets.configureTableViewBelow(
-        //     tableView,
-        //     topView: segmentedControl, // Comentado temporalmente
-        //     in: view,
-        //     delegate: self,
-        //     dataSource: self
-        // )
-        
-        // Configurar tabla usando el aperturaLabelView como topView
-        LayoutPresets.configureTableViewBelow(
-            tableView,
-            topView: aperturaLabelView,
-            in: view,
-            delegate: self,
-            dataSource: self
-        )
-    }
-
-    // MARK: - Segmented Control Action (Comentado temporalmente)
-    /*
-    @objc private func segmentedControlChanged(_ sender: UISegmentedControl) {
-        switch sender.selectedSegmentIndex {
-        case 0:
-            viewModel.loadTeams(for: .apertura)
-        case 1:
-            viewModel.loadTeams(for: .clausura)
-        case 2:
-            viewModel.loadTeams(for: .acumulado)
-        default:
-            break
-        }
-    }
-    */
 }

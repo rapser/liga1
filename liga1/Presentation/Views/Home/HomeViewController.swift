@@ -12,6 +12,7 @@ class HomeViewController: UIViewController {
 
     // MARK: - Properties
 
+    private let containerView = ContainerView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -33,15 +34,17 @@ class HomeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Inicio"
         setupUI()
         setupAdapter()
         bindViewModel()
         registerForTraitChanges()
-        // No es necesario llamar fetchActiveJornadas() porque el observer se activa automáticamente en init del ViewModel
+        viewModel.fetchActiveJornadas()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        title = "Inicio"
         // Asegurar que el color esté actualizado cuando aparece la vista
         configureRefreshControlColor()
     }
@@ -49,23 +52,24 @@ class HomeViewController: UIViewController {
     // MARK: - Setup
 
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
+        containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
         // Configurar tableView para eliminar espacio entre header y nav bar
         // sectionHeaderTopPadding elimina el padding automático de iOS 15+
         tableView.sectionHeaderTopPadding = 0
-        
-        // Agregar tableView a la vista primero
-        tableView.prepareForAutoLayout()
-        tableView.addTo(view).fillSuperview()
-        
+
+        tableView
+            .addTo(containerView)
+            .fillSuperview()
+
         // Configurar refresh control después de agregar el tableView
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
-        
+
         // Asegurar que el refresh control esté visible
         refreshControl.layer.zPosition = 1000
-        
+
         configureRefreshControlColor()
     }
     
@@ -123,7 +127,6 @@ class HomeViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        // Observar cambios en las secciones de jornadas
         viewModel.$jornadaSections
             .receive(on: DispatchQueue.main)
             .sink { [weak self] sections in
@@ -131,7 +134,6 @@ class HomeViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        // Observar estado de carga
         viewModel.$isLoading
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
@@ -141,7 +143,6 @@ class HomeViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        // Observar errores
         viewModel.$error
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)

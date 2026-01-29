@@ -50,8 +50,10 @@ class TeamsRepository: TeamsRepositoryProtocol {
                         }
                         // Asignar el ID del documento y el nombre completo si no viene
                         let nombreCompleto = dto.name ?? EquipoPeruano.obtenerNombreCompleto(paraId: doc.documentID)
-                        // Usar el logo del DTO o el documentID como fallback
-                        let logo = dto.logo ?? doc.documentID
+                        // IMPORTANTE: Siempre usar el documentID como logo (código corto del equipo)
+                        // El documentID es el código del equipo (ej: "ali", "uni", "cri")
+                        // Esto es necesario para los topics de notificaciones push
+                        let logo = doc.documentID
                         
                         return TeamDTO(
                             id: doc.documentID,
@@ -82,7 +84,6 @@ class TeamsRepository: TeamsRepositoryProtocol {
                     if allHaveZeroPoints {
                         // Ordenar alfabéticamente por nombre
                         teams.sort { $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending }
-                        Logger.shared.debug("TeamsRepository: All teams have 0 points, sorting alphabetically")
                     } else {
                         // Ordenar por puntos (descendente) y diferencia de goles (descendente)
                         // Este es el ordenamiento estándar que ya estaba funcionando
@@ -92,7 +93,6 @@ class TeamsRepository: TeamsRepositoryProtocol {
                             }
                             return $0.puntos > $1.puntos
                         }
-                        Logger.shared.debug("TeamsRepository: Teams have points, sorting by points and goal difference")
                     }
 
                     promise(.success(teams))

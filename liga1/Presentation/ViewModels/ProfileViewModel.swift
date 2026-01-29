@@ -97,6 +97,12 @@ class ProfileViewModel {
                     action: .feedback
                 ),
                 ProfileOption(
+                    title: "Ver Logs",
+                    icon: UIImage(systemName: "doc.text.fill"),
+                    subtitle: "Logs de la aplicación",
+                    action: .viewLogs
+                ),
+                ProfileOption(
                     title: "Condiciones de uso",
                     icon: UIImage(systemName: "doc.text.fill"),
                     subtitle: nil,
@@ -109,7 +115,7 @@ class ProfileViewModel {
                     action: .privacy
                 ),
                 ProfileOption(
-                    title: "Ajustes de privacidad",
+title: "Ajustes de privacidad",
                     icon: UIImage(systemName: "gearshape.fill"),
                     subtitle: nil,
                     action: .privacySettings
@@ -156,6 +162,7 @@ class ProfileViewModel {
         case privacy
         case privacySettings
         case registrarPartidos
+        case viewLogs
         case none
     }
 }

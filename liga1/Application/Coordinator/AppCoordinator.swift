@@ -38,7 +38,6 @@ final class AppCoordinator: Coordinator {
     }
     
     @objc private func handleLogoutSuccessfulNotification(_ notification: Notification) {
-        Logger.shared.info("📢 AppCoordinator: Recibida notificación de logout exitoso")
         
         // Limpiar todos los child coordinators
         childCoordinators.removeAll()
@@ -49,7 +48,6 @@ final class AppCoordinator: Coordinator {
             // Intentar cerrar sesión nuevamente
             do {
                 try Auth.auth().signOut()
-                Logger.shared.info("✅ AppCoordinator: Sesión cerrada forzadamente")
             } catch {
                 Logger.shared.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
             }
@@ -58,7 +56,6 @@ final class AppCoordinator: Coordinator {
         // Navegar al LoginFlow
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            Logger.shared.info("🚪 AppCoordinator: Navegando al LoginFlow desde notificación")
             self.showLoginFlow()
         }
     }
@@ -76,10 +73,7 @@ final class AppCoordinator: Coordinator {
         }
     }
     
-    @objc private func handleLoginSuccessfulNotification(_ notification: Notification) {
-        let source = notification.userInfo?["source"] as? String ?? "unknown"
-        Logger.shared.info("📢 AppCoordinator: Recibida notificación de login exitoso (source: \(source))")
-        
+    @objc private func handleLoginSuccessfulNotification(_ notification: Notification) {        
         // Verificar que realmente haya un usuario autenticado
         guard Auth.auth().currentUser != nil else {
             Logger.shared.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
@@ -89,13 +83,11 @@ final class AppCoordinator: Coordinator {
         // Navegar al MainFlow directamente
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            Logger.shared.info("🏠 AppCoordinator: Navegando al MainFlow desde notificación")
             self.showMainFlow()
         }
     }
 
     func showLoginFlow() {
-        Logger.shared.info("🚪 AppCoordinator: Mostrando LoginFlow")
         
         // Limpiar cualquier child coordinator previo
         childCoordinators.removeAll()
@@ -107,15 +99,12 @@ final class AppCoordinator: Coordinator {
         window.makeKeyAndVisible()
         loginCoordinator.start()
         
-        Logger.shared.info("✅ AppCoordinator: LoginFlow configurado")
     }
 
     func showMainFlow() {
-        Logger.shared.info("🏠 AppCoordinator: Mostrando MainFlow (TabBar)")
         let mainTabBar = MainTabBarController(container: container)
         window.rootViewController = mainTabBar
         window.makeKeyAndVisible()
-        Logger.shared.info("✅ AppCoordinator: MainFlow configurado y visible")
     }
 }
 
@@ -123,7 +112,6 @@ final class AppCoordinator: Coordinator {
 
 extension AppCoordinator: LoginCoordinatorDelegate {
     func loginCoordinatorDidFinish(_ coordinator: LoginCoordinator) {
-        Logger.shared.info("✅ AppCoordinator: LoginCoordinator finalizó, navegando al MainFlow")
         removeChildCoordinator(coordinator)
         
         // Verificar que haya un usuario autenticado antes de navegar

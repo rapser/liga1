@@ -17,6 +17,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
                    UNUserNotificationCenterDelegate,
                    MessagingDelegate {
 
+    // MARK: - Properties
+
+    var notificationTopicManager: NotificationTopicManagerProtocol?
+    private lazy var notificationDeduplicator = DIContainer.shared.makeNotificationDeduplicator()
+
+    // MARK: - Lifecycle
+
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
@@ -36,7 +43,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
 
         // Registrar para notificaciones remotas
         application.registerForRemoteNotifications()
-        
+
+        // NUEVO: Inicializar NotificationTopicManager
+        let topicManager = DIContainer.shared.makeNotificationTopicManager()
+        topicManager.startObserving()
+        self.notificationTopicManager = topicManager
+
         // Limpiar badge al abrir la app
         clearBadge()
 
@@ -74,19 +86,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
-        let token = tokenParts.joined()
-        Logger.shared.info("📱 Device Token APNs: \(token)")
-
-        // Pasar el token a Firebase Messaging
         Messaging.messaging().apnsToken = deviceToken
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            if let topicManager = self?.notificationTopicManager {
+                topicManager.syncTopicsWithFavorites()
+            }
+        }
     }
 
     func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        Logger.shared.error("❌ Error al registrar notificaciones remotas", error: error)
+        Logger.shared.error("Error al registrar notificaciones remotas", error: error)
     }
 
     func application(
@@ -94,11 +107,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
-        Logger.shared.info("📮 Notificación remota recibida en background: \(userInfo)")
+        if let eventId = userInfo["event_id"] as? String {
+            guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
+                completionHandler(.noData)
+                return
+            }
+        }
 
-        // Aquí puedes actualizar datos en background
-        // Por ejemplo: sincronizar marcadores de partidos
-
+        Messaging.messaging().appDidReceiveMessage(userInfo)
         completionHandler(.newData)
     }
 
@@ -110,9 +126,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         let userInfo = notification.request.content.userInfo
-        Logger.shared.info("📬 Notificación recibida en foreground: \(userInfo)")
 
-        // Mostrar banner, sonido y badge incluso en foreground
+        if let eventId = userInfo["event_id"] as? String {
+            guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
+                completionHandler([])
+                return
+            }
+        }
+
+        Messaging.messaging().appDidReceiveMessage(userInfo)
         completionHandler([.banner, .sound, .badge])
     }
 
@@ -122,11 +144,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let userInfo = response.notification.request.content.userInfo
-        Logger.shared.info("👆 Usuario tocó notificación: \(userInfo)")
 
-        // Manejar tap en notificación
+        if let eventId = userInfo["event_id"] as? String {
+            guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
+                completionHandler()
+                return
+            }
+        }
+
         handleNotificationTap(userInfo: userInfo)
-
         completionHandler()
     }
 
@@ -135,25 +161,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let token = fcmToken else { return }
 
-        Logger.shared.info("🔑 FCM Token recibido: \(token)")
-
         let notificationService = DIContainer.shared.makeNotificationService()
         notificationService.handleNotificationToken(token)
+        notificationService.subscribeToTopic("liga1_all")
 
-        // Suscribirse a topics de notificaciones
-        notificationService.subscribeToTopic("live_matches")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            let topicManager = DIContainer.shared.makeNotificationTopicManager()
+            topicManager.syncTopicsWithFavorites()
+            topicManager.resubscribeToSavedTopics()
+        }
     }
 
     // MARK: - Private Helpers
 
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
         // Parsear datos de la notificación
-        guard let matchId = userInfo["matchId"] as? String,
-              let type = userInfo["type"] as? String else {
+        guard let matchId = userInfo["matchId"] as? String else {
             return
         }
 
-        Logger.shared.debug("Procesando notificación - Type: \(type), Match: \(matchId)")
 
         // Notificar al AppCoordinator para navegar
         NotificationCenter.default.post(

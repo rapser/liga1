@@ -32,13 +32,11 @@ class ToggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol {
             )).eraseToAnyPublisher()
         }
 
-        Logger.shared.debug("ToggleFavoriteUseCase: Toggling favorite for match: \(matchId)")
 
         return service.toggleFavorite(matchId: matchId)
             .map { _ in () }  // Convertir Bool a Void
             .handleEvents(
                 receiveOutput: { _ in
-                    Logger.shared.info("ToggleFavoriteUseCase: Successfully toggled favorite for match \(matchId)")
                 },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
