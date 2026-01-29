@@ -12,7 +12,6 @@ protocol ObserveUserPreferencesUseCaseProtocol {
     func execute() -> AnyPublisher<UserPreferences?, Never>
 }
 
-/// Use Case para observar cambios en las preferencias de usuario en tiempo real
 class ObserveUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol {
 
     private let userPreferencesService: UserPreferencesServiceProtocol

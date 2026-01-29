@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 
-/// Use Case para observar cambios en matches de una jornada en tiempo real
 protocol ObserveMatchesUseCaseProtocol {
     func execute(for jornadaId: String) -> AnyPublisher<[Match], Never>
 }

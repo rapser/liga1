@@ -16,12 +16,7 @@ protocol NotificationTopicManagerProtocol {
     func resubscribeToSavedTopics()
 }
 
-/// Servicio orquestador que sincroniza equipos favoritos con suscripciones FCM
-/// Responsabilidades:
-/// 1. Observar cambios en favoritos de equipos
-/// 2. Observar cambios en preferencias de notificaciones
-/// 3. Sincronizar suscripciones a topics FCM automáticamente
-/// 4. Mantener persistencia de topics en Firestore
+/// Sincroniza equipos favoritos y preferencias con suscripciones FCM.
 class NotificationTopicManager: NotificationTopicManagerProtocol {
 
     // MARK: - Dependencies

@@ -22,9 +22,6 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
 
     private let database: DatabaseProtocol
     private let authProvider: AuthProvider
-    private var preferencesListener: ListenerRegistration?
-
-    // Subject para emitir cambios en tiempo real
     private let preferencesSubject = CurrentValueSubject<UserPreferences?, Never>(nil)
 
     private var db: Firestore {
@@ -35,31 +32,20 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
         self.database = database
         self.authProvider = authProvider
         
-        // Si el usuario ya está autenticado, iniciar listener inmediatamente
         if getUserId() != nil {
-            startObservingPreferences()
+            fetchPreferencesAndNotify()
         } else {
-            // Si no está autenticado, observar cambios de autenticación
-            // y iniciar listener cuando el usuario se autentique
             observeAuthState()
         }
     }
 
-    deinit {
-        preferencesListener?.remove()
-    }
-    
-    // MARK: - Auth State Observation
-    
     private func observeAuthState() {
-        // Observar cambios en el estado de autenticación
-        // Cuando el usuario se autentica, iniciar el listener
         NotificationCenter.default.addObserver(
             forName: NSNotification.Name("LoginSuccessful"),
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.startObservingPreferences()
+            self?.fetchPreferencesAndNotify()
         }
     }
 
@@ -77,28 +63,17 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
             .document(FirestoreConstants.PreferencesDocument.notifications)
     }
 
-    private func startObservingPreferences() {
-        guard getUserId() != nil else {
-            return
-        }
-
-        guard let docRef = getPreferencesDocumentRef() else {
-            return
-        }
-
-        preferencesListener?.remove()
-
-        preferencesListener = docRef.addSnapshotListener { [weak self] snapshot, error in
+    private func fetchPreferencesAndNotify() {
+        guard let docRef = getPreferencesDocumentRef() else { return }
+        docRef.getDocument { [weak self] snapshot, error in
             if let error = error {
-                Logger.shared.error("Error listening to user preferences", error: error)
+                Logger.shared.error("Error fetching user preferences", error: error)
                 return
             }
-
             guard let data = snapshot?.data() else {
                 self?.preferencesSubject.send(UserPreferences())
                 return
             }
-
             do {
                 let dto = try Firestore.Decoder().decode(UserPreferencesDTO.self, from: data)
                 let preferences = UserPreferencesMapper.toDomain(from: dto)
@@ -162,6 +137,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                     promise(.failure(error))
                 } else {
                     promise(.success(()))
+                    self.fetchPreferencesAndNotify()
                 }
             }
         }
@@ -191,10 +167,12 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                             promise(.failure(setError))
                         } else {
                             promise(.success(()))
+                            self.fetchPreferencesAndNotify()
                         }
                     }
                 } else {
                     promise(.success(()))
+                    self.fetchPreferencesAndNotify()
                 }
             }
         }
@@ -218,6 +196,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                     promise(.failure(error))
                 } else {
                     promise(.success(()))
+                    self.fetchPreferencesAndNotify()
                 }
             }
         }
@@ -241,6 +220,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                     promise(.failure(error))
                 } else {
                     promise(.success(()))
+                    self.fetchPreferencesAndNotify()
                 }
             }
         }

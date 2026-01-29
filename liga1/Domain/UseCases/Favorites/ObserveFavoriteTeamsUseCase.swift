@@ -10,6 +10,7 @@ import Combine
 
 protocol ObserveFavoriteTeamsUseCaseProtocol {
     func execute() -> AnyPublisher<Set<String>, Never>
+    func refreshFavoriteTeams() -> AnyPublisher<Void, Error>
 }
 
 final class ObserveFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol {
@@ -22,5 +23,9 @@ final class ObserveFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol {
 
     func execute() -> AnyPublisher<Set<String>, Never> {
         return service.observeFavoriteTeams()
+    }
+
+    func refreshFavoriteTeams() -> AnyPublisher<Void, Error> {
+        return service.fetchFavoriteTeams()
     }
 }

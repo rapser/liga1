@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 
-/// Use Case para observar cambios en favoritos
 protocol ObserveFavoritesUseCaseProtocol {
     func execute() -> AnyPublisher<Set<String>, Never>
 }

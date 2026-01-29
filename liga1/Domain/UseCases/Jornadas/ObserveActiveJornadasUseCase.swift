@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 
-/// Use Case para observar cambios en jornadas activas en tiempo real
 protocol ObserveActiveJornadasUseCaseProtocol {
     func execute() -> AnyPublisher<[Jornada], Never>
 }

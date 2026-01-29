@@ -13,13 +13,15 @@ import Combine
 protocol FavoritesServiceProtocol {
     // Matches
     func toggleFavorite(matchId: String) -> AnyPublisher<Bool, Error>
+    func fetchFavorites() -> AnyPublisher<Void, Error>
     func isFavorite(matchId: String) -> AnyPublisher<Bool, Never>
     func getAllFavorites() -> AnyPublisher<[String], Never>
     func observeFavorites() -> AnyPublisher<Set<String>, Never>
-    func getCurrentFavoriteTeams() -> Set<String> // Obtener valor actual directamente
+    func getCurrentFavoriteTeams() -> Set<String>
 
     // Teams
     func toggleFavoriteTeam(teamId: String) -> AnyPublisher<Bool, Error>
+    func fetchFavoriteTeams() -> AnyPublisher<Void, Error>
     func isFavoriteTeam(teamId: String) -> AnyPublisher<Bool, Never>
     func getAllFavoriteTeams() -> AnyPublisher<[String], Never>
     func observeFavoriteTeams() -> AnyPublisher<Set<String>, Never>
@@ -29,10 +31,7 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private let database: DatabaseProtocol
     private let authProvider: AuthProvider
-    private var favoritesListener: ListenerRegistration?
-    private var favoriteTeamsListener: ListenerRegistration?
 
-    // Subject para emitir cambios en tiempo real
     private let favoritesSubject = CurrentValueSubject<Set<String>, Never>([])
     private let favoriteTeamsSubject = CurrentValueSubject<Set<String>, Never>([])
 
@@ -43,85 +42,80 @@ class FavoritesService: FavoritesServiceProtocol {
     init(database: DatabaseProtocol, authProvider: AuthProvider) {
         self.database = database
         self.authProvider = authProvider
-        
-        // Si el usuario ya está autenticado, iniciar listeners inmediatamente
+
         if getUserId() != nil {
-            startObservingFavorites()
-            startObservingFavoriteTeams()
+            fetchFavorites().sink { _ in } receiveValue: { }.store(in: &cancellables)
+            fetchFavoriteTeams().sink { _ in } receiveValue: { }.store(in: &cancellables)
         } else {
-            // Si no está autenticado, observar cambios de autenticación
-            // y iniciar listeners cuando el usuario se autentique
             observeAuthState()
         }
     }
 
-    deinit {
-        favoritesListener?.remove()
-        favoriteTeamsListener?.remove()
-    }
-    
-    // MARK: - Auth State Observation
-    
+    private var cancellables = Set<AnyCancellable>()
+
     private func observeAuthState() {
         NotificationCenter.default.addObserver(
             forName: NSNotification.Name("LoginSuccessful"),
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.startObservingFavorites()
-            self?.startObservingFavoriteTeams()
+            guard let self = self else { return }
+            self.fetchFavorites().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
+            self.fetchFavoriteTeams().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
         }
     }
-
-    // MARK: - Private Helpers
 
     private func getUserId() -> String? {
         return authProvider.currentUserId
     }
 
-    private func startObservingFavorites() {
-        guard let userId = getUserId() else {
-            return
-        }
-
-        favoritesListener?.remove()
-
-        favoritesListener = db.collection(FirestoreConstants.Collection.users)
-            .document(userId)
-            .collection(FirestoreConstants.Collection.favorites)
-            .addSnapshotListener { [weak self] snapshot, error in
-                if let error = error {
-                    Logger.shared.error("Error listening to favorites", error: error)
-                    return
-                }
-
-                let favoriteIds = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
-                self?.favoritesSubject.send(favoriteIds)
-            }
-    }
-
-    private func startObservingFavoriteTeams() {
-        guard let userId = getUserId() else {
-            return
-        }
-
-        favoriteTeamsListener?.remove()
-
-        favoriteTeamsListener = db.collection(FirestoreConstants.Collection.users)
-            .document(userId)
-            .collection("favoriteTeams")
-            .addSnapshotListener { [weak self] snapshot, error in
-                if let error = error {
-                    Logger.shared.error("Error listening to favorite teams", error: error)
-                    return
-                }
-
-                let favoriteTeamIds = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
-                self?.favoriteTeamsSubject.send(favoriteTeamIds)
-            }
-    }
-
     // MARK: - Protocol Implementation
+
+    func fetchFavorites() -> AnyPublisher<Void, Error> {
+        Future<Void, Error> { [weak self] promise in
+            guard let self = self, let userId = self.getUserId() else {
+                promise(.failure(NSError(domain: "FavoritesService", code: 401, userInfo: [NSLocalizedDescriptionKey: "Usuario no autenticado"])))
+                return
+            }
+            self.db.collection(FirestoreConstants.Collection.users)
+                .document(userId)
+                .collection(FirestoreConstants.Collection.favorites)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        Logger.shared.error("Error fetching favorites", error: error)
+                        promise(.failure(error))
+                        return
+                    }
+                    let ids = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
+                    self.favoritesSubject.send(ids)
+                    promise(.success(()))
+                }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func fetchFavoriteTeams() -> AnyPublisher<Void, Error> {
+        Future<Void, Error> { [weak self] promise in
+            guard let self = self, let userId = self.getUserId() else {
+                promise(.failure(NSError(domain: "FavoritesService", code: 401, userInfo: [NSLocalizedDescriptionKey: "Usuario no autenticado"])))
+                return
+            }
+            self.db.collection(FirestoreConstants.Collection.users)
+                .document(userId)
+                .collection("favoriteTeams")
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        Logger.shared.error("Error fetching favorite teams", error: error)
+                        promise(.failure(error))
+                        return
+                    }
+                    let ids = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
+                    self.favoriteTeamsSubject.send(ids)
+                    promise(.success(()))
+                }
+        }
+        .eraseToAnyPublisher()
+    }
 
     func toggleFavorite(matchId: String) -> AnyPublisher<Bool, Error> {
         return Future<Bool, Error> { [weak self] promise in
@@ -144,16 +138,15 @@ class FavoritesService: FavoritesServiceProtocol {
                 }
 
                 if snapshot?.exists == true {
-                    // Ya es favorito, eliminar
                     favRef.delete { error in
                         if let error = error {
                             promise(.failure(error))
                         } else {
                             promise(.success(false))
+                            self.fetchFavorites().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
                         }
                     }
                 } else {
-                    // No es favorito, agregar
                     favRef.setData([
                         "matchId": matchId,
                         "timestamp": FieldValue.serverTimestamp()
@@ -162,6 +155,7 @@ class FavoritesService: FavoritesServiceProtocol {
                             promise(.failure(error))
                         } else {
                             promise(.success(true))
+                            self.fetchFavorites().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
                         }
                     }
                 }
@@ -219,6 +213,7 @@ class FavoritesService: FavoritesServiceProtocol {
                             promise(.failure(error))
                         } else {
                             promise(.success(false))
+                            self.fetchFavoriteTeams().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
                         }
                     }
                 } else {
@@ -231,6 +226,7 @@ class FavoritesService: FavoritesServiceProtocol {
                             promise(.failure(error))
                         } else {
                             promise(.success(true))
+                            self.fetchFavoriteTeams().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
                         }
                     }
                 }

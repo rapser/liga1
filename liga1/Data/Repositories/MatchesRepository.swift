@@ -36,22 +36,11 @@ class MatchesRepository: MatchesRepositoryProtocol {
 
     private let database: DatabaseProtocol
     
-    // Diccionarios para manejar múltiples listeners (uno por jornada)
-    private var matchListeners: [String: ListenerRegistration] = [:]
     private var matchSubjects: [String: CurrentValueSubject<[Match], Never>] = [:]
-    private let listenersQueue = DispatchQueue(label: "com.liga1.matchesRepository.listeners")
+    private let subjectsQueue = DispatchQueue(label: "com.liga1.matchesRepository.subjects")
 
     init(database: DatabaseProtocol) {
         self.database = database
-    }
-    
-    deinit {
-        listenersQueue.sync {
-            // Remover todos los listeners al destruir el repositorio
-            matchListeners.values.forEach { $0.remove() }
-            matchListeners.removeAll()
-            matchSubjects.removeAll()
-        }
     }
 
     private var db: Firestore {
@@ -110,6 +99,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
     private func processMatches(snapshot: QuerySnapshot?, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
         guard let documents = snapshot?.documents else {
             Logger.shared.warning("MatchesRepository: No documents found for jornada \(jornadaId)")
+            getOrCreateSubject(for: jornadaId).send([])
             promise(.success([]))
             return
         }
@@ -167,10 +157,9 @@ class MatchesRepository: MatchesRepositoryProtocol {
         
         
         let matches = MatchMapper.toDomain(from: matchDTOs)
-        
-        // Ordenar manualmente por fecha si no se ordenó en Firestore
         let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
-        
+
+        getOrCreateSubject(for: jornadaId).send(sortedMatches)
         promise(.success(sortedMatches))
     }
 
@@ -270,119 +259,25 @@ class MatchesRepository: MatchesRepositoryProtocol {
         .eraseToAnyPublisher()
     }
     
-    // MARK: - Observe Matches
-    
     func observeMatches(for jornadaId: String) -> AnyPublisher<[Match], Never> {
-        return listenersQueue.sync {
-            // Si ya existe un subject para esta jornada, devolverlo
+        return subjectsQueue.sync {
             if let existingSubject = matchSubjects[jornadaId] {
                 return existingSubject.eraseToAnyPublisher()
             }
-            
-            // Crear nuevo subject para esta jornada
             let subject = CurrentValueSubject<[Match], Never>([])
             matchSubjects[jornadaId] = subject
-            
-            // Iniciar listener para esta jornada
-            startObservingMatches(for: jornadaId, subject: subject)
-            
             return subject.eraseToAnyPublisher()
         }
     }
-    
-    private func startObservingMatches(for jornadaId: String, subject: CurrentValueSubject<[Match], Never>) {
-        let query = db.collection(FirestoreConstants.Collection.jornadas)
-            .document(jornadaId)
-            .collection(FirestoreConstants.Collection.matches)
-            .order(by: FirestoreConstants.MatchField.fecha)
-        
-        let listener = query.addSnapshotListener { [weak self] snapshot, error in
-            if let error = error as NSError?,
-               error.domain == "FIRFirestoreErrorDomain",
-               error.code == 9 { // Error de índice faltante
-                Logger.shared.warning("MatchesRepository: Index missing for fecha field, listening without order for jornada \(jornadaId)")
-                // Intentar sin ordenar
-                let queryWithoutOrder = self?.db.collection(FirestoreConstants.Collection.jornadas)
-                    .document(jornadaId)
-                    .collection(FirestoreConstants.Collection.matches)
-                
-                // Remover listener anterior y crear uno nuevo sin orden
-                self?.listenersQueue.async {
-                    if let oldListener = self?.matchListeners[jornadaId] {
-                        oldListener.remove()
-                    }
-                    let newListener = queryWithoutOrder?.addSnapshotListener { snapshot, error in
-                        self?.processMatchesSnapshot(snapshot: snapshot, error: error, jornadaId: jornadaId, subject: subject)
-                    }
-                    if let newListener = newListener {
-                        self?.matchListeners[jornadaId] = newListener
-                    }
-                }
-                return
+
+    private func getOrCreateSubject(for jornadaId: String) -> CurrentValueSubject<[Match], Never> {
+        subjectsQueue.sync {
+            if let existing = matchSubjects[jornadaId] {
+                return existing
             }
-            
-            self?.processMatchesSnapshot(snapshot: snapshot, error: error, jornadaId: jornadaId, subject: subject)
+            let subject = CurrentValueSubject<[Match], Never>([])
+            matchSubjects[jornadaId] = subject
+            return subject
         }
-        
-        listenersQueue.async {
-            self.matchListeners[jornadaId] = listener
-        }
-    }
-    
-    private func processMatchesSnapshot(snapshot: QuerySnapshot?, error: Error?, jornadaId: String, subject: CurrentValueSubject<[Match], Never>) {
-        if let error = error {
-            Logger.shared.error("MatchesRepository: Error listening to matches for jornada \(jornadaId)", error: error)
-            return
-        }
-        
-        guard let documents = snapshot?.documents else {
-            Logger.shared.warning("MatchesRepository: No documents found in listener for jornada \(jornadaId)")
-            subject.send([])
-            return
-        }
-        
-        
-        // Procesar documentos (misma lógica que processMatches)
-        var matchDTOs: [MatchDTO] = []
-        for doc in documents {
-            let documentID = doc.documentID
-            let data = doc.data()
-            
-            // Extraer equipoLocalId y equipoVisitanteId del documentID
-            let (equipoLocalId, equipoVisitanteId): (String?, String?) = {
-                if let local = data["equipoLocalId"] as? String,
-                   let visitante = data["equipoVisitanteId"] as? String {
-                    return (local, visitante)
-                }
-                
-                let components = documentID.split(separator: "_")
-                if components.count >= 2 {
-                    return (String(components[0]), String(components[1]))
-                }
-                return (nil, nil)
-            }()
-            
-            // Mapear campos de goles
-            let golesTeamA = data["golesTeamA"] as? Int ?? data["golesEquipoLocal"] as? Int
-            let golesTeamB = data["golesTeamB"] as? Int ?? data["golesEquipoVisitante"] as? Int
-            
-            let dto = MatchDTO(
-                id: documentID,
-                equipoLocalId: equipoLocalId,
-                equipoVisitanteId: equipoVisitanteId,
-                fecha: data["fecha"] as? Timestamp,
-                golesTeamA: golesTeamA,
-                golesTeamB: golesTeamB,
-                estado: data["estado"] as? String,
-                suspendido: data["suspendido"] as? Bool
-            )
-            
-            matchDTOs.append(dto)
-        }
-        
-        let matches = MatchMapper.toDomain(from: matchDTOs)
-        let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
-        
-        subject.send(sortedMatches)
     }
 }

@@ -39,7 +39,7 @@ class HomeViewController: UIViewController {
         setupAdapter()
         bindViewModel()
         registerForTraitChanges()
-        // No es necesario llamar fetchActiveJornadas() porque el observer se activa automáticamente en init del ViewModel
+        viewModel.fetchActiveJornadas()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -127,7 +127,6 @@ class HomeViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        // Observar cambios en las secciones de jornadas
         viewModel.$jornadaSections
             .receive(on: DispatchQueue.main)
             .sink { [weak self] sections in
@@ -135,7 +134,6 @@ class HomeViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        // Observar estado de carga
         viewModel.$isLoading
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
@@ -145,7 +143,6 @@ class HomeViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        // Observar errores
         viewModel.$error
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)

@@ -224,7 +224,6 @@ class NotificationSettingsViewController: UIViewController {
     // MARK: - Binding
 
     private func bindViewModel() {
-        // Observar cambios en pushNotificationsEnabled
         viewModel.$pushNotificationsEnabled
             .receive(on: DispatchQueue.main)
             .sink { [weak self] enabled in
@@ -232,7 +231,6 @@ class NotificationSettingsViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        // Observar errores
         viewModel.$errorMessage
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
