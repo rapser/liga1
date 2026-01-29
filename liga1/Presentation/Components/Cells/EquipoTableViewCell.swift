@@ -9,33 +9,48 @@ import UIKit
 
 class EquipoTableViewCell: UITableViewCell {
 
-    private lazy var stackView = UIStackView()
-        .prepareForAutoLayout()
-        .axis(.horizontal)
-        .alignment(.center)
-        .spacing(Spacing.tiny)
+    private lazy var stackView: UIStackView = {
+        let stack = UIStackView()
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.spacing = Spacing.tiny
+        return stack
+    }()
 
-    private lazy var posicionLabel = UILabel()
-        .font(.systemFont(ofSize: 12))
-        .alignment(.center)
+    private lazy var posicionLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12)
+        label.textAlignment = .center
+        return label
+    }()
 
-    private lazy var logoImageView = UIImageView()
-        .prepareForAutoLayout()
-        .contentMode(.scaleAspectFit)
-        .clip()
+    private lazy var logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        return imageView
+    }()
 
-    private lazy var nombreLabel = UILabel()
-        .font(.systemFont(ofSize: 14))
-        .alignment(.left)
-        .lines(1)
+    private lazy var nombreLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textAlignment = .left
+        label.numberOfLines = 1
+        return label
+    }()
 
     private lazy var partidosJugadosLabel = Self.createValueLabel()
     private lazy var golesLabel = Self.createValueLabel()
 
-    private lazy var puntosLabel = UILabel()
-        .font(.boldSystemFont(ofSize: 14))
-        .textColor(.label)
-        .alignment(.center)
+    private lazy var puntosLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 14)
+        label.textColor = .label
+        label.textAlignment = .center
+        return label
+    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -114,8 +129,9 @@ class EquipoTableViewCell: UITableViewCell {
     }
     
     private static func createValueLabel() -> UILabel {
-        UILabel()
-            .font(.systemFont(ofSize: 12))
-            .alignment(.center)
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12)
+        label.textAlignment = .center
+        return label
     }
 }

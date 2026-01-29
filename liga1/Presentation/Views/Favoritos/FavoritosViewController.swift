@@ -4,6 +4,7 @@
 //
 //  Created by miguel tomairo on 24/12/24.
 //  Updated on 17/01/26 - Added segmented control and teams
+//  Refactored with AppKit on 2026-01-28
 //
 
 import UIKit
@@ -11,66 +12,33 @@ import Combine
 
 class FavoritosViewController: UIViewController {
 
-    let tableView = UITableView(frame: .zero, style: .plain)
-    let viewModel: FavoritosViewModel
-    private var cancellables = Set<AnyCancellable>()
-
     // MARK: - UI Components
-
-    private lazy var segmentedControl: UISegmentedControl = {
+    private let containerView = ContainerView()
+    private let segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: ["Partidos", "Equipos"])
         control.selectedSegmentIndex = 0
         control.selectedSegmentTintColor = .liga1Red
         control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
         control.setTitleTextAttributes([.foregroundColor: UIColor.liga1Red], for: .normal)
-        control.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
         return control
     }()
+    private let tableView = UITableView(frame: .zero, style: .plain)
+
+    // MARK: - Properties
+    let viewModel: FavoritosViewModel
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Empty States
-
-    private lazy var emptyMatchesView = UIView().background(.systemBackground)
-    private lazy var emptyMatchesStack = createEmptyStateStack()
-    private lazy var emptyMatchesIcon = createStarIcon()
-    private lazy var emptyMatchesTitleLabel = UILabel()
-        .text("Agrega tu primer partido")
-        .font(.systemFont(ofSize: 18, weight: .bold))
-        .textColor(.label)
-        .alignment(.center)
-
-    private lazy var emptyMatchesDescLabel = UILabel()
-        .text("Ten todos los partidos importantes\nen un solo lugar")
-        .font(.systemFont(ofSize: 14, weight: .regular))
-        .textColor(.secondaryLabel)
-        .alignment(.center)
-        .lines(0)
-
-    private lazy var emptyTeamsView = UIView().background(.systemBackground)
-    private lazy var emptyTeamsStack = createEmptyStateStack()
-    private lazy var emptyTeamsIcon = createStarIcon()
-    private lazy var emptyTeamsTitleLabel = UILabel()
-        .text("Agrega tu primer equipo")
-        .font(.systemFont(ofSize: 18, weight: .bold))
-        .textColor(.label)
-        .alignment(.center)
-
-    private lazy var emptyTeamsDescLabel = UILabel()
-        .text("Ten todos los partidos y las noticias importantes\nde tus equipos favoritos en un solo lugar")
-        .font(.systemFont(ofSize: 14, weight: .regular))
-        .textColor(.secondaryLabel)
-        .alignment(.center)
-        .lines(0)
-
-    private lazy var searchTeamButton: UIButton = {
+    private let emptyMatchesView = EmptyStateView()
+    private let emptyTeamsView = EmptyStateView()
+    private let searchTeamButton: UIButton = {
         var config = UIButton.Configuration.filled()
         config.title = "Buscar equipo"
         config.cornerStyle = .medium
         config.baseBackgroundColor = .black
         config.baseForegroundColor = .white
         config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 24, bottom: 12, trailing: 24)
-        let button = UIButton(configuration: config)
-        button.addTarget(self, action: #selector(searchTeamTapped), for: .touchUpInside)
-        return button
+        return UIButton(configuration: config)
     }()
 
     // MARK: - Initialization
@@ -84,27 +52,26 @@ class FavoritosViewController: UIViewController {
         fatalError("init(coder:) has not been implemented - use init(viewModel:)")
     }
 
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        title = "Favoritos"
-
-        setupNavigationBar()
-        setupSegmentedControl()
-        setupTableView()
-        setupEmptyStates()
+        configureNavigationBar()
+        setupUI()
         bindViewModel()
         updateView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        title = "Favoritos"
     }
 
-    // MARK: - Setup UI
+    // MARK: - Setup Methods
+    private func configureNavigationBar() {
+        view.backgroundColor = .systemBackground
+        title = "Favoritos"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
 
-    private func setupNavigationBar() {
         let addButton = UIBarButtonItem(
             image: UIImage(systemName: "plus"),
             style: .plain,
@@ -113,93 +80,107 @@ class FavoritosViewController: UIViewController {
         )
         addButton.tintColor = .liga1Red
         navigationItem.rightBarButtonItem = addButton
-
-        // Inicialmente oculto (solo visible en sección Equipos)
-        navigationItem.rightBarButtonItem?.isHidden = true
+        navigationItem.rightBarButtonItem?.isHidden = true // Inicialmente oculto
     }
 
-    private func createStarIcon() -> UIImageView {
-        let config = UIImage.SymbolConfiguration(pointSize: 80, weight: .light)
-        return UIImageView()
-            .image(UIImage(systemName: "star", withConfiguration: config))
-            .tintColor(.systemGray3)
-            .contentMode(.scaleAspectFit)
-    }
+    private func setupUI() {
+        // Container principal
+        containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
-    private func createEmptyStateStack() -> UIStackView {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = 16
-        return stack
+        // Segmented Control
+        setupSegmentedControl()
+
+        // TableView
+        setupTableView()
+
+        // Empty States
+        setupEmptyStates()
     }
 
     private func setupSegmentedControl() {
-        segmentedControl
-            .addTo(view)
-            .pinTop(constant: Spacing.medium, useSafeArea: true)
-            .pinHorizontal(padding: Spacing.standard)
-            .height(32)
+        segmentedControl.prepareForAutoLayout()
+        segmentedControl.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
+
+        containerView.addSubview(segmentedControl)
+
+        segmentedControl.anchor(
+            top: containerView.topAnchor,
+            leading: containerView.leadingAnchor,
+            trailing: containerView.trailingAnchor,
+            padding: UIEdgeInsets(
+                top: Spacing.medium,
+                left: Spacing.standard,
+                bottom: 0,
+                right: Spacing.standard
+            )
+        )
+        segmentedControl.height(32)
     }
 
     private func setupTableView() {
+        tableView.prepareForAutoLayout()
         tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
         tableView.register(TeamTableViewCell.self, forCellReuseIdentifier: TeamTableViewCell.identifier)
         tableView.delegate = self
         tableView.dataSource = self
 
-        tableView
-            .addTo(view)
-            .pinTop(to: segmentedControl.bottomAnchor, constant: Spacing.medium)
-            .pinLeading()
-            .pinTrailing()
-            .pinBottom()
+        containerView.addSubview(tableView)
+
+        tableView.anchor(
+            top: segmentedControl.bottomAnchor,
+            leading: containerView.leadingAnchor,
+            bottom: containerView.bottomAnchor,
+            trailing: containerView.trailingAnchor,
+            padding: UIEdgeInsets(top: Spacing.medium, left: 0, bottom: 0, right: 0)
+        )
     }
 
     private func setupEmptyStates() {
-        // Setup Empty Matches
-        emptyMatchesView
-            .addTo(view)
-            .pinTop(to: segmentedControl.bottomAnchor, constant: Spacing.medium)
-            .pinLeading()
-            .pinTrailing()
-            .pinBottom()
-            .hidden()
+        // Configure empty matches
+        emptyMatchesView.configure(
+            systemImage: "star",
+            title: "Agrega tu primer partido",
+            message: "Ten todos los partidos importantes\nen un solo lugar"
+        )
+        emptyMatchesView.prepareForAutoLayout()
+        emptyMatchesView.isHidden = true
 
-        emptyMatchesStack
-            .addTo(emptyMatchesView)
-            .centerInSuperview()
-            .pinHorizontal(padding: Spacing.extraLarge)
+        containerView.addSubview(emptyMatchesView)
 
-        emptyMatchesIcon.square(80)
+        emptyMatchesView.anchor(
+            top: segmentedControl.bottomAnchor,
+            leading: containerView.leadingAnchor,
+            bottom: containerView.bottomAnchor,
+            trailing: containerView.trailingAnchor,
+            padding: UIEdgeInsets(top: Spacing.medium, left: 0, bottom: 0, right: 0)
+        )
 
-        emptyMatchesStack.addArrangedSubview(emptyMatchesIcon)
-        emptyMatchesStack.addArrangedSubview(emptyMatchesTitleLabel)
-        emptyMatchesStack.addArrangedSubview(emptyMatchesDescLabel)
+        // Configure empty teams with button
+        emptyTeamsView.configure(
+            systemImage: "star",
+            title: "Agrega tu primer equipo",
+            message: "Ten todos los partidos y las noticias importantes\nde tus equipos favoritos en un solo lugar"
+        )
+        emptyTeamsView.prepareForAutoLayout()
+        emptyTeamsView.isHidden = true
 
-        // Setup Empty Teams
-        emptyTeamsView
-            .addTo(view)
-            .pinTop(to: segmentedControl.bottomAnchor, constant: Spacing.medium)
-            .pinLeading()
-            .pinTrailing()
-            .pinBottom()
-            .hidden()
-
-        emptyTeamsStack
-            .addTo(emptyTeamsView)
-            .centerInSuperview()
-            .pinHorizontal(padding: Spacing.extraLarge)
-
-        emptyTeamsIcon.square(80)
+        // Add search button to empty teams view
         searchTeamButton.prepareForAutoLayout()
+        searchTeamButton.addTarget(self, action: #selector(searchTeamTapped), for: .touchUpInside)
+        emptyTeamsView.addCustomView(searchTeamButton)
 
-        emptyTeamsStack.addArrangedSubview(emptyTeamsIcon)
-        emptyTeamsStack.addArrangedSubview(emptyTeamsTitleLabel)
-        emptyTeamsStack.addArrangedSubview(emptyTeamsDescLabel)
-        emptyTeamsStack.addArrangedSubview(searchTeamButton)
+        containerView.addSubview(emptyTeamsView)
+
+        emptyTeamsView.anchor(
+            top: segmentedControl.bottomAnchor,
+            leading: containerView.leadingAnchor,
+            bottom: containerView.bottomAnchor,
+            trailing: containerView.trailingAnchor,
+            padding: UIEdgeInsets(top: Spacing.medium, left: 0, bottom: 0, right: 0)
+        )
     }
 
+    // MARK: - Data & Binding
     private func bindViewModel() {
         viewModel.$matches
             .receive(on: DispatchQueue.main)

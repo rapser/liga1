@@ -77,25 +77,23 @@ class LogsViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        // Agregar componentes a la vista
-        textView.addTo(view)
-        stackView.addTo(view)
+        textView
+            .addTo(view)
+            .pinTop(useSafeArea: true)
+            .pinLeading()
+            .pinTrailing()
         
-        // Constraints
-        NSLayoutConstraint.activate([
-            textView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            textView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            textView.bottomAnchor.constraint(equalTo: stackView.topAnchor, constant: -16),
-            
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            stackView.heightAnchor.constraint(equalToConstant: 50),
-            
-            copyButton.heightAnchor.constraint(equalToConstant: 50),
-            clearButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
+        stackView
+            .addTo(view)
+            .pinLeading(constant: Spacing.standard)
+            .pinTrailing(constant: Spacing.standard)
+            .pinBottom(constant: Spacing.standard, useSafeArea: true)
+            .height(50)
+        
+        textView.pinBottom(to: stackView.topAnchor, constant: -Spacing.standard)
+        
+        copyButton.height(50)
+        clearButton.height(50)
     }
     
     private func loadLogs() {
@@ -117,30 +115,19 @@ class LogsViewController: UIViewController {
     @objc private func copyToClipboard() {
         let logs = Logger.shared.getAllLogs()
         UIPasteboard.general.string = logs
-        
-        // Mostrar feedback
-        let alert = UIAlertController(
-            title: "Copiado",
-            message: "Los logs se han copiado al portapapeles",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        showAlert(title: "Copiado", message: "Los logs se han copiado al portapapeles")
     }
     
     @objc private func clearLogs() {
-        let alert = UIAlertController(
+        showConfirmation(
             title: "Limpiar Logs",
             message: "¿Estás seguro de que deseas limpiar todos los logs?",
-            preferredStyle: .alert
-        )
-        
-        alert.addAction(UIAlertAction(title: "Cancelar", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Limpiar", style: .destructive) { [weak self] _ in
+            confirmTitle: "Limpiar",
+            cancelTitle: "Cancelar",
+            confirmStyle: .destructive
+        ) { [weak self] _ in
             Logger.shared.clearLogs()
             self?.loadLogs()
-        })
-        
-        present(alert, animated: true)
+        }
     }
 }

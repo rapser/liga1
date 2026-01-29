@@ -3,6 +3,7 @@
 //  liga1
 //
 //  Created by miguel tomairo on 27/10/24.
+//  Refactored with AppKit on 2026-01-28
 //
 
 import UIKit
@@ -11,21 +12,16 @@ import UserNotifications
 
 class ProfileViewController: UIViewController {
 
-    // MARK: - Properties
+    // MARK: - UI Components
+    private let containerView = ContainerView()
+    private let tableView = UITableView(frame: .zero, style: .insetGrouped)
 
+    // MARK: - Properties
     let viewModel: ProfileViewModel
     private let container: DIContainer
     private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - Tabla
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .insetGrouped)
-        tableView.prepareForAutoLayout()
-        return tableView
-    }()
-
     // MARK: - Initialization
-
     init(viewModel: ProfileViewModel, container: DIContainer) {
         self.viewModel = viewModel
         self.container = container
@@ -39,32 +35,46 @@ class ProfileViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        title = "Configuración"
-        setupTableView()
+        configureNavigationBar()
+        setupUI()
         bindViewModel()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        title = "Configuración"
     }
 
-    // MARK: - Setup
+    // MARK: - Setup Methods
+    private func configureNavigationBar() {
+        view.backgroundColor = .systemBackground
+        title = "Configuración"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+    }
+
+    private func setupUI() {
+        // Container principal
+        containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
+
+        // TableView
+        setupTableView()
+    }
 
     private func setupTableView() {
+        // Configurar tableView
+        tableView.prepareForAutoLayout()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-
-        tableView
-            .addTo(view)
-            .pinTop(useSafeArea: true)
-            .pinBottom(useSafeArea: true)
-            .pinHorizontal()
-
         tableView.delegate = self
         tableView.dataSource = self
+
+        // Agregar al container
+        containerView.addSubview(tableView)
+
+        // Constraints: llenar todo el container
+        tableView.fillSuperview()
     }
 
+    // MARK: - Data & Binding
     private func bindViewModel() {
         viewModel.$sections
             .receive(on: DispatchQueue.main)
@@ -90,8 +100,7 @@ class ProfileViewController: UIViewController {
             .store(in: &cancellables)
     }
 
-    // MARK: - Internal Methods
-
+    // MARK: - Actions
     func handleAction(_ action: ProfileViewModel.ProfileAction) {
         switch action {
         case .notification:
@@ -124,40 +133,37 @@ class ProfileViewController: UIViewController {
         }
     }
 
+    // MARK: - Navigation
     private func showLogoutConfirmation() {
-        let alert = UIAlertController(title: "Cerrar Sesión",
-                                      message: "¿Estás seguro de que deseas cerrar sesión?",
-                                      preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: "Cerrar Sesión",
+            message: "¿Estás seguro de que deseas cerrar sesión?",
+            preferredStyle: .alert
+        )
 
-        alert.addAction(UIAlertAction(title: "Cancelar", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Aceptar", style: .destructive, handler: { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Cancelar", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Aceptar", style: .destructive) { [weak self] _ in
             self?.viewModel.logout()
-        }))
+        })
 
-        present(alert, animated: true, completion: nil)
+        present(alert, animated: true)
     }
 
     private func navigateToLogin() {
-        
-        // Publicar notificación para que AppCoordinator maneje la navegación
-        NotificationCenter.default.post(
-            name: NSNotification.Name("LogoutSuccessful"),
-            object: nil
-        )
-        
-        // También navegar directamente como fallback
+        NotificationCenter.default.post(name: NSNotification.Name("LogoutSuccessful"), object: nil)
+
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let window = windowScene.windows.first {
                 let loginCoordinator = self.container.makeLoginCoordinator(navigationController: UINavigationController())
-                loginCoordinator.delegate = nil // No necesitamos delegate para logout
+                loginCoordinator.delegate = nil
                 loginCoordinator.start()
-                
+
                 window.rootViewController = loginCoordinator.navigationController
                 window.makeKeyAndVisible()
-                
-                UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
+
+                UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil)
             }
         }
     }
@@ -166,21 +172,20 @@ class ProfileViewController: UIViewController {
         let registrarPartidosVC = container.makeRegistrarPartidosViewController()
         navigationController?.pushViewController(registrarPartidosVC, animated: true)
     }
-    
+
     private func navigateToNotificationHistory() {
         let notificationHistoryVC = NotificationHistoryViewController()
         navigationController?.pushViewController(notificationHistoryVC, animated: true)
     }
-    
+
     private func openNotificationSettings() {
         let viewModel = container.makeNotificationSettingsViewModel()
         let notificationSettingsVC = NotificationSettingsViewController(viewModel: viewModel)
         navigationController?.pushViewController(notificationSettingsVC, animated: true)
     }
-    
+
     private func navigateToLogs() {
         let logsVC = LogsViewController()
         navigationController?.pushViewController(logsVC, animated: true)
     }
-
 }
