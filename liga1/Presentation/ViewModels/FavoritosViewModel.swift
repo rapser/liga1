@@ -193,5 +193,10 @@ class FavoritosViewModel {
         }
 
         self.teams = favoriteTeamsArray
+
+        // Si hay favoritos en Firestore pero no pudimos emparejar (p. ej. allTeams aún vacío), volver a cargar el catálogo
+        if !favoriteTeamIds.isEmpty && favoriteTeamsArray.isEmpty && allTeams.isEmpty {
+            fetchAllTeams()
+        }
     }
 }
