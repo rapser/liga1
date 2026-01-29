@@ -11,6 +11,8 @@ class LogsViewController: UIViewController {
     
     // MARK: - UI Components
     
+    private let containerView = ContainerView()
+    
     private lazy var textView: UITextView = {
         let textView = UITextView()
         textView.prepareForAutoLayout()
@@ -76,18 +78,19 @@ class LogsViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
+        containerView.attachToSafeArea(in: view)
         
         textView
-            .addTo(view)
-            .pinTop(useSafeArea: true)
+            .addTo(containerView)
+            .pinTop()
             .pinLeading()
             .pinTrailing()
         
         stackView
-            .addTo(view)
+            .addTo(containerView)
             .pinLeading(constant: Spacing.standard)
             .pinTrailing(constant: Spacing.standard)
-            .pinBottom(constant: Spacing.standard, useSafeArea: true)
+            .pinBottom(constant: Spacing.standard)
             .height(50)
         
         textView.pinBottom(to: stackView.topAnchor, constant: -Spacing.standard)

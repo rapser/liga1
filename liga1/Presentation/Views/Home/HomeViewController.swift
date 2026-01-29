@@ -12,6 +12,7 @@ class HomeViewController: UIViewController {
 
     // MARK: - Properties
 
+    private let containerView = ContainerView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -52,14 +53,15 @@ class HomeViewController: UIViewController {
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
+        containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
         // Configurar tableView para eliminar espacio entre header y nav bar
         // sectionHeaderTopPadding elimina el padding automático de iOS 15+
         tableView.sectionHeaderTopPadding = 0
 
-        // Agregar tableView a la vista primero
-        tableView.prepareForAutoLayout()
-        tableView.addTo(view).fillSuperview()
+        tableView
+            .addTo(containerView)
+            .fillSuperview()
 
         // Configurar refresh control después de agregar el tableView
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)

@@ -28,7 +28,7 @@ class LoginViewController: UIViewController {
 
     // MARK: - UI Components
 
-    private lazy var scrollView = UIScrollView().prepareForAutoLayout()
+    private let containerView = ContainerView()
     private lazy var contentView = UIView().prepareForAutoLayout()
 
     private lazy var logoImageView: UIImageView = {
@@ -93,21 +93,10 @@ class LoginViewController: UIViewController {
     // MARK: - Setup
 
     private func setupLayout() {
-        // Add scroll view
-        scrollView
-            .addTo(view)
+        containerView.attachToSafeArea(in: view)
+        contentView
+            .addTo(containerView)
             .fillSuperview()
-
-        // Add content view to scroll view
-        contentView.addTo(scrollView)
-
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
-        ])
 
         // Logo
         logoImageView

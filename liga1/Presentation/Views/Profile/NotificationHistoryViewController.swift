@@ -12,6 +12,8 @@ class NotificationHistoryViewController: UIViewController {
     
     // MARK: - Properties
     
+    private let containerView = ContainerView()
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.prepareForAutoLayout()
@@ -21,6 +23,16 @@ class NotificationHistoryViewController: UIViewController {
         tableView.separatorStyle = .singleLine
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         return tableView
+    }()
+    
+    private lazy var emptyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "No hay notificaciones en el historial"
+        label.textColor = .secondaryLabel
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 16)
+        label.isHidden = true
+        return label
     }()
     
     private var notifications: [UNNotification] = []
@@ -39,11 +51,13 @@ class NotificationHistoryViewController: UIViewController {
     // MARK: - Setup
     
     private func setupTableView() {
+        containerView.attachToSafeArea(in: view)
         tableView
-            .addTo(view)
-            .pinTop(useSafeArea: true)
-            .pinBottom(useSafeArea: true)
-            .pinHorizontal()
+            .addTo(containerView)
+            .fillSuperview()
+        emptyLabel
+            .addTo(containerView)
+            .centerInSuperview()
     }
     
     // MARK: - Load Data
@@ -59,27 +73,13 @@ class NotificationHistoryViewController: UIViewController {
                     return notification1.date > notification2.date
                 }
                 self?.tableView.reloadData()
-                
                 if notifications.isEmpty {
-                    self?.showEmptyState()
+                    self?.emptyLabel.isHidden = false
+                } else {
+                    self?.emptyLabel.isHidden = true
                 }
             }
         }
-    }
-    
-    private func showEmptyState() {
-        let emptyLabel = UILabel()
-        emptyLabel.text = "No hay notificaciones en el historial"
-        emptyLabel.textColor = .secondaryLabel
-        emptyLabel.textAlignment = .center
-        emptyLabel.font = .systemFont(ofSize: 16)
-        emptyLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(emptyLabel)
-        NSLayoutConstraint.activate([
-            emptyLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emptyLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
     }
     
     // MARK: - Helper Methods
@@ -174,7 +174,7 @@ extension NotificationHistoryViewController: UITableViewDelegate {
             
             // Si no quedan notificaciones, mostrar estado vacío
             if self.notifications.isEmpty {
-                self.showEmptyState()
+                self.emptyLabel.isHidden = false
             }
             
             completion(true)

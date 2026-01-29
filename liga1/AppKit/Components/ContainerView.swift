@@ -9,7 +9,12 @@ import UIKit
 
 // MARK: - ContainerView
 
-/// Vista contenedora que facilita el layout entre navigation bar y tab bar
+/// Vista contenedora que ocupa el área desde debajo del navigation bar hasta el tab bar (o el borde inferior si no hay tab bar).
+///
+/// **Regla de UI:**
+/// - **Navigation bar:** Solo debe contener el título y opcionalmente `UIBarButtonItem`(s). Nada más.
+/// - **Contenedor:** Ocupa toda el área entre nav bar y tab bar. Dentro del contenedor se coloca todo el contenido:
+///   vistas verticales (stacks), una sola TableView, un label y luego una TableView, etc.
 class ContainerView: UIView {
 
     // MARK: - Initialization

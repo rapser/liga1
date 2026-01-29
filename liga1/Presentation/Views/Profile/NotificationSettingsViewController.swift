@@ -16,11 +16,7 @@ class NotificationSettingsViewController: UIViewController {
     private let viewModel: NotificationSettingsViewModel
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.prepareForAutoLayout()
-        return scrollView
-    }()
+    private let containerView = ContainerView()
     
     private lazy var contentView: UIView = {
         let view = UIView()
@@ -152,21 +148,10 @@ class NotificationSettingsViewController: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        // Scroll View
-        scrollView
-            .addTo(view)
+        containerView.attachToSafeArea(in: view)
+        contentView
+            .addTo(containerView)
             .fillSuperview()
-
-        // Content View
-        contentView.addTo(scrollView)
-
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
-        ])
 
         // NUEVO: Card de notificaciones push
         notificationsCard
