@@ -86,35 +86,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
-        let token = tokenParts.joined()
-        Logger.shared.info("📱 ========== TOKEN APNS REGISTRADO ==========")
-        Logger.shared.info("📱 Device Token APNs recibido: \(token)")
-        #if targetEnvironment(simulator)
-        Logger.shared.info("⚠️ Esto NO debería aparecer en un simulador")
-        #else
-        Logger.shared.info("✅ Dispositivo físico detectado - Token APNS válido")
-        #endif
-
-        // Pasar el token a Firebase Messaging
         Messaging.messaging().apnsToken = deviceToken
-        Logger.shared.info("✅ Token APNS configurado en Firebase Messaging")
-        
-        // Sincronizar topics ahora que el token APNS está disponible
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            Logger.shared.info("🔄 AppDelegate: Token APNS disponible - Sincronizando topics")
             if let topicManager = self?.notificationTopicManager {
                 topicManager.syncTopicsWithFavorites()
             }
         }
-        Logger.shared.info("📱 ==========================================")
     }
 
     func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        Logger.shared.error("❌ Error al registrar notificaciones remotas", error: error)
+        Logger.shared.error("Error al registrar notificaciones remotas", error: error)
     }
 
     func application(
@@ -122,39 +107,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
-        Logger.shared.info("📮 ========== NOTIFICACIÓN RECIBIDA (BACKGROUND) ==========")
-        Logger.shared.info("📮 Notificación remota recibida en background")
-        Logger.shared.info("📮 UserInfo completo: \(userInfo)")
-        
-        // Extraer información relevante
-        if let topic = userInfo["gcm.notification.topic"] as? String ?? userInfo["from"] as? String {
-            Logger.shared.info("📮 Topic de la notificación: \(topic)")
-        }
-        if let eventType = userInfo["event_type"] as? String {
-            Logger.shared.info("📮 Tipo de evento: \(eventType)")
-        }
-        if let eventId = userInfo["event_id"] as? String {
-            Logger.shared.info("📮 ID del evento: \(eventId)")
-        }
-
-        // NUEVO: Verificar si es duplicado usando event_id
         if let eventId = userInfo["event_id"] as? String {
             guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
-                Logger.shared.info("⚠️ Notificación duplicada ignorada (background): \(eventId)")
-                Logger.shared.info("📮 ================================================")
                 completionHandler(.noData)
                 return
             }
         }
 
-        // Procesar la notificación normalmente
         Messaging.messaging().appDidReceiveMessage(userInfo)
-
-        // Aquí puedes actualizar datos en background
-        // Por ejemplo: sincronizar marcadores de partidos
-
-        Logger.shared.info("✅ Notificación procesada correctamente (background)")
-        Logger.shared.info("📮 ================================================")
         completionHandler(.newData)
     }
 
@@ -166,44 +126,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         let userInfo = notification.request.content.userInfo
-        Logger.shared.info("📬 ========== NOTIFICACIÓN RECIBIDA (FOREGROUND) ==========")
-        Logger.shared.info("📬 Notificación recibida en foreground")
-        Logger.shared.info("📬 UserInfo completo: \(userInfo)")
-        
-        // Extraer información relevante
-        if let topic = userInfo["gcm.notification.topic"] as? String ?? userInfo["from"] as? String {
-            Logger.shared.info("📬 Topic de la notificación: \(topic)")
-        }
-        if let eventType = userInfo["event_type"] as? String {
-            Logger.shared.info("📬 Tipo de evento: \(eventType)")
-        }
-        if let eventId = userInfo["event_id"] as? String {
-            Logger.shared.info("📬 ID del evento: \(eventId)")
-        }
-        if let title = notification.request.content.title as String? {
-            Logger.shared.info("📬 Título: \(title)")
-        }
-        if let body = notification.request.content.body as String? {
-            Logger.shared.info("📬 Cuerpo: \(body)")
-        }
 
-        // NUEVO: Verificar si es duplicado usando event_id
         if let eventId = userInfo["event_id"] as? String {
             guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
-                Logger.shared.info("⚠️ Notificación duplicada ignorada (foreground): \(eventId)")
-                Logger.shared.info("📬 ================================================")
                 completionHandler([])
                 return
             }
         }
 
-        // Procesar la notificación normalmente
         Messaging.messaging().appDidReceiveMessage(userInfo)
-
-        // Mostrar banner, sonido y badge incluso en foreground
-        Logger.shared.info("✅ Notificación procesada correctamente (foreground)")
-        Logger.shared.info("📬 Mostrando banner, sonido y badge")
-        Logger.shared.info("📬 ================================================")
         completionHandler([.banner, .sound, .badge])
     }
 
@@ -213,20 +144,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let userInfo = response.notification.request.content.userInfo
-        Logger.shared.info("👆 Usuario tocó notificación: \(userInfo)")
 
-        // NUEVO: Verificar si es duplicado usando event_id
         if let eventId = userInfo["event_id"] as? String {
             guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
-                Logger.shared.debug("⚠️ Tap en notificación duplicada ignorado: \(eventId)")
                 completionHandler()
                 return
             }
         }
 
-        // Manejar tap en notificación
         handleNotificationTap(userInfo: userInfo)
-
         completionHandler()
     }
 
@@ -235,25 +161,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let token = fcmToken else { return }
 
-        Logger.shared.info("🔑 FCM Token recibido: \(token)")
-
         let notificationService = DIContainer.shared.makeNotificationService()
         notificationService.handleNotificationToken(token)
-
-        // Suscribirse a topic general de la liga (siempre activo)
-        Logger.shared.info("📢 AppDelegate: Suscribiendo a topic liga1_all")
         notificationService.subscribeToTopic("liga1_all")
 
-        // Esperar un momento para que los favoritos se carguen desde Firestore
-        // antes de sincronizar topics
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            // Sincronizar topics con favoritos de equipos
-            Logger.shared.info("🔄 AppDelegate: Sincronizando topics con favoritos (después de delay)")
             let topicManager = DIContainer.shared.makeNotificationTopicManager()
             topicManager.syncTopicsWithFavorites()
-            
-            // También re-suscribirse a topics guardados por si acaso
-            Logger.shared.info("🔄 AppDelegate: Re-suscribiendo a topics guardados")
             topicManager.resubscribeToSavedTopics()
         }
     }
@@ -262,12 +176,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
 
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
         // Parsear datos de la notificación
-        guard let matchId = userInfo["matchId"] as? String,
-              let type = userInfo["type"] as? String else {
+        guard let matchId = userInfo["matchId"] as? String else {
             return
         }
 
-        Logger.shared.debug("Procesando notificación - Type: \(type), Match: \(matchId)")
 
         // Notificar al AppCoordinator para navegar
         NotificationCenter.default.post(

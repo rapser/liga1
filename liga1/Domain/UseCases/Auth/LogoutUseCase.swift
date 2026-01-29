@@ -22,12 +22,10 @@ class LogoutUseCase: LogoutUseCaseProtocol {
     }
 
     func execute() -> AnyPublisher<Void, Error> {
-        Logger.shared.debug("LogoutUseCase: Logging out user")
 
         return authService.logout()
             .handleEvents(
                 receiveOutput: { _ in
-                    Logger.shared.info("LogoutUseCase: User logged out successfully")
                 },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {

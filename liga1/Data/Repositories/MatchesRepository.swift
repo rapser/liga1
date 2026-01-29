@@ -65,7 +65,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 return
             }
 
-            Logger.shared.debug("MatchesRepository: Fetching matches for jornada: \(jornadaId)")
             
             let query = self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(jornadaId)
@@ -115,13 +114,10 @@ class MatchesRepository: MatchesRepositoryProtocol {
             return
         }
 
-        Logger.shared.debug("MatchesRepository: Found \(documents.count) documents for jornada \(jornadaId)")
 
         // Convertir MatchDTO a Match usando el mapper
         var matchDTOs: [MatchDTO] = []
         for doc in documents {
-            Logger.shared.debug("MatchesRepository: Processing document \(doc.documentID)")
-            Logger.shared.debug("MatchesRepository: Document data keys: \(doc.data().keys.joined(separator: ", "))")
             
             let documentID = doc.documentID
             let data = doc.data()
@@ -140,7 +136,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 if components.count >= 2 {
                     let local = String(components[0])
                     let visitante = String(components[1])
-                    Logger.shared.debug("MatchesRepository: Extracted equipoLocalId=\(local), equipoVisitanteId=\(visitante) from documentID: \(documentID)")
                     return (local, visitante)
                 }
                 
@@ -167,18 +162,15 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 suspendido: data["suspendido"] as? Bool
             )
             
-            Logger.shared.debug("MatchesRepository: Successfully created MatchDTO: id=\(dto.id ?? "nil"), equipoLocal=\(dto.equipoLocalId ?? "nil"), equipoVisitante=\(dto.equipoVisitanteId ?? "nil"), fecha=\(dto.fecha?.dateValue().description ?? "nil"), golesA=\(dto.golesTeamA ?? 0), golesB=\(dto.golesTeamB ?? 0)")
             matchDTOs.append(dto)
         }
         
-        Logger.shared.debug("MatchesRepository: Successfully decoded \(matchDTOs.count) MatchDTOs for jornada \(jornadaId) out of \(documents.count) documents")
         
         let matches = MatchMapper.toDomain(from: matchDTOs)
         
         // Ordenar manualmente por fecha si no se ordenó en Firestore
         let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
         
-        Logger.shared.info("MatchesRepository: Successfully mapped \(sortedMatches.count) matches for jornada \(jornadaId) from \(matchDTOs.count) DTOs")
         promise(.success(sortedMatches))
     }
 
@@ -284,7 +276,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
         return listenersQueue.sync {
             // Si ya existe un subject para esta jornada, devolverlo
             if let existingSubject = matchSubjects[jornadaId] {
-                Logger.shared.debug("MatchesRepository: Reusing existing observer for jornada: \(jornadaId)")
                 return existingSubject.eraseToAnyPublisher()
             }
             
@@ -295,7 +286,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
             // Iniciar listener para esta jornada
             startObservingMatches(for: jornadaId, subject: subject)
             
-            Logger.shared.debug("MatchesRepository: Started observing matches for jornada: \(jornadaId)")
             return subject.eraseToAnyPublisher()
         }
     }
@@ -351,7 +341,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
             return
         }
         
-        Logger.shared.debug("MatchesRepository: Listener update - Found \(documents.count) documents for jornada \(jornadaId)")
         
         // Procesar documentos (misma lógica que processMatches)
         var matchDTOs: [MatchDTO] = []
@@ -394,7 +383,6 @@ class MatchesRepository: MatchesRepositoryProtocol {
         let matches = MatchMapper.toDomain(from: matchDTOs)
         let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
         
-        Logger.shared.info("MatchesRepository: Listener update - Mapped \(sortedMatches.count) matches for jornada \(jornadaId)")
         subject.send(sortedMatches)
     }
 }

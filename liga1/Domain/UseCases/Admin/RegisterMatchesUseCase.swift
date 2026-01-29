@@ -53,8 +53,6 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
             receiveCompletion: { completion in
                 if case .failure(let error) = completion {
                     Logger.shared.error("RegisterMatchesUseCase: Failed to register jornada \(jornadaId)", error: error)
-                } else {
-                    Logger.shared.info("RegisterMatchesUseCase: Successfully registered jornada \(jornadaId) with \(matches.count) matches")
                 }
             }
         )
@@ -62,7 +60,6 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
     }
 
     func registerAllAperturaJornadas() -> AnyPublisher<Void, Error> {
-        Logger.shared.info("RegisterMatchesUseCase: Starting registration of all 17 Apertura jornadas")
         
         return adminMatchRepository.registerAllAperturaJornadas()
             .handleEvents(

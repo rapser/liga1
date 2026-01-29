@@ -22,12 +22,10 @@ class ObserveMatchesUseCase: ObserveMatchesUseCaseProtocol {
     }
     
     func execute(for jornadaId: String) -> AnyPublisher<[Match], Never> {
-        Logger.shared.debug("ObserveMatchesUseCase: Starting to observe matches for jornada: \(jornadaId)")
         
         return repository.observeMatches(for: jornadaId)
             .handleEvents(
                 receiveOutput: { matches in
-                    Logger.shared.info("ObserveMatchesUseCase: Matches updated for jornada \(jornadaId), count: \(matches.count)")
                 }
             )
             .eraseToAnyPublisher()

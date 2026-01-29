@@ -138,7 +138,6 @@ class ProfileViewController: UIViewController {
     }
 
     private func navigateToLogin() {
-        Logger.shared.info("🚪 ProfileViewController: Navegando al login después de cerrar sesión")
         
         // Publicar notificación para que AppCoordinator maneje la navegación
         NotificationCenter.default.post(
@@ -159,7 +158,6 @@ class ProfileViewController: UIViewController {
                 window.makeKeyAndVisible()
                 
                 UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil, completion: nil)
-                Logger.shared.info("✅ ProfileViewController: Navegación al login completada")
             }
         }
     }

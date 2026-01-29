@@ -49,7 +49,6 @@ class JornadasRepository: JornadasRepositoryProtocol {
                     return
                 }
                 
-                Logger.shared.debug("JornadasRepository: Listener update - Found \(documents.count) documents")
                 
                 // Procesar documentos (misma lógica que fetchActiveJornadas)
                 var jornadas: [Jornada] = []
@@ -89,7 +88,6 @@ class JornadasRepository: JornadasRepositoryProtocol {
                     }
                 }
                 
-                Logger.shared.info("JornadasRepository: Listener update - Mapped \(jornadas.count) jornadas")
                 self?.jornadasSubject.send(jornadas)
             }
     }
@@ -116,7 +114,6 @@ class JornadasRepository: JornadasRepositoryProtocol {
                         return
                     }
 
-                    Logger.shared.debug("JornadasRepository: Found \(documents.count) documents")
 
                     // Decodificar DTOs desde Firestore y convertir usando el mapper
                     // Pasamos el documentID para extraer torneo y numero si no están en el documento
@@ -136,12 +133,9 @@ class JornadasRepository: JornadasRepositoryProtocol {
                                 )
                             }
                             
-                            Logger.shared.debug("JornadasRepository: Processing document \(doc.documentID)")
-                            Logger.shared.debug("JornadasRepository: DTO - id: \(dto.id ?? "nil"), mostrar: \(dto.mostrar ?? false), numero: \(dto.numero?.description ?? "nil"), torneo: \(dto.torneo ?? "nil")")
                             
                             // Convertir DTO a entidad de dominio, pasando el documentID por si falta
                             if let jornada = JornadaMapper.toDomain(from: dto, documentID: doc.documentID) {
-                                Logger.shared.debug("JornadasRepository: Successfully mapped jornada: \(jornada.id) - \(jornada.torneo) \(jornada.numero)")
                                 jornadas.append(jornada)
                             } else {
                                 Logger.shared.warning("JornadasRepository: Failed to map jornada from document \(doc.documentID)")
@@ -161,13 +155,11 @@ class JornadasRepository: JornadasRepositoryProtocol {
                                     fechaInicio: data[FirestoreConstants.JornadaField.fechaInicio] as? Timestamp
                                 ), documentID: doc.documentID) {
                                     jornadas.append(jornada)
-                                    Logger.shared.debug("JornadasRepository: Created jornada manually from documentID: \(doc.documentID)")
                                 }
                             }
                         }
                     }
 
-                    Logger.shared.info("JornadasRepository: Successfully mapped \(jornadas.count) jornadas from \(documents.count) documents")
                     promise(.success(jornadas))
                 }
         }

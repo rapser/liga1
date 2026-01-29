@@ -23,15 +23,6 @@ class ObserveUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol {
 
     func execute() -> AnyPublisher<UserPreferences?, Never> {
         return userPreferencesService.observePreferences()
-            .handleEvents(
-                receiveOutput: { preferences in
-                    if let prefs = preferences {
-                        Logger.shared.debug("📋 Preferencias actualizadas: pushEnabled=\(prefs.pushNotificationsEnabled), topics=\(prefs.subscribedTopics.count)")
-                    } else {
-                        Logger.shared.debug("📋 Preferencias no disponibles (primera carga)")
-                    }
-                }
-            )
             .eraseToAnyPublisher()
     }
 }

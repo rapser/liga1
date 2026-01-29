@@ -63,14 +63,11 @@ class FavoritesService: FavoritesServiceProtocol {
     // MARK: - Auth State Observation
     
     private func observeAuthState() {
-        // Observar cambios en el estado de autenticación
-        // Cuando el usuario se autentica, iniciar los listeners
         NotificationCenter.default.addObserver(
             forName: NSNotification.Name("LoginSuccessful"),
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Logger.shared.info("👂 FavoritesService: Usuario autenticado - Iniciando listeners")
             self?.startObservingFavorites()
             self?.startObservingFavoriteTeams()
         }
@@ -84,57 +81,42 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private func startObservingFavorites() {
         guard let userId = getUserId() else {
-            Logger.shared.info("👂 FavoritesService: No hay usuario autenticado - No iniciando listener de favoritos")
             return
         }
-        
-        // Remover listener anterior si existe
+
         favoritesListener?.remove()
 
-        Logger.shared.info("👂 FavoritesService: Iniciando observación de favoritos para usuario: \(userId)")
         favoritesListener = db.collection(FirestoreConstants.Collection.users)
             .document(userId)
             .collection(FirestoreConstants.Collection.favorites)
             .addSnapshotListener { [weak self] snapshot, error in
                 if let error = error {
-                    Logger.shared.error("❌ Error listening to favorites", error: error)
+                    Logger.shared.error("Error listening to favorites", error: error)
                     return
                 }
 
                 let favoriteIds = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
-                Logger.shared.info("👂 FavoritesService: Favoritos actualizados desde Firestore: \(favoriteIds)")
                 self?.favoritesSubject.send(favoriteIds)
             }
     }
 
     private func startObservingFavoriteTeams() {
         guard let userId = getUserId() else {
-            Logger.shared.info("👂 FavoritesService: No hay usuario autenticado - No iniciando listener de equipos favoritos")
             return
         }
-        
-        // Remover listener anterior si existe
+
         favoriteTeamsListener?.remove()
 
-        Logger.shared.info("👂 FavoritesService: Iniciando observación de equipos favoritos para usuario: \(userId)")
-        
         favoriteTeamsListener = db.collection(FirestoreConstants.Collection.users)
             .document(userId)
             .collection("favoriteTeams")
             .addSnapshotListener { [weak self] snapshot, error in
                 if let error = error {
-                    Logger.shared.error("❌ FavoritesService: Error listening to favorite teams", error: error)
+                    Logger.shared.error("Error listening to favorite teams", error: error)
                     return
                 }
 
                 let favoriteTeamIds = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
-                Logger.shared.info("👂 FavoritesService: Equipos favoritos actualizados desde Firestore")
-                Logger.shared.info("   📋 Documentos encontrados: \(snapshot?.documents.count ?? 0)")
-                Logger.shared.info("   🏷️ IDs de equipos favoritos: \(favoriteTeamIds)")
-                Logger.shared.info("   📝 Detalles de documentos:")
-                snapshot?.documents.forEach { doc in
-                    Logger.shared.info("      - DocumentID: '\(doc.documentID)', Data: \(doc.data())")
-                }
                 self?.favoriteTeamsSubject.send(favoriteTeamIds)
             }
     }
@@ -219,43 +201,35 @@ class FavoritesService: FavoritesServiceProtocol {
                 return
             }
 
-            // IMPORTANTE: Asegurar que el teamId esté normalizado a minúsculas
             let normalizedTeamId = teamId.lowercased()
-            Logger.shared.info("💾 FavoritesService: Guardando equipo en favoritos - teamId recibido: '\(teamId)', normalizado: '\(normalizedTeamId)'")
-            
+
             let favRef = self.db.collection(FirestoreConstants.Collection.users).document(userId).collection("favoriteTeams").document(normalizedTeamId)
 
             favRef.getDocument { snapshot, error in
                 if let error = error {
-                    Logger.shared.error("💾 FavoritesService: Error obteniendo documento", error: error)
+                    Logger.shared.error("Error obteniendo documento", error: error)
                     promise(.failure(error))
                     return
                 }
 
                 if snapshot?.exists == true {
-                    // Ya es favorito, eliminar
-                    Logger.shared.info("💾 FavoritesService: Eliminando equipo de favoritos: '\(normalizedTeamId)'")
                     favRef.delete { error in
                         if let error = error {
-                            Logger.shared.error("💾 FavoritesService: Error eliminando favorito", error: error)
+                            Logger.shared.error("Error eliminando favorito", error: error)
                             promise(.failure(error))
                         } else {
-                            Logger.shared.info("💾 FavoritesService: Equipo eliminado exitosamente de favoritos")
                             promise(.success(false))
                         }
                     }
                 } else {
-                    // No es favorito, agregar
-                    Logger.shared.info("💾 FavoritesService: Agregando equipo a favoritos: '\(normalizedTeamId)'")
                     favRef.setData([
                         "teamId": normalizedTeamId,
                         "timestamp": FieldValue.serverTimestamp()
                     ]) { error in
                         if let error = error {
-                            Logger.shared.error("💾 FavoritesService: Error agregando favorito", error: error)
+                            Logger.shared.error("Error agregando favorito", error: error)
                             promise(.failure(error))
                         } else {
-                            Logger.shared.info("💾 FavoritesService: Equipo agregado exitosamente a favoritos con teamId: '\(normalizedTeamId)'")
                             promise(.success(true))
                         }
                     }

@@ -33,19 +33,14 @@ final class NotificationDeduplicator: NotificationDeduplicatorProtocol {
         var shouldShow = false
 
         queue.sync(flags: .barrier) {
-            // Verificar si ya existe
             if receivedEventIds.contains(eventId) {
-                Logger.shared.debug("⚠️ Notificación duplicada ignorada: \(eventId)")
                 shouldShow = false
                 return
             }
 
-            // Agregar a la lista
             receivedEventIds.insert(eventId)
-            Logger.shared.debug("✅ Notificación nueva recibida: \(eventId)")
             shouldShow = true
 
-            // Programar eliminación después del tiempo de ventana
             DispatchQueue.main.asyncAfter(deadline: .now() + deduplicationWindow) { [weak self] in
                 self?.removeEventId(eventId)
             }
@@ -57,7 +52,6 @@ final class NotificationDeduplicator: NotificationDeduplicatorProtocol {
     func cleanup() {
         queue.async(flags: .barrier) { [weak self] in
             self?.receivedEventIds.removeAll()
-            Logger.shared.debug("🧹 Cache de notificaciones limpiado")
         }
     }
 
@@ -66,7 +60,6 @@ final class NotificationDeduplicator: NotificationDeduplicatorProtocol {
     private func removeEventId(_ eventId: String) {
         queue.async(flags: .barrier) { [weak self] in
             self?.receivedEventIds.remove(eventId)
-            Logger.shared.debug("🗑️ Event ID expirado removido: \(eventId)")
         }
     }
 }

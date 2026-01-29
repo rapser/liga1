@@ -22,7 +22,6 @@ class FetchTeamsUseCase: FetchTeamsUseCaseProtocol {
     }
 
     func execute(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
-        Logger.shared.debug("FetchTeamsUseCase: Fetching teams for torneo: \(torneo)")
 
         // Validar que no sea acumulado
         if torneo == .acumulado {
@@ -37,7 +36,6 @@ class FetchTeamsUseCase: FetchTeamsUseCaseProtocol {
         return repository.fetchTeams(for: torneo)
             .handleEvents(
                 receiveOutput: { teams in
-                    Logger.shared.info("FetchTeamsUseCase: Successfully fetched \(teams.count) teams for \(torneo)")
                 },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {

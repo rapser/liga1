@@ -57,9 +57,7 @@ class NotificationSettingsViewModel {
                         self?.pushNotificationsEnabled = !enabled
                     }
                 },
-                receiveValue: {
-                    Logger.shared.info("✅ Preferencias de notificaciones actualizadas")
-                }
+                receiveValue: { _ in }
             )
             .store(in: &cancellables)
     }

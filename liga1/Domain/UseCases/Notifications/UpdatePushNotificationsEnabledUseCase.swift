@@ -30,7 +30,6 @@ class UpdatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCa
     }
 
     func execute(enabled: Bool) -> AnyPublisher<Void, Error> {
-        Logger.shared.info("🔔 Actualizando notificaciones push: \(enabled ? "activadas" : "desactivadas")")
 
         return userPreferencesService.updatePushNotificationsEnabled(enabled)
             .handleEvents(
@@ -39,11 +38,9 @@ class UpdatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCa
 
                     if enabled {
                         // Re-suscribirse a topics guardados
-                        Logger.shared.info("✅ Notificaciones activadas - Re-suscribiendo a topics")
                         self.notificationTopicManager.resubscribeToSavedTopics()
                     } else {
                         // Desuscribirse de todos los topics de equipos
-                        Logger.shared.info("🔕 Notificaciones desactivadas - Desuscribiendo de topics")
                         self.notificationTopicManager.unsubscribeFromAllTeamTopics()
                     }
                 },

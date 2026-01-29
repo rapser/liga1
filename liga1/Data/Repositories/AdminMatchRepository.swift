@@ -181,7 +181,6 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                     Logger.shared.error("AdminMatchRepository: Failed to register jornada \(jornadaId)", error: error)
                     promise(.failure(error))
                 } else {
-                    Logger.shared.info("AdminMatchRepository: Successfully registered jornada \(jornadaId) with \(matches.count) matches")
                     promise(.success(()))
                 }
             }

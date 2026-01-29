@@ -373,12 +373,6 @@ extension FavoritosViewController: TeamTableViewCellDelegate {
         // IMPORTANTE: Usar logo (código corto) en lugar de nombre para los topics
         // Normalizar a minúsculas para asegurar consistencia con el backend
         let teamCode = team.logo.lowercased()
-        let topicName = "team_\(teamCode)"
-        Logger.shared.info("⭐ FavoritosViewController: Agregando equipo a favoritos")
-        Logger.shared.info("   📝 Nombre del equipo: '\(team.nombre)'")
-        Logger.shared.info("   🏷️ Logo/código original: '\(team.logo)'")
-        Logger.shared.info("   🔑 Código normalizado: '\(teamCode)'")
-        Logger.shared.info("   📢 Topic que se generará: '\(topicName)'")
         viewModel.toggleFavoriteTeam(teamId: teamCode)
     }
 }
@@ -390,12 +384,6 @@ extension FavoritosViewController: TeamSearchModalDelegate {
         // IMPORTANTE: Usar logo (código corto) en lugar de nombre para los topics
         // Normalizar a minúsculas para asegurar consistencia con el backend
         let teamCode = team.logo.lowercased()
-        let topicName = "team_\(teamCode)"
-        Logger.shared.info("⭐ FavoritosViewController: Agregando equipo desde búsqueda")
-        Logger.shared.info("   📝 Nombre del equipo: '\(team.nombre)'")
-        Logger.shared.info("   🏷️ Logo/código original: '\(team.logo)'")
-        Logger.shared.info("   🔑 Código normalizado: '\(teamCode)'")
-        Logger.shared.info("   📢 Topic que se generará: '\(topicName)'")
         viewModel.toggleFavoriteTeam(teamId: teamCode)
     }
 }

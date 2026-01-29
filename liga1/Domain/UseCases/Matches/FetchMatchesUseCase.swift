@@ -32,7 +32,6 @@ class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
             )).eraseToAnyPublisher()
         }
 
-        Logger.shared.debug("FetchMatchesUseCase: Fetching matches for jornada: \(jornadaId)")
 
         return repository.fetchMatches(for: jornadaId)
             .map { [weak self] matches in
@@ -41,7 +40,6 @@ class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
             }
             .handleEvents(
                 receiveOutput: { matches in
-                    Logger.shared.info("FetchMatchesUseCase: Successfully fetched and filtered \(matches.count) matches for jornada \(jornadaId)")
                 },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
@@ -78,14 +76,12 @@ class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
         // Buscar la primera fecha que sea mayor o igual a hoy
         guard let closestDate = sortedDates.first(where: { $0 >= todayStart }) else {
             // Si no hay fechas futuras, retornar vacío (todos los partidos ya pasaron)
-            Logger.shared.info("FetchMatchesUseCase: No upcoming matches found")
             return []
         }
 
         // Retornar solo los partidos de esa fecha más cercana
         let filteredMatches = matchesByDate[closestDate] ?? []
 
-        Logger.shared.info("FetchMatchesUseCase: Filtered to \(filteredMatches.count) matches for date: \(closestDate)")
 
         return filteredMatches.sorted { $0.fecha < $1.fecha }
     }
