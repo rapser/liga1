@@ -42,7 +42,7 @@ class NotificationHistoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         title = "Historial"
         setupTableView()
         loadNotificationHistory()

@@ -52,7 +52,7 @@ class HomeViewController: UIViewController {
     // MARK: - Setup
 
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
         // Configurar tableView para eliminar espacio entre header y nav bar

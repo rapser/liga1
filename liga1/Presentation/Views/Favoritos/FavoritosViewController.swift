@@ -63,11 +63,12 @@ class FavoritosViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.refreshFavoriteTeamsIfNeeded()
     }
 
     // MARK: - Setup Methods
     private func configureNavigationBar() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         title = "Favoritos"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
@@ -313,7 +314,7 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
             return nil
         }
 
-        let containerView = UIView().background(.systemBackground)
+        let containerView = UIView().background(.appBackground)
         let titleText = viewModel.selectedSegment == .matches ? "Mis Partidos Favoritos" : "Mis Equipos Favoritos"
 
         LayoutPresets.titleLabel(text: titleText, fontSize: 18)

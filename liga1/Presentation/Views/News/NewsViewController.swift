@@ -45,7 +45,7 @@ class NewsViewController: UIViewController {
 
     // MARK: - Setup Methods
     private func configureNavigationBar() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         title = "Noticias"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
@@ -62,6 +62,7 @@ class NewsViewController: UIViewController {
     private func setupTableView() {
         // Configurar tableView
         tableView.prepareForAutoLayout()
+        tableView.backgroundColor = .appBackground
         tableView.register(NewsCell.self, forCellReuseIdentifier: "NewsCell")
         tableView.register(FeaturedNewsContentCell.self, forCellReuseIdentifier: FeaturedNewsContentCell.reuseIdentifier)
         tableView.register(FeaturedNewsTitleHeaderView.self, forHeaderFooterViewReuseIdentifier: FeaturedNewsTitleHeaderView.reuseIdentifier)

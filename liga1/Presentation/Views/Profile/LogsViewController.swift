@@ -17,7 +17,7 @@ class LogsViewController: UIViewController {
         let textView = UITextView()
         textView.prepareForAutoLayout()
         textView.font = UIFont.monospacedSystemFont(ofSize: 12, weight: .regular)
-        textView.backgroundColor = .systemBackground
+        textView.backgroundColor = .appBackground
         textView.isEditable = false
         textView.textColor = .label
         textView.contentInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
@@ -77,7 +77,7 @@ class LogsViewController: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         containerView.attachToSafeArea(in: view)
         
         textView

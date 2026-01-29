@@ -133,7 +133,7 @@ class NotificationSettingsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         title = "Notificaciones"
         setupUI()
         bindViewModel()

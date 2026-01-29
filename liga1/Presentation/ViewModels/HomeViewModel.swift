@@ -104,7 +104,6 @@ class HomeViewModel {
 
     private func loadMatchesForJornadas(_ jornadas: [Jornada]) {
         guard !jornadas.isEmpty else {
-            Logger.shared.warning("HomeViewModel: No jornadas to load matches for")
             jornadaSections = []
             return
         }

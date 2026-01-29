@@ -105,7 +105,7 @@ class RegistrarPartidosViewController: UIViewController {
 
     private func setupUI() {
         title = "Registrar Partidos"
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         navigationItem.largeTitleDisplayMode = .never
     }
 

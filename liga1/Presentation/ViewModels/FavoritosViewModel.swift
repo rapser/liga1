@@ -80,6 +80,11 @@ class FavoritosViewModel {
 
     // MARK: - Public Methods - Teams
 
+    /// Vuelve a construir la lista de equipos favoritos con los datos actuales (evita que quede vacía por condición de carrera).
+    func refreshFavoriteTeamsIfNeeded() {
+        updateFavoriteTeams()
+    }
+
     func toggleFavoriteTeam(teamId: String) {
         toggleFavoriteTeamUseCase.execute(teamId: teamId)
             .receive(on: DispatchQueue.main)

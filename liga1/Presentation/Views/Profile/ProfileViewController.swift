@@ -14,7 +14,7 @@ class ProfileViewController: UIViewController {
 
     // MARK: - UI Components
     private let containerView = ContainerView()
-    private let tableView = UITableView(frame: .zero, style: .insetGrouped)
+    private let tableView = UITableView(frame: .zero, style: .plain)
 
     // MARK: - Properties
     let viewModel: ProfileViewModel
@@ -46,7 +46,7 @@ class ProfileViewController: UIViewController {
 
     // MARK: - Setup Methods
     private func configureNavigationBar() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         title = "Configuración"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
@@ -63,6 +63,7 @@ class ProfileViewController: UIViewController {
     private func setupTableView() {
         // Configurar tableView
         tableView.prepareForAutoLayout()
+        tableView.backgroundColor = .appBackground
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.delegate = self
         tableView.dataSource = self

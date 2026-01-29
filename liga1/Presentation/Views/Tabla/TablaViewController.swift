@@ -47,7 +47,7 @@ class TablaViewController: UIViewController {
 
     // MARK: - Setup Methods
     private func configureNavigationBar() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .appBackground
         title = "Tabla"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always

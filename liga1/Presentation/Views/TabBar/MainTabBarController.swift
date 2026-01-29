@@ -78,23 +78,23 @@ class MainTabBarController: UITabBarController {
     private func configureNavigationBarAppearance() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .systemBackground
+        appearance.backgroundColor = .appBackground
         appearance.shadowColor = .clear
         appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
         appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
 
-        // Aplicar la misma apariencia a todos los estados para consistencia
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
         UINavigationBar.appearance().compactScrollEdgeAppearance = appearance
+        UINavigationBar.appearance().isTranslucent = false
         UINavigationBar.appearance().tintColor = .liga1Red
     }
 
     private func configureTabBarAppearance() {
         let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-        appearance.backgroundColor = .systemBackground
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .appBackground
 
         // Configurar color del item seleccionado (rojo Liga 1)
         let selectedItemAppearance = UITabBarItemAppearance()
@@ -117,7 +117,7 @@ class MainTabBarController: UITabBarController {
                                      imageSystemName: String) -> UINavigationController {
         let nav = UINavigationController(rootViewController: rootViewController)
         nav.navigationBar.prefersLargeTitles = true
-        rootViewController.view.backgroundColor = .systemBackground
+        rootViewController.view.backgroundColor = .appBackground
         rootViewController.tabBarItem = UITabBarItem(title: title,
                                                      image: UIImage(systemName: imageSystemName),
                                                      tag: 0)
