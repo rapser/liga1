@@ -79,96 +79,75 @@ extension HomeTableViewAdapter: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let jornadaSection = sections[section]
-        let containerView = UIView()
-        containerView.backgroundColor = .systemBackground
 
-        // Header superior: Fecha del día con icono de calendario
-        let dateHeaderView = UIView()
-        dateHeaderView.backgroundColor = .systemBackground
-        dateHeaderView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let fechaDiaLabel = UILabel()
-        fechaDiaLabel.font = .systemFont(ofSize: 16)
-        fechaDiaLabel.textColor = .label
-        fechaDiaLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Obtener la fecha del primer partido
         let fechaPartido: Date
         if let primerPartido = jornadaSection.matches.first {
             fechaPartido = primerPartido.fecha
         } else {
-            fechaPartido = Date() // Fallback si no hay partidos
+            fechaPartido = Date()
         }
-        
-        // Formatear la fecha
+
+        let dateHeaderView = UIView()
+        dateHeaderView.backgroundColor = .systemBackground
+
+        let fechaDiaLabel = UILabel()
         fechaDiaLabel.text = formatDateForHeader(fechaPartido)
-        
+        fechaDiaLabel.font = .systemFont(ofSize: 16)
+        fechaDiaLabel.textColor = .label
+
         let calendarIcon = UIImageView(image: UIImage(systemName: "calendar"))
         calendarIcon.tintColor = .secondaryLabel
         calendarIcon.contentMode = .scaleAspectFit
-        calendarIcon.translatesAutoresizingMaskIntoConstraints = false
-        
-        dateHeaderView.addSubview(fechaDiaLabel)
-        dateHeaderView.addSubview(calendarIcon)
-        
-        NSLayoutConstraint.activate([
-            fechaDiaLabel.leadingAnchor.constraint(equalTo: dateHeaderView.leadingAnchor, constant: 16),
-            fechaDiaLabel.centerYAnchor.constraint(equalTo: dateHeaderView.centerYAnchor),
-            
-            calendarIcon.trailingAnchor.constraint(equalTo: dateHeaderView.trailingAnchor, constant: -16),
-            calendarIcon.centerYAnchor.constraint(equalTo: dateHeaderView.centerYAnchor),
-            calendarIcon.widthAnchor.constraint(equalToConstant: 20),
-            calendarIcon.heightAnchor.constraint(equalToConstant: 20)
-        ])
 
-        // Header inferior: Fecha de jornada y torneo
+        fechaDiaLabel
+            .addTo(dateHeaderView)
+            .pinLeading(constant: Spacing.standard)
+            .centerY()
+        calendarIcon
+            .addTo(dateHeaderView)
+            .square(20)
+            .pinTrailing(constant: Spacing.standard)
+            .centerY()
+
         let jornadaHeaderView = UIView()
-        // Fondo sutil para diferenciar del header superior (se adapta a modo claro/oscuro)
         jornadaHeaderView.backgroundColor = .secondarySystemBackground
-        jornadaHeaderView.translatesAutoresizingMaskIntoConstraints = false
 
         let fechaLabel = UILabel()
+        fechaLabel.text = "Fecha \(jornadaSection.numero)"
         fechaLabel.font = .boldSystemFont(ofSize: 18)
         fechaLabel.textColor = .label
-        fechaLabel.translatesAutoresizingMaskIntoConstraints = false
-        fechaLabel.text = "Fecha \(jornadaSection.numero)"
 
+        let torneoCapitalizado = jornadaSection.torneo.capitalized
         let torneoLabel = UILabel()
+        torneoLabel.text = "Liga 1 - \(torneoCapitalizado) 2026"
         torneoLabel.font = .systemFont(ofSize: 14)
         torneoLabel.textColor = .secondaryLabel
-        torneoLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        // Capitalizar torneo (clausura -> Clausura)
-        let torneoCapitalizado = jornadaSection.torneo.capitalized
-        torneoLabel.text = "Liga 1 - \(torneoCapitalizado) 2026"
+        fechaLabel
+            .addTo(jornadaHeaderView)
+            .pinLeading(constant: Spacing.standard)
+            .pinTop(constant: Spacing.small)
+        torneoLabel
+            .addTo(jornadaHeaderView)
+            .pinLeading(to: fechaLabel.leadingAnchor)
+            .pinTop(to: fechaLabel.bottomAnchor, constant: Spacing.tiny)
+            .pinBottom(constant: Spacing.small)
 
-        jornadaHeaderView.addSubview(fechaLabel)
-        jornadaHeaderView.addSubview(torneoLabel)
+        let containerView = UIView()
+        containerView.backgroundColor = .systemBackground
 
-        NSLayoutConstraint.activate([
-            fechaLabel.leadingAnchor.constraint(equalTo: jornadaHeaderView.leadingAnchor, constant: 16),
-            fechaLabel.topAnchor.constraint(equalTo: jornadaHeaderView.topAnchor, constant: 8),
-
-            torneoLabel.leadingAnchor.constraint(equalTo: fechaLabel.leadingAnchor),
-            torneoLabel.topAnchor.constraint(equalTo: fechaLabel.bottomAnchor, constant: 4),
-            torneoLabel.bottomAnchor.constraint(equalTo: jornadaHeaderView.bottomAnchor, constant: -8)
-        ])
-
-        // Agregar ambos headers al contenedor
-        containerView.addSubview(dateHeaderView)
-        containerView.addSubview(jornadaHeaderView)
-
-        NSLayoutConstraint.activate([
-            dateHeaderView.topAnchor.constraint(equalTo: containerView.topAnchor),
-            dateHeaderView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            dateHeaderView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            dateHeaderView.heightAnchor.constraint(equalToConstant: 44),
-            
-            jornadaHeaderView.topAnchor.constraint(equalTo: dateHeaderView.bottomAnchor),
-            jornadaHeaderView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            jornadaHeaderView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            jornadaHeaderView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
-        ])
+        dateHeaderView
+            .addTo(containerView)
+            .pinTop()
+            .pinLeading()
+            .pinTrailing()
+            .height(44)
+        jornadaHeaderView
+            .addTo(containerView)
+            .pinTop(to: dateHeaderView.bottomAnchor)
+            .pinLeading()
+            .pinTrailing()
+            .pinBottom()
 
         return containerView
     }

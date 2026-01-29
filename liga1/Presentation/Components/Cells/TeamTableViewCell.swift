@@ -59,32 +59,23 @@ class TeamTableViewCell: UITableViewCell {
         selectionStyle = .none
         contentView.backgroundColor = .systemBackground
 
-        contentView.addSubview(logoImageView)
-        contentView.addSubview(teamNameLabel)
-        contentView.addSubview(favoriteButton)
+        logoImageView
+            .addTo(contentView)
+            .pinLeading(constant: Spacing.standard)
+            .centerY()
+            .size(width: 40, height: 40)
 
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        teamNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        favoriteButton.translatesAutoresizingMaskIntoConstraints = false
+        favoriteButton
+            .addTo(contentView)
+            .pinTrailing(constant: Spacing.standard)
+            .centerY()
+            .size(width: 44, height: 44)
 
-        NSLayoutConstraint.activate([
-            // Logo
-            logoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            logoImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            logoImageView.widthAnchor.constraint(equalToConstant: 40),
-            logoImageView.heightAnchor.constraint(equalToConstant: 40),
-
-            // Team Name
-            teamNameLabel.leadingAnchor.constraint(equalTo: logoImageView.trailingAnchor, constant: 12),
-            teamNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            teamNameLabel.trailingAnchor.constraint(equalTo: favoriteButton.leadingAnchor, constant: -12),
-
-            // Favorite Button
-            favoriteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            favoriteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            favoriteButton.widthAnchor.constraint(equalToConstant: 44),
-            favoriteButton.heightAnchor.constraint(equalToConstant: 44)
-        ])
+        teamNameLabel
+            .addTo(contentView)
+            .pinLeading(to: logoImageView.trailingAnchor, constant: Spacing.medium)
+            .centerY()
+            .pinTrailing(to: favoriteButton.leadingAnchor, constant: -Spacing.medium)
 
         favoriteButton.addTarget(self, action: #selector(favoriteTapped), for: .touchUpInside)
     }

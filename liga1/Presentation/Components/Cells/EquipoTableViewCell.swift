@@ -11,10 +11,10 @@ class EquipoTableViewCell: UITableViewCell {
 
     private lazy var stackView: UIStackView = {
         let stack = UIStackView()
-        stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
         stack.alignment = .center
         stack.spacing = Spacing.tiny
+        stack.prepareForAutoLayout()
         return stack
     }()
 
@@ -27,9 +27,9 @@ class EquipoTableViewCell: UITableViewCell {
 
     private lazy var logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
+        imageView.prepareForAutoLayout()
         return imageView
     }()
 
