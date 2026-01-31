@@ -19,6 +19,9 @@ final class SessionManager {
     weak var window: UIWindow?
     private var container: DIContainer?
 
+    /// Se invoca cuando el usuario toca una notificación push (matchId).
+    var onNotificationTap: ((String) -> Void)?
+
     // MARK: - Configuración inicial
     func configure(with window: UIWindow?, container: DIContainer) {
         self.window = window

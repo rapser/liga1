@@ -53,8 +53,7 @@ final class DIContainer {
     }
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        let authService = makeAuthService() as! AuthService
-        return FavoritesService(database: makeDatabase(), authProvider: authService)
+        return FavoritesService(database: makeDatabase(), authService: makeAuthService())
     }()
     
     func makeFavoritesService() -> FavoritesServiceProtocol {
@@ -70,8 +69,7 @@ final class DIContainer {
     }
 
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
-        let authService = makeAuthService() as! AuthService
-        return UserPreferencesService(database: makeDatabase(), authProvider: authService)
+        return UserPreferencesService(database: makeDatabase(), authService: makeAuthService())
     }()
     
     func makeUserPreferencesService() -> UserPreferencesServiceProtocol {
@@ -98,6 +96,16 @@ final class DIContainer {
 
     func makeNotificationDeduplicator() -> NotificationDeduplicatorProtocol {
         return notificationDeduplicator
+    }
+
+    // MARK: - EventBus
+
+    private lazy var appEventBus: AppEventBusProtocol = {
+        return AppEventBus()
+    }()
+
+    func makeAppEventBus() -> AppEventBusProtocol {
+        return appEventBus
     }
 
     // MARK: - Use Cases - Jornadas
@@ -244,7 +252,8 @@ final class DIContainer {
             observeFavoritesUseCase: makeObserveFavoritesUseCase(),
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
             toggleFavoriteTeamUseCase: makeToggleFavoriteTeamUseCase(),
-            observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase()
+            observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase(),
+            notificationTopicManager: makeNotificationTopicManager()
         )
     }
 
@@ -291,8 +300,12 @@ final class DIContainer {
         return NewsViewController(viewModel: makeNewsViewModel())
     }
 
-    func makeProfileViewController() -> ProfileViewController {
-        return ProfileViewController(viewModel: makeProfileViewModel(), container: self)
+    func makeProfileViewController(eventBus: AppEventBusProtocol? = nil) -> ProfileViewController {
+        return ProfileViewController(
+            viewModel: makeProfileViewModel(),
+            container: self,
+            eventBus: eventBus ?? makeAppEventBus()
+        )
     }
 
     func makeLoginViewController() -> LoginViewController {
@@ -303,13 +316,29 @@ final class DIContainer {
         return RegistrarPartidosViewController(viewModel: makeRegistrarPartidosViewModel())
     }
 
+    func makeLogsViewController() -> LogsViewController {
+        return LogsViewController()
+    }
+
+    func makeNotificationHistoryViewController() -> NotificationHistoryViewController {
+        return NotificationHistoryViewController()
+    }
+
     // MARK: - Coordinators
 
     func makeAppCoordinator(window: UIWindow) -> AppCoordinator {
-        return AppCoordinator(window: window, container: self)
+        return AppCoordinator(window: window, container: self, eventBus: makeAppEventBus())
     }
 
     func makeLoginCoordinator(navigationController: UINavigationController) -> LoginCoordinator {
-        return LoginCoordinator(navigationController: navigationController, container: self)
+        return LoginCoordinator(
+            navigationController: navigationController,
+            container: self,
+            eventBus: makeAppEventBus()
+        )
+    }
+
+    func makeMainTabBarController(eventBus: AppEventBusProtocol) -> MainTabBarController {
+        return MainTabBarController(container: self, eventBus: eventBus)
     }
 }

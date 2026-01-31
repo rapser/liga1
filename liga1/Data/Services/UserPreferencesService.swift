@@ -21,38 +21,35 @@ protocol UserPreferencesServiceProtocol {
 class UserPreferencesService: UserPreferencesServiceProtocol {
 
     private let database: DatabaseProtocol
-    private let authProvider: AuthProvider
+    private let authService: AuthServiceProtocol
     private let preferencesSubject = CurrentValueSubject<UserPreferences?, Never>(nil)
 
     private var db: Firestore {
         database.db
     }
 
-    init(database: DatabaseProtocol, authProvider: AuthProvider) {
-        self.database = database
-        self.authProvider = authProvider
-        
-        if getUserId() != nil {
-            fetchPreferencesAndNotify()
-        } else {
-            observeAuthState()
-        }
-    }
+    private var cancellables = Set<AnyCancellable>()
 
-    private func observeAuthState() {
-        NotificationCenter.default.addObserver(
-            forName: NSNotification.Name("LoginSuccessful"),
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.fetchPreferencesAndNotify()
-        }
+    init(database: DatabaseProtocol, authService: AuthServiceProtocol) {
+        self.database = database
+        self.authService = authService
+
+        authService.observeCurrentUser()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] user in
+                if user != nil {
+                    self?.fetchPreferencesAndNotify()
+                } else {
+                    self?.preferencesSubject.send(nil)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Private Helpers
 
     private func getUserId() -> String? {
-        return authProvider.currentUserId
+        return authService.currentUserId
     }
 
     private func getPreferencesDocumentRef() -> DocumentReference? {

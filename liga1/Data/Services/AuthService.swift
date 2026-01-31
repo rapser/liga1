@@ -7,24 +7,41 @@
 
 import Foundation
 import FirebaseAuth
-import GoogleSignIn
 import FirebaseCore
 import Combine
-import UIKit
 
-protocol AuthServiceProtocol {
+protocol AuthServiceProtocol: AuthProvider {
     func login(email: String, password: String) -> AnyPublisher<Void, Error>
-    func loginWithGoogle(presentingViewController: UIViewController) -> AnyPublisher<Void, Error>
+    func signInWithGoogle(credential: GoogleCredential) -> AnyPublisher<Void, Error>
     func logout() -> AnyPublisher<Void, Error>
     func getCurrentUser() -> AnyPublisher<User?, Never>
+    /// Emite cada vez que cambia el estado de autenticación (login/logout).
+    func observeCurrentUser() -> AnyPublisher<User?, Never>
 }
 
 class AuthService: AuthServiceProtocol, AuthProvider {
+
+    // MARK: - Auth state observation
+
+    private let currentUserSubject = CurrentValueSubject<User?, Never>(nil)
+    private var authStateListenerHandle: AuthStateDidChangeListenerHandle?
 
     // MARK: - AuthProvider
 
     var currentUserId: String? {
         return Auth.auth().currentUser?.uid
+    }
+
+    init() {
+        authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            self?.currentUserSubject.send(user)
+        }
+    }
+
+    deinit {
+        if let handle = authStateListenerHandle {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
     }
 
     func login(email: String, password: String) -> AnyPublisher<Void, Error> {
@@ -40,53 +57,18 @@ class AuthService: AuthServiceProtocol, AuthProvider {
         .eraseToAnyPublisher()
     }
 
-    func loginWithGoogle(presentingViewController: UIViewController) -> AnyPublisher<Void, Error> {
+    func signInWithGoogle(credential: GoogleCredential) -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { promise in
-            
-            guard let clientID = FirebaseApp.app()?.options.clientID else {
-                Logger.shared.error("❌ AuthService: No se pudo obtener clientID de Firebase", error: nil)
-                let error = NSError(
-                    domain: "AuthService",
-                    code: -1,
-                    userInfo: [NSLocalizedDescriptionKey: "Error al configurar Google Sign In"]
-                )
-                promise(.failure(error))
-                return
-            }
-
-            let config = GIDConfiguration(clientID: clientID)
-            GIDSignIn.sharedInstance.configuration = config
-
-            GIDSignIn.sharedInstance.signIn(withPresenting: presentingViewController) { result, error in
+            let firebaseCredential = GoogleAuthProvider.credential(
+                withIDToken: credential.idToken,
+                accessToken: credential.accessToken
+            )
+            Auth.auth().signIn(with: firebaseCredential) { _, error in
                 if let error = error {
-                    Logger.shared.error("❌ AuthService: Error en Google Sign In UI", error: error)
+                    Logger.shared.error("❌ AuthService: Error al autenticar con Firebase", error: error)
                     promise(.failure(error))
-                    return
-                }
-
-                guard let user = result?.user, let idToken = user.idToken?.tokenString else {
-                    Logger.shared.error("❌ AuthService: No se pudo obtener credenciales de Google", error: nil)
-                    let error = NSError(
-                        domain: "AuthService",
-                        code: -2,
-                        userInfo: [NSLocalizedDescriptionKey: "Error al obtener credenciales de Google"]
-                    )
-                    promise(.failure(error))
-                    return
-                }
-
-                let credential = GoogleAuthProvider.credential(
-                    withIDToken: idToken,
-                    accessToken: user.accessToken.tokenString
-                )
-
-                Auth.auth().signIn(with: credential) { authResult, error in
-                    if let error = error {
-                        Logger.shared.error("❌ AuthService: Error al autenticar con Firebase", error: error)
-                        promise(.failure(error))
-                    } else {
-                        promise(.success(()))
-                    }
+                } else {
+                    promise(.success(()))
                 }
             }
         }
@@ -107,6 +89,11 @@ class AuthService: AuthServiceProtocol, AuthProvider {
 
     func getCurrentUser() -> AnyPublisher<User?, Never> {
         return Just(Auth.auth().currentUser)
+            .eraseToAnyPublisher()
+    }
+
+    func observeCurrentUser() -> AnyPublisher<User?, Never> {
+        return currentUserSubject
             .eraseToAnyPublisher()
     }
 }

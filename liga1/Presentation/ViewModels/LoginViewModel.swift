@@ -70,21 +70,8 @@ class LoginViewModel {
                 }
             } receiveValue: { [weak self] _ in
                 guard let self = self else { return }
-                
-                // Usar NotificationCenter como mecanismo principal para la navegación
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(
-                        name: NSNotification.Name("LoginSuccessful"),
-                        object: nil,
-                        userInfo: ["source": "email"]
-                    )
-                    
-                    // También intentar usar el delegate si está disponible
-                    if let delegate = self.coordinatorDelegate {
-                        delegate.loginViewModelDidLogin(self)
-                    } else {
-                        Logger.shared.warning("⚠️ coordinatorDelegate es nil, usando solo NotificationCenter")
-                    }
+                    self.coordinatorDelegate?.loginViewModelDidLogin(self)
                 }
             }
             .store(in: &cancellables)
@@ -102,9 +89,8 @@ class LoginViewModel {
     func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
-
-        
-        loginUseCase.executeWithGoogle(presentingViewController: presentingViewController)
+        let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController)
+        loginUseCase.executeWithGoogle(credentialProvider: credentialProvider)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -114,22 +100,8 @@ class LoginViewModel {
                 }
             } receiveValue: { [weak self] _ in
                 guard let self = self else { return }
-                
-                // Usar NotificationCenter como mecanismo principal para la navegación
-                // Esto es más robusto que el delegate porque no depende de referencias débiles
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(
-                        name: NSNotification.Name("LoginSuccessful"),
-                        object: nil,
-                        userInfo: ["source": "google"]
-                    )
-                    
-                    // También intentar usar el delegate si está disponible
-                    if let delegate = self.coordinatorDelegate {
-                        delegate.loginViewModelDidLogin(self)
-                    } else {
-                        Logger.shared.warning("⚠️ coordinatorDelegate es nil, usando solo NotificationCenter")
-                    }
+                    self.coordinatorDelegate?.loginViewModelDidLogin(self)
                 }
             }
             .store(in: &cancellables)

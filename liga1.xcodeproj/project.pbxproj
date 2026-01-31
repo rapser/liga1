@@ -75,6 +75,12 @@
 		464B95B62F287624001C4049 /* NotificationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464B95B52F287624001C4049 /* NotificationSettingsViewModel.swift */; };
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
+		46B2E9432F2DB2C800EB66B3 /* AppEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */; };
+		46B2E9442F2DB2C800EB66B3 /* AppEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */; };
+		46B2E9452F2DB2C800EB66B3 /* AppEventBusProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */; };
+		46B2E9492F2DB2D800EB66B3 /* GoogleCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */; };
+		46B2E94A2F2DB2D800EB66B3 /* GoogleCredentialProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */; };
+		46B2E94D2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */; };
 		46C3EB082F2942BF00E9EA0C /* NotificationDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */; };
 		46C3EB0A2F29853400E9EA0C /* LogsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB092F29853400E9EA0C /* LogsViewController.swift */; };
 		46C3EB1C2F2B128D00E9EA0C /* AppKit+Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB162F2B128D00E9EA0C /* AppKit+Examples.swift */; };
@@ -215,6 +221,12 @@
 		464B95B12F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePushNotificationsEnabledUseCase.swift; sourceTree = "<group>"; };
 		464B95B52F287624001C4049 /* NotificationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsViewModel.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEvent.swift; sourceTree = "<group>"; };
+		46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEventBus.swift; sourceTree = "<group>"; };
+		46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEventBusProtocol.swift; sourceTree = "<group>"; };
+		46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCredential.swift; sourceTree = "<group>"; };
+		46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCredentialProvider.swift; sourceTree = "<group>"; };
+		46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCredentialProviderImpl.swift; sourceTree = "<group>"; };
 		46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeduplicator.swift; sourceTree = "<group>"; };
 		46C3EB092F29853400E9EA0C /* LogsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsViewController.swift; sourceTree = "<group>"; };
 		46C3EB0C2F2B128D00E9EA0C /* ContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerView.swift; sourceTree = "<group>"; };
@@ -374,6 +386,7 @@
 		4640018E2F08853F00A8C905 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				46B2E9482F2DB2D800EB66B3 /* Auth */,
 				46CDF4AA2F1086F100F280E6 /* Repositories */,
 				46CDF4772F1061E600F280E6 /* Entities */,
 				4640018D2F08853F00A8C905 /* UseCases */,
@@ -444,6 +457,7 @@
 		464001B42F08853F00A8C905 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				46B2E94C2F2DB2FF00EB66B3 /* Auth */,
 				46CDF4872F10623000F280E6 /* Mappers */,
 				46D820A02F09D72A00FAA836 /* Models */,
 				464001962F08853F00A8C905 /* Components */,
@@ -647,6 +661,33 @@
 				464B95B12F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift */,
 			);
 			path = Notifications;
+			sourceTree = "<group>";
+		};
+		46B2E9422F2DB2C800EB66B3 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */,
+				46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */,
+				46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */,
+			);
+			path = Events;
+			sourceTree = "<group>";
+		};
+		46B2E9482F2DB2D800EB66B3 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */,
+				46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		46B2E94C2F2DB2FF00EB66B3 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */,
+			);
+			path = Auth;
 			sourceTree = "<group>";
 		};
 		46C3EB072F2942BF00E9EA0C /* Notifications */ = {
@@ -908,6 +949,7 @@
 		46D995C62C6EC90700D4951C /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				46B2E9422F2DB2C800EB66B3 /* Events */,
 				46D820A52F09DD0500FAA836 /* Coordinator */,
 				46D995922C6E90EC00D4951C /* AppDelegate.swift */,
 				469E54322E765141001ECD36 /* SessionManager.swift */,
@@ -1083,8 +1125,14 @@
 				46CDF48E2F10625B00F280E6 /* JornadaUI.swift in Sources */,
 				464001C22F08853F00A8C905 /* HeaderView.swift in Sources */,
 				46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */,
+				46B2E94D2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift in Sources */,
 				464001C32F08853F00A8C905 /* TorneoType.swift in Sources */,
+				46B2E9492F2DB2D800EB66B3 /* GoogleCredential.swift in Sources */,
+				46B2E94A2F2DB2D800EB66B3 /* GoogleCredentialProvider.swift in Sources */,
 				464B95A82F2875B4001C4049 /* UserPreferencesMapper.swift in Sources */,
+				46B2E9432F2DB2C800EB66B3 /* AppEventBus.swift in Sources */,
+				46B2E9442F2DB2C800EB66B3 /* AppEvent.swift in Sources */,
+				46B2E9452F2DB2C800EB66B3 /* AppEventBusProtocol.swift in Sources */,
 				46CDF4B12F10877B00F280E6 /* NewsItem.swift in Sources */,
 				464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */,
 				46CDF4A12F1068A300F280E6 /* TeamMapper.swift in Sources */,
@@ -1297,7 +1345,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1330,7 +1378,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

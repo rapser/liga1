@@ -7,12 +7,11 @@
 
 import Foundation
 import Combine
-import UIKit
 
-/// Use Case para realizar login
+/// Use Case para realizar login (Domain sin UIKit).
 protocol LoginUseCaseProtocol {
     func execute(email: String, password: String) -> AnyPublisher<Void, Error>
-    func executeWithGoogle(presentingViewController: UIViewController) -> AnyPublisher<Void, Error>
+    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<Void, Error>
 }
 
 class LoginUseCase: LoginUseCaseProtocol {
@@ -24,7 +23,6 @@ class LoginUseCase: LoginUseCaseProtocol {
     }
 
     func execute(email: String, password: String) -> AnyPublisher<Void, Error> {
-        // Validación de negocio
         guard !email.isEmpty, !password.isEmpty else {
             return Fail(error: NSError(
                 domain: "LoginUseCase",
@@ -33,8 +31,6 @@ class LoginUseCase: LoginUseCaseProtocol {
             ))
             .eraseToAnyPublisher()
         }
-
-        // Validación de formato de email
         guard isValidEmail(email) else {
             return Fail(error: NSError(
                 domain: "LoginUseCase",
@@ -43,13 +39,18 @@ class LoginUseCase: LoginUseCaseProtocol {
             ))
             .eraseToAnyPublisher()
         }
-
-        // Delegar la autenticación al servicio
         return authService.login(email: email, password: password)
     }
 
-    func executeWithGoogle(presentingViewController: UIViewController) -> AnyPublisher<Void, Error> {
-        return authService.loginWithGoogle(presentingViewController: presentingViewController)
+    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<Void, Error> {
+        return credentialProvider.provideCredential()
+            .flatMap { [weak self] credential -> AnyPublisher<Void, Error> in
+                guard let self = self else {
+                    return Fail<Void, Error>(error: NSError(domain: "LoginUseCase", code: -1, userInfo: nil)).eraseToAnyPublisher()
+                }
+                return self.authService.signInWithGoogle(credential: credential)
+            }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Private Methods

@@ -175,18 +175,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     // MARK: - Private Helpers
 
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
-        // Parsear datos de la notificación
         guard let matchId = userInfo["matchId"] as? String else {
             return
         }
-
-
-        // Notificar al AppCoordinator para navegar
-        NotificationCenter.default.post(
-            name: NSNotification.Name("NavigateToMatch"),
-            object: nil,
-            userInfo: ["matchId": matchId]
-        )
+        SessionManager.shared.onNotificationTap?(matchId)
     }
 }
 

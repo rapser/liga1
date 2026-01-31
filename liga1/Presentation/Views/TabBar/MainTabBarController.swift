@@ -10,14 +10,16 @@ import UIKit
 class MainTabBarController: UITabBarController {
 
     private let container: DIContainer
+    private let eventBus: AppEventBusProtocol
 
-    init(container: DIContainer) {
+    init(container: DIContainer, eventBus: AppEventBusProtocol) {
         self.container = container
+        self.eventBus = eventBus
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented - use init(container:)")
+        fatalError("init(coder:) has not been implemented - use init(container:eventBus:)")
     }
 
     override func viewDidLoad() {
@@ -39,7 +41,7 @@ class MainTabBarController: UITabBarController {
         let newsVC = container.makeNewsViewController()
         newsVC.title = "Noticias"
 
-        let perfilVC = container.makeProfileViewController()
+        let perfilVC = container.makeProfileViewController(eventBus: eventBus)
         perfilVC.title = "Configuración"
 
         // Crear NavControllers con estilo Large Title

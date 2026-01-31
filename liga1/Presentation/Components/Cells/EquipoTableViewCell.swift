@@ -91,7 +91,7 @@ class EquipoTableViewCell: UITableViewCell {
         logoImageView.square(20)
     }
     
-    func configure(with model: Team, position: Int, positionColor: UIColor? = nil, isChampion: Bool = false) {
+    func configure(with model: TeamUI, position: Int, positionColor: UIColor? = nil, isChampion: Bool = false) {
         posicionLabel.text = "\(position)."
 
         // Si es campeón (puesto 1), aplicar fondo amarillo solo al número

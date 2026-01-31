@@ -13,7 +13,7 @@ class TorneoViewModel {
 
     // MARK: - Published Properties
 
-    @Published private(set) var displayedTeams: [Team] = []
+    @Published private(set) var displayedTeams: [TeamUI] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: Error?
     @Published private(set) var selectedTorneo: TorneoType = .clausura
@@ -25,9 +25,9 @@ class TorneoViewModel {
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
-    private var cachedApertura: [Team] = []
-    private var cachedClausura: [Team] = []
-    private var cachedAcumulado: [Team] = []
+    private var cachedApertura: [TeamUI] = []
+    private var cachedClausura: [TeamUI] = []
+    private var cachedAcumulado: [TeamUI] = []
 
     // MARK: - Initialization
 
@@ -99,13 +99,13 @@ class TorneoViewModel {
                 }
             } receiveValue: { [weak self] teams in
                 guard let self = self else { return }
-                self.displayedTeams = teams
-
+                let teamsUI = TeamUIMapper.toUI(from: teams)
+                self.displayedTeams = teamsUI
                 switch torneo {
                 case .apertura:
-                    self.cachedApertura = teams
+                    self.cachedApertura = teamsUI
                 case .clausura:
-                    self.cachedClausura = teams
+                    self.cachedClausura = teamsUI
                 case .acumulado:
                     break
                 }
@@ -181,8 +181,9 @@ class TorneoViewModel {
                     }
                 }
 
-                self.cachedAcumulado = acumuladoTeams
-                self.displayedTeams = acumuladoTeams
+                let acumuladoTeamsUI = TeamUIMapper.toUI(from: acumuladoTeams)
+                self.cachedAcumulado = acumuladoTeamsUI
+                self.displayedTeams = acumuladoTeamsUI
             }
             .store(in: &cancellables)
     }

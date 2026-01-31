@@ -43,11 +43,8 @@ class FeaturedNewsContentCell: UITableViewCell {
         backgroundColor = .systemBackground
     }
 
-    func configure(with item: NewsItem) {
-        // Remover vista anterior si existe
+    func configure(with item: NewsItemUI) {
         newsHeaderView?.removeFromSuperview()
-
-        // Crear nueva vista
         let headerView = NewsHeaderView(item: item, sectionTitle: "")
         headerView
             .prepareForAutoLayout()

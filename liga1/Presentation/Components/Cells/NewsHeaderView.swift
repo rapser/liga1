@@ -22,16 +22,12 @@ class NewsHeaderView: UIView {
         .lines(3)
         .textColor(.label)
 
-    init(item: NewsItem, sectionTitle: String) {
+    init(item: NewsItemUI, sectionTitle: String) {
         super.init(frame: .zero)
         backgroundColor = .systemBackground
-
-        // Cargar imagen
-        if let url = URL(string: item.imageUrl) {
+        if let url = item.imageURL {
             newsImageView.kf.setImage(with: url)
         }
-
-        // Configurar título
         titleLabel.text(item.title)
 
         // Layout

@@ -17,36 +17,22 @@ final class LoginCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     weak var delegate: LoginCoordinatorDelegate?
     private let container: DIContainer
+    private let eventBus: AppEventBusProtocol
 
-    init(navigationController: UINavigationController, container: DIContainer) {
+    init(navigationController: UINavigationController, container: DIContainer, eventBus: AppEventBusProtocol) {
         self.navigationController = navigationController
         self.container = container
+        self.eventBus = eventBus
     }
 
     func start() {
         let loginVC = container.makeLoginViewController()
         loginVC.viewModel.coordinatorDelegate = self
-        
-        // Suscribirse a notificaciones como fallback
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleLoginSuccessfulNotification),
-            name: NSNotification.Name("LoginSuccessful"),
-            object: nil
-        )
-        
         navigationController.setViewControllers([loginVC], animated: false)
-    }
-    
-    @objc private func handleLoginSuccessfulNotification(_ notification: Notification) {
-        didFinishLogin()
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
 
     func didFinishLogin() {
+        eventBus.publish(.loginSuccess)
         delegate?.loginCoordinatorDidFinish(self)
     }
 }

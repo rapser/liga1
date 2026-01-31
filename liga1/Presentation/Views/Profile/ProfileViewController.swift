@@ -19,17 +19,19 @@ class ProfileViewController: UIViewController {
     // MARK: - Properties
     let viewModel: ProfileViewModel
     private let container: DIContainer
+    private let eventBus: AppEventBusProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
-    init(viewModel: ProfileViewModel, container: DIContainer) {
+    init(viewModel: ProfileViewModel, container: DIContainer, eventBus: AppEventBusProtocol) {
         self.viewModel = viewModel
         self.container = container
+        self.eventBus = eventBus
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented - use init(viewModel:container:)")
+        fatalError("init(coder:) has not been implemented - use init(viewModel:container:eventBus:)")
     }
 
     // MARK: - Lifecycle
@@ -96,7 +98,7 @@ class ProfileViewController: UIViewController {
             .filter { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.navigateToLogin()
+                self?.eventBus.publish(.logoutRequested)
             }
             .store(in: &cancellables)
     }
@@ -150,33 +152,9 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    private func navigateToLogin() {
-        NotificationCenter.default.post(name: NSNotification.Name("LogoutSuccessful"), object: nil)
-
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let window = windowScene.windows.first {
-                let loginCoordinator = self.container.makeLoginCoordinator(navigationController: UINavigationController())
-                loginCoordinator.delegate = nil
-                loginCoordinator.start()
-
-                window.rootViewController = loginCoordinator.navigationController
-                window.makeKeyAndVisible()
-
-                UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve, animations: nil)
-            }
-        }
-    }
-
     private func navigateToRegistrarPartidos() {
         let registrarPartidosVC = container.makeRegistrarPartidosViewController()
         navigationController?.pushViewController(registrarPartidosVC, animated: true)
-    }
-
-    private func navigateToNotificationHistory() {
-        let notificationHistoryVC = NotificationHistoryViewController()
-        navigationController?.pushViewController(notificationHistoryVC, animated: true)
     }
 
     private func openNotificationSettings() {
@@ -186,7 +164,12 @@ class ProfileViewController: UIViewController {
     }
 
     private func navigateToLogs() {
-        let logsVC = LogsViewController()
+        let logsVC = container.makeLogsViewController()
         navigationController?.pushViewController(logsVC, animated: true)
+    }
+
+    private func navigateToNotificationHistory() {
+        let notificationHistoryVC = container.makeNotificationHistoryViewController()
+        navigationController?.pushViewController(notificationHistoryVC, animated: true)
     }
 }

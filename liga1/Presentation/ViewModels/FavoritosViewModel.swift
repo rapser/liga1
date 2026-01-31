@@ -36,6 +36,7 @@ class FavoritosViewModel {
     private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
     private let toggleFavoriteTeamUseCase: ToggleFavoriteTeamUseCaseProtocol
     private let observeFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol
+    private let notificationTopicManager: NotificationTopicManagerProtocol
 
     // MARK: - Private Properties
 
@@ -49,7 +50,8 @@ class FavoritosViewModel {
         observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol,
         fetchTeamsUseCase: FetchTeamsUseCaseProtocol,
         toggleFavoriteTeamUseCase: ToggleFavoriteTeamUseCaseProtocol,
-        observeFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol
+        observeFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol,
+        notificationTopicManager: NotificationTopicManagerProtocol
     ) {
         self.fetchFavoriteMatchesUseCase = fetchFavoriteMatchesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
@@ -57,6 +59,7 @@ class FavoritosViewModel {
         self.fetchTeamsUseCase = fetchTeamsUseCase
         self.toggleFavoriteTeamUseCase = toggleFavoriteTeamUseCase
         self.observeFavoriteTeamsUseCase = observeFavoriteTeamsUseCase
+        self.notificationTopicManager = notificationTopicManager
 
         observeFavorites()
         observeFavoriteTeams()
@@ -94,10 +97,7 @@ class FavoritosViewModel {
                 if case .failure(let error) = completion {
                     Logger.shared.error("❌ FavoritosViewModel: Error al cambiar favorito para equipo: \(teamId)", error: error)
                 } else {
-                    // Forzar sincronización de topics después de cambiar favorito
-                    // El delay ya está manejado dentro de syncTopicsWithFavorites()
-                    let topicManager = DIContainer.shared.makeNotificationTopicManager()
-                    topicManager.syncTopicsWithFavorites()
+                    self.notificationTopicManager.syncTopicsWithFavorites()
                 }
             } receiveValue: { _ in
             }
