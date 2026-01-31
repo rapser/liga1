@@ -21,7 +21,6 @@ class TorneoViewModel {
     // MARK: - Dependencies
 
     private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
-    private let logger: LoggerProtocol
 
     // MARK: - Private Properties
 
@@ -32,9 +31,8 @@ class TorneoViewModel {
 
     // MARK: - Initialization
 
-    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol, logger: LoggerProtocol) {
+    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol) {
         self.fetchTeamsUseCase = fetchTeamsUseCase
-        self.logger = logger
     }
 
     // MARK: - Public Methods

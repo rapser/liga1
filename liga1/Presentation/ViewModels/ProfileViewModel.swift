@@ -22,14 +22,12 @@ class ProfileViewModel {
     // MARK: - Private Properties
 
     private let logoutUseCase: LogoutUseCaseProtocol
-    private let logger: LoggerProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
-    init(logoutUseCase: LogoutUseCaseProtocol, logger: LoggerProtocol) {
+    init(logoutUseCase: LogoutUseCaseProtocol) {
         self.logoutUseCase = logoutUseCase
-        self.logger = logger
         setupSections()
     }
 
@@ -44,7 +42,6 @@ class ProfileViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    self?.logger.error("Failed to logout", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] _ in

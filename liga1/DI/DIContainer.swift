@@ -240,8 +240,7 @@ final class DIContainer {
             observeActiveJornadasUseCase: makeObserveActiveJornadasUseCase(),
             fetchMatchesUseCase: makeFetchMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
-            observeFavoritesUseCase: makeObserveFavoritesUseCase(),
-            logger: makeLogger()
+            observeFavoritesUseCase: makeObserveFavoritesUseCase()
         )
     }
 
@@ -253,8 +252,7 @@ final class DIContainer {
 
     func makeTorneoViewModel() -> TorneoViewModel {
         return TorneoViewModel(
-            fetchTeamsUseCase: makeFetchTeamsUseCase(),
-            logger: makeLogger()
+            fetchTeamsUseCase: makeFetchTeamsUseCase()
         )
     }
 
@@ -266,15 +264,13 @@ final class DIContainer {
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
             toggleFavoriteTeamUseCase: makeToggleFavoriteTeamUseCase(),
             observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase(),
-            notificationTopicManager: makeNotificationTopicManager(),
-            logger: makeLogger()
+            notificationTopicManager: makeNotificationTopicManager()
         )
     }
 
     func makeProfileViewModel() -> ProfileViewModel {
         return ProfileViewModel(
-            logoutUseCase: makeLogoutUseCase(),
-            logger: makeLogger()
+            logoutUseCase: makeLogoutUseCase()
         )
     }
 
@@ -295,8 +291,7 @@ final class DIContainer {
     func makeNotificationSettingsViewModel() -> NotificationSettingsViewModel {
         return NotificationSettingsViewModel(
             updatePushNotificationsEnabledUseCase: makeUpdatePushNotificationsEnabledUseCase(),
-            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase(),
-            logger: makeLogger()
+            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase()
         )
     }
 
