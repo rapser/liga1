@@ -155,7 +155,11 @@ extension HomeTableViewAdapter: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 104 // 44 (header fecha) + 60 (header jornada)
     }
-    
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 70
+    }
+
     // Helper para formatear la fecha del header
     private func formatDateForHeader(_ date: Date) -> String {
         let calendar = Calendar.current
