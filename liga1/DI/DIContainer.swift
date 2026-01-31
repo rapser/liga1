@@ -48,14 +48,23 @@ final class DIContainer {
 
     // MARK: - Services
 
-    func makeAuthService() -> AuthServiceProtocol {
+    // Auth Module - usar AuthRepository en lugar de AuthServiceProtocol
+    private lazy var authService: AuthService = {
         return AuthService(logger: makeLogger())
+    }()
+
+    func makeAuthRepository() -> AuthRepository {
+        return authService
+    }
+
+    func makeAuthProvider() -> AuthProvider {
+        return authService
     }
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        return FavoritesService(database: makeDatabase(), authService: makeAuthService(), logger: makeLogger())
+        return FavoritesService(database: makeDatabase(), authService: authService, logger: makeLogger())
     }()
-    
+
     func makeFavoritesService() -> FavoritesServiceProtocol {
         return favoritesService
     }
@@ -69,9 +78,14 @@ final class DIContainer {
     }
 
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
-        return UserPreferencesService(database: makeDatabase(), authService: makeAuthService(), logger: makeLogger())
+        return UserPreferencesService(
+            database: makeDatabase(),
+            authProvider: makeAuthProvider(),
+            authRepository: makeAuthRepository(),
+            logger: makeLogger()
+        )
     }()
-    
+
     func makeUserPreferencesService() -> UserPreferencesServiceProtocol {
         return userPreferencesService
     }
@@ -196,14 +210,13 @@ final class DIContainer {
 
     func makeLoginUseCase() -> LoginUseCaseProtocol {
         return LoginUseCase(
-            authService: makeAuthService()
+            authRepository: makeAuthRepository()
         )
     }
 
     func makeLogoutUseCase() -> LogoutUseCaseProtocol {
         return LogoutUseCase(
-            authService: makeAuthService(),
-            logger: makeLogger()
+            authRepository: makeAuthRepository()
         )
     }
 
@@ -321,8 +334,15 @@ final class DIContainer {
         )
     }
 
-    func makeLoginViewController() -> LoginViewController {
-        return LoginViewController(viewModel: makeLoginViewModel())
+    func makeLoginViewController(presentingViewController: UIViewController) -> LoginViewController {
+        let viewModel = makeLoginViewModel()
+        let googleCredentialProvider = GoogleCredentialProviderImpl(
+            presentingViewController: presentingViewController
+        )
+        return LoginViewController(
+            viewModel: viewModel,
+            googleCredentialProvider: googleCredentialProvider
+        )
     }
 
     func makeRegistrarPartidosViewController() -> RegistrarPartidosViewController {

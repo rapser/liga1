@@ -8,7 +8,12 @@
 import Foundation
 
 /// Credencial de Google para firmar en Firebase (idToken + accessToken).
-struct GoogleCredential {
-    let idToken: String
-    let accessToken: String
+public struct GoogleCredential {
+    public let idToken: String
+    public let accessToken: String
+
+    public init(idToken: String, accessToken: String) {
+        self.idToken = idToken
+        self.accessToken = accessToken
+    }
 }

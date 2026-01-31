@@ -30,7 +30,7 @@ protocol FavoritesServiceProtocol {
 class FavoritesService: FavoritesServiceProtocol {
 
     private let database: DatabaseProtocol
-    private let authService: AuthServiceProtocol
+    private let authService: AuthService // Usar implementación concreta internamente
     private let logger: LoggerProtocol
 
     private let favoritesSubject = CurrentValueSubject<Set<String>, Never>([])
@@ -42,7 +42,7 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(database: DatabaseProtocol, authService: AuthServiceProtocol, logger: LoggerProtocol) {
+    init(database: DatabaseProtocol, authService: AuthService, logger: LoggerProtocol) {
         self.database = database
         self.authService = authService
         self.logger = logger

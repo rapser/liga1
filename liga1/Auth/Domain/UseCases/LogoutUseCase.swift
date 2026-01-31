@@ -3,38 +3,27 @@
 //  liga1
 //
 //  Auth/Domain: use case de logout.
+//  Refactored on 31/01/26 to use AuthRepository.
 //
 
 import Foundation
 import Combine
 
 /// Use Case para realizar logout
-protocol LogoutUseCaseProtocol {
+public protocol LogoutUseCaseProtocol {
     func execute() -> AnyPublisher<Void, Error>
 }
 
 class LogoutUseCase: LogoutUseCaseProtocol {
 
-    private let authService: AuthServiceProtocol
-    private let logger: LoggerProtocol
+    private let authRepository: AuthRepository
 
-    init(authService: AuthServiceProtocol, logger: LoggerProtocol) {
-        self.authService = authService
-        self.logger = logger
+    init(authRepository: AuthRepository) {
+        self.authRepository = authRepository
     }
 
     func execute() -> AnyPublisher<Void, Error> {
-
-        return authService.logout()
-            .handleEvents(
-                receiveOutput: { _ in
-                },
-                receiveCompletion: { [weak self] completion in
-                    if case .failure(let error) = completion {
-                        self?.logger.error("LogoutUseCase: Failed to logout user", error: error)
-                    }
-                }
-            )
+        return authRepository.logout()
             .eraseToAnyPublisher()
     }
 }

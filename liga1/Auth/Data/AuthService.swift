@@ -3,6 +3,7 @@
 //  liga1
 //
 //  Auth/Data: implementación de autenticación (Firebase Auth).
+//  Refactored on 31/01/26 to implement AuthRepository.
 //
 
 import Foundation
@@ -10,16 +11,8 @@ import FirebaseAuth
 import FirebaseCore
 import Combine
 
-protocol AuthServiceProtocol: AuthProvider {
-    func login(email: String, password: String) -> AnyPublisher<Void, Error>
-    func signInWithGoogle(credential: GoogleCredential) -> AnyPublisher<Void, Error>
-    func logout() -> AnyPublisher<Void, Error>
-    func getCurrentUser() -> AnyPublisher<User?, Never>
-    /// Emite cada vez que cambia el estado de autenticación (login/logout).
-    func observeCurrentUser() -> AnyPublisher<User?, Never>
-}
-
-class AuthService: AuthServiceProtocol, AuthProvider {
+/// Implementación de AuthRepository usando Firebase Auth
+class AuthService: AuthRepository, AuthProvider {
 
     // MARK: - Auth state observation
 
@@ -33,10 +26,20 @@ class AuthService: AuthServiceProtocol, AuthProvider {
         return Auth.auth().currentUser?.uid
     }
 
+    // MARK: - Initialization
+
     init(logger: LoggerProtocol) {
         self.logger = logger
-        authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
-            self?.currentUserSubject.send(user)
+
+        // Inicializar con el usuario actual si existe
+        if let firebaseUser = Auth.auth().currentUser {
+            currentUserSubject.send(UserMapper.toDomain(from: firebaseUser))
+        }
+
+        // Observar cambios en el estado de autenticación
+        authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, firebaseUser in
+            let domainUser = UserMapper.toDomainOptional(from: firebaseUser)
+            self?.currentUserSubject.send(domainUser)
         }
     }
 
@@ -46,32 +49,59 @@ class AuthService: AuthServiceProtocol, AuthProvider {
         }
     }
 
-    func login(email: String, password: String) -> AnyPublisher<Void, Error> {
-        return Future<Void, Error> { promise in
+    // MARK: - AuthRepository
+
+    func login(email: String, password: String) -> AnyPublisher<User, Error> {
+        return Future<User, Error> { promise in
             Auth.auth().signIn(withEmail: email, password: password) { result, error in
                 if let error = error {
                     promise(.failure(error))
-                } else {
-                    promise(.success(()))
+                    return
                 }
+
+                guard let firebaseUser = result?.user else {
+                    let error = NSError(
+                        domain: "AuthService",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "No se pudo obtener el usuario"]
+                    )
+                    promise(.failure(error))
+                    return
+                }
+
+                let user = UserMapper.toDomain(from: firebaseUser)
+                promise(.success(user))
             }
         }
         .eraseToAnyPublisher()
     }
 
-    func signInWithGoogle(credential: GoogleCredential) -> AnyPublisher<Void, Error> {
-        return Future<Void, Error> { promise in
+    func signInWithGoogle(credential: GoogleCredential) -> AnyPublisher<User, Error> {
+        return Future<User, Error> { promise in
             let firebaseCredential = GoogleAuthProvider.credential(
                 withIDToken: credential.idToken,
                 accessToken: credential.accessToken
             )
-            Auth.auth().signIn(with: firebaseCredential) { _, error in
+
+            Auth.auth().signIn(with: firebaseCredential) { result, error in
                 if let error = error {
                     self.logger.error("❌ AuthService: Error al autenticar con Firebase", error: error)
                     promise(.failure(error))
-                } else {
-                    promise(.success(()))
+                    return
                 }
+
+                guard let firebaseUser = result?.user else {
+                    let error = NSError(
+                        domain: "AuthService",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "No se pudo obtener el usuario"]
+                    )
+                    promise(.failure(error))
+                    return
+                }
+
+                let user = UserMapper.toDomain(from: firebaseUser)
+                promise(.success(user))
             }
         }
         .eraseToAnyPublisher()
@@ -90,12 +120,21 @@ class AuthService: AuthServiceProtocol, AuthProvider {
     }
 
     func getCurrentUser() -> AnyPublisher<User?, Never> {
-        return Just(Auth.auth().currentUser)
+        let firebaseUser = Auth.auth().currentUser
+        let domainUser = UserMapper.toDomainOptional(from: firebaseUser)
+        return Just(domainUser)
             .eraseToAnyPublisher()
     }
 
-    func observeCurrentUser() -> AnyPublisher<User?, Never> {
+    func observeAuthState() -> AnyPublisher<User?, Never> {
         return currentUserSubject
             .eraseToAnyPublisher()
+    }
+
+    // MARK: - Additional Methods (para compatibilidad interna)
+
+    /// Observa al usuario actual (alias de observeAuthState para compatibilidad)
+    func observeCurrentUser() -> AnyPublisher<User?, Never> {
+        return observeAuthState()
     }
 }

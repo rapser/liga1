@@ -12,7 +12,7 @@ import UIKit
 /// Delegate para comunicar eventos de navegación al Coordinator
 protocol LoginViewModelCoordinatorDelegate: AnyObject {
     func loginViewModelDidRequestGoogleSignIn(_ viewModel: LoginViewModel)
-    func loginViewModelDidLogin(_ viewModel: LoginViewModel)
+    func loginViewModelDidLogin(_ viewModel: LoginViewModel, user: User)
 }
 
 /// Delegate para comunicar eventos de UI al ViewController
@@ -69,10 +69,10 @@ class LoginViewModel {
                     self?.logger.error("❌ Login failed for email: \(email)", error: error)
                     self?.error = error.localizedDescription
                 }
-            } receiveValue: { [weak self] _ in
+            } receiveValue: { [weak self] user in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
-                    self.coordinatorDelegate?.loginViewModelDidLogin(self)
+                    self.coordinatorDelegate?.loginViewModelDidLogin(self, user: user)
                 }
             }
             .store(in: &cancellables)
@@ -90,7 +90,7 @@ class LoginViewModel {
     func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
-        let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController, logger: logger)
+        let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController)
         loginUseCase.executeWithGoogle(credentialProvider: credentialProvider)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -99,10 +99,10 @@ class LoginViewModel {
                     self?.logger.error("❌ Google Sign In failed", error: error)
                     self?.error = error.localizedDescription
                 }
-            } receiveValue: { [weak self] _ in
+            } receiveValue: { [weak self] user in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
-                    self.coordinatorDelegate?.loginViewModelDidLogin(self)
+                    self.coordinatorDelegate?.loginViewModelDidLogin(self, user: user)
                 }
             }
             .store(in: &cancellables)

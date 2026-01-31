@@ -9,6 +9,6 @@ import Foundation
 import Combine
 
 /// Proveedor de credencial de Google. La implementación (presentar UI, GIDSignIn) vive en Auth/Presentation.
-protocol GoogleCredentialProvider {
+public protocol GoogleCredentialProvider {
     func provideCredential() -> AnyPublisher<GoogleCredential, Error>
 }

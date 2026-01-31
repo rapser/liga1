@@ -3,26 +3,27 @@
 //  liga1
 //
 //  Auth/Domain: use case de login (sin UIKit).
+//  Refactored on 31/01/26 to use AuthRepository.
 //
 
 import Foundation
 import Combine
 
 /// Use Case para realizar login (Domain sin UIKit).
-protocol LoginUseCaseProtocol {
-    func execute(email: String, password: String) -> AnyPublisher<Void, Error>
-    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<Void, Error>
+public protocol LoginUseCaseProtocol {
+    func execute(email: String, password: String) -> AnyPublisher<User, Error>
+    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error>
 }
 
 class LoginUseCase: LoginUseCaseProtocol {
 
-    private let authService: AuthServiceProtocol
+    private let authRepository: AuthRepository
 
-    init(authService: AuthServiceProtocol) {
-        self.authService = authService
+    init(authRepository: AuthRepository) {
+        self.authRepository = authRepository
     }
 
-    func execute(email: String, password: String) -> AnyPublisher<Void, Error> {
+    func execute(email: String, password: String) -> AnyPublisher<User, Error> {
         guard !email.isEmpty, !password.isEmpty else {
             return Fail(error: NSError(
                 domain: "LoginUseCase",
@@ -39,16 +40,18 @@ class LoginUseCase: LoginUseCaseProtocol {
             ))
             .eraseToAnyPublisher()
         }
-        return authService.login(email: email, password: password)
+        return authRepository.login(email: email, password: password)
     }
 
-    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<Void, Error> {
+    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error> {
         return credentialProvider.provideCredential()
-            .flatMap { [weak self] credential -> AnyPublisher<Void, Error> in
+            .flatMap { [weak self] credential -> AnyPublisher<User, Error> in
                 guard let self = self else {
-                    return Fail<Void, Error>(error: NSError(domain: "LoginUseCase", code: -1, userInfo: nil)).eraseToAnyPublisher()
+                    return Fail<User, Error>(
+                        error: NSError(domain: "LoginUseCase", code: -1, userInfo: nil)
+                    ).eraseToAnyPublisher()
                 }
-                return self.authService.signInWithGoogle(credential: credential)
+                return self.authRepository.signInWithGoogle(credential: credential)
             }
             .eraseToAnyPublisher()
     }

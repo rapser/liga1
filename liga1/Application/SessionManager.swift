@@ -51,8 +51,9 @@ final class SessionManager {
         let logger = container.makeLogger()
         do {
             try Auth.auth().signOut()
-            let loginVC = container.makeLoginViewController()
-            let nav = UINavigationController(rootViewController: loginVC)
+            let nav = UINavigationController()
+            let loginVC = container.makeLoginViewController(presentingViewController: nav)
+            nav.setViewControllers([loginVC], animated: false)
             window?.rootViewController = nav
         } catch let error {
             logger.error("❌ Error al cerrar sesión", error: error)

@@ -13,12 +13,15 @@ class LoginViewController: UIViewController {
     // MARK: - Properties
 
     let viewModel: LoginViewModel
+    private let googleCredentialProvider: GoogleCredentialProvider
     private var cancellables = Set<AnyCancellable>()
+    weak var delegate: LoginViewControllerDelegate?
 
     // MARK: - Initialization
 
-    init(viewModel: LoginViewModel) {
+    init(viewModel: LoginViewModel, googleCredentialProvider: GoogleCredentialProvider) {
         self.viewModel = viewModel
+        self.googleCredentialProvider = googleCredentialProvider
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -82,6 +85,7 @@ class LoginViewController: UIViewController {
         view.backgroundColor = .appBackground
 
         viewModel.delegate = self
+        viewModel.coordinatorDelegate = self
 
         setupLayout()
         setupActions()
@@ -214,5 +218,17 @@ class LoginViewController: UIViewController {
 extension LoginViewController: LoginViewModelDelegate {
     func loginViewModelNeedsGoogleSignInPresentation(_ viewModel: LoginViewModel) {
         viewModel.performGoogleSignIn(presentingViewController: self)
+    }
+}
+
+// MARK: - LoginViewModelCoordinatorDelegate
+
+extension LoginViewController: LoginViewModelCoordinatorDelegate {
+    func loginViewModelDidRequestGoogleSignIn(_ viewModel: LoginViewModel) {
+        // No se usa actualmente
+    }
+
+    func loginViewModelDidLogin(_ viewModel: LoginViewModel, user: User) {
+        delegate?.loginViewControllerDidLogin(self, user: user)
     }
 }

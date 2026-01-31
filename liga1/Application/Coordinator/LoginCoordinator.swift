@@ -26,7 +26,7 @@ final class LoginCoordinator: Coordinator {
     }
 
     func start() {
-        let loginVC = container.makeLoginViewController()
+        let loginVC = container.makeLoginViewController(presentingViewController: navigationController)
         loginVC.viewModel.coordinatorDelegate = self
         navigationController.setViewControllers([loginVC], animated: false)
     }
@@ -45,7 +45,7 @@ extension LoginCoordinator: LoginViewModelCoordinatorDelegate {
         // Este método puede ser usado para analytics o logging
     }
 
-    func loginViewModelDidLogin(_ viewModel: LoginViewModel) {
+    func loginViewModelDidLogin(_ viewModel: LoginViewModel, user: User) {
         didFinishLogin()
     }
 }
