@@ -35,6 +35,7 @@ class LoginViewModel {
     // MARK: - Dependencies
 
     private let loginUseCase: LoginUseCaseProtocol
+    private let logger: LoggerProtocol
 
     // MARK: - Private Properties
 
@@ -42,8 +43,9 @@ class LoginViewModel {
 
     // MARK: - Initialization
 
-    init(loginUseCase: LoginUseCaseProtocol) {
+    init(loginUseCase: LoginUseCaseProtocol, logger: LoggerProtocol) {
         self.loginUseCase = loginUseCase
+        self.logger = logger
     }
 
     // MARK: - Public Methods
@@ -64,7 +66,7 @@ class LoginViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("❌ Login failed for email: \(email)", error: error)
+                    self?.logger.error("❌ Login failed for email: \(email)", error: error)
                     self?.error = error.localizedDescription
                 }
             } receiveValue: { [weak self] _ in
@@ -80,7 +82,7 @@ class LoginViewModel {
         if let delegate = delegate {
             delegate.loginViewModelNeedsGoogleSignInPresentation(self)
         } else {
-            Logger.shared.error("❌ LoginViewModel: delegate es nil - no se puede presentar Google Sign In", error: nil)
+            logger.error("❌ LoginViewModel: delegate es nil - no se puede presentar Google Sign In", error: nil)
             error = "Error de configuración. Por favor intenta de nuevo."
         }
     }
@@ -88,13 +90,13 @@ class LoginViewModel {
     func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
-        let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController)
+        let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController, logger: logger)
         loginUseCase.executeWithGoogle(credentialProvider: credentialProvider)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("❌ Google Sign In failed", error: error)
+                    self?.logger.error("❌ Google Sign In failed", error: error)
                     self?.error = error.localizedDescription
                 }
             } receiveValue: { [weak self] _ in

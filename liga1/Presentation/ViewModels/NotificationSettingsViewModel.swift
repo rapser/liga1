@@ -20,6 +20,7 @@ class NotificationSettingsViewModel {
 
     private let updatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCaseProtocol
     private let observeUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol
+    private let logger: LoggerProtocol
 
     // MARK: - Private Properties
 
@@ -29,10 +30,12 @@ class NotificationSettingsViewModel {
 
     init(
         updatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCaseProtocol,
-        observeUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol
+        observeUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol,
+        logger: LoggerProtocol
     ) {
         self.updatePushNotificationsEnabledUseCase = updatePushNotificationsEnabledUseCase
         self.observeUserPreferencesUseCase = observeUserPreferencesUseCase
+        self.logger = logger
 
         observePreferences()
     }
@@ -50,7 +53,7 @@ class NotificationSettingsViewModel {
                     self?.isLoading = false
 
                     if case .failure(let error) = completion {
-                        Logger.shared.error("❌ Error actualizando preferencias", error: error)
+                        self?.logger.error("❌ Error actualizando preferencias", error: error)
                         self?.errorMessage = "No se pudo actualizar la configuración. Intenta nuevamente."
 
                         // Revertir el cambio en la UI

@@ -27,11 +27,11 @@ final class DIContainer {
     // MARK: - Repositories
 
     func makeJornadasRepository() -> JornadasRepositoryProtocol {
-        return JornadasRepository(database: makeDatabase())
+        return JornadasRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     func makeMatchesRepository() -> MatchesRepositoryProtocol {
-        return MatchesRepository(database: makeDatabase())
+        return MatchesRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     func makeTeamsRepository() -> TeamsRepositoryProtocol {
@@ -39,21 +39,21 @@ final class DIContainer {
     }
 
     func makeNewsRepository() -> NewsRepositoryProtocol {
-        return NewsRepository(database: makeDatabase())
+        return NewsRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     func makeAdminMatchRepository() -> AdminMatchRepositoryProtocol {
-        return AdminMatchRepository(database: makeDatabase())
+        return AdminMatchRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     // MARK: - Services
 
     func makeAuthService() -> AuthServiceProtocol {
-        return AuthService()
+        return AuthService(logger: makeLogger())
     }
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        return FavoritesService(database: makeDatabase(), authService: makeAuthService())
+        return FavoritesService(database: makeDatabase(), authService: makeAuthService(), logger: makeLogger())
     }()
     
     func makeFavoritesService() -> FavoritesServiceProtocol {
@@ -69,7 +69,7 @@ final class DIContainer {
     }
 
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
-        return UserPreferencesService(database: makeDatabase(), authService: makeAuthService())
+        return UserPreferencesService(database: makeDatabase(), authService: makeAuthService(), logger: makeLogger())
     }()
     
     func makeUserPreferencesService() -> UserPreferencesServiceProtocol {
@@ -80,7 +80,8 @@ final class DIContainer {
         return NotificationTopicManager(
             notificationService: makeNotificationService(),
             favoritesService: makeFavoritesService(),
-            userPreferencesService: makeUserPreferencesService()
+            userPreferencesService: makeUserPreferencesService(),
+            logger: makeLogger()
         )
     }()
 
@@ -98,6 +99,12 @@ final class DIContainer {
         return notificationDeduplicator
     }
 
+    // MARK: - Logging
+
+    func makeLogger() -> LoggerProtocol {
+        return Logger.shared
+    }
+
     // MARK: - EventBus
 
     private lazy var appEventBus: AppEventBusProtocol = {
@@ -112,7 +119,8 @@ final class DIContainer {
 
     func makeFetchActiveJornadasUseCase() -> FetchActiveJornadasUseCaseProtocol {
         return FetchActiveJornadasUseCase(
-            repository: makeJornadasRepository()
+            repository: makeJornadasRepository(),
+            logger: makeLogger()
         )
     }
 
@@ -194,7 +202,8 @@ final class DIContainer {
 
     func makeLogoutUseCase() -> LogoutUseCaseProtocol {
         return LogoutUseCase(
-            authService: makeAuthService()
+            authService: makeAuthService(),
+            logger: makeLogger()
         )
     }
 
@@ -202,7 +211,8 @@ final class DIContainer {
 
     func makeRegisterMatchesUseCase() -> RegisterMatchesUseCaseProtocol {
         return RegisterMatchesUseCase(
-            adminMatchRepository: makeAdminMatchRepository()
+            adminMatchRepository: makeAdminMatchRepository(),
+            logger: makeLogger()
         )
     }
 
@@ -211,7 +221,8 @@ final class DIContainer {
     func makeUpdatePushNotificationsEnabledUseCase() -> UpdatePushNotificationsEnabledUseCaseProtocol {
         return UpdatePushNotificationsEnabledUseCase(
             userPreferencesService: makeUserPreferencesService(),
-            notificationTopicManager: makeNotificationTopicManager()
+            notificationTopicManager: makeNotificationTopicManager(),
+            logger: makeLogger()
         )
     }
 
@@ -229,7 +240,8 @@ final class DIContainer {
             observeActiveJornadasUseCase: makeObserveActiveJornadasUseCase(),
             fetchMatchesUseCase: makeFetchMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
-            observeFavoritesUseCase: makeObserveFavoritesUseCase()
+            observeFavoritesUseCase: makeObserveFavoritesUseCase(),
+            logger: makeLogger()
         )
     }
 
@@ -241,7 +253,8 @@ final class DIContainer {
 
     func makeTorneoViewModel() -> TorneoViewModel {
         return TorneoViewModel(
-            fetchTeamsUseCase: makeFetchTeamsUseCase()
+            fetchTeamsUseCase: makeFetchTeamsUseCase(),
+            logger: makeLogger()
         )
     }
 
@@ -253,32 +266,37 @@ final class DIContainer {
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
             toggleFavoriteTeamUseCase: makeToggleFavoriteTeamUseCase(),
             observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase(),
-            notificationTopicManager: makeNotificationTopicManager()
+            notificationTopicManager: makeNotificationTopicManager(),
+            logger: makeLogger()
         )
     }
 
     func makeProfileViewModel() -> ProfileViewModel {
         return ProfileViewModel(
-            logoutUseCase: makeLogoutUseCase()
+            logoutUseCase: makeLogoutUseCase(),
+            logger: makeLogger()
         )
     }
 
     func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            loginUseCase: makeLoginUseCase()
+            loginUseCase: makeLoginUseCase(),
+            logger: makeLogger()
         )
     }
 
     func makeRegistrarPartidosViewModel() -> RegistrarPartidosViewModel {
         return RegistrarPartidosViewModel(
-            registerMatchesUseCase: makeRegisterMatchesUseCase()
+            registerMatchesUseCase: makeRegisterMatchesUseCase(),
+            logger: makeLogger()
         )
     }
 
     func makeNotificationSettingsViewModel() -> NotificationSettingsViewModel {
         return NotificationSettingsViewModel(
             updatePushNotificationsEnabledUseCase: makeUpdatePushNotificationsEnabledUseCase(),
-            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase()
+            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase(),
+            logger: makeLogger()
         )
     }
 
@@ -317,7 +335,7 @@ final class DIContainer {
     }
 
     func makeLogsViewController() -> LogsViewController {
-        return LogsViewController()
+        return LogsViewController(logger: makeLogger())
     }
 
     func makeNotificationHistoryViewController() -> NotificationHistoryViewController {
@@ -327,7 +345,7 @@ final class DIContainer {
     // MARK: - Coordinators
 
     func makeAppCoordinator(window: UIWindow) -> AppCoordinator {
-        return AppCoordinator(window: window, container: self, eventBus: makeAppEventBus())
+        return AppCoordinator(window: window, container: self, eventBus: makeAppEventBus(), logger: makeLogger())
     }
 
     func makeLoginCoordinator(navigationController: UINavigationController) -> LoginCoordinator {

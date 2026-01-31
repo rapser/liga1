@@ -13,11 +13,13 @@ import Combine
 class JornadasRepository: JornadasRepositoryProtocol {
 
     private let database: DatabaseProtocol
+    private let logger: LoggerProtocol
 
     private let jornadasSubject = CurrentValueSubject<[Jornada], Never>([])
 
-    init(database: DatabaseProtocol) {
+    init(database: DatabaseProtocol, logger: LoggerProtocol) {
         self.database = database
+        self.logger = logger
     }
 
     private var db: Firestore {
@@ -41,7 +43,7 @@ class JornadasRepository: JornadasRepositoryProtocol {
                     }
 
                     guard let documents = snapshot?.documents else {
-                        Logger.shared.warning("JornadasRepository: No documents found")
+                        self.logger.warning("JornadasRepository: No documents found")
                     promise(.success([]))
                     return
                 }
@@ -66,13 +68,13 @@ class JornadasRepository: JornadasRepositoryProtocol {
                             
                             
                             // Convertir DTO a entidad de dominio, pasando el documentID por si falta
-                            if let jornada = JornadaMapper.toDomain(from: dto, documentID: doc.documentID) {
+                            if let jornada = JornadaMapper.toDomain(from: dto, documentID: doc.documentID, logger: self.logger) {
                                 jornadas.append(jornada)
                             } else {
-                                Logger.shared.warning("JornadasRepository: Failed to map jornada from document \(doc.documentID)")
+                                self.logger.warning("JornadasRepository: Failed to map jornada from document \(doc.documentID)")
                             }
                         } catch {
-                            Logger.shared.error("JornadasRepository: Failed to decode JornadaDTO for document \(doc.documentID)", error: error)
+                            self.logger.error("JornadasRepository: Failed to decode JornadaDTO for document \(doc.documentID)", error: error)
                             // Intentar crear jornada manualmente desde el documentID si la decodificación falla
                             let data = doc.data()
                             if let mostrar = data[FirestoreConstants.JornadaField.mostrar] as? Bool,
@@ -84,7 +86,7 @@ class JornadasRepository: JornadasRepositoryProtocol {
                                     numero: nil,
                                     torneo: nil,
                                     fechaInicio: data[FirestoreConstants.JornadaField.fechaInicio] as? Timestamp
-                                ), documentID: doc.documentID) {
+                                ), documentID: doc.documentID, logger: self.logger) {
                                     jornadas.append(jornada)
                                 }
                             }

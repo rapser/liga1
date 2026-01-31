@@ -12,9 +12,8 @@ import FirebaseFirestore
 struct MatchMapper {
 
     /// Convierte MatchDTO a Match (Domain Model)
-    static func toDomain(from dto: MatchDTO) -> Match? {
+    static func toDomain(from dto: MatchDTO, logger: LoggerProtocol) -> Match? {
         guard let fecha = dto.fecha?.dateValue() else {
-            Logger.shared.warning("MatchMapper: Missing fecha in MatchDTO with id: \(dto.id ?? "unknown")")
             return nil
         }
 
@@ -28,7 +27,6 @@ struct MatchMapper {
                   !equipoVisitanteId.isEmpty {
             matchId = "\(equipoLocalId)_\(equipoVisitanteId)"
         } else {
-            Logger.shared.warning("MatchMapper: Cannot construct matchId - missing id, equipoLocalId (\(dto.equipoLocalId ?? "nil")), or equipoVisitanteId (\(dto.equipoVisitanteId ?? "nil"))")
             return nil
         }
 
@@ -67,7 +65,7 @@ struct MatchMapper {
     }
 
     /// Convierte array de MatchDTO a array de Match
-    static func toDomain(from dtos: [MatchDTO]) -> [Match] {
-        return dtos.compactMap { toDomain(from: $0) }
+    static func toDomain(from dtos: [MatchDTO], logger: LoggerProtocol) -> [Match] {
+        return dtos.compactMap { toDomain(from: $0, logger: logger) }
     }
 }

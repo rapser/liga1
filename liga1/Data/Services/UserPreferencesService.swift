@@ -22,6 +22,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
 
     private let database: DatabaseProtocol
     private let authService: AuthServiceProtocol
+    private let logger: LoggerProtocol
     private let preferencesSubject = CurrentValueSubject<UserPreferences?, Never>(nil)
 
     private var db: Firestore {
@@ -30,9 +31,10 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(database: DatabaseProtocol, authService: AuthServiceProtocol) {
+    init(database: DatabaseProtocol, authService: AuthServiceProtocol, logger: LoggerProtocol) {
         self.database = database
         self.authService = authService
+        self.logger = logger
 
         authService.observeCurrentUser()
             .receive(on: DispatchQueue.main)
@@ -64,7 +66,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
         guard let docRef = getPreferencesDocumentRef() else { return }
         docRef.getDocument { [weak self] snapshot, error in
             if let error = error {
-                Logger.shared.error("Error fetching user preferences", error: error)
+                self?.logger.error("Error fetching user preferences", error: error)
                 return
             }
             guard let data = snapshot?.data() else {
@@ -76,7 +78,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                 let preferences = UserPreferencesMapper.toDomain(from: dto)
                 self?.preferencesSubject.send(preferences)
             } catch {
-                Logger.shared.error("Error decoding user preferences", error: error)
+                self?.logger.error("Error decoding user preferences", error: error)
                 self?.preferencesSubject.send(UserPreferences())
             }
         }
@@ -94,7 +96,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
 
             docRef.getDocument { snapshot, error in
                 if let error = error {
-                    Logger.shared.error("Error fetching user preferences", error: error)
+                    self.logger.error("Error fetching user preferences", error: error)
                     promise(.failure(error))
                     return
                 }
@@ -109,7 +111,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                     let preferences = UserPreferencesMapper.toDomain(from: dto)
                     promise(.success(preferences))
                 } catch {
-                    Logger.shared.error("Error decoding preferences", error: error)
+                    self.logger.error("Error decoding preferences", error: error)
                     promise(.failure(error))
                 }
             }
@@ -130,7 +132,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                 FirestoreConstants.PreferencesField.updatedAt: FieldValue.serverTimestamp()
             ], merge: true) { error in
                 if let error = error {
-                    Logger.shared.error("Error updating push notifications enabled", error: error)
+                    self.logger.error("Error updating push notifications enabled", error: error)
                     promise(.failure(error))
                 } else {
                     promise(.success(()))
@@ -160,7 +162,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                         FirestoreConstants.PreferencesField.updatedAt: FieldValue.serverTimestamp()
                     ]) { setError in
                         if let setError = setError {
-                            Logger.shared.error("Error creating preferences with topic", error: setError)
+                            self.logger.error("Error creating preferences with topic", error: setError)
                             promise(.failure(setError))
                         } else {
                             promise(.success(()))
@@ -189,7 +191,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                 FirestoreConstants.PreferencesField.updatedAt: FieldValue.serverTimestamp()
             ]) { error in
                 if let error = error {
-                    Logger.shared.error("Error removing topic", error: error)
+                    self.logger.error("Error removing topic", error: error)
                     promise(.failure(error))
                 } else {
                     promise(.success(()))
@@ -213,7 +215,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
                 FirestoreConstants.PreferencesField.updatedAt: FieldValue.serverTimestamp()
             ], merge: true) { error in
                 if let error = error {
-                    Logger.shared.error("Error setting subscribed topics", error: error)
+                    self.logger.error("Error setting subscribed topics", error: error)
                     promise(.failure(error))
                 } else {
                     promise(.success(()))

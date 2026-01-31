@@ -55,7 +55,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             do {
                 try await UNUserNotificationCenter.current().setBadgeCount(0)
             } catch {
-                Logger.shared.error("Error al limpiar badge", error: error)
+                DIContainer.shared.makeLogger().error("Error al limpiar badge", error: error)
             }
         }
     }

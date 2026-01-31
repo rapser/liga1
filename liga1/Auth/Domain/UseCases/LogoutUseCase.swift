@@ -16,9 +16,11 @@ protocol LogoutUseCaseProtocol {
 class LogoutUseCase: LogoutUseCaseProtocol {
 
     private let authService: AuthServiceProtocol
+    private let logger: LoggerProtocol
 
-    init(authService: AuthServiceProtocol) {
+    init(authService: AuthServiceProtocol, logger: LoggerProtocol) {
         self.authService = authService
+        self.logger = logger
     }
 
     func execute() -> AnyPublisher<Void, Error> {
@@ -27,9 +29,9 @@ class LogoutUseCase: LogoutUseCaseProtocol {
             .handleEvents(
                 receiveOutput: { _ in
                 },
-                receiveCompletion: { completion in
+                receiveCompletion: { [weak self] completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("LogoutUseCase: Failed to logout user", error: error)
+                        self?.logger.error("LogoutUseCase: Failed to logout user", error: error)
                     }
                 }
             )

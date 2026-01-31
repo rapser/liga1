@@ -45,17 +45,17 @@ final class SessionManager {
     // MARK: - Logout
     func logout() {
         guard let container = container else {
-            Logger.shared.error("❌ SessionManager: Container no configurado", error: nil)
+            DIContainer.shared.makeLogger().error("❌ SessionManager: Container no configurado", error: nil)
             return
         }
-
+        let logger = container.makeLogger()
         do {
             try Auth.auth().signOut()
             let loginVC = container.makeLoginViewController()
             let nav = UINavigationController(rootViewController: loginVC)
             window?.rootViewController = nav
         } catch let error {
-            Logger.shared.error("❌ Error al cerrar sesión", error: error)
+            logger.error("❌ Error al cerrar sesión", error: error)
         }
     }
     

@@ -31,6 +31,7 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private let database: DatabaseProtocol
     private let authService: AuthServiceProtocol
+    private let logger: LoggerProtocol
 
     private let favoritesSubject = CurrentValueSubject<Set<String>, Never>([])
     private let favoriteTeamsSubject = CurrentValueSubject<Set<String>, Never>([])
@@ -41,9 +42,10 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(database: DatabaseProtocol, authService: AuthServiceProtocol) {
+    init(database: DatabaseProtocol, authService: AuthServiceProtocol, logger: LoggerProtocol) {
         self.database = database
         self.authService = authService
+        self.logger = logger
 
         authService.observeCurrentUser()
             .receive(on: DispatchQueue.main)
@@ -77,7 +79,7 @@ class FavoritesService: FavoritesServiceProtocol {
                 .collection(FirestoreConstants.Collection.favorites)
                 .getDocuments { snapshot, error in
                     if let error = error {
-                        Logger.shared.error("Error fetching favorites", error: error)
+                        self.logger.error("Error fetching favorites", error: error)
                         promise(.failure(error))
                         return
                     }
@@ -100,7 +102,7 @@ class FavoritesService: FavoritesServiceProtocol {
                 .collection("favoriteTeams")
                 .getDocuments { snapshot, error in
                     if let error = error {
-                        Logger.shared.error("Error fetching favorite teams", error: error)
+                        self.logger.error("Error fetching favorite teams", error: error)
                         promise(.failure(error))
                         return
                     }
@@ -196,7 +198,7 @@ class FavoritesService: FavoritesServiceProtocol {
 
             favRef.getDocument { snapshot, error in
                 if let error = error {
-                    Logger.shared.error("Error obteniendo documento", error: error)
+                    self.logger.error("Error obteniendo documento", error: error)
                     promise(.failure(error))
                     return
                 }
@@ -204,7 +206,7 @@ class FavoritesService: FavoritesServiceProtocol {
                 if snapshot?.exists == true {
                     favRef.delete { error in
                         if let error = error {
-                            Logger.shared.error("Error eliminando favorito", error: error)
+                            self.logger.error("Error eliminando favorito", error: error)
                             promise(.failure(error))
                         } else {
                             promise(.success(false))
@@ -217,7 +219,7 @@ class FavoritesService: FavoritesServiceProtocol {
                         "timestamp": FieldValue.serverTimestamp()
                     ]) { error in
                         if let error = error {
-                            Logger.shared.error("Error agregando favorito", error: error)
+                            self.logger.error("Error agregando favorito", error: error)
                             promise(.failure(error))
                         } else {
                             promise(.success(true))

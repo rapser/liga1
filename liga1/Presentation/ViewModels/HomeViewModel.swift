@@ -24,6 +24,7 @@ class HomeViewModel {
     private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
     private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
     private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
+    private let logger: LoggerProtocol
 
     // MARK: - Private Properties
 
@@ -36,13 +37,15 @@ class HomeViewModel {
         observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol,
         fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
         toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
-        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
+        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol,
+        logger: LoggerProtocol
     ) {
         self.fetchActiveJornadasUseCase = fetchActiveJornadasUseCase
         self.observeActiveJornadasUseCase = observeActiveJornadasUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
         self.observeFavoritesUseCase = observeFavoritesUseCase
+        self.logger = logger
 
         observeActiveJornadas()
         observeFavorites()
@@ -59,7 +62,7 @@ class HomeViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to fetch active jornadas", error: error)
+                    self?.logger.error("Failed to fetch active jornadas", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] jornadas in
@@ -73,7 +76,7 @@ class HomeViewModel {
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 if case .failure(let error) = completion {
-                    Logger.shared.error("HomeViewModel: Failed to toggle favorite for match: \(matchId)", error: error)
+                    self.logger.error("HomeViewModel: Failed to toggle favorite for match: \(matchId)", error: error)
                 }
             } receiveValue: { _ in
                 // Favorite toggled successfully
@@ -122,7 +125,7 @@ class HomeViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case .failure(let error) = completion {
-                    Logger.shared.error("HomeViewModel: Failed to load matches for jornadas", error: error)
+                    self?.logger.error("HomeViewModel: Failed to load matches for jornadas", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] results in

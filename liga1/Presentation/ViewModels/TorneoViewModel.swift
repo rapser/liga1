@@ -21,6 +21,7 @@ class TorneoViewModel {
     // MARK: - Dependencies
 
     private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
+    private let logger: LoggerProtocol
 
     // MARK: - Private Properties
 
@@ -31,8 +32,9 @@ class TorneoViewModel {
 
     // MARK: - Initialization
 
-    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol) {
+    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol, logger: LoggerProtocol) {
         self.fetchTeamsUseCase = fetchTeamsUseCase
+        self.logger = logger
     }
 
     // MARK: - Public Methods
@@ -94,7 +96,6 @@ class TorneoViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to fetch teams for torneo: \(torneo)", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] teams in
@@ -125,7 +126,6 @@ class TorneoViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to fetch acumulado teams", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] (aperturaTeams, clausuraTeams) in

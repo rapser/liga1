@@ -25,6 +25,7 @@ class AuthService: AuthServiceProtocol, AuthProvider {
 
     private let currentUserSubject = CurrentValueSubject<User?, Never>(nil)
     private var authStateListenerHandle: AuthStateDidChangeListenerHandle?
+    private let logger: LoggerProtocol
 
     // MARK: - AuthProvider
 
@@ -32,7 +33,8 @@ class AuthService: AuthServiceProtocol, AuthProvider {
         return Auth.auth().currentUser?.uid
     }
 
-    init() {
+    init(logger: LoggerProtocol) {
+        self.logger = logger
         authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             self?.currentUserSubject.send(user)
         }
@@ -65,7 +67,7 @@ class AuthService: AuthServiceProtocol, AuthProvider {
             )
             Auth.auth().signIn(with: firebaseCredential) { _, error in
                 if let error = error {
-                    Logger.shared.error("❌ AuthService: Error al autenticar con Firebase", error: error)
+                    self.logger.error("❌ AuthService: Error al autenticar con Firebase", error: error)
                     promise(.failure(error))
                 } else {
                     promise(.success(()))

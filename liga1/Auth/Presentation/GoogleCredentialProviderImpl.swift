@@ -15,9 +15,11 @@ import FirebaseCore
 final class GoogleCredentialProviderImpl: GoogleCredentialProvider {
 
     private weak var presentingViewController: UIViewController?
+    private let logger: LoggerProtocol
 
-    init(presentingViewController: UIViewController) {
+    init(presentingViewController: UIViewController, logger: LoggerProtocol) {
         self.presentingViewController = presentingViewController
+        self.logger = logger
     }
 
     func provideCredential() -> AnyPublisher<GoogleCredential, Error> {
@@ -28,7 +30,7 @@ final class GoogleCredentialProviderImpl: GoogleCredentialProvider {
                 return
             }
             guard let clientID = FirebaseApp.app()?.options.clientID else {
-                Logger.shared.error("❌ GoogleCredentialProviderImpl: No se pudo obtener clientID", error: nil)
+                self.logger.error("❌ GoogleCredentialProviderImpl: No se pudo obtener clientID", error: nil)
                 promise(.failure(NSError(domain: "GoogleCredentialProviderImpl", code: -2, userInfo: [NSLocalizedDescriptionKey: "Error al configurar Google Sign In"])))
                 return
             }
@@ -36,13 +38,13 @@ final class GoogleCredentialProviderImpl: GoogleCredentialProvider {
             GIDSignIn.sharedInstance.configuration = config
             GIDSignIn.sharedInstance.signIn(withPresenting: presenting) { result, error in
                 if let error = error {
-                    Logger.shared.error("❌ GoogleCredentialProviderImpl: Error en Google Sign In", error: error)
+                    self.logger.error("❌ GoogleCredentialProviderImpl: Error en Google Sign In", error: error)
                     promise(.failure(error))
                     return
                 }
                 guard let user = result?.user,
                       let idToken = user.idToken?.tokenString else {
-                    Logger.shared.error("❌ GoogleCredentialProviderImpl: No se pudo obtener credenciales", error: nil)
+                    self.logger.error("❌ GoogleCredentialProviderImpl: No se pudo obtener credenciales", error: nil)
                     promise(.failure(NSError(domain: "GoogleCredentialProviderImpl", code: -3, userInfo: [NSLocalizedDescriptionKey: "Error al obtener credenciales de Google"])))
                     return
                 }

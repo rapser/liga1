@@ -22,17 +22,7 @@ class FetchNewsUseCase: FetchNewsUseCaseProtocol {
     }
 
     func execute() -> AnyPublisher<[NewsItem], Error> {
-
         return repository.fetchNews()
-            .handleEvents(
-                receiveOutput: { news in
-                },
-                receiveCompletion: { completion in
-                    if case .failure(let error) = completion {
-                        Logger.shared.error("FetchNewsUseCase: Failed to fetch news", error: error)
-                    }
-                }
-            )
             .eraseToAnyPublisher()
     }
 }

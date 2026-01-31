@@ -13,9 +13,11 @@ import Combine
 class NewsRepository: NewsRepositoryProtocol {
 
     private let database: DatabaseProtocol
+    private let logger: LoggerProtocol
 
-    init(database: DatabaseProtocol) {
+    init(database: DatabaseProtocol, logger: LoggerProtocol) {
         self.database = database
+        self.logger = logger
     }
 
     private var db: Firestore {
@@ -34,7 +36,7 @@ class NewsRepository: NewsRepositoryProtocol {
                 .order(by: FirestoreConstants.NewsField.fecha, descending: true)
                 .getDocuments { snapshot, error in
                     if let error = error {
-                        Logger.shared.error("NewsRepository: Error fetching documents", error: error)
+                        self.logger.error("NewsRepository: Error fetching documents", error: error)
                         promise(.failure(error))
                         return
                     }

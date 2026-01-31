@@ -17,12 +17,14 @@ final class AppCoordinator: Coordinator {
     let window: UIWindow
     private let container: DIContainer
     private let eventBus: AppEventBusProtocol
+    private let logger: LoggerProtocol
     private var cancellables = Set<AnyCancellable>()
 
-    init(window: UIWindow, container: DIContainer, eventBus: AppEventBusProtocol) {
+    init(window: UIWindow, container: DIContainer, eventBus: AppEventBusProtocol, logger: LoggerProtocol) {
         self.window = window
         self.container = container
         self.eventBus = eventBus
+        self.logger = logger
         self.navigationController = UINavigationController()
         eventBus.events()
             .receive(on: DispatchQueue.main)
@@ -42,7 +44,7 @@ final class AppCoordinator: Coordinator {
     private func handleLoginSuccess() {
         childCoordinators.removeAll()
         guard Auth.auth().currentUser != nil else {
-            Logger.shared.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
+            self.logger.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
             return
         }
         DispatchQueue.main.async { [weak self] in
@@ -53,11 +55,11 @@ final class AppCoordinator: Coordinator {
     private func handleLogoutRequested() {
         childCoordinators.removeAll()
         if Auth.auth().currentUser != nil {
-            Logger.shared.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
+            self.logger.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
             do {
                 try Auth.auth().signOut()
             } catch {
-                Logger.shared.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
+                self.logger.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
             }
         }
         DispatchQueue.main.async { [weak self] in
