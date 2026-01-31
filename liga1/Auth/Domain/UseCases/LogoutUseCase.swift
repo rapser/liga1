@@ -2,7 +2,7 @@
 //  LogoutUseCase.swift
 //  liga1
 //
-//  Created by miguel tomairo on 02/01/26.
+//  Auth/Domain: use case de logout.
 //
 
 import Foundation

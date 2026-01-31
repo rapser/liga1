@@ -2,7 +2,7 @@
 //  GoogleCredentialProviderImpl.swift
 //  liga1
 //
-//  Presentation: obtiene credencial de Google presentando la UI (GIDSignIn).
+//  Auth/Presentation: obtiene credencial de Google presentando la UI (GIDSignIn).
 //
 
 import Foundation

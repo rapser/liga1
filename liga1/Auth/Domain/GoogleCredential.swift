@@ -2,7 +2,7 @@
 //  GoogleCredential.swift
 //  liga1
 //
-//  Domain: valor para autenticación con Google (sin UIKit).
+//  Auth/Domain: valor para autenticación con Google (sin UIKit).
 //
 
 import Foundation

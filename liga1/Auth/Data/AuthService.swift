@@ -2,7 +2,7 @@
 //  AuthService.swift
 //  liga1
 //
-//  Created by miguel tomairo on 02/01/26.
+//  Auth/Data: implementación de autenticación (Firebase Auth).
 //
 
 import Foundation

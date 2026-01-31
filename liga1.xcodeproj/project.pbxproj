@@ -324,7 +324,6 @@
 			isa = PBXGroup;
 			children = (
 				46C3EB072F2942BF00E9EA0C /* Notifications */,
-				46D8209D2F09D71600FAA836 /* Auth */,
 				464009B62F098D4F00A8C905 /* Constants */,
 				464009B82F098D4F00A8C905 /* Firebase */,
 				464009BA2F098D4F00A8C905 /* Logging */,
@@ -350,7 +349,6 @@
 			children = (
 				464B95A92F2875D1001C4049 /* NotificationTopicManager.swift */,
 				464B95AA2F2875D1001C4049 /* UserPreferencesService.swift */,
-				464001832F08853F00A8C905 /* AuthService.swift */,
 				464001842F08853F00A8C905 /* FavoritesService.swift */,
 			);
 			path = Services;
@@ -373,7 +371,6 @@
 			children = (
 				464B95B22F287601001C4049 /* Notifications */,
 				464009BF2F098D8D00A8C905 /* Admin */,
-				464009C22F098D8D00A8C905 /* Auth */,
 				464009C62F098D8D00A8C905 /* Favorites */,
 				464009C82F098D8D00A8C905 /* Jornadas */,
 				464009CA2F098D8D00A8C905 /* Matches */,
@@ -386,7 +383,6 @@
 		4640018E2F08853F00A8C905 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
-				46B2E9482F2DB2D800EB66B3 /* Auth */,
 				46CDF4AA2F1086F100F280E6 /* Repositories */,
 				46CDF4772F1061E600F280E6 /* Entities */,
 				4640018D2F08853F00A8C905 /* UseCases */,
@@ -431,7 +427,6 @@
 				464009D92F098DBB00A8C905 /* RegistrarPartidosViewModel.swift */,
 				464001972F08853F00A8C905 /* FavoritosViewModel.swift */,
 				464001982F08853F00A8C905 /* HomeViewModel.swift */,
-				464001992F08853F00A8C905 /* LoginViewModel.swift */,
 				4640019A2F08853F00A8C905 /* NewsViewModel.swift */,
 				4640019B2F08853F00A8C905 /* ProfileViewModel.swift */,
 				4640019C2F08853F00A8C905 /* TorneoViewModel.swift */,
@@ -445,7 +440,6 @@
 				464009DC2F098DF600A8C905 /* Admin */,
 				464009DE2F098DF600A8C905 /* Favoritos */,
 				464009E12F098DF600A8C905 /* Home */,
-				464009E32F098DF600A8C905 /* Login */,
 				464009E82F098DF600A8C905 /* News */,
 				464009EB2F098DF600A8C905 /* Profile */,
 				464009ED2F098DF600A8C905 /* TabBar */,
@@ -457,7 +451,6 @@
 		464001B42F08853F00A8C905 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
-				46B2E94C2F2DB2FF00EB66B3 /* Auth */,
 				46CDF4872F10623000F280E6 /* Mappers */,
 				46D820A02F09D72A00FAA836 /* Models */,
 				464001962F08853F00A8C905 /* Components */,
@@ -499,15 +492,6 @@
 				464009BE2F098D8D00A8C905 /* RegisterMatchesUseCase.swift */,
 			);
 			path = Admin;
-			sourceTree = "<group>";
-		};
-		464009C22F098D8D00A8C905 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				464009C02F098D8D00A8C905 /* LoginUseCase.swift */,
-				464009C12F098D8D00A8C905 /* LogoutUseCase.swift */,
-			);
-			path = Auth;
 			sourceTree = "<group>";
 		};
 		464009C62F098D8D00A8C905 /* Favorites */ = {
@@ -583,14 +567,6 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
-		464009E32F098DF600A8C905 /* Login */ = {
-			isa = PBXGroup;
-			children = (
-				464009E22F098DF600A8C905 /* LoginViewController.swift */,
-			);
-			path = Login;
-			sourceTree = "<group>";
-		};
 		464009E82F098DF600A8C905 /* News */ = {
 			isa = PBXGroup;
 			children = (
@@ -663,6 +639,70 @@
 			path = Notifications;
 			sourceTree = "<group>";
 		};
+		46A0E1002F2E000100A8C905 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				46A0E1012F2E000100A8C905 /* Domain */,
+				46A0E1022F2E000100A8C905 /* Data */,
+				46A0E1032F2E000100A8C905 /* Presentation */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		46A0E1012F2E000100A8C905 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				46D8209C2F09D71600FAA836 /* AuthProvider.swift */,
+				46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */,
+				46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */,
+				46A0E1042F2E000100A8C905 /* UseCases */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		46A0E1022F2E000100A8C905 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				464001832F08853F00A8C905 /* AuthService.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		46A0E1032F2E000100A8C905 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */,
+				46A0E1052F2E000100A8C905 /* ViewModels */,
+				46A0E1062F2E000100A8C905 /* Views */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
+		46A0E1042F2E000100A8C905 /* UseCases */ = {
+			isa = PBXGroup;
+			children = (
+				464009C02F098D8D00A8C905 /* LoginUseCase.swift */,
+				464009C12F098D8D00A8C905 /* LogoutUseCase.swift */,
+			);
+			path = UseCases;
+			sourceTree = "<group>";
+		};
+		46A0E1052F2E000100A8C905 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				464001992F08853F00A8C905 /* LoginViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		46A0E1062F2E000100A8C905 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				464009E22F098DF600A8C905 /* LoginViewController.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		46B2E9422F2DB2C800EB66B3 /* Events */ = {
 			isa = PBXGroup;
 			children = (
@@ -671,23 +711,6 @@
 				46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */,
 			);
 			path = Events;
-			sourceTree = "<group>";
-		};
-		46B2E9482F2DB2D800EB66B3 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */,
-				46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */,
-			);
-			path = Auth;
-			sourceTree = "<group>";
-		};
-		46B2E94C2F2DB2FF00EB66B3 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */,
-			);
-			path = Auth;
 			sourceTree = "<group>";
 		};
 		46C3EB072F2942BF00E9EA0C /* Notifications */ = {
@@ -885,14 +908,6 @@
 			path = Repositories;
 			sourceTree = "<group>";
 		};
-		46D8209D2F09D71600FAA836 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				46D8209C2F09D71600FAA836 /* AuthProvider.swift */,
-			);
-			path = Auth;
-			sourceTree = "<group>";
-		};
 		46D820A02F09D72A00FAA836 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -934,6 +949,7 @@
 			isa = PBXGroup;
 			children = (
 				46C3EB192F2B128D00E9EA0C /* AppKit */,
+				46A0E1002F2E000100A8C905 /* Auth */,
 				46C874522F1B68B8008C3619 /* liga1.entitlements */,
 				46D995C62C6EC90700D4951C /* Application */,
 				4640017A2F08853F00A8C905 /* Core */,

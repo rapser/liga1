@@ -2,7 +2,7 @@
 //  LoginUseCase.swift
 //  liga1
 //
-//  Created by miguel tomairo on 02/01/26.
+//  Auth/Domain: use case de login (sin UIKit).
 //
 
 import Foundation

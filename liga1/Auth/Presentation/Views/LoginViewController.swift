@@ -2,7 +2,7 @@
 //  LoginViewController.swift
 //  liga1
 //
-//  Created by miguel tomairo on 18/10/24.
+//  Auth/Presentation: pantalla de login.
 //
 
 import UIKit
