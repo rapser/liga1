@@ -15,15 +15,15 @@ public protocol LoginUseCaseProtocol {
     func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error>
 }
 
-class LoginUseCase: LoginUseCaseProtocol {
+public final class LoginUseCase: LoginUseCaseProtocol {
 
     private let authRepository: AuthRepository
 
-    init(authRepository: AuthRepository) {
+    public init(authRepository: AuthRepository) {
         self.authRepository = authRepository
     }
 
-    func execute(email: String, password: String) -> AnyPublisher<User, Error> {
+    public func execute(email: String, password: String) -> AnyPublisher<User, Error> {
         guard !email.isEmpty, !password.isEmpty else {
             return Fail(error: NSError(
                 domain: "LoginUseCase",
@@ -43,7 +43,7 @@ class LoginUseCase: LoginUseCaseProtocol {
         return authRepository.login(email: email, password: password)
     }
 
-    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error> {
+    public func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error> {
         return credentialProvider.provideCredential()
             .flatMap { [weak self] credential -> AnyPublisher<User, Error> in
                 guard let self = self else {

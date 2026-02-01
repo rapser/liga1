@@ -19,7 +19,7 @@ public protocol AuthCoordinatorDelegate: AnyObject {
 }
 
 /// Coordinador para manejar el flujo de autenticación
-public class AuthCoordinator {
+public final class AuthCoordinator {
 
     // MARK: - Properties
 
@@ -74,7 +74,7 @@ extension AuthCoordinator: LoginViewControllerDelegate {
 // MARK: - LoginViewControllerDelegate Protocol
 
 /// Protocolo para comunicar eventos desde LoginViewController
-protocol LoginViewControllerDelegate: AnyObject {
+public protocol LoginViewControllerDelegate: AnyObject {
     func loginViewControllerDidLogin(_ viewController: LoginViewController, user: User)
     func loginViewControllerDidCancel(_ viewController: LoginViewController)
 }

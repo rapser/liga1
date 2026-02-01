@@ -8,18 +8,18 @@
 import UIKit
 import Combine
 
-class LoginViewController: UIViewController {
+public final class LoginViewController: UIViewController {
 
     // MARK: - Properties
 
-    let viewModel: LoginViewModel
+    public let viewModel: LoginViewModel
     private let googleCredentialProvider: GoogleCredentialProvider
     private var cancellables = Set<AnyCancellable>()
-    weak var delegate: LoginViewControllerDelegate?
+    public weak var delegate: LoginViewControllerDelegate?
 
     // MARK: - Initialization
 
-    init(viewModel: LoginViewModel, googleCredentialProvider: GoogleCredentialProvider) {
+    public init(viewModel: LoginViewModel, googleCredentialProvider: GoogleCredentialProvider) {
         self.viewModel = viewModel
         self.googleCredentialProvider = googleCredentialProvider
         super.init(nibName: nil, bundle: nil)

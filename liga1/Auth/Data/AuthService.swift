@@ -12,7 +12,7 @@ import FirebaseCore
 import Combine
 
 /// Implementación de AuthRepository usando Firebase Auth
-class AuthService: AuthRepository, AuthProvider {
+public final class AuthService: AuthRepository, AuthProvider {
 
     // MARK: - Auth state observation
 
@@ -22,13 +22,13 @@ class AuthService: AuthRepository, AuthProvider {
 
     // MARK: - AuthProvider
 
-    var currentUserId: String? {
+    public var currentUserId: String? {
         return Auth.auth().currentUser?.uid
     }
 
     // MARK: - Initialization
 
-    init(logger: LoggerProtocol) {
+    public init(logger: LoggerProtocol) {
         self.logger = logger
 
         // Inicializar con el usuario actual si existe
@@ -51,7 +51,7 @@ class AuthService: AuthRepository, AuthProvider {
 
     // MARK: - AuthRepository
 
-    func login(email: String, password: String) -> AnyPublisher<User, Error> {
+    public func login(email: String, password: String) -> AnyPublisher<User, Error> {
         return Future<User, Error> { promise in
             Auth.auth().signIn(withEmail: email, password: password) { result, error in
                 if let error = error {
@@ -76,7 +76,7 @@ class AuthService: AuthRepository, AuthProvider {
         .eraseToAnyPublisher()
     }
 
-    func signInWithGoogle(credential: GoogleCredential) -> AnyPublisher<User, Error> {
+    public func signInWithGoogle(credential: GoogleCredential) -> AnyPublisher<User, Error> {
         return Future<User, Error> { promise in
             let firebaseCredential = GoogleAuthProvider.credential(
                 withIDToken: credential.idToken,
@@ -107,7 +107,7 @@ class AuthService: AuthRepository, AuthProvider {
         .eraseToAnyPublisher()
     }
 
-    func logout() -> AnyPublisher<Void, Error> {
+    public func logout() -> AnyPublisher<Void, Error> {
         return Future<Void, Error> { promise in
             do {
                 try Auth.auth().signOut()
@@ -119,14 +119,14 @@ class AuthService: AuthRepository, AuthProvider {
         .eraseToAnyPublisher()
     }
 
-    func getCurrentUser() -> AnyPublisher<User?, Never> {
+    public func getCurrentUser() -> AnyPublisher<User?, Never> {
         let firebaseUser = Auth.auth().currentUser
         let domainUser = UserMapper.toDomainOptional(from: firebaseUser)
         return Just(domainUser)
             .eraseToAnyPublisher()
     }
 
-    func observeAuthState() -> AnyPublisher<User?, Never> {
+    public func observeAuthState() -> AnyPublisher<User?, Never> {
         return currentUserSubject
             .eraseToAnyPublisher()
     }
@@ -134,7 +134,7 @@ class AuthService: AuthRepository, AuthProvider {
     // MARK: - Additional Methods (para compatibilidad interna)
 
     /// Observa al usuario actual (alias de observeAuthState para compatibilidad)
-    func observeCurrentUser() -> AnyPublisher<User?, Never> {
+    public func observeCurrentUser() -> AnyPublisher<User?, Never> {
         return observeAuthState()
     }
 }

@@ -14,15 +14,15 @@ public protocol LogoutUseCaseProtocol {
     func execute() -> AnyPublisher<Void, Error>
 }
 
-class LogoutUseCase: LogoutUseCaseProtocol {
+public final class LogoutUseCase: LogoutUseCaseProtocol {
 
     private let authRepository: AuthRepository
 
-    init(authRepository: AuthRepository) {
+    public init(authRepository: AuthRepository) {
         self.authRepository = authRepository
     }
 
-    func execute() -> AnyPublisher<Void, Error> {
+    public func execute() -> AnyPublisher<Void, Error> {
         return authRepository.logout()
             .eraseToAnyPublisher()
     }

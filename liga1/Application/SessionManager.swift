@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import FirebaseAuth
+import Combine
 
 final class SessionManager {
 
@@ -18,6 +18,7 @@ final class SessionManager {
 
     weak var window: UIWindow?
     private var container: DIContainer?
+    private var cancellables = Set<AnyCancellable>()
 
     /// Se invoca cuando el usuario toca una notificación push (matchId).
     var onNotificationTap: ((String) -> Void)?
@@ -27,12 +28,12 @@ final class SessionManager {
         self.window = window
         self.container = container
     }
-    
+
     // MARK: - Inactividad
     func startInactivityTimer() {
         resetTimer()
     }
-    
+
     func resetTimer() {
         inactivityTimer?.invalidate()
         inactivityTimer = Timer.scheduledTimer(timeInterval: inactivityTimeLimit,
@@ -41,7 +42,7 @@ final class SessionManager {
                                                userInfo: nil,
                                                repeats: false)
     }
-    
+
     // MARK: - Logout
     func logout() {
         guard let container = container else {
@@ -49,29 +50,42 @@ final class SessionManager {
             return
         }
         let logger = container.makeLogger()
-        do {
-            try Auth.auth().signOut()
-            let nav = UINavigationController()
-            let loginVC = container.makeLoginViewController(presentingViewController: nav)
-            nav.setViewControllers([loginVC], animated: false)
-            window?.rootViewController = nav
-        } catch let error {
-            logger.error("❌ Error al cerrar sesión", error: error)
-        }
+        let logoutUseCase = container.makeLogoutUseCase()
+
+        logoutUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case .failure(let error) = completion {
+                        logger.error("❌ Error al cerrar sesión", error: error)
+                    }
+                    self?.navigateToLogin()
+                },
+                receiveValue: { }
+            )
+            .store(in: &cancellables)
     }
-    
+
+    private func navigateToLogin() {
+        guard let container = container else { return }
+        let nav = UINavigationController()
+        let loginVC = container.makeLoginViewController(presentingViewController: nav)
+        nav.setViewControllers([loginVC], animated: false)
+        window?.rootViewController = nav
+    }
+
     // MARK: - Alerta de expiración
     @objc private func showSessionExpiredAlert() {
         logout()
-        
+
         guard let rootVC = window?.rootViewController else { return }
-        
+
         let alert = UIAlertController(title: "Sesión Expirada",
                                       message: "Tu sesión ha terminado por inactividad.",
                                       preferredStyle: .alert)
-        
+
         alert.addAction(UIAlertAction(title: "Aceptar", style: .default))
-        
+
         rootVC.present(alert, animated: true)
     }
 }

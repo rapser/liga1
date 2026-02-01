@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import FirebaseAuth
 import Combine
 
 /// Coordinator principal de la aplicación
@@ -18,13 +17,24 @@ final class AppCoordinator: Coordinator {
     private let container: DIContainer
     private let eventBus: AppEventBusProtocol
     private let logger: LoggerProtocol
+    private let authProvider: AuthProvider
+    private let logoutUseCase: LogoutUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
 
-    init(window: UIWindow, container: DIContainer, eventBus: AppEventBusProtocol, logger: LoggerProtocol) {
+    init(
+        window: UIWindow,
+        container: DIContainer,
+        eventBus: AppEventBusProtocol,
+        logger: LoggerProtocol,
+        authProvider: AuthProvider,
+        logoutUseCase: LogoutUseCaseProtocol
+    ) {
         self.window = window
         self.container = container
         self.eventBus = eventBus
         self.logger = logger
+        self.authProvider = authProvider
+        self.logoutUseCase = logoutUseCase
         self.navigationController = UINavigationController()
         eventBus.events()
             .receive(on: DispatchQueue.main)
@@ -43,7 +53,7 @@ final class AppCoordinator: Coordinator {
 
     private func handleLoginSuccess() {
         childCoordinators.removeAll()
-        guard Auth.auth().currentUser != nil else {
+        guard authProvider.currentUserId != nil else {
             self.logger.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
             return
         }
@@ -54,13 +64,18 @@ final class AppCoordinator: Coordinator {
 
     private func handleLogoutRequested() {
         childCoordinators.removeAll()
-        if Auth.auth().currentUser != nil {
+        if authProvider.currentUserId != nil {
             self.logger.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
-            do {
-                try Auth.auth().signOut()
-            } catch {
-                self.logger.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
-            }
+            logoutUseCase.execute()
+                .sink(
+                    receiveCompletion: { [weak self] completion in
+                        if case .failure(let error) = completion {
+                            self?.logger.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
+                        }
+                    },
+                    receiveValue: { }
+                )
+                .store(in: &cancellables)
         }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -69,8 +84,8 @@ final class AppCoordinator: Coordinator {
     }
 
     func start() {
-        // Verificar si hay usuario autenticado
-        if Auth.auth().currentUser != nil {
+        // Verificar si hay usuario autenticado usando AuthProvider
+        if authProvider.currentUserId != nil {
             showMainFlow()
         } else {
             showLoginFlow()

@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseFirestore
-import FirebaseAuth
 import Combine
 
 protocol FavoritesServiceProtocol {
@@ -30,7 +29,7 @@ protocol FavoritesServiceProtocol {
 class FavoritesService: FavoritesServiceProtocol {
 
     private let database: DatabaseProtocol
-    private let authService: AuthService // Usar implementación concreta internamente
+    private let authProvider: AuthProvider
     private let logger: LoggerProtocol
 
     private let favoritesSubject = CurrentValueSubject<Set<String>, Never>([])
@@ -42,12 +41,12 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(database: DatabaseProtocol, authService: AuthService, logger: LoggerProtocol) {
+    init(database: DatabaseProtocol, authProvider: AuthProvider, logger: LoggerProtocol) {
         self.database = database
-        self.authService = authService
+        self.authProvider = authProvider
         self.logger = logger
 
-        authService.observeCurrentUser()
+        authProvider.observeCurrentUser()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
                 guard let self = self else { return }
@@ -63,7 +62,7 @@ class FavoritesService: FavoritesServiceProtocol {
     }
 
     private func getUserId() -> String? {
-        return authService.currentUserId
+        return authProvider.currentUserId
     }
 
     // MARK: - Protocol Implementation

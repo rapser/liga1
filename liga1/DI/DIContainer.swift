@@ -62,7 +62,7 @@ final class DIContainer {
     }
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        return FavoritesService(database: makeDatabase(), authService: authService, logger: makeLogger())
+        return FavoritesService(database: makeDatabase(), authProvider: makeAuthProvider(), logger: makeLogger())
     }()
 
     func makeFavoritesService() -> FavoritesServiceProtocol {
@@ -360,7 +360,14 @@ final class DIContainer {
     // MARK: - Coordinators
 
     func makeAppCoordinator(window: UIWindow) -> AppCoordinator {
-        return AppCoordinator(window: window, container: self, eventBus: makeAppEventBus(), logger: makeLogger())
+        return AppCoordinator(
+            window: window,
+            container: self,
+            eventBus: makeAppEventBus(),
+            logger: makeLogger(),
+            authProvider: makeAuthProvider(),
+            logoutUseCase: makeLogoutUseCase()
+        )
     }
 
     func makeLoginCoordinator(navigationController: UINavigationController) -> LoginCoordinator {

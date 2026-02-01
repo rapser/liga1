@@ -10,27 +10,27 @@ import Combine
 import UIKit
 
 /// Delegate para comunicar eventos de navegación al Coordinator
-protocol LoginViewModelCoordinatorDelegate: AnyObject {
+public protocol LoginViewModelCoordinatorDelegate: AnyObject {
     func loginViewModelDidRequestGoogleSignIn(_ viewModel: LoginViewModel)
     func loginViewModelDidLogin(_ viewModel: LoginViewModel, user: User)
 }
 
 /// Delegate para comunicar eventos de UI al ViewController
-protocol LoginViewModelDelegate: AnyObject {
+public protocol LoginViewModelDelegate: AnyObject {
     func loginViewModelNeedsGoogleSignInPresentation(_ viewModel: LoginViewModel)
 }
 
-class LoginViewModel {
+public final class LoginViewModel {
 
     // MARK: - Published Properties
 
-    @Published private(set) var isLoading: Bool = false
-    @Published private(set) var error: String?
+    @Published public private(set) var isLoading: Bool = false
+    @Published public private(set) var error: String?
 
     // MARK: - Delegates
 
-    weak var coordinatorDelegate: LoginViewModelCoordinatorDelegate?
-    weak var delegate: LoginViewModelDelegate?
+    public weak var coordinatorDelegate: LoginViewModelCoordinatorDelegate?
+    public weak var delegate: LoginViewModelDelegate?
 
     // MARK: - Dependencies
 
@@ -43,14 +43,14 @@ class LoginViewModel {
 
     // MARK: - Initialization
 
-    init(loginUseCase: LoginUseCaseProtocol, logger: LoggerProtocol) {
+    public init(loginUseCase: LoginUseCaseProtocol, logger: LoggerProtocol) {
         self.loginUseCase = loginUseCase
         self.logger = logger
     }
 
     // MARK: - Public Methods
 
-    func login(email: String, password: String) {
+    public func login(email: String, password: String) {
         // Validación básica
         guard !email.isEmpty, !password.isEmpty else {
             error = "Por favor completa todos los campos"
@@ -78,7 +78,7 @@ class LoginViewModel {
             .store(in: &cancellables)
     }
 
-    func signInWithGoogle() {
+    public func signInWithGoogle() {
         if let delegate = delegate {
             delegate.loginViewModelNeedsGoogleSignInPresentation(self)
         } else {
@@ -87,7 +87,7 @@ class LoginViewModel {
         }
     }
 
-    func performGoogleSignIn(presentingViewController: UIViewController) {
+    public func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
         let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController)
@@ -108,7 +108,7 @@ class LoginViewModel {
             .store(in: &cancellables)
     }
 
-    func clearError() {
+    public func clearError() {
         error = nil
     }
 }
