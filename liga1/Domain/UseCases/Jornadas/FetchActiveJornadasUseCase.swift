@@ -16,9 +16,11 @@ protocol FetchActiveJornadasUseCaseProtocol {
 class FetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol {
 
     private let repository: JornadasRepositoryProtocol
+    private let logger: LoggerProtocol
 
-    init(repository: JornadasRepositoryProtocol) {
+    init(repository: JornadasRepositoryProtocol, logger: LoggerProtocol) {
         self.repository = repository
+        self.logger = logger
     }
 
     func execute() -> AnyPublisher<[Jornada], Error> {
@@ -29,7 +31,7 @@ class FetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol {
                 },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("FetchActiveJornadasUseCase: Failed to fetch active jornadas", error: error)
+                        self.logger.error("FetchActiveJornadasUseCase: Failed to fetch active jornadas", error: error)
                     }
                 }
             )

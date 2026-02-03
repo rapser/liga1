@@ -40,6 +40,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appCoordinator = appCoordinator
         appCoordinator.start()
 
+        // Tap en notificación → EventBus → AppCoordinator maneja .navigateToMatch
+        let eventBus = container.makeAppEventBus()
+        SessionManager.shared.onNotificationTap = { matchId in
+            eventBus.publish(.navigateToMatch(matchId: matchId))
+        }
+
         window.makeKeyAndVisible()
     }
     
@@ -49,7 +55,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             do {
                 try await UNUserNotificationCenter.current().setBadgeCount(0)
             } catch {
-                Logger.shared.error("Error al limpiar badge", error: error)
+                DIContainer.shared.makeLogger().error("Error al limpiar badge", error: error)
             }
         }
     }

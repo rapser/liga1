@@ -19,12 +19,14 @@ class RegistrarPartidosViewModel {
     // MARK: - Private Properties
 
     private let registerMatchesUseCase: RegisterMatchesUseCaseProtocol
+    private let logger: LoggerProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
-    init(registerMatchesUseCase: RegisterMatchesUseCaseProtocol) {
+    init(registerMatchesUseCase: RegisterMatchesUseCaseProtocol, logger: LoggerProtocol) {
         self.registerMatchesUseCase = registerMatchesUseCase
+        self.logger = logger
     }
 
     // MARK: - Public Methods
@@ -49,7 +51,7 @@ class RegistrarPartidosViewModel {
         .sink { [weak self] completion in
             self?.isLoading = false
             if case .failure(let error) = completion {
-                Logger.shared.error("Failed to register jornada \(jornadaId)", error: error)
+                self?.logger.error("Failed to register jornada \(jornadaId)", error: error)
                 self?.error = error
             }
         } receiveValue: { [weak self] _ in
@@ -69,7 +71,7 @@ class RegistrarPartidosViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to register all Apertura jornadas", error: error)
+                    self?.logger.error("Failed to register all Apertura jornadas", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] _ in

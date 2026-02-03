@@ -24,6 +24,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
     private let notificationService: NotificationServiceProtocol
     private let favoritesService: FavoritesServiceProtocol
     private let userPreferencesService: UserPreferencesServiceProtocol
+    private let logger: LoggerProtocol
 
     // MARK: - Properties
 
@@ -35,11 +36,13 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
     init(
         notificationService: NotificationServiceProtocol,
         favoritesService: FavoritesServiceProtocol,
-        userPreferencesService: UserPreferencesServiceProtocol
+        userPreferencesService: UserPreferencesServiceProtocol,
+        logger: LoggerProtocol
     ) {
         self.notificationService = notificationService
         self.favoritesService = favoritesService
         self.userPreferencesService = userPreferencesService
+        self.logger = logger
     }
 
     // MARK: - NotificationTopicManagerProtocol
@@ -95,7 +98,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("Error obteniendo preferencias", error: error)
+                        self.logger.error("Error obteniendo preferencias", error: error)
                     }
                 },
                 receiveValue: { [weak self] preferences in
@@ -119,7 +122,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("Error obteniendo preferencias", error: error)
+                        self.logger.error("Error obteniendo preferencias", error: error)
                     }
                 },
                 receiveValue: { [weak self] preferences in
@@ -171,7 +174,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("Error agregando topic a preferencias", error: error)
+                        self.logger.error("Error agregando topic a preferencias", error: error)
                     }
                 },
                 receiveValue: { _ in }
@@ -185,7 +188,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("Error removiendo topic de preferencias", error: error)
+                        self.logger.error("Error removiendo topic de preferencias", error: error)
                     }
                 },
                 receiveValue: { _ in }

@@ -42,7 +42,6 @@ class ProfileViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to logout", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] _ in

@@ -99,7 +99,6 @@ class NewsViewController: UIViewController {
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
-                Logger.shared.error("NewsViewController: Error received", error: error)
                 self?.showError(error)
             }
             .store(in: &cancellables)

@@ -75,6 +75,21 @@
 		464B95B62F287624001C4049 /* NotificationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464B95B52F287624001C4049 /* NotificationSettingsViewModel.swift */; };
 		469E54332E765142001ECD36 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469E54322E765141001ECD36 /* SessionManager.swift */; };
 		469E54422E767199001ECD36 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 469E54412E767199001ECD36 /* Kingfisher */; };
+		46B2E9432F2DB2C800EB66B3 /* AppEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */; };
+		46B2E9442F2DB2C800EB66B3 /* AppEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */; };
+		46B2E9452F2DB2C800EB66B3 /* AppEventBusProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */; };
+		46B2E9492F2DB2D800EB66B3 /* GoogleCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */; };
+		46B2E94A2F2DB2D800EB66B3 /* GoogleCredentialProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */; };
+		46B2E94D2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */; };
+		46B2E9502F2E532300EB66B3 /* AuthCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E94E2F2E532300EB66B3 /* AuthCoordinator.swift */; };
+		46B2E9532F2E532E00EB66B3 /* AuthDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9512F2E532E00EB66B3 /* AuthDIContainer.swift */; };
+		46B2E9552F2E533D00EB66B3 /* AuthModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9542F2E533D00EB66B3 /* AuthModule.swift */; };
+		46B2E95A2F2E543800EB66B3 /* UserUIMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9562F2E543800EB66B3 /* UserUIMapper.swift */; };
+		46B2E95B2F2E543800EB66B3 /* UserUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9582F2E543800EB66B3 /* UserUI.swift */; };
+		46B2E9602F2E545A00EB66B3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E95C2F2E545A00EB66B3 /* User.swift */; };
+		46B2E9612F2E545A00EB66B3 /* AuthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E95E2F2E545A00EB66B3 /* AuthRepository.swift */; };
+		46B2E9662F2E547000EB66B3 /* UserDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9622F2E547000EB66B3 /* UserDTO.swift */; };
+		46B2E9672F2E547000EB66B3 /* UserMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9642F2E547000EB66B3 /* UserMapper.swift */; };
 		46C3EB082F2942BF00E9EA0C /* NotificationDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */; };
 		46C3EB0A2F29853400E9EA0C /* LogsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB092F29853400E9EA0C /* LogsViewController.swift */; };
 		46C3EB1C2F2B128D00E9EA0C /* AppKit+Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB162F2B128D00E9EA0C /* AppKit+Examples.swift */; };
@@ -215,6 +230,21 @@
 		464B95B12F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePushNotificationsEnabledUseCase.swift; sourceTree = "<group>"; };
 		464B95B52F287624001C4049 /* NotificationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsViewModel.swift; sourceTree = "<group>"; };
 		469E54322E765141001ECD36 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEvent.swift; sourceTree = "<group>"; };
+		46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEventBus.swift; sourceTree = "<group>"; };
+		46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEventBusProtocol.swift; sourceTree = "<group>"; };
+		46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCredential.swift; sourceTree = "<group>"; };
+		46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCredentialProvider.swift; sourceTree = "<group>"; };
+		46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCredentialProviderImpl.swift; sourceTree = "<group>"; };
+		46B2E94E2F2E532300EB66B3 /* AuthCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthCoordinator.swift; sourceTree = "<group>"; };
+		46B2E9512F2E532E00EB66B3 /* AuthDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthDIContainer.swift; sourceTree = "<group>"; };
+		46B2E9542F2E533D00EB66B3 /* AuthModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModule.swift; sourceTree = "<group>"; };
+		46B2E9562F2E543800EB66B3 /* UserUIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserUIMapper.swift; sourceTree = "<group>"; };
+		46B2E9582F2E543800EB66B3 /* UserUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserUI.swift; sourceTree = "<group>"; };
+		46B2E95C2F2E545A00EB66B3 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		46B2E95E2F2E545A00EB66B3 /* AuthRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRepository.swift; sourceTree = "<group>"; };
+		46B2E9622F2E547000EB66B3 /* UserDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDTO.swift; sourceTree = "<group>"; };
+		46B2E9642F2E547000EB66B3 /* UserMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMapper.swift; sourceTree = "<group>"; };
 		46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeduplicator.swift; sourceTree = "<group>"; };
 		46C3EB092F29853400E9EA0C /* LogsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsViewController.swift; sourceTree = "<group>"; };
 		46C3EB0C2F2B128D00E9EA0C /* ContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerView.swift; sourceTree = "<group>"; };
@@ -312,7 +342,6 @@
 			isa = PBXGroup;
 			children = (
 				46C3EB072F2942BF00E9EA0C /* Notifications */,
-				46D8209D2F09D71600FAA836 /* Auth */,
 				464009B62F098D4F00A8C905 /* Constants */,
 				464009B82F098D4F00A8C905 /* Firebase */,
 				464009BA2F098D4F00A8C905 /* Logging */,
@@ -338,7 +367,6 @@
 			children = (
 				464B95A92F2875D1001C4049 /* NotificationTopicManager.swift */,
 				464B95AA2F2875D1001C4049 /* UserPreferencesService.swift */,
-				464001832F08853F00A8C905 /* AuthService.swift */,
 				464001842F08853F00A8C905 /* FavoritesService.swift */,
 			);
 			path = Services;
@@ -361,7 +389,6 @@
 			children = (
 				464B95B22F287601001C4049 /* Notifications */,
 				464009BF2F098D8D00A8C905 /* Admin */,
-				464009C22F098D8D00A8C905 /* Auth */,
 				464009C62F098D8D00A8C905 /* Favorites */,
 				464009C82F098D8D00A8C905 /* Jornadas */,
 				464009CA2F098D8D00A8C905 /* Matches */,
@@ -418,7 +445,6 @@
 				464009D92F098DBB00A8C905 /* RegistrarPartidosViewModel.swift */,
 				464001972F08853F00A8C905 /* FavoritosViewModel.swift */,
 				464001982F08853F00A8C905 /* HomeViewModel.swift */,
-				464001992F08853F00A8C905 /* LoginViewModel.swift */,
 				4640019A2F08853F00A8C905 /* NewsViewModel.swift */,
 				4640019B2F08853F00A8C905 /* ProfileViewModel.swift */,
 				4640019C2F08853F00A8C905 /* TorneoViewModel.swift */,
@@ -432,7 +458,6 @@
 				464009DC2F098DF600A8C905 /* Admin */,
 				464009DE2F098DF600A8C905 /* Favoritos */,
 				464009E12F098DF600A8C905 /* Home */,
-				464009E32F098DF600A8C905 /* Login */,
 				464009E82F098DF600A8C905 /* News */,
 				464009EB2F098DF600A8C905 /* Profile */,
 				464009ED2F098DF600A8C905 /* TabBar */,
@@ -485,15 +510,6 @@
 				464009BE2F098D8D00A8C905 /* RegisterMatchesUseCase.swift */,
 			);
 			path = Admin;
-			sourceTree = "<group>";
-		};
-		464009C22F098D8D00A8C905 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				464009C02F098D8D00A8C905 /* LoginUseCase.swift */,
-				464009C12F098D8D00A8C905 /* LogoutUseCase.swift */,
-			);
-			path = Auth;
 			sourceTree = "<group>";
 		};
 		464009C62F098D8D00A8C905 /* Favorites */ = {
@@ -569,14 +585,6 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
-		464009E32F098DF600A8C905 /* Login */ = {
-			isa = PBXGroup;
-			children = (
-				464009E22F098DF600A8C905 /* LoginViewController.swift */,
-			);
-			path = Login;
-			sourceTree = "<group>";
-		};
 		464009E82F098DF600A8C905 /* News */ = {
 			isa = PBXGroup;
 			children = (
@@ -647,6 +655,153 @@
 				464B95B12F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift */,
 			);
 			path = Notifications;
+			sourceTree = "<group>";
+		};
+		46A0E1002F2E000100A8C905 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9542F2E533D00EB66B3 /* AuthModule.swift */,
+				46B2E9522F2E532E00EB66B3 /* DI */,
+				46B2E94F2F2E532300EB66B3 /* Coordinator */,
+				46A0E1012F2E000100A8C905 /* Domain */,
+				46A0E1022F2E000100A8C905 /* Data */,
+				46A0E1032F2E000100A8C905 /* Presentation */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		46A0E1012F2E000100A8C905 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E95D2F2E545A00EB66B3 /* Entities */,
+				46B2E95F2F2E545A00EB66B3 /* Repositories */,
+				46D8209C2F09D71600FAA836 /* AuthProvider.swift */,
+				46B2E9462F2DB2D800EB66B3 /* GoogleCredential.swift */,
+				46B2E9472F2DB2D800EB66B3 /* GoogleCredentialProvider.swift */,
+				46A0E1042F2E000100A8C905 /* UseCases */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		46A0E1022F2E000100A8C905 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9632F2E547000EB66B3 /* DTOs */,
+				46B2E9652F2E547000EB66B3 /* Mappers */,
+				464001832F08853F00A8C905 /* AuthService.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		46A0E1032F2E000100A8C905 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9572F2E543800EB66B3 /* Mappers */,
+				46B2E9592F2E543800EB66B3 /* Models */,
+				46B2E94B2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift */,
+				46A0E1052F2E000100A8C905 /* ViewModels */,
+				46A0E1062F2E000100A8C905 /* Views */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
+		46A0E1042F2E000100A8C905 /* UseCases */ = {
+			isa = PBXGroup;
+			children = (
+				464009C02F098D8D00A8C905 /* LoginUseCase.swift */,
+				464009C12F098D8D00A8C905 /* LogoutUseCase.swift */,
+			);
+			path = UseCases;
+			sourceTree = "<group>";
+		};
+		46A0E1052F2E000100A8C905 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				464001992F08853F00A8C905 /* LoginViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		46A0E1062F2E000100A8C905 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				464009E22F098DF600A8C905 /* LoginViewController.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		46B2E9422F2DB2C800EB66B3 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */,
+				46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */,
+				46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */,
+			);
+			path = Events;
+			sourceTree = "<group>";
+		};
+		46B2E94F2F2E532300EB66B3 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E94E2F2E532300EB66B3 /* AuthCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		46B2E9522F2E532E00EB66B3 /* DI */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9512F2E532E00EB66B3 /* AuthDIContainer.swift */,
+			);
+			path = DI;
+			sourceTree = "<group>";
+		};
+		46B2E9572F2E543800EB66B3 /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9562F2E543800EB66B3 /* UserUIMapper.swift */,
+			);
+			path = Mappers;
+			sourceTree = "<group>";
+		};
+		46B2E9592F2E543800EB66B3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9582F2E543800EB66B3 /* UserUI.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		46B2E95D2F2E545A00EB66B3 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E95C2F2E545A00EB66B3 /* User.swift */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		46B2E95F2F2E545A00EB66B3 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E95E2F2E545A00EB66B3 /* AuthRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		46B2E9632F2E547000EB66B3 /* DTOs */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9622F2E547000EB66B3 /* UserDTO.swift */,
+			);
+			path = DTOs;
+			sourceTree = "<group>";
+		};
+		46B2E9652F2E547000EB66B3 /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+				46B2E9642F2E547000EB66B3 /* UserMapper.swift */,
+			);
+			path = Mappers;
 			sourceTree = "<group>";
 		};
 		46C3EB072F2942BF00E9EA0C /* Notifications */ = {
@@ -844,14 +999,6 @@
 			path = Repositories;
 			sourceTree = "<group>";
 		};
-		46D8209D2F09D71600FAA836 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				46D8209C2F09D71600FAA836 /* AuthProvider.swift */,
-			);
-			path = Auth;
-			sourceTree = "<group>";
-		};
 		46D820A02F09D72A00FAA836 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -893,6 +1040,7 @@
 			isa = PBXGroup;
 			children = (
 				46C3EB192F2B128D00E9EA0C /* AppKit */,
+				46A0E1002F2E000100A8C905 /* Auth */,
 				46C874522F1B68B8008C3619 /* liga1.entitlements */,
 				46D995C62C6EC90700D4951C /* Application */,
 				4640017A2F08853F00A8C905 /* Core */,
@@ -908,6 +1056,7 @@
 		46D995C62C6EC90700D4951C /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				46B2E9422F2DB2C800EB66B3 /* Events */,
 				46D820A52F09DD0500FAA836 /* Coordinator */,
 				46D995922C6E90EC00D4951C /* AppDelegate.swift */,
 				469E54322E765141001ECD36 /* SessionManager.swift */,
@@ -1034,6 +1183,8 @@
 				464001B62F08853F00A8C905 /* NewsViewModel.swift in Sources */,
 				46CDF4BF2F10A09D00F280E6 /* DividerView.swift in Sources */,
 				464001BA2F08853F00A8C905 /* FavoritosViewModel.swift in Sources */,
+				46B2E9602F2E545A00EB66B3 /* User.swift in Sources */,
+				46B2E9612F2E545A00EB66B3 /* AuthRepository.swift in Sources */,
 				464B95AF2F2875E5001C4049 /* UserPreferences.swift in Sources */,
 				46C874542F1B6C26008C3619 /* NotificationService.swift in Sources */,
 				464009BB2F098D4F00A8C905 /* Logger.swift in Sources */,
@@ -1043,6 +1194,7 @@
 				464009BD2F098D4F00A8C905 /* FirestoreManager.swift in Sources */,
 				464009CF2F098D8D00A8C905 /* LogoutUseCase.swift in Sources */,
 				464009D02F098D8D00A8C905 /* LoginUseCase.swift in Sources */,
+				46B2E9552F2E533D00EB66B3 /* AuthModule.swift in Sources */,
 				464009D12F098D8D00A8C905 /* FetchTeamsUseCase.swift in Sources */,
 				46CDF4822F1061FC00F280E6 /* JornadaDTO.swift in Sources */,
 				46CDF4832F1061FC00F280E6 /* MatchDTO.swift in Sources */,
@@ -1051,6 +1203,8 @@
 				464009D22F098D8D00A8C905 /* FetchActiveJornadasUseCase.swift in Sources */,
 				464B95B32F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift in Sources */,
 				464B95B42F287601001C4049 /* ObserveUserPreferencesUseCase.swift in Sources */,
+				46B2E9662F2E547000EB66B3 /* UserDTO.swift in Sources */,
+				46B2E9672F2E547000EB66B3 /* UserMapper.swift in Sources */,
 				464009D32F098D8D00A8C905 /* ObserveFavoritesUseCase.swift in Sources */,
 				464009D42F098D8D00A8C905 /* FetchNewsUseCase.swift in Sources */,
 				464009D52F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift in Sources */,
@@ -1083,14 +1237,21 @@
 				46CDF48E2F10625B00F280E6 /* JornadaUI.swift in Sources */,
 				464001C22F08853F00A8C905 /* HeaderView.swift in Sources */,
 				46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */,
+				46B2E94D2F2DB2FF00EB66B3 /* GoogleCredentialProviderImpl.swift in Sources */,
 				464001C32F08853F00A8C905 /* TorneoType.swift in Sources */,
+				46B2E9492F2DB2D800EB66B3 /* GoogleCredential.swift in Sources */,
+				46B2E94A2F2DB2D800EB66B3 /* GoogleCredentialProvider.swift in Sources */,
 				464B95A82F2875B4001C4049 /* UserPreferencesMapper.swift in Sources */,
+				46B2E9432F2DB2C800EB66B3 /* AppEventBus.swift in Sources */,
+				46B2E9442F2DB2C800EB66B3 /* AppEvent.swift in Sources */,
+				46B2E9452F2DB2C800EB66B3 /* AppEventBusProtocol.swift in Sources */,
 				46CDF4B12F10877B00F280E6 /* NewsItem.swift in Sources */,
 				464001C42F08853F00A8C905 /* EquipoPeruano.swift in Sources */,
 				46CDF4A12F1068A300F280E6 /* TeamMapper.swift in Sources */,
 				46C874572F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift in Sources */,
 				46C874582F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift in Sources */,
 				46CDF4A22F1068A300F280E6 /* JornadaMapper.swift in Sources */,
+				46B2E9502F2E532300EB66B3 /* AuthCoordinator.swift in Sources */,
 				46CDF4A32F1068A300F280E6 /* NewsItemMapper.swift in Sources */,
 				46CDF4A42F1068A300F280E6 /* MatchMapper.swift in Sources */,
 				464001C92F08853F00A8C905 /* ProfileViewModel.swift in Sources */,
@@ -1104,6 +1265,7 @@
 				46CDF4AE2F1086F100F280E6 /* JornadasRepositoryProtocol.swift in Sources */,
 				46CDF4AF2F1086F100F280E6 /* TeamsRepositoryProtocol.swift in Sources */,
 				46CDF4BB2F10884600F280E6 /* NewsItemUI.swift in Sources */,
+				46B2E9532F2E532E00EB66B3 /* AuthDIContainer.swift in Sources */,
 				46D820A62F09DD0500FAA836 /* LoginCoordinator.swift in Sources */,
 				46D820A72F09DD0500FAA836 /* AppCoordinator.swift in Sources */,
 				46D820A82F09DD0500FAA836 /* Coordinator.swift in Sources */,
@@ -1115,6 +1277,8 @@
 				464009F32F098DF600A8C905 /* LoginViewController.swift in Sources */,
 				46CDF49B2F10686F00F280E6 /* MatchUI.swift in Sources */,
 				464009F42F098DF600A8C905 /* HomeViewController.swift in Sources */,
+				46B2E95A2F2E543800EB66B3 /* UserUIMapper.swift in Sources */,
+				46B2E95B2F2E543800EB66B3 /* UserUI.swift in Sources */,
 				464009F52F098DF600A8C905 /* MainTabBarController.swift in Sources */,
 				464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */,
 				46400A002F098EB800A8C905 /* DIContainer.swift in Sources */,
@@ -1209,7 +1373,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1268,7 +1432,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -1287,7 +1451,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
@@ -1320,7 +1484,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;

@@ -67,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
             do {
                 try await UNUserNotificationCenter.current().setBadgeCount(0)
             } catch {
-                Logger.shared.error("Error al limpiar badge", error: error)
+                DIContainer.shared.makeLogger().error("Error al limpiar badge", error: error)
             }
         }
     }
@@ -99,7 +99,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        Logger.shared.error("Error al registrar notificaciones remotas", error: error)
+        DIContainer.shared.makeLogger().error("Error al registrar notificaciones remotas", error: error)
     }
 
     func application(
@@ -175,18 +175,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     // MARK: - Private Helpers
 
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
-        // Parsear datos de la notificación
         guard let matchId = userInfo["matchId"] as? String else {
             return
         }
-
-
-        // Notificar al AppCoordinator para navegar
-        NotificationCenter.default.post(
-            name: NSNotification.Name("NavigateToMatch"),
-            object: nil,
-            userInfo: ["matchId": matchId]
-        )
+        SessionManager.shared.onNotificationTap?(matchId)
     }
 }
 

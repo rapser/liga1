@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseFirestore
-import FirebaseAuth
 import Combine
 
 protocol FavoritesServiceProtocol {
@@ -31,6 +30,7 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private let database: DatabaseProtocol
     private let authProvider: AuthProvider
+    private let logger: LoggerProtocol
 
     private let favoritesSubject = CurrentValueSubject<Set<String>, Never>([])
     private let favoriteTeamsSubject = CurrentValueSubject<Set<String>, Never>([])
@@ -39,30 +39,26 @@ class FavoritesService: FavoritesServiceProtocol {
         database.db
     }
 
-    init(database: DatabaseProtocol, authProvider: AuthProvider) {
-        self.database = database
-        self.authProvider = authProvider
-
-        if getUserId() != nil {
-            fetchFavorites().sink { _ in } receiveValue: { }.store(in: &cancellables)
-            fetchFavoriteTeams().sink { _ in } receiveValue: { }.store(in: &cancellables)
-        } else {
-            observeAuthState()
-        }
-    }
-
     private var cancellables = Set<AnyCancellable>()
 
-    private func observeAuthState() {
-        NotificationCenter.default.addObserver(
-            forName: NSNotification.Name("LoginSuccessful"),
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            self.fetchFavorites().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
-            self.fetchFavoriteTeams().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
-        }
+    init(database: DatabaseProtocol, authProvider: AuthProvider, logger: LoggerProtocol) {
+        self.database = database
+        self.authProvider = authProvider
+        self.logger = logger
+
+        authProvider.observeCurrentUser()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] user in
+                guard let self = self else { return }
+                if user != nil {
+                    self.fetchFavorites().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
+                    self.fetchFavoriteTeams().sink { _ in } receiveValue: { }.store(in: &self.cancellables)
+                } else {
+                    self.favoritesSubject.send([])
+                    self.favoriteTeamsSubject.send([])
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func getUserId() -> String? {
@@ -82,7 +78,7 @@ class FavoritesService: FavoritesServiceProtocol {
                 .collection(FirestoreConstants.Collection.favorites)
                 .getDocuments { snapshot, error in
                     if let error = error {
-                        Logger.shared.error("Error fetching favorites", error: error)
+                        self.logger.error("Error fetching favorites", error: error)
                         promise(.failure(error))
                         return
                     }
@@ -105,7 +101,7 @@ class FavoritesService: FavoritesServiceProtocol {
                 .collection("favoriteTeams")
                 .getDocuments { snapshot, error in
                     if let error = error {
-                        Logger.shared.error("Error fetching favorite teams", error: error)
+                        self.logger.error("Error fetching favorite teams", error: error)
                         promise(.failure(error))
                         return
                     }
@@ -201,7 +197,7 @@ class FavoritesService: FavoritesServiceProtocol {
 
             favRef.getDocument { snapshot, error in
                 if let error = error {
-                    Logger.shared.error("Error obteniendo documento", error: error)
+                    self.logger.error("Error obteniendo documento", error: error)
                     promise(.failure(error))
                     return
                 }
@@ -209,7 +205,7 @@ class FavoritesService: FavoritesServiceProtocol {
                 if snapshot?.exists == true {
                     favRef.delete { error in
                         if let error = error {
-                            Logger.shared.error("Error eliminando favorito", error: error)
+                            self.logger.error("Error eliminando favorito", error: error)
                             promise(.failure(error))
                         } else {
                             promise(.success(false))
@@ -222,7 +218,7 @@ class FavoritesService: FavoritesServiceProtocol {
                         "timestamp": FieldValue.serverTimestamp()
                     ]) { error in
                         if let error = error {
-                            Logger.shared.error("Error agregando favorito", error: error)
+                            self.logger.error("Error agregando favorito", error: error)
                             promise(.failure(error))
                         } else {
                             promise(.success(true))

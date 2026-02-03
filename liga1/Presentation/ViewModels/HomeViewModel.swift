@@ -59,7 +59,6 @@ class HomeViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to fetch active jornadas", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] jornadas in
@@ -72,8 +71,8 @@ class HomeViewModel {
         toggleFavoriteUseCase.execute(matchId: matchId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                if case .failure(let error) = completion {
-                    Logger.shared.error("HomeViewModel: Failed to toggle favorite for match: \(matchId)", error: error)
+                if case .failure = completion {
+                    // Error silently handled
                 }
             } receiveValue: { _ in
                 // Favorite toggled successfully
@@ -122,7 +121,6 @@ class HomeViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case .failure(let error) = completion {
-                    Logger.shared.error("HomeViewModel: Failed to load matches for jornadas", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] results in

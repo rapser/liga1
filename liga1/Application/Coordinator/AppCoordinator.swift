@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import FirebaseAuth
+import Combine
 
 /// Coordinator principal de la aplicación
 /// Maneja la navegación de alto nivel (Login vs Main)
@@ -15,113 +15,113 @@ final class AppCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     let window: UIWindow
     private let container: DIContainer
+    private let eventBus: AppEventBusProtocol
+    private let logger: LoggerProtocol
+    private let authProvider: AuthProvider
+    private let logoutUseCase: LogoutUseCaseProtocol
+    private var cancellables = Set<AnyCancellable>()
 
-    init(window: UIWindow, container: DIContainer) {
+    init(
+        window: UIWindow,
+        container: DIContainer,
+        eventBus: AppEventBusProtocol,
+        logger: LoggerProtocol,
+        authProvider: AuthProvider,
+        logoutUseCase: LogoutUseCaseProtocol
+    ) {
         self.window = window
         self.container = container
+        self.eventBus = eventBus
+        self.logger = logger
+        self.authProvider = authProvider
+        self.logoutUseCase = logoutUseCase
         self.navigationController = UINavigationController()
-        
-        // Suscribirse a notificaciones de login y logout
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleLoginSuccessfulNotification),
-            name: NSNotification.Name("LoginSuccessful"),
-            object: nil
-        )
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleLogoutSuccessfulNotification),
-            name: NSNotification.Name("LogoutSuccessful"),
-            object: nil
-        )
-    }
-    
-    @objc private func handleLogoutSuccessfulNotification(_ notification: Notification) {
-        
-        // Limpiar todos los child coordinators
-        childCoordinators.removeAll()
-        
-        // Verificar que NO haya un usuario autenticado
-        if Auth.auth().currentUser != nil {
-            Logger.shared.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
-            // Intentar cerrar sesión nuevamente
-            do {
-                try Auth.auth().signOut()
-            } catch {
-                Logger.shared.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
+        eventBus.events()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                switch event {
+                case .loginSuccess:
+                    self?.handleLoginSuccess()
+                case .logoutRequested:
+                    self?.handleLogoutRequested()
+                case .navigateToMatch(let matchId):
+                    self?.handleNotificationTap(matchId: matchId)
+                }
             }
+            .store(in: &cancellables)
+    }
+
+    private func handleLoginSuccess() {
+        childCoordinators.removeAll()
+        guard authProvider.currentUserId != nil else {
+            self.logger.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
+            return
         }
-        
-        // Navegar al LoginFlow
+        DispatchQueue.main.async { [weak self] in
+            self?.showMainFlow()
+        }
+    }
+
+    private func handleLogoutRequested() {
+        childCoordinators.removeAll()
+        if authProvider.currentUserId != nil {
+            self.logger.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
+            logoutUseCase.execute()
+                .sink(
+                    receiveCompletion: { [weak self] completion in
+                        if case .failure(let error) = completion {
+                            self?.logger.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
+                        }
+                    },
+                    receiveValue: { }
+                )
+                .store(in: &cancellables)
+        }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.showLoginFlow()
         }
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
 
     func start() {
-        // Verificar si hay usuario autenticado
-        if Auth.auth().currentUser != nil {
+        // Verificar si hay usuario autenticado usando AuthProvider
+        if authProvider.currentUserId != nil {
             showMainFlow()
         } else {
             showLoginFlow()
         }
     }
-    
-    @objc private func handleLoginSuccessfulNotification(_ notification: Notification) {        
-        // Verificar que realmente haya un usuario autenticado
-        guard Auth.auth().currentUser != nil else {
-            Logger.shared.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
-            return
-        }
-        
-        // Navegar al MainFlow directamente
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.showMainFlow()
-        }
-    }
 
     func showLoginFlow() {
-        
-        // Limpiar cualquier child coordinator previo
         childCoordinators.removeAll()
-        
         let loginCoordinator = container.makeLoginCoordinator(navigationController: navigationController)
         loginCoordinator.delegate = self
         addChildCoordinator(loginCoordinator)
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         loginCoordinator.start()
-        
     }
 
     func showMainFlow() {
-        let mainTabBar = MainTabBarController(container: container)
+        let mainTabBar = container.makeMainTabBarController(eventBus: eventBus)
         window.rootViewController = mainTabBar
         window.makeKeyAndVisible()
     }
+
+    /// Navegación al abrir la app desde un tap en notificación push (matchId).
+    func handleNotificationTap(matchId: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self,
+                  let mainTabBar = self.window.rootViewController as? MainTabBarController else { return }
+            mainTabBar.selectedIndex = 0
+        }
+    }
 }
 
-// MARK: - LoginCoordinatorDelegate
+// MARK: - LoginCoordinatorDelegate (compatibilidad; la lógica principal va por EventBus .loginSuccess)
 
 extension AppCoordinator: LoginCoordinatorDelegate {
     func loginCoordinatorDidFinish(_ coordinator: LoginCoordinator) {
         removeChildCoordinator(coordinator)
-        
-        // Verificar que haya un usuario autenticado antes de navegar
-        guard Auth.auth().currentUser != nil else {
-            Logger.shared.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
-            return
-        }
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.showMainFlow()
-        }
     }
 }

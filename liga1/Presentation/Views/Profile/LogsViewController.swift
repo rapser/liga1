@@ -9,6 +9,10 @@ import UIKit
 
 class LogsViewController: UIViewController {
     
+    // MARK: - Dependencies
+    
+    private let logger: LoggerProtocol
+    
     // MARK: - UI Components
     
     private let containerView = ContainerView()
@@ -61,6 +65,17 @@ class LogsViewController: UIViewController {
         return stackView
     }()
     
+    // MARK: - Initialization
+    
+    init(logger: LoggerProtocol) {
+        self.logger = logger
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented - use init(logger:)")
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -100,7 +115,7 @@ class LogsViewController: UIViewController {
     }
     
     private func loadLogs() {
-        let logs = Logger.shared.getAllLogs()
+        let logs = logger.getAllLogs()
         textView.text = logs.isEmpty ? "No hay logs disponibles" : logs
         
         // Scroll al final
@@ -116,7 +131,7 @@ class LogsViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func copyToClipboard() {
-        let logs = Logger.shared.getAllLogs()
+        let logs = logger.getAllLogs()
         UIPasteboard.general.string = logs
         showAlert(title: "Copiado", message: "Los logs se han copiado al portapapeles")
     }
@@ -129,7 +144,7 @@ class LogsViewController: UIViewController {
             cancelTitle: "Cancelar",
             confirmStyle: .destructive
         ) { [weak self] _ in
-            Logger.shared.clearLogs()
+            self?.logger.clearLogs()
             self?.loadLogs()
         }
     }

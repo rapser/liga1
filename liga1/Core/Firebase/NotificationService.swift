@@ -23,9 +23,6 @@ final class NotificationService: NotificationServiceProtocol {
     private var subscriptionRetryCount: [String: Int] = [:]
     private let maxRetries = 3
 
-    // MARK: - Initialization
-    init() {}
-
     // MARK: - Public Methods
 
     func requestNotificationPermissions() {
@@ -76,8 +73,6 @@ final class NotificationService: NotificationServiceProtocol {
             guard let self = self else { return }
 
             if let error = error {
-                Logger.shared.error("Error suscribiéndose a topic '\(topic)'", error: error)
-
                 #if !targetEnvironment(simulator)
                 let retryCount = self.subscriptionRetryCount[topic] ?? 0
                 if retryCount < self.maxRetries {
@@ -99,11 +94,7 @@ final class NotificationService: NotificationServiceProtocol {
     }
 
     func unsubscribeFromTopic(_ topic: String) {
-        Messaging.messaging().unsubscribe(fromTopic: topic) { error in
-            if let error = error {
-                Logger.shared.error("Error desuscribiéndose del topic \(topic)", error: error)
-            }
-        }
+        Messaging.messaging().unsubscribe(fromTopic: topic)
     }
 
     func handleNotificationToken(_ token: String) {
