@@ -10,27 +10,27 @@ import Combine
 import UIKit
 
 /// Delegate para comunicar eventos de navegación al Coordinator
-public protocol LoginViewModelCoordinatorDelegate: AnyObject {
+protocol LoginViewModelCoordinatorDelegate: AnyObject {
     func loginViewModelDidRequestGoogleSignIn(_ viewModel: LoginViewModel)
     func loginViewModelDidLogin(_ viewModel: LoginViewModel, user: User)
 }
 
 /// Delegate para comunicar eventos de UI al ViewController
-public protocol LoginViewModelDelegate: AnyObject {
+protocol LoginViewModelDelegate: AnyObject {
     func loginViewModelNeedsGoogleSignInPresentation(_ viewModel: LoginViewModel)
 }
 
-public final class LoginViewModel {
+final class LoginViewModel {
 
     // MARK: - Published Properties
 
-    @Published public private(set) var isLoading: Bool = false
-    @Published public private(set) var error: String?
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var error: String?
 
     // MARK: - Delegates
 
-    public weak var coordinatorDelegate: LoginViewModelCoordinatorDelegate?
-    public weak var delegate: LoginViewModelDelegate?
+    weak var coordinatorDelegate: LoginViewModelCoordinatorDelegate?
+    weak var delegate: LoginViewModelDelegate?
 
     // MARK: - Dependencies
 
@@ -43,24 +43,23 @@ public final class LoginViewModel {
 
     // MARK: - Initialization
 
-    public init(loginUseCase: LoginUseCaseProtocol, logger: LoggerProtocol) {
+    init(loginUseCase: LoginUseCaseProtocol, logger: LoggerProtocol) {
         self.loginUseCase = loginUseCase
         self.logger = logger
     }
 
-    // MARK: - Public Methods
+    // MARK: - Methods
 
-    public func login(email: String, password: String) {
+    func login(email: String, password: String) {
         // Validación básica
         guard !email.isEmpty, !password.isEmpty else {
             error = "Por favor completa todos los campos"
             return
         }
-        
+
         isLoading = true
         error = nil
 
-        
         loginUseCase.execute(email: email, password: password)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -78,7 +77,7 @@ public final class LoginViewModel {
             .store(in: &cancellables)
     }
 
-    public func signInWithGoogle() {
+    func signInWithGoogle() {
         if let delegate = delegate {
             delegate.loginViewModelNeedsGoogleSignInPresentation(self)
         } else {
@@ -87,7 +86,7 @@ public final class LoginViewModel {
         }
     }
 
-    public func performGoogleSignIn(presentingViewController: UIViewController) {
+    func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
         let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController)
@@ -108,7 +107,7 @@ public final class LoginViewModel {
             .store(in: &cancellables)
     }
 
-    public func clearError() {
+    func clearError() {
         error = nil
     }
 }

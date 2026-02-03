@@ -8,18 +8,18 @@
 import UIKit
 import Combine
 
-public final class LoginViewController: UIViewController {
+final class LoginViewController: UIViewController {
 
     // MARK: - Properties
 
-    public let viewModel: LoginViewModel
+    let viewModel: LoginViewModel
     private let googleCredentialProvider: GoogleCredentialProvider
     private var cancellables = Set<AnyCancellable>()
-    public weak var delegate: LoginViewControllerDelegate?
+    weak var delegate: LoginViewControllerDelegate?
 
     // MARK: - Initialization
 
-    public init(viewModel: LoginViewModel, googleCredentialProvider: GoogleCredentialProvider) {
+    init(viewModel: LoginViewModel, googleCredentialProvider: GoogleCredentialProvider) {
         self.viewModel = viewModel
         self.googleCredentialProvider = googleCredentialProvider
         super.init(nibName: nil, bundle: nil)
@@ -182,7 +182,6 @@ public final class LoginViewController: UIViewController {
                 self?.showError(title: "Error", message: error)
             }
             .store(in: &cancellables)
-
     }
 
     // MARK: - Actions
@@ -210,7 +209,6 @@ public final class LoginViewController: UIViewController {
         loadingComponents.overlay.isHidden = !show
         show ? loadingComponents.indicator.startAnimating() : loadingComponents.indicator.stopAnimating()
     }
-
 }
 
 // MARK: - LoginViewModelDelegate

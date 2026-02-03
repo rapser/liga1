@@ -10,20 +10,20 @@ import Foundation
 import Combine
 
 /// Use Case para realizar login (Domain sin UIKit).
-public protocol LoginUseCaseProtocol {
+protocol LoginUseCaseProtocol {
     func execute(email: String, password: String) -> AnyPublisher<User, Error>
     func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error>
 }
 
-public final class LoginUseCase: LoginUseCaseProtocol {
+final class LoginUseCase: LoginUseCaseProtocol {
 
     private let authRepository: AuthRepository
 
-    public init(authRepository: AuthRepository) {
+    init(authRepository: AuthRepository) {
         self.authRepository = authRepository
     }
 
-    public func execute(email: String, password: String) -> AnyPublisher<User, Error> {
+    func execute(email: String, password: String) -> AnyPublisher<User, Error> {
         guard !email.isEmpty, !password.isEmpty else {
             return Fail(error: NSError(
                 domain: "LoginUseCase",
@@ -43,7 +43,7 @@ public final class LoginUseCase: LoginUseCaseProtocol {
         return authRepository.login(email: email, password: password)
     }
 
-    public func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error> {
+    func executeWithGoogle(credentialProvider: GoogleCredentialProvider) -> AnyPublisher<User, Error> {
         return credentialProvider.provideCredential()
             .flatMap { [weak self] credential -> AnyPublisher<User, Error> in
                 guard let self = self else {

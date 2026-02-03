@@ -10,19 +10,19 @@ import Foundation
 import Combine
 
 /// Use Case para realizar logout
-public protocol LogoutUseCaseProtocol {
+protocol LogoutUseCaseProtocol {
     func execute() -> AnyPublisher<Void, Error>
 }
 
-public final class LogoutUseCase: LogoutUseCaseProtocol {
+final class LogoutUseCase: LogoutUseCaseProtocol {
 
     private let authRepository: AuthRepository
 
-    public init(authRepository: AuthRepository) {
+    init(authRepository: AuthRepository) {
         self.authRepository = authRepository
     }
 
-    public func execute() -> AnyPublisher<Void, Error> {
+    func execute() -> AnyPublisher<Void, Error> {
         return authRepository.logout()
             .eraseToAnyPublisher()
     }

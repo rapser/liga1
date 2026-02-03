@@ -8,64 +8,94 @@
 
 import Foundation
 import UIKit
+import Combine
 
-/// Módulo de autenticación - Interfaz pública
-/// Proporciona acceso a funcionalidades del módulo sin exponer detalles internos
+/// Módulo de autenticación - Interfaz pública (Facade)
+/// Esta es la ÚNICA API que los consumidores deben usar
 public final class AuthModule {
 
-    // MARK: - Coordinator
+    // MARK: - Private
 
-    /// Crea un coordinador de autenticación
+    private static var authService: AuthService?
+
+    private static func getService() -> AuthService {
+        if let service = authService {
+            return service
+        }
+        let service = AuthService(logger: Logger.shared)
+        authService = service
+        return service
+    }
+
+    // MARK: - Configuration
+
+    /// Configura el módulo de autenticación
+    /// - Parameter logger: Logger para registro de eventos (opcional)
+    public static func configure(logger: LoggerProtocol = Logger.shared) {
+        authService = AuthService(logger: logger)
+    }
+
+    // MARK: - Current User
+
+    /// Usuario actualmente autenticado (nil si no hay sesión)
+    public static var currentUser: User? {
+        getService().currentUserId != nil ? nil : nil // TODO: Implementar getCurrentUser sync
+    }
+
+    /// ID del usuario actualmente autenticado
+    public static var currentUserId: String? {
+        getService().currentUserId
+    }
+
+    /// Observa cambios en el estado de autenticación
+    public static func observeAuthState() -> AnyPublisher<User?, Never> {
+        getService().observeAuthState()
+    }
+
+    // MARK: - Authentication
+
+    /// Inicia sesión con email y contraseña
+    /// - Parameters:
+    ///   - email: Correo electrónico
+    ///   - password: Contraseña
+    /// - Returns: Publisher con el usuario autenticado o error
+    public static func login(email: String, password: String) -> AnyPublisher<User, Error> {
+        getService().login(email: email, password: password)
+    }
+
+    /// Inicia sesión con Google
+    /// - Parameter presentingViewController: ViewController para presentar la UI de Google
+    /// - Returns: Publisher con el usuario autenticado o error
+    public static func loginWithGoogle(presenting viewController: UIViewController) -> AnyPublisher<User, Error> {
+        let provider = GoogleCredentialProviderImpl(presentingViewController: viewController)
+        return provider.provideCredential()
+            .flatMap { credential in
+                getService().signInWithGoogle(credential: credential)
+            }
+            .eraseToAnyPublisher()
+    }
+
+    /// Cierra la sesión actual
+    /// - Returns: Publisher que completa cuando el logout termina
+    public static func logout() -> AnyPublisher<Void, Error> {
+        getService().logout()
+    }
+
+    // MARK: - Coordinator (opcional - para apps que quieran UI incluida)
+
+    /// Crea un coordinador de autenticación con UI incluida
     /// - Parameters:
     ///   - navigationController: Navigation controller para presentar las pantallas
     ///   - logger: Logger para registro de eventos
     /// - Returns: Coordinador configurado y listo para iniciar
     public static func makeCoordinator(
         navigationController: UINavigationController,
-        logger: LoggerProtocol
+        logger: LoggerProtocol = Logger.shared
     ) -> AuthCoordinator {
         let diContainer = AuthDIContainer(logger: logger)
         return AuthCoordinator(
             navigationController: navigationController,
             diContainer: diContainer
         )
-    }
-
-    // MARK: - Repositories
-
-    /// Crea una instancia del repositorio de autenticación
-    /// Útil cuando otros módulos necesitan acceso a funcionalidades de auth
-    /// - Parameter logger: Logger para registro de eventos
-    /// - Returns: Repositorio de autenticación configurado
-    public static func makeAuthRepository(logger: LoggerProtocol) -> AuthRepository {
-        return AuthService(logger: logger)
-    }
-
-    // MARK: - Use Cases
-
-    /// Crea el use case de login
-    /// - Parameter logger: Logger para registro de eventos
-    /// - Returns: Use case de login configurado
-    public static func makeLoginUseCase(logger: LoggerProtocol) -> LoginUseCaseProtocol {
-        let repository = makeAuthRepository(logger: logger)
-        return LoginUseCase(authRepository: repository)
-    }
-
-    /// Crea el use case de logout
-    /// - Parameter logger: Logger para registro de eventos
-    /// - Returns: Use case de logout configurado
-    public static func makeLogoutUseCase(logger: LoggerProtocol) -> LogoutUseCaseProtocol {
-        let repository = makeAuthRepository(logger: logger)
-        return LogoutUseCase(authRepository: repository)
-    }
-
-    // MARK: - Auth Provider
-
-    /// Crea un provider de autenticación
-    /// Útil cuando otros módulos solo necesitan verificar userId actual
-    /// - Parameter logger: Logger para registro de eventos
-    /// - Returns: Provider de autenticación
-    public static func makeAuthProvider(logger: LoggerProtocol) -> AuthProvider {
-        return AuthService(logger: logger)
     }
 }

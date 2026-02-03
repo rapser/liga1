@@ -12,15 +12,15 @@ import GoogleSignIn
 import FirebaseCore
 
 /// Implementación de GoogleCredentialProvider que presenta la UI de Google Sign-In.
-public final class GoogleCredentialProviderImpl: GoogleCredentialProvider {
+final class GoogleCredentialProviderImpl: GoogleCredentialProvider {
 
     private weak var presentingViewController: UIViewController?
 
-    public init(presentingViewController: UIViewController) {
+    init(presentingViewController: UIViewController) {
         self.presentingViewController = presentingViewController
     }
 
-    public func provideCredential() -> AnyPublisher<GoogleCredential, Error> {
+    func provideCredential() -> AnyPublisher<GoogleCredential, Error> {
         return Future<GoogleCredential, Error> { [weak self] promise in
             guard let self = self,
                   let presenting = self.presentingViewController else {

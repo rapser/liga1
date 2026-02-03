@@ -73,8 +73,8 @@ extension AuthCoordinator: LoginViewControllerDelegate {
 
 // MARK: - LoginViewControllerDelegate Protocol
 
-/// Protocolo para comunicar eventos desde LoginViewController
-public protocol LoginViewControllerDelegate: AnyObject {
+/// Protocolo interno para comunicar eventos desde LoginViewController
+protocol LoginViewControllerDelegate: AnyObject {
     func loginViewControllerDidLogin(_ viewController: LoginViewController, user: User)
     func loginViewControllerDidCancel(_ viewController: LoginViewController)
 }
