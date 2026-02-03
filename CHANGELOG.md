@@ -19,17 +19,16 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - **Historial de notificaciones**: Tabla plana con mayor altura de celdas para mejor legibilidad
 
 ### 🐛 Fixed
-- **Login con Email/Password**: Corregido problema de navegación después del login exitoso usando NotificationCenter como mecanismo principal
-- **Login con Google**: Corregido problema donde el coordinatorDelegate se perdía durante el flujo, ahora usa NotificationCenter para navegación robusta
-- **Logout**: Mejorado el flujo de logout para asegurar que cierra sesión correctamente en Firebase y navega al login
+- **Login**: Navegación post-login por delegado (coordinatorDelegate) desde LoginViewModel al Coordinator
+- **Logout**: Flujo de logout delegado al AppCoordinator vía MainFlowDelegate; el ViewController ya no manipula la ventana
+- **Tap en notificación push**: Navegación al partido mediante SessionManager.onNotificationTap y AppCoordinator.handleNotificationTap(matchId)
 
 ### 🗑️ Removed
 - **Service Extension de notificaciones push rich**: Eliminado PushServiceExtension y todas sus referencias
 - **Opción de selección de tema**: Eliminada la opción manual de cambiar entre modo claro/oscuro/automático
 
 ### 🏗️ Refactor
-- **Sistema de navegación post-login**: Refactorizado para usar NotificationCenter como mecanismo principal de comunicación entre ViewModels y Coordinators
-- **AppCoordinator**: Ahora escucha directamente notificaciones de login/logout para navegación más robusta
+- **Comunicación entre capas (Clean Architecture)**: Eliminado NotificationCenter como canal entre capas. Login: navegación solo por delegado (LoginViewModel → LoginCoordinator → AppCoordinator). Logout: protocolo MainFlowDelegate; ProfileViewController notifica al AppCoordinator vía delegado. FavoritesService y UserPreferencesService reaccionan al estado de auth (AuthService.observeCurrentUser()) en lugar de escuchar "LoginSuccessful". Tap en notificación push: AppDelegate invoca SessionManager.onNotificationTap(matchId); SceneDelegate registra el handler que llama a AppCoordinator.handleNotificationTap(matchId).
 
 ---
 

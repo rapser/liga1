@@ -24,7 +24,6 @@ class ToggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol {
     func execute(matchId: String) -> AnyPublisher<Void, Error> {
         // Validación de negocio
         guard !matchId.isEmpty else {
-            Logger.shared.error("ToggleFavoriteUseCase: matchId is empty", error: nil)
             return Fail(error: NSError(
                 domain: "ToggleFavoriteUseCase",
                 code: -1,
@@ -32,18 +31,8 @@ class ToggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol {
             )).eraseToAnyPublisher()
         }
 
-
         return service.toggleFavorite(matchId: matchId)
-            .map { _ in () }  // Convertir Bool a Void
-            .handleEvents(
-                receiveOutput: { _ in
-                },
-                receiveCompletion: { completion in
-                    if case .failure(let error) = completion {
-                        Logger.shared.error("ToggleFavoriteUseCase: Failed to toggle favorite for match \(matchId)", error: error)
-                    }
-                }
-            )
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 }

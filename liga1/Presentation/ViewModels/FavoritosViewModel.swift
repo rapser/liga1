@@ -36,6 +36,7 @@ class FavoritosViewModel {
     private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
     private let toggleFavoriteTeamUseCase: ToggleFavoriteTeamUseCaseProtocol
     private let observeFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol
+    private let notificationTopicManager: NotificationTopicManagerProtocol
 
     // MARK: - Private Properties
 
@@ -49,7 +50,8 @@ class FavoritosViewModel {
         observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol,
         fetchTeamsUseCase: FetchTeamsUseCaseProtocol,
         toggleFavoriteTeamUseCase: ToggleFavoriteTeamUseCaseProtocol,
-        observeFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol
+        observeFavoriteTeamsUseCase: ObserveFavoriteTeamsUseCaseProtocol,
+        notificationTopicManager: NotificationTopicManagerProtocol
     ) {
         self.fetchFavoriteMatchesUseCase = fetchFavoriteMatchesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
@@ -57,6 +59,7 @@ class FavoritosViewModel {
         self.fetchTeamsUseCase = fetchTeamsUseCase
         self.toggleFavoriteTeamUseCase = toggleFavoriteTeamUseCase
         self.observeFavoriteTeamsUseCase = observeFavoriteTeamsUseCase
+        self.notificationTopicManager = notificationTopicManager
 
         observeFavorites()
         observeFavoriteTeams()
@@ -69,8 +72,8 @@ class FavoritosViewModel {
         toggleFavoriteUseCase.execute(matchId: matchId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to toggle favorite for match: \(matchId)", error: error)
+                if case .failure = completion {
+                    // Error silently handled
                 }
             } receiveValue: { _ in
                 // Favorite toggled successfully
@@ -91,13 +94,10 @@ class FavoritosViewModel {
         toggleFavoriteTeamUseCase.execute(teamId: teamId)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                if case .failure(let error) = completion {
-                    Logger.shared.error("❌ FavoritosViewModel: Error al cambiar favorito para equipo: \(teamId)", error: error)
+                if case .failure = completion {
+                    // Error silently handled
                 } else {
-                    // Forzar sincronización de topics después de cambiar favorito
-                    // El delay ya está manejado dentro de syncTopicsWithFavorites()
-                    let topicManager = DIContainer.shared.makeNotificationTopicManager()
-                    topicManager.syncTopicsWithFavorites()
+                    self.notificationTopicManager.syncTopicsWithFavorites()
                 }
             } receiveValue: { _ in
             }
@@ -140,7 +140,6 @@ class FavoritosViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to fetch favorite matches", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] matches in
@@ -165,7 +164,6 @@ class FavoritosViewModel {
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
-                    Logger.shared.error("Failed to fetch teams", error: error)
                     self?.error = error
                 }
             } receiveValue: { [weak self] teams in

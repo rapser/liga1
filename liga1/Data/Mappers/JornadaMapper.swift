@@ -13,10 +13,9 @@ struct JornadaMapper {
 
     /// Convierte JornadaDTO a Jornada (Domain Model puro)
     /// El documentID debe tener formato "torneo_numero" (ej: "apertura_01")
-    static func toDomain(from dto: JornadaDTO, documentID: String? = nil) -> Jornada? {
+    static func toDomain(from dto: JornadaDTO, documentID: String? = nil, logger: LoggerProtocol) -> Jornada? {
         guard let id = dto.id ?? documentID,
               let mostrar = dto.mostrar else {
-            Logger.shared.warning("JornadaMapper: Missing required fields - id: \(dto.id ?? "nil"), mostrar: \(dto.mostrar ?? false)")
             return nil
         }
 
@@ -32,7 +31,6 @@ struct JornadaMapper {
             torneo = parsed.torneo
             numero = parsed.numero
         } else {
-            Logger.shared.warning("JornadaMapper: Cannot extract torneo and numero from id: \(id)")
             return nil
         }
 
@@ -80,7 +78,7 @@ struct JornadaMapper {
 
     /// Convierte array de JornadaDTO a array de Jornada
     /// Nota: Este método no recibe documentIDs, así que asume que los DTOs ya tienen id asignado
-    static func toDomain(from dtos: [JornadaDTO]) -> [Jornada] {
-        return dtos.compactMap { toDomain(from: $0) }
+    static func toDomain(from dtos: [JornadaDTO], logger: LoggerProtocol) -> [Jornada] {
+        return dtos.compactMap { toDomain(from: $0, documentID: nil, logger: logger) }
     }
 }

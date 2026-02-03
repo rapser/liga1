@@ -35,12 +35,14 @@ private struct MatchIdComponents {
 class MatchesRepository: MatchesRepositoryProtocol {
 
     private let database: DatabaseProtocol
+    private let logger: LoggerProtocol
     
     private var matchSubjects: [String: CurrentValueSubject<[Match], Never>] = [:]
     private let subjectsQueue = DispatchQueue(label: "com.liga1.matchesRepository.subjects")
 
-    init(database: DatabaseProtocol) {
+    init(database: DatabaseProtocol, logger: LoggerProtocol) {
         self.database = database
+        self.logger = logger
     }
 
     private var db: Firestore {
@@ -67,13 +69,11 @@ class MatchesRepository: MatchesRepositoryProtocol {
                     if let error = error as NSError?,
                        error.domain == "FIRFirestoreErrorDomain",
                        error.code == 9 { // Error de índice faltante
-                        Logger.shared.warning("MatchesRepository: Index missing for fecha field, fetching without order")
                         self?.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
                         return
                     }
-                    
+
                     if let error = error {
-                        Logger.shared.error("MatchesRepository: Error fetching matches for jornada \(jornadaId)", error: error)
                         promise(.failure(error))
                         return
                     }
@@ -87,18 +87,16 @@ class MatchesRepository: MatchesRepositoryProtocol {
     private func fetchMatchesWithoutOrder(query: Query, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
         query.getDocuments(source: .default) { [weak self] snapshot, error in
             if let error = error {
-                Logger.shared.error("MatchesRepository: Error fetching matches without order for jornada \(jornadaId)", error: error)
                 promise(.failure(error))
                 return
             }
-            
+
             self?.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
         }
     }
     
     private func processMatches(snapshot: QuerySnapshot?, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
         guard let documents = snapshot?.documents else {
-            Logger.shared.warning("MatchesRepository: No documents found for jornada \(jornadaId)")
             getOrCreateSubject(for: jornadaId).send([])
             promise(.success([]))
             return
@@ -128,8 +126,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
                     let visitante = String(components[1])
                     return (local, visitante)
                 }
-                
-                Logger.shared.warning("MatchesRepository: Cannot extract equipoLocalId and equipoVisitanteId from documentID: \(documentID)")
+
                 return (nil, nil)
             }()
             
@@ -156,7 +153,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
         }
         
         
-        let matches = MatchMapper.toDomain(from: matchDTOs)
+        let matches = MatchMapper.toDomain(from: matchDTOs, logger: self.logger)
         let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
 
         getOrCreateSubject(for: jornadaId).send(sortedMatches)
@@ -195,11 +192,11 @@ class MatchesRepository: MatchesRepositoryProtocol {
                     .document(idComponents.jornadaId)
                     .collection(FirestoreConstants.Collection.matches)
                     .document(idComponents.matchId)
-                    .getDocument { snapshot, error in
+                    .getDocument { [weak self] snapshot, error in
                         defer { dispatchGroup.leave() }
 
                         if let error = error {
-                            Logger.shared.error("MatchesRepository: Error fetching match \(fullMatchId)", error: error)
+                            self?.logger.error("MatchesRepository: Error fetching match \(fullMatchId)", error: error)
                             fetchError = error
                             return
                         }
@@ -211,25 +208,25 @@ class MatchesRepository: MatchesRepositoryProtocol {
                         // Crear MatchDTO manualmente desde los datos del documento
                         let documentID = snapshot.documentID
                         let data = snapshot.data() ?? [:]
-                        
+
                         // Extraer equipoLocalId y equipoVisitanteId del documentID
                         let (equipoLocalId, equipoVisitanteId): (String?, String?) = {
                             if let local = data["equipoLocalId"] as? String,
                                let visitante = data["equipoVisitanteId"] as? String {
                                 return (local, visitante)
                             }
-                            
+
                             let components = documentID.split(separator: "_")
                             if components.count >= 2 {
                                 return (String(components[0]), String(components[1]))
                             }
                             return (nil, nil)
                         }()
-                        
+
                         // Mapear campos de goles
                         let golesTeamA = data["golesTeamA"] as? Int ?? data["golesEquipoLocal"] as? Int
                         let golesTeamB = data["golesTeamB"] as? Int ?? data["golesEquipoVisitante"] as? Int
-                        
+
                         let matchDTO = MatchDTO(
                             id: documentID,
                             equipoLocalId: equipoLocalId,
@@ -240,9 +237,10 @@ class MatchesRepository: MatchesRepositoryProtocol {
                             estado: data["estado"] as? String,
                             suspendido: data["suspendido"] as? Bool
                         )
-                        
+
                         // Convertir MatchDTO a Match usando el mapper
-                        if let match = MatchMapper.toDomain(from: matchDTO) {
+                        guard let self = self else { return }
+                        if let match = MatchMapper.toDomain(from: matchDTO, logger: self.logger) {
                             allMatches.append(match)
                         }
                     }

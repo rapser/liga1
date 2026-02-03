@@ -59,16 +59,12 @@ class NewsCell: UITableViewCell {
         fechaLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -Spacing.small).isActive = true
     }
 
-    func configure(with item: NewsItem) {
+    func configure(with item: NewsItemUI) {
         titleLabel.text = item.title
-        if let url = URL(string: item.imageUrl) {
+        if let url = item.imageURL {
             newsImageView.kf.setImage(with: url)
         }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        fechaLabel.text = formatter.string(from: item.publishedDate)
-
+        fechaLabel.text = item.fechaFormateada
         if item.featured {
             contentView.backgroundColor = UIColor(red: 1, green: 0.95, blue: 0.8, alpha: 1)
         } else {

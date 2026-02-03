@@ -332,7 +332,7 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return viewModel.selectedSegment == .matches ? UITableView.automaticDimension : 60
+        return 70
     }
 }
 

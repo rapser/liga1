@@ -13,9 +13,11 @@ import Combine
 class AdminMatchRepository: AdminMatchRepositoryProtocol {
 
     private let database: DatabaseProtocol
+    private let logger: LoggerProtocol
 
-    init(database: DatabaseProtocol) {
+    init(database: DatabaseProtocol, logger: LoggerProtocol) {
         self.database = database
+        self.logger = logger
     }
 
     private var db: Firestore {
@@ -111,7 +113,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
                         .document(match.id)
                     batch.setData(data, forDocument: docRef)
                 } catch {
-                    Logger.shared.error("AdminMatchRepository: Failed to encode match \(match.id)", error: error)
+                    self.logger.error("AdminMatchRepository: Failed to encode match \(match.id)", error: error)
                     // Continuar con el siguiente match
                 }
             }
@@ -178,7 +180,7 @@ class AdminMatchRepository: AdminMatchRepositoryProtocol {
             
             batch.commit { error in
                 if let error = error {
-                    Logger.shared.error("AdminMatchRepository: Failed to register jornada \(jornadaId)", error: error)
+                    self.logger.error("AdminMatchRepository: Failed to register jornada \(jornadaId)", error: error)
                     promise(.failure(error))
                 } else {
                     promise(.success(()))

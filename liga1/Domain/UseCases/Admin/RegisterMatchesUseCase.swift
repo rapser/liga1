@@ -19,9 +19,11 @@ protocol RegisterMatchesUseCaseProtocol {
 final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
 
     private let adminMatchRepository: AdminMatchRepositoryProtocol
+    private let logger: LoggerProtocol
 
-    init(adminMatchRepository: AdminMatchRepositoryProtocol) {
+    init(adminMatchRepository: AdminMatchRepositoryProtocol, logger: LoggerProtocol) {
         self.adminMatchRepository = adminMatchRepository
+        self.logger = logger
     }
 
     func registerJornadaWithMatches(jornadaId: String, mostrar: Bool, fechaInicio: Date, matches: [Match]) -> AnyPublisher<Void, Error> {
@@ -31,14 +33,14 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 code: -14,
                 userInfo: [NSLocalizedDescriptionKey: "La lista de partidos no puede estar vacía"]
             )
-            Logger.shared.error("RegisterMatchesUseCase: Empty matches array for jornada", error: nil)
+            self.logger.error("RegisterMatchesUseCase: Empty matches array for jornada", error: nil)
             return Fail(error: error).eraseToAnyPublisher()
         }
         
         // Validar cada partido
         for (index, match) in matches.enumerated() {
             if let validationError = validateMatch(match, jornadaId: jornadaId) {
-                Logger.shared.error("RegisterMatchesUseCase: Validation failed for match at index \(index) in jornada \(jornadaId)", error: validationError)
+                self.logger.error("RegisterMatchesUseCase: Validation failed for match at index \(index) in jornada \(jornadaId)", error: validationError)
                 return Fail(error: validationError).eraseToAnyPublisher()
             }
         }
@@ -52,7 +54,7 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
         .handleEvents(
             receiveCompletion: { completion in
                 if case .failure(let error) = completion {
-                    Logger.shared.error("RegisterMatchesUseCase: Failed to register jornada \(jornadaId)", error: error)
+                    self.logger.error("RegisterMatchesUseCase: Failed to register jornada \(jornadaId)", error: error)
                 }
             }
         )
@@ -66,9 +68,9 @@ final class RegisterMatchesUseCase: RegisterMatchesUseCaseProtocol {
                 receiveCompletion: { completion in
                     switch completion {
                     case .failure(let error):
-                        Logger.shared.error("RegisterMatchesUseCase: Failed to register all Apertura jornadas", error: error)
+                        self.logger.error("RegisterMatchesUseCase: Failed to register all Apertura jornadas", error: error)
                     case .finished:
-                        Logger.shared.info("RegisterMatchesUseCase: Successfully registered all 17 Apertura jornadas")
+                        self.logger.info("RegisterMatchesUseCase: Successfully registered all 17 Apertura jornadas")
                     }
                 }
             )

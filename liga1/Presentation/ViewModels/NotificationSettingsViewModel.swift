@@ -49,8 +49,7 @@ class NotificationSettingsViewModel {
                 receiveCompletion: { [weak self] completion in
                     self?.isLoading = false
 
-                    if case .failure(let error) = completion {
-                        Logger.shared.error("❌ Error actualizando preferencias", error: error)
+                    if case .failure = completion {
                         self?.errorMessage = "No se pudo actualizar la configuración. Intenta nuevamente."
 
                         // Revertir el cambio en la UI

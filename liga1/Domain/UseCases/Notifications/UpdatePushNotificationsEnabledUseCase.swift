@@ -20,13 +20,16 @@ class UpdatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCa
 
     private let userPreferencesService: UserPreferencesServiceProtocol
     private let notificationTopicManager: NotificationTopicManagerProtocol
+    private let logger: LoggerProtocol
 
     init(
         userPreferencesService: UserPreferencesServiceProtocol,
-        notificationTopicManager: NotificationTopicManagerProtocol
+        notificationTopicManager: NotificationTopicManagerProtocol,
+        logger: LoggerProtocol
     ) {
         self.userPreferencesService = userPreferencesService
         self.notificationTopicManager = notificationTopicManager
+        self.logger = logger
     }
 
     func execute(enabled: Bool) -> AnyPublisher<Void, Error> {
@@ -46,7 +49,7 @@ class UpdatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCa
                 },
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        Logger.shared.error("❌ Error actualizando notificaciones push", error: error)
+                        self.logger.error("❌ Error actualizando notificaciones push", error: error)
                     }
                 }
             )

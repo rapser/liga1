@@ -27,11 +27,11 @@ final class DIContainer {
     // MARK: - Repositories
 
     func makeJornadasRepository() -> JornadasRepositoryProtocol {
-        return JornadasRepository(database: makeDatabase())
+        return JornadasRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     func makeMatchesRepository() -> MatchesRepositoryProtocol {
-        return MatchesRepository(database: makeDatabase())
+        return MatchesRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     func makeTeamsRepository() -> TeamsRepositoryProtocol {
@@ -39,24 +39,32 @@ final class DIContainer {
     }
 
     func makeNewsRepository() -> NewsRepositoryProtocol {
-        return NewsRepository(database: makeDatabase())
+        return NewsRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     func makeAdminMatchRepository() -> AdminMatchRepositoryProtocol {
-        return AdminMatchRepository(database: makeDatabase())
+        return AdminMatchRepository(database: makeDatabase(), logger: makeLogger())
     }
 
     // MARK: - Services
 
-    func makeAuthService() -> AuthServiceProtocol {
-        return AuthService()
+    // Auth Module - usar AuthRepository en lugar de AuthServiceProtocol
+    private lazy var authService: AuthService = {
+        return AuthService(logger: makeLogger())
+    }()
+
+    func makeAuthRepository() -> AuthRepository {
+        return authService
+    }
+
+    func makeAuthProvider() -> AuthProvider {
+        return authService
     }
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        let authService = makeAuthService() as! AuthService
-        return FavoritesService(database: makeDatabase(), authProvider: authService)
+        return FavoritesService(database: makeDatabase(), authProvider: makeAuthProvider(), logger: makeLogger())
     }()
-    
+
     func makeFavoritesService() -> FavoritesServiceProtocol {
         return favoritesService
     }
@@ -70,10 +78,14 @@ final class DIContainer {
     }
 
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
-        let authService = makeAuthService() as! AuthService
-        return UserPreferencesService(database: makeDatabase(), authProvider: authService)
+        return UserPreferencesService(
+            database: makeDatabase(),
+            authProvider: makeAuthProvider(),
+            authRepository: makeAuthRepository(),
+            logger: makeLogger()
+        )
     }()
-    
+
     func makeUserPreferencesService() -> UserPreferencesServiceProtocol {
         return userPreferencesService
     }
@@ -82,7 +94,8 @@ final class DIContainer {
         return NotificationTopicManager(
             notificationService: makeNotificationService(),
             favoritesService: makeFavoritesService(),
-            userPreferencesService: makeUserPreferencesService()
+            userPreferencesService: makeUserPreferencesService(),
+            logger: makeLogger()
         )
     }()
 
@@ -100,11 +113,28 @@ final class DIContainer {
         return notificationDeduplicator
     }
 
+    // MARK: - Logging
+
+    func makeLogger() -> LoggerProtocol {
+        return Logger.shared
+    }
+
+    // MARK: - EventBus
+
+    private lazy var appEventBus: AppEventBusProtocol = {
+        return AppEventBus()
+    }()
+
+    func makeAppEventBus() -> AppEventBusProtocol {
+        return appEventBus
+    }
+
     // MARK: - Use Cases - Jornadas
 
     func makeFetchActiveJornadasUseCase() -> FetchActiveJornadasUseCaseProtocol {
         return FetchActiveJornadasUseCase(
-            repository: makeJornadasRepository()
+            repository: makeJornadasRepository(),
+            logger: makeLogger()
         )
     }
 
@@ -180,13 +210,13 @@ final class DIContainer {
 
     func makeLoginUseCase() -> LoginUseCaseProtocol {
         return LoginUseCase(
-            authService: makeAuthService()
+            authRepository: makeAuthRepository()
         )
     }
 
     func makeLogoutUseCase() -> LogoutUseCaseProtocol {
         return LogoutUseCase(
-            authService: makeAuthService()
+            authRepository: makeAuthRepository()
         )
     }
 
@@ -194,7 +224,8 @@ final class DIContainer {
 
     func makeRegisterMatchesUseCase() -> RegisterMatchesUseCaseProtocol {
         return RegisterMatchesUseCase(
-            adminMatchRepository: makeAdminMatchRepository()
+            adminMatchRepository: makeAdminMatchRepository(),
+            logger: makeLogger()
         )
     }
 
@@ -203,7 +234,8 @@ final class DIContainer {
     func makeUpdatePushNotificationsEnabledUseCase() -> UpdatePushNotificationsEnabledUseCaseProtocol {
         return UpdatePushNotificationsEnabledUseCase(
             userPreferencesService: makeUserPreferencesService(),
-            notificationTopicManager: makeNotificationTopicManager()
+            notificationTopicManager: makeNotificationTopicManager(),
+            logger: makeLogger()
         )
     }
 
@@ -244,7 +276,8 @@ final class DIContainer {
             observeFavoritesUseCase: makeObserveFavoritesUseCase(),
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
             toggleFavoriteTeamUseCase: makeToggleFavoriteTeamUseCase(),
-            observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase()
+            observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase(),
+            notificationTopicManager: makeNotificationTopicManager()
         )
     }
 
@@ -256,13 +289,15 @@ final class DIContainer {
 
     func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            loginUseCase: makeLoginUseCase()
+            loginUseCase: makeLoginUseCase(),
+            logger: makeLogger()
         )
     }
 
     func makeRegistrarPartidosViewModel() -> RegistrarPartidosViewModel {
         return RegistrarPartidosViewModel(
-            registerMatchesUseCase: makeRegisterMatchesUseCase()
+            registerMatchesUseCase: makeRegisterMatchesUseCase(),
+            logger: makeLogger()
         )
     }
 
@@ -291,25 +326,59 @@ final class DIContainer {
         return NewsViewController(viewModel: makeNewsViewModel())
     }
 
-    func makeProfileViewController() -> ProfileViewController {
-        return ProfileViewController(viewModel: makeProfileViewModel(), container: self)
+    func makeProfileViewController(eventBus: AppEventBusProtocol? = nil) -> ProfileViewController {
+        return ProfileViewController(
+            viewModel: makeProfileViewModel(),
+            container: self,
+            eventBus: eventBus ?? makeAppEventBus()
+        )
     }
 
-    func makeLoginViewController() -> LoginViewController {
-        return LoginViewController(viewModel: makeLoginViewModel())
+    func makeLoginViewController(presentingViewController: UIViewController) -> LoginViewController {
+        let viewModel = makeLoginViewModel()
+        let googleCredentialProvider = GoogleCredentialProviderImpl(
+            presentingViewController: presentingViewController
+        )
+        return LoginViewController(
+            viewModel: viewModel,
+            googleCredentialProvider: googleCredentialProvider
+        )
     }
 
     func makeRegistrarPartidosViewController() -> RegistrarPartidosViewController {
         return RegistrarPartidosViewController(viewModel: makeRegistrarPartidosViewModel())
     }
 
+    func makeLogsViewController() -> LogsViewController {
+        return LogsViewController(logger: makeLogger())
+    }
+
+    func makeNotificationHistoryViewController() -> NotificationHistoryViewController {
+        return NotificationHistoryViewController()
+    }
+
     // MARK: - Coordinators
 
     func makeAppCoordinator(window: UIWindow) -> AppCoordinator {
-        return AppCoordinator(window: window, container: self)
+        return AppCoordinator(
+            window: window,
+            container: self,
+            eventBus: makeAppEventBus(),
+            logger: makeLogger(),
+            authProvider: makeAuthProvider(),
+            logoutUseCase: makeLogoutUseCase()
+        )
     }
 
     func makeLoginCoordinator(navigationController: UINavigationController) -> LoginCoordinator {
-        return LoginCoordinator(navigationController: navigationController, container: self)
+        return LoginCoordinator(
+            navigationController: navigationController,
+            container: self,
+            eventBus: makeAppEventBus()
+        )
+    }
+
+    func makeMainTabBarController(eventBus: AppEventBusProtocol) -> MainTabBarController {
+        return MainTabBarController(container: self, eventBus: eventBus)
     }
 }
