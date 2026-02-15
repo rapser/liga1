@@ -19,6 +19,15 @@ class HomeViewController: UIViewController {
     private let refreshControl = UIRefreshControl()
     private lazy var tableViewAdapter = HomeTableViewAdapter(tableView: tableView)
 
+    // Loader para la carga inicial
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.prepareForAutoLayout()
+        indicator.hidesWhenStopped = true
+        indicator.color = .label
+        return indicator
+    }()
+
     // MARK: - Initialization
 
     init(viewModel: HomeViewModel) {
@@ -71,6 +80,11 @@ class HomeViewController: UIViewController {
         refreshControl.layer.zPosition = 1000
 
         configureRefreshControlColor()
+
+        // Agregar loading indicator
+        loadingIndicator
+            .addTo(containerView)
+            .centerInSuperview()
     }
     
     private func configureRefreshControlColor() {
@@ -137,8 +151,19 @@ class HomeViewController: UIViewController {
         viewModel.$isLoading
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
-                if !isLoading {
-                    self?.refreshControl.endRefreshing()
+                guard let self = self else { return }
+
+                if isLoading {
+                    // Mostrar loader solo si la tabla está vacía (carga inicial)
+                    if self.viewModel.jornadaSections.isEmpty {
+                        self.loadingIndicator.startAnimating()
+                        self.tableView.isHidden = true
+                    }
+                } else {
+                    // Ocultar loader y mostrar tabla
+                    self.loadingIndicator.stopAnimating()
+                    self.tableView.isHidden = false
+                    self.refreshControl.endRefreshing()
                 }
             }
             .store(in: &cancellables)

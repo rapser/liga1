@@ -125,10 +125,11 @@ class MatchTableViewCell: UITableViewCell {
             .centerY()
             .square(32)
 
-        // Stack vertical con los dos equipos
+        // Stack vertical con los dos equipos - ahora se extiende hasta el final menos un margen
         equiposStackView
             .addTo(contentView)
             .pinLeading(to: estrellaButton.trailingAnchor, constant: Spacing.small)
+            .pinTrailing(constant: 80) // Espacio para marcadores/hora
             .pinTop(constant: 12)
             .pinBottom(constant: 12)
 
@@ -142,7 +143,26 @@ class MatchTableViewCell: UITableViewCell {
         // Setup Equipo Visitante
         setupEquipoVisitante()
 
-        // Label de hora (centrado verticalmente)
+        // Configurar marcadores y hora en el contentView (compartiendo el mismo espacio a la derecha)
+        setupMarcadoresYHora()
+    }
+
+    private func setupMarcadoresYHora() {
+        // Marcador Local - anclado al trailing del contentView
+        marcadorLocalLabel
+            .addTo(contentView)
+            .pinTrailing(constant: Spacing.small)
+            .pinTop(constant: 12)
+            .width(40)
+
+        // Marcador Visitante - debajo del marcador local
+        marcadorVisitanteLabel
+            .addTo(contentView)
+            .pinTrailing(constant: Spacing.small)
+            .pinBottom(constant: 12)
+            .width(40)
+
+        // Hora - centrada verticalmente, en la misma posición que los marcadores
         horaLabel
             .addTo(contentView)
             .pinTrailing(constant: Spacing.small)
@@ -158,29 +178,12 @@ class MatchTableViewCell: UITableViewCell {
             .centerY()
             .square(24)
 
-        // Nombre
+        // Nombre - ocupa todo el espacio disponible
         nombreLocalLabel
             .addTo(equipoLocalContainer)
             .pinLeading(to: logoLocalImageView.trailingAnchor, constant: Spacing.small)
-            .centerY()
-
-        // Marcador
-        marcadorLocalLabel
-            .addTo(equipoLocalContainer)
             .pinTrailing()
             .centerY()
-            .width(30)
-
-        // Restricción para evitar overlap
-        nombreLocalLabel.trailingAnchor.constraint(
-            lessThanOrEqualTo: marcadorLocalLabel.leadingAnchor,
-            constant: -Spacing.small
-        ).isActive = true
-
-        // Conectar el trailing del container al stack
-        equipoLocalContainer.trailingAnchor.constraint(
-            equalTo: equiposStackView.trailingAnchor
-        ).isActive = true
     }
 
     private func setupEquipoVisitante() {
@@ -191,29 +194,12 @@ class MatchTableViewCell: UITableViewCell {
             .centerY()
             .square(24)
 
-        // Nombre
+        // Nombre - ocupa todo el espacio disponible
         nombreVisitanteLabel
             .addTo(equipoVisitanteContainer)
             .pinLeading(to: logoVisitanteImageView.trailingAnchor, constant: Spacing.small)
-            .centerY()
-
-        // Marcador
-        marcadorVisitanteLabel
-            .addTo(equipoVisitanteContainer)
             .pinTrailing()
             .centerY()
-            .width(30)
-
-        // Restricción para evitar overlap
-        nombreVisitanteLabel.trailingAnchor.constraint(
-            lessThanOrEqualTo: marcadorVisitanteLabel.leadingAnchor,
-            constant: -Spacing.small
-        ).isActive = true
-
-        // Conectar el trailing del container al stack
-        equipoVisitanteContainer.trailingAnchor.constraint(
-            equalTo: equiposStackView.trailingAnchor
-        ).isActive = true
     }
 
     // MARK: - Actions
