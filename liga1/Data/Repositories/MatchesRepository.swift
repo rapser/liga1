@@ -9,28 +9,6 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-/// Helper para parsear IDs compuestos de partidos
-private struct MatchIdComponents {
-    let jornadaId: String
-    let matchId: String
-
-    /// Parsea un fullMatchId con formato "torneo_numero_equipoA_equipoB" (ej: "apertura_01_atl_uni")
-    /// - Returns: MatchIdComponents o nil si el formato es inválido
-    static func parse(_ fullMatchId: String) -> MatchIdComponents? {
-        let components = fullMatchId.split(separator: "_", maxSplits: 2)
-        guard components.count == 3 else {
-            return nil
-        }
-
-        let torneo = String(components[0])      // "apertura" o "clausura"
-        let numero = String(components[1])       // "01"
-        let matchId = String(components[2])      // "atl_uni"
-        let jornadaId = "\(torneo)_\(numero)"   // "apertura_01"
-
-        return MatchIdComponents(jornadaId: jornadaId, matchId: matchId)
-    }
-}
-
 /// Implementación del protocolo MatchesRepositoryProtocol
 class MatchesRepository: MatchesRepositoryProtocol {
 
@@ -298,6 +276,30 @@ class MatchesRepository: MatchesRepositoryProtocol {
             let subject = CurrentValueSubject<[Match], Never>([])
             matchSubjects[jornadaId] = subject
             return subject
+        }
+    }
+
+    // MARK: - Helper Types
+
+    /// Helper para parsear IDs compuestos de partidos
+    private struct MatchIdComponents {
+        let jornadaId: String
+        let matchId: String
+
+        /// Parsea un fullMatchId con formato "torneo_numero_equipoA_equipoB" (ej: "apertura_01_atl_uni")
+        /// - Returns: MatchIdComponents o nil si el formato es inválido
+        static func parse(_ fullMatchId: String) -> MatchIdComponents? {
+            let components = fullMatchId.split(separator: "_", maxSplits: 2)
+            guard components.count == 3 else {
+                return nil
+            }
+
+            let torneo = String(components[0])      // "apertura" o "clausura"
+            let numero = String(components[1])       // "01"
+            let matchId = String(components[2])      // "atl_uni"
+            let jornadaId = "\(torneo)_\(numero)"   // "apertura_01"
+
+            return MatchIdComponents(jornadaId: jornadaId, matchId: matchId)
         }
     }
 }

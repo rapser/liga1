@@ -169,7 +169,6 @@
 		464001762F08853F00A8C905 /* LayoutPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutPresets.swift; sourceTree = "<group>"; };
 		464001772F08853F00A8C905 /* TablePosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TablePosition.swift; sourceTree = "<group>"; };
 		464001782F08853F00A8C905 /* TorneoType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorneoType.swift; sourceTree = "<group>"; };
-		4640017D2F08853F00A8C905 /* AdminMatchRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminMatchRepository.swift; sourceTree = "<group>"; };
 		4640017E2F08853F00A8C905 /* JornadasRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadasRepository.swift; sourceTree = "<group>"; };
 		4640017F2F08853F00A8C905 /* MatchesRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesRepository.swift; sourceTree = "<group>"; };
 		464001802F08853F00A8C905 /* NewsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRepository.swift; sourceTree = "<group>"; };
@@ -191,7 +190,6 @@
 		464009B52F098D4F00A8C905 /* FirestoreConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConstants.swift; sourceTree = "<group>"; };
 		464009B72F098D4F00A8C905 /* FirestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreManager.swift; sourceTree = "<group>"; };
 		464009B92F098D4F00A8C905 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		464009BE2F098D8D00A8C905 /* RegisterMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterMatchesUseCase.swift; sourceTree = "<group>"; };
 		464009C02F098D8D00A8C905 /* LoginUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginUseCase.swift; sourceTree = "<group>"; };
 		464009C12F098D8D00A8C905 /* LogoutUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutUseCase.swift; sourceTree = "<group>"; };
 		464009C32F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchFavoriteMatchesUseCase.swift; sourceTree = "<group>"; };
@@ -202,7 +200,6 @@
 		464009CB2F098D8D00A8C905 /* FetchNewsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchNewsUseCase.swift; sourceTree = "<group>"; };
 		464009CD2F098D8D00A8C905 /* FetchTeamsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchTeamsUseCase.swift; sourceTree = "<group>"; };
 		464009D92F098DBB00A8C905 /* RegistrarPartidosViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrarPartidosViewModel.swift; sourceTree = "<group>"; };
-		464009DB2F098DF600A8C905 /* RegistrarPartidosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrarPartidosViewController.swift; sourceTree = "<group>"; };
 		464009DD2F098DF600A8C905 /* FavoritosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosViewController.swift; sourceTree = "<group>"; };
 		464009DF2F098DF600A8C905 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		464009E22F098DF600A8C905 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -240,7 +237,6 @@
 		46B2E9622F2E547000EB66B3 /* UserDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDTO.swift; sourceTree = "<group>"; };
 		46B2E9642F2E547000EB66B3 /* UserMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMapper.swift; sourceTree = "<group>"; };
 		46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeduplicator.swift; sourceTree = "<group>"; };
-		46C3EB092F29853400E9EA0C /* LogsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsViewController.swift; sourceTree = "<group>"; };
 		46C3EB0C2F2B128D00E9EA0C /* ContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerView.swift; sourceTree = "<group>"; };
 		46C3EB0D2F2B128D00E9EA0C /* HeaderViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderViews.swift; sourceTree = "<group>"; };
 		46C3EB0E2F2B128D00E9EA0C /* NavigationBar+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NavigationBar+Builder.swift"; sourceTree = "<group>"; };
@@ -268,7 +264,6 @@
 		46CDF49D2F1068A300F280E6 /* MatchMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchMapper.swift; sourceTree = "<group>"; };
 		46CDF49E2F1068A300F280E6 /* NewsItemMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItemMapper.swift; sourceTree = "<group>"; };
 		46CDF49F2F1068A300F280E6 /* TeamMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamMapper.swift; sourceTree = "<group>"; };
-		46CDF4A52F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminMatchRepositoryProtocol.swift; sourceTree = "<group>"; };
 		46CDF4A62F1086F100F280E6 /* JornadasRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadasRepositoryProtocol.swift; sourceTree = "<group>"; };
 		46CDF4A72F1086F100F280E6 /* MatchesRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchesRepositoryProtocol.swift; sourceTree = "<group>"; };
 		46CDF4A82F1086F100F280E6 /* NewsRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRepositoryProtocol.swift; sourceTree = "<group>"; };
@@ -347,7 +342,6 @@
 		464001822F08853F00A8C905 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				4640017D2F08853F00A8C905 /* AdminMatchRepository.swift */,
 				4640017E2F08853F00A8C905 /* JornadasRepository.swift */,
 				4640017F2F08853F00A8C905 /* MatchesRepository.swift */,
 				464001802F08853F00A8C905 /* NewsRepository.swift */,
@@ -382,7 +376,6 @@
 			isa = PBXGroup;
 			children = (
 				464B95B22F287601001C4049 /* Notifications */,
-				464009BF2F098D8D00A8C905 /* Admin */,
 				464009C62F098D8D00A8C905 /* Favorites */,
 				464009C82F098D8D00A8C905 /* Jornadas */,
 				464009CA2F098D8D00A8C905 /* Matches */,
@@ -449,7 +442,6 @@
 		464001B32F08853F00A8C905 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				464009DC2F098DF600A8C905 /* Admin */,
 				464009DE2F098DF600A8C905 /* Favoritos */,
 				464009E12F098DF600A8C905 /* Home */,
 				464009E82F098DF600A8C905 /* News */,
@@ -498,14 +490,6 @@
 			path = Logging;
 			sourceTree = "<group>";
 		};
-		464009BF2F098D8D00A8C905 /* Admin */ = {
-			isa = PBXGroup;
-			children = (
-				464009BE2F098D8D00A8C905 /* RegisterMatchesUseCase.swift */,
-			);
-			path = Admin;
-			sourceTree = "<group>";
-		};
 		464009C62F098D8D00A8C905 /* Favorites */ = {
 			isa = PBXGroup;
 			children = (
@@ -552,14 +536,6 @@
 			path = Teams;
 			sourceTree = "<group>";
 		};
-		464009DC2F098DF600A8C905 /* Admin */ = {
-			isa = PBXGroup;
-			children = (
-				464009DB2F098DF600A8C905 /* RegistrarPartidosViewController.swift */,
-			);
-			path = Admin;
-			sourceTree = "<group>";
-		};
 		464009DE2F098DF600A8C905 /* Favoritos */ = {
 			isa = PBXGroup;
 			children = (
@@ -592,7 +568,6 @@
 		464009EB2F098DF600A8C905 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				46C3EB092F29853400E9EA0C /* LogsViewController.swift */,
 				4614616F2F1EA4A700BBC929 /* NotificationSettingsViewController.swift */,
 				4614616D2F1EA08D00BBC929 /* NotificationHistoryViewController.swift */,
 				464009E92F098DF600A8C905 /* ProfileViewController.swift */,
@@ -984,7 +959,6 @@
 		46CDF4AA2F1086F100F280E6 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				46CDF4A52F1086F100F280E6 /* AdminMatchRepositoryProtocol.swift */,
 				46CDF4A62F1086F100F280E6 /* JornadasRepositoryProtocol.swift */,
 				46CDF4A72F1086F100F280E6 /* MatchesRepositoryProtocol.swift */,
 				46CDF4A82F1086F100F280E6 /* NewsRepositoryProtocol.swift */,
