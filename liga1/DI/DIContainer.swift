@@ -325,10 +325,6 @@ final class DIContainer {
         )
     }
 
-    func makeLogsViewController() -> LogsViewController {
-        return LogsViewController(logger: makeLogger())
-    }
-
     func makeNotificationHistoryViewController() -> NotificationHistoryViewController {
         return NotificationHistoryViewController()
     }

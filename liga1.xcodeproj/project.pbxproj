@@ -87,7 +87,6 @@
 		46B2E9662F2E547000EB66B3 /* UserDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9622F2E547000EB66B3 /* UserDTO.swift */; };
 		46B2E9672F2E547000EB66B3 /* UserMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9642F2E547000EB66B3 /* UserMapper.swift */; };
 		46C3EB082F2942BF00E9EA0C /* NotificationDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */; };
-		46C3EB0A2F29853400E9EA0C /* LogsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB092F29853400E9EA0C /* LogsViewController.swift */; };
 		46C3EB1C2F2B128D00E9EA0C /* AppKit+Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB162F2B128D00E9EA0C /* AppKit+Examples.swift */; };
 		46C3EB1D2F2B128D00E9EA0C /* UIStackView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB142F2B128D00E9EA0C /* UIStackView+Builder.swift */; };
 		46C3EB1F2F2B128D00E9EA0C /* TableView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB0F2F2B128D00E9EA0C /* TableView+Builder.swift */; };
@@ -1203,7 +1202,6 @@
 				464009D32F098D8D00A8C905 /* ObserveFavoritesUseCase.swift in Sources */,
 				464009D42F098D8D00A8C905 /* FetchNewsUseCase.swift in Sources */,
 				464009D52F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift in Sources */,
-				46C3EB0A2F29853400E9EA0C /* LogsViewController.swift in Sources */,
 				46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */,
 				461461702F1EA4A700BBC929 /* NotificationSettingsViewController.swift in Sources */,
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,

@@ -127,8 +127,6 @@ class ProfileViewController: UIViewController {
         case .privacySettings:
             // TODO: Implementar ajustes de privacidad
             break
-        case .viewLogs:
-            navigateToLogs()
         case .none:
             break
         }
@@ -154,11 +152,6 @@ class ProfileViewController: UIViewController {
         let viewModel = container.makeNotificationSettingsViewModel()
         let notificationSettingsVC = NotificationSettingsViewController(viewModel: viewModel)
         navigationController?.pushViewController(notificationSettingsVC, animated: true)
-    }
-
-    private func navigateToLogs() {
-        let logsVC = container.makeLogsViewController()
-        navigationController?.pushViewController(logsVC, animated: true)
     }
 
     private func navigateToNotificationHistory() {
