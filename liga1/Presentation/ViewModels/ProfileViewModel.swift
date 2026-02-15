@@ -80,14 +80,6 @@ class ProfileViewModel {
                     action: .editUsername
                 )
             ]),
-            ProfileSection(title: "Administración", options: [
-                ProfileOption(
-                    title: "Registrar Partidos",
-                    icon: UIImage(systemName: "football.fill"),
-                    subtitle: "Herramienta para registro masivo",
-                    action: .registrarPartidos
-                )
-            ]),
             ProfileSection(title: "Otros", options: [
                 ProfileOption(
                     title: "Envía tus comentarios",
@@ -160,7 +152,6 @@ title: "Ajustes de privacidad",
         case terms
         case privacy
         case privacySettings
-        case registrarPartidos
         case viewLogs
         case none
     }

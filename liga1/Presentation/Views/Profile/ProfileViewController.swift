@@ -127,8 +127,6 @@ class ProfileViewController: UIViewController {
         case .privacySettings:
             // TODO: Implementar ajustes de privacidad
             break
-        case .registrarPartidos:
-            navigateToRegistrarPartidos()
         case .viewLogs:
             navigateToLogs()
         case .none:
@@ -150,11 +148,6 @@ class ProfileViewController: UIViewController {
         })
 
         present(alert, animated: true)
-    }
-
-    private func navigateToRegistrarPartidos() {
-        let registrarPartidosVC = container.makeRegistrarPartidosViewController()
-        navigationController?.pushViewController(registrarPartidosVC, animated: true)
     }
 
     private func openNotificationSettings() {

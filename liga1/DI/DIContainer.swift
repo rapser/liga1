@@ -42,10 +42,6 @@ final class DIContainer {
         return NewsRepository(database: makeDatabase(), logger: makeLogger())
     }
 
-    func makeAdminMatchRepository() -> AdminMatchRepositoryProtocol {
-        return AdminMatchRepository(database: makeDatabase(), logger: makeLogger())
-    }
-
     // MARK: - Services
 
     // Auth Module - usar AuthRepository en lugar de AuthServiceProtocol
@@ -220,15 +216,6 @@ final class DIContainer {
         )
     }
 
-    // MARK: - Use Cases - Admin
-
-    func makeRegisterMatchesUseCase() -> RegisterMatchesUseCaseProtocol {
-        return RegisterMatchesUseCase(
-            adminMatchRepository: makeAdminMatchRepository(),
-            logger: makeLogger()
-        )
-    }
-
     // MARK: - Use Cases - Notifications
 
     func makeUpdatePushNotificationsEnabledUseCase() -> UpdatePushNotificationsEnabledUseCaseProtocol {
@@ -294,13 +281,6 @@ final class DIContainer {
         )
     }
 
-    func makeRegistrarPartidosViewModel() -> RegistrarPartidosViewModel {
-        return RegistrarPartidosViewModel(
-            registerMatchesUseCase: makeRegisterMatchesUseCase(),
-            logger: makeLogger()
-        )
-    }
-
     func makeNotificationSettingsViewModel() -> NotificationSettingsViewModel {
         return NotificationSettingsViewModel(
             updatePushNotificationsEnabledUseCase: makeUpdatePushNotificationsEnabledUseCase(),
@@ -343,10 +323,6 @@ final class DIContainer {
             viewModel: viewModel,
             googleCredentialProvider: googleCredentialProvider
         )
-    }
-
-    func makeRegistrarPartidosViewController() -> RegistrarPartidosViewController {
-        return RegistrarPartidosViewController(viewModel: makeRegistrarPartidosViewModel())
     }
 
     func makeLogsViewController() -> LogsViewController {
