@@ -2,7 +2,8 @@
 //  LoginViewModel.swift
 //  liga1
 //
-//  Auth/Presentation: ViewModel del flujo de login.
+//  AuthKit/Presentation: ViewModel del flujo de login.
+//  Refactored on 15/02/26 to use AuthManager instead of LoginUseCase.
 //
 
 import Foundation
@@ -34,7 +35,6 @@ final class LoginViewModel {
 
     // MARK: - Dependencies
 
-    private let loginUseCase: LoginUseCaseProtocol
     private let logger: LoggerProtocol
 
     // MARK: - Private Properties
@@ -43,24 +43,26 @@ final class LoginViewModel {
 
     // MARK: - Initialization
 
-    init(loginUseCase: LoginUseCaseProtocol, logger: LoggerProtocol) {
-        self.loginUseCase = loginUseCase
+    init(logger: LoggerProtocol) {
         self.logger = logger
     }
 
     // MARK: - Methods
 
     func login(email: String, password: String) {
-        // Validación básica
-        guard !email.isEmpty, !password.isEmpty else {
-            error = "Por favor completa todos los campos"
+        // Validar con LoginValidator
+        do {
+            try LoginValidator.validate(email: email, password: password)
+        } catch {
+            self.error = error.localizedDescription
             return
         }
 
         isLoading = true
         error = nil
 
-        loginUseCase.execute(email: email, password: password)
+        // Llamar directamente a AuthManager
+        AuthManager.shared.login(email: email, password: password)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -70,6 +72,7 @@ final class LoginViewModel {
                 }
             } receiveValue: { [weak self] user in
                 guard let self = self else { return }
+                self.logger.info("✅ Login exitoso: \(user.email ?? "")")
                 DispatchQueue.main.async {
                     self.coordinatorDelegate?.loginViewModelDidLogin(self, user: user)
                 }
@@ -89,8 +92,15 @@ final class LoginViewModel {
     func performGoogleSignIn(presentingViewController: UIViewController) {
         isLoading = true
         error = nil
+
+        // Obtener credencial de Google
         let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController)
-        loginUseCase.executeWithGoogle(credentialProvider: credentialProvider)
+
+        credentialProvider.provideCredential()
+            .flatMap { credential in
+                // Autenticar con AuthManager usando la credencial de Google
+                AuthManager.shared.signInWithGoogle(credential: credential)
+            }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -100,6 +110,7 @@ final class LoginViewModel {
                 }
             } receiveValue: { [weak self] user in
                 guard let self = self else { return }
+                self.logger.info("✅ Google Sign In exitoso: \(user.email ?? "")")
                 DispatchQueue.main.async {
                     self.coordinatorDelegate?.loginViewModelDidLogin(self, user: user)
                 }

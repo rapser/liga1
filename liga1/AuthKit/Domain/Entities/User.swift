@@ -2,14 +2,15 @@
 //  User.swift
 //  liga1
 //
-//  Auth/Domain/Entities: Entidad de dominio pura para usuario autenticado.
-//  Created on 31/01/26.
+//  AuthKit/Domain/Entities: Entidad de dominio para usuario autenticado.
+//  Created on 15/02/26.
 //
 
 import Foundation
 
-/// Entidad de dominio para Usuario (sin dependencias de Firebase o UIKit)
-public struct User {
+/// Entidad de dominio que representa un usuario autenticado
+/// Sin dependencias de Firebase, UIKit, ni detalles de implementación
+public struct User: Equatable {
     public let id: String
     public let email: String?
     public let displayName: String?
@@ -18,10 +19,10 @@ public struct User {
 
     public init(
         id: String,
-        email: String? = nil,
-        displayName: String? = nil,
-        photoURL: String? = nil,
-        isEmailVerified: Bool = false
+        email: String?,
+        displayName: String?,
+        photoURL: String?,
+        isEmailVerified: Bool
     ) {
         self.id = id
         self.email = email
@@ -29,11 +30,9 @@ public struct User {
         self.photoURL = photoURL
         self.isEmailVerified = isEmailVerified
     }
-}
 
-// MARK: - Equatable
+    // MARK: - Equatable
 
-extension User: Equatable {
     public static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id
     }

@@ -17,24 +17,18 @@ final class AppCoordinator: Coordinator {
     private let container: DIContainer
     private let eventBus: AppEventBusProtocol
     private let logger: LoggerProtocol
-    private let authProvider: AuthProvider
-    private let logoutUseCase: LogoutUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
 
     init(
         window: UIWindow,
         container: DIContainer,
         eventBus: AppEventBusProtocol,
-        logger: LoggerProtocol,
-        authProvider: AuthProvider,
-        logoutUseCase: LogoutUseCaseProtocol
+        logger: LoggerProtocol
     ) {
         self.window = window
         self.container = container
         self.eventBus = eventBus
         self.logger = logger
-        self.authProvider = authProvider
-        self.logoutUseCase = logoutUseCase
         self.navigationController = UINavigationController()
         eventBus.events()
             .receive(on: DispatchQueue.main)
@@ -53,7 +47,7 @@ final class AppCoordinator: Coordinator {
 
     private func handleLoginSuccess() {
         childCoordinators.removeAll()
-        guard authProvider.currentUserId != nil else {
+        guard AuthManager.shared.currentUserId != nil else {
             self.logger.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
             return
         }
@@ -64,9 +58,9 @@ final class AppCoordinator: Coordinator {
 
     private func handleLogoutRequested() {
         childCoordinators.removeAll()
-        if authProvider.currentUserId != nil {
+        if AuthManager.shared.currentUserId != nil {
             self.logger.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
-            logoutUseCase.execute()
+            AuthManager.shared.logout()
                 .sink(
                     receiveCompletion: { [weak self] completion in
                         if case .failure(let error) = completion {
@@ -84,8 +78,8 @@ final class AppCoordinator: Coordinator {
     }
 
     func start() {
-        // Verificar si hay usuario autenticado usando AuthProvider
-        if authProvider.currentUserId != nil {
+        // Verificar si hay usuario autenticado usando AuthManager
+        if AuthManager.shared.currentUserId != nil {
             showMainFlow()
         } else {
             showLoginFlow()

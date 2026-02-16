@@ -8,6 +8,11 @@
 import UIKit
 import Combine
 
+/// Delegate para comunicar eventos del LoginViewController al Coordinator
+protocol LoginViewControllerDelegate: AnyObject {
+    func loginViewControllerDidLogin(_ viewController: LoginViewController, user: User)
+}
+
 final class LoginViewController: UIViewController {
 
     // MARK: - Properties

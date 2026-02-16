@@ -3,7 +3,7 @@
 //  liga1
 //
 //  Created by miguel tomairo on 02/01/26.
-//  Refactored on 03/01/26.
+//  Refactored on 15/02/26 to use AuthManager instead of LogoutUseCase.
 //
 
 import Foundation
@@ -21,13 +21,11 @@ class ProfileViewModel {
 
     // MARK: - Private Properties
 
-    private let logoutUseCase: LogoutUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
-    init(logoutUseCase: LogoutUseCaseProtocol) {
-        self.logoutUseCase = logoutUseCase
+    init() {
         setupSections()
     }
 
@@ -37,7 +35,8 @@ class ProfileViewModel {
         isLoading = true
         error = nil
 
-        logoutUseCase.execute()
+        // Llamar directamente a AuthManager
+        AuthManager.shared.logout()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false

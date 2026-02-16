@@ -44,21 +44,10 @@ final class DIContainer {
 
     // MARK: - Services
 
-    // Auth Module - usar AuthRepository en lugar de AuthServiceProtocol
-    private lazy var authService: AuthService = {
-        return AuthService(logger: makeLogger())
-    }()
-
-    func makeAuthRepository() -> AuthRepository {
-        return authService
-    }
-
-    func makeAuthProvider() -> AuthProvider {
-        return authService
-    }
+    // MARK: - Services
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        return FavoritesService(database: makeDatabase(), authProvider: makeAuthProvider(), logger: makeLogger())
+        return FavoritesService(database: makeDatabase(), logger: makeLogger())
     }()
 
     func makeFavoritesService() -> FavoritesServiceProtocol {
@@ -76,8 +65,6 @@ final class DIContainer {
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
         return UserPreferencesService(
             database: makeDatabase(),
-            authProvider: makeAuthProvider(),
-            authRepository: makeAuthRepository(),
             logger: makeLogger()
         )
     }()
@@ -203,18 +190,8 @@ final class DIContainer {
     }
 
     // MARK: - Use Cases - Auth
-
-    func makeLoginUseCase() -> LoginUseCaseProtocol {
-        return LoginUseCase(
-            authRepository: makeAuthRepository()
-        )
-    }
-
-    func makeLogoutUseCase() -> LogoutUseCaseProtocol {
-        return LogoutUseCase(
-            authRepository: makeAuthRepository()
-        )
-    }
+    // AuthKit ahora se usa directamente vía AuthManager.shared
+    // No se necesitan UseCases separados
 
     // MARK: - Use Cases - Notifications
 
@@ -269,14 +246,11 @@ final class DIContainer {
     }
 
     func makeProfileViewModel() -> ProfileViewModel {
-        return ProfileViewModel(
-            logoutUseCase: makeLogoutUseCase()
-        )
+        return ProfileViewModel()
     }
 
     func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            loginUseCase: makeLoginUseCase(),
             logger: makeLogger()
         )
     }
@@ -336,9 +310,7 @@ final class DIContainer {
             window: window,
             container: self,
             eventBus: makeAppEventBus(),
-            logger: makeLogger(),
-            authProvider: makeAuthProvider(),
-            logoutUseCase: makeLogoutUseCase()
+            logger: makeLogger()
         )
     }
 
