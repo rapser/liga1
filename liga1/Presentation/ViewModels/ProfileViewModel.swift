@@ -19,6 +19,12 @@ class ProfileViewModel {
     @Published private(set) var error: Error?
     @Published var logoutSuccessful: Bool = false
 
+    // User profile data
+    @Published private(set) var displayName: String = "Usuario"
+    @Published private(set) var email: String = ""
+    @Published private(set) var photoURL: String?
+    @Published private(set) var profileImageData: Data?
+
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
@@ -27,6 +33,7 @@ class ProfileViewModel {
 
     init() {
         setupSections()
+        observeAuthState()
     }
 
     // MARK: - Public Methods
@@ -50,6 +57,46 @@ class ProfileViewModel {
     }
 
     // MARK: - Private Methods
+
+    private func observeAuthState() {
+        AuthManager.shared.observeAuthState()
+            .compactMap { $0 } // Solo cuando hay usuario
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] user in
+                self?.updateUserInfo(from: user)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateUserInfo(from user: User) {
+        // Actualizar display name
+        self.displayName = user.displayName ?? "Usuario"
+
+        // Actualizar email
+        self.email = user.email ?? ""
+
+        // Actualizar photo URL
+        self.photoURL = user.photoURL
+
+        // Descargar imagen de perfil si existe
+        if let photoURLString = user.photoURL,
+           let url = URL(string: photoURLString) {
+            downloadProfileImage(from: url)
+        } else {
+            // Usar imagen por defecto
+            self.profileImageData = nil
+        }
+    }
+
+    private func downloadProfileImage(from url: URL) {
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            if let data = data, error == nil {
+                DispatchQueue.main.async {
+                    self?.profileImageData = data
+                }
+            }
+        }.resume()
+    }
 
     private func setupSections() {
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "N/A"

@@ -38,15 +38,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Iniciar AppCoordinator
         let appCoordinator = container.makeAppCoordinator(window: window)
         self.appCoordinator = appCoordinator
-        appCoordinator.start()
+        appCoordinator.start() // AppCoordinator maneja window.makeKeyAndVisible()
 
         // Tap en notificación → EventBus → AppCoordinator maneja .navigateToMatch
         let eventBus = container.makeAppEventBus()
         SessionManager.shared.onNotificationTap = { matchId in
             eventBus.publish(.navigateToMatch(matchId: matchId))
         }
-
-        window.makeKeyAndVisible()
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {

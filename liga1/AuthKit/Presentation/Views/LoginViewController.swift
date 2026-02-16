@@ -106,56 +106,69 @@ final class LoginViewController: UIViewController {
             .addTo(containerView)
             .fillSuperview()
 
+        // Crear un stack vertical para centrar todo el contenido
+        let formStackView = UIStackView()
+        formStackView.axis = .vertical
+        formStackView.spacing = 0
+        formStackView.alignment = .fill
+        formStackView.distribution = .fill
+        formStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        contentView.addSubview(formStackView)
+
         // Logo
-        logoImageView
-            .addTo(contentView)
-            .centerX()
-            .pinTop(constant: 80)
-            .square(120)
+        let logoContainer = UIView()
+        logoContainer.translatesAutoresizingMaskIntoConstraints = false
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        logoContainer.addSubview(logoImageView)
 
-        // Title
-        titleLabel
-            .addTo(contentView)
-            .pinTop(to: logoImageView.bottomAnchor, constant: Spacing.extraLarge)
-            .pinHorizontal(padding: Spacing.extraLarge)
+        NSLayoutConstraint.activate([
+            logoImageView.centerXAnchor.constraint(equalTo: logoContainer.centerXAnchor),
+            logoImageView.topAnchor.constraint(equalTo: logoContainer.topAnchor, constant: 20),
+            logoImageView.bottomAnchor.constraint(equalTo: logoContainer.bottomAnchor, constant: -20),
+            logoImageView.widthAnchor.constraint(equalToConstant: 100),
+            logoImageView.heightAnchor.constraint(equalToConstant: 100)
+        ])
 
-        // Subtitle
-        subtitleLabel
-            .addTo(contentView)
-            .pinTop(to: titleLabel.bottomAnchor, constant: Spacing.small)
-            .pinHorizontal(padding: Spacing.extraLarge)
+        // Textos (Title + Subtitle)
+        let textsStackView = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        textsStackView.axis = .vertical
+        textsStackView.spacing = 8
+        textsStackView.alignment = .fill
 
-        // Email TextField
-        emailTextField
-            .addTo(contentView)
-            .pinTop(to: subtitleLabel.bottomAnchor, constant: 40)
-            .pinHorizontal(padding: Spacing.extraLarge)
+        // Campos de texto
+        let fieldsStackView = UIStackView(arrangedSubviews: [emailTextField, passwordTextField])
+        fieldsStackView.axis = .vertical
+        fieldsStackView.spacing = Spacing.standard
+        fieldsStackView.alignment = .fill
 
-        // Password TextField
-        passwordTextField
-            .addTo(contentView)
-            .pinTop(to: emailTextField.bottomAnchor, constant: Spacing.standard)
-            .pinHorizontal(padding: Spacing.extraLarge)
+        // Agregar todos los elementos al stack principal
+        formStackView.addArrangedSubview(logoContainer)
+        formStackView.setCustomSpacing(Spacing.large, after: logoContainer)
 
-        // Login Button
-        loginButton
-            .addTo(contentView)
-            .pinTop(to: passwordTextField.bottomAnchor, constant: Spacing.large)
-            .pinHorizontal(padding: Spacing.extraLarge)
+        formStackView.addArrangedSubview(textsStackView)
+        formStackView.setCustomSpacing(32, after: textsStackView)
 
-        // Divider
-        dividerView
-            .addTo(contentView)
-            .pinTop(to: loginButton.bottomAnchor, constant: Spacing.large)
-            .pinHorizontal(padding: Spacing.extraLarge)
-            .height(40)
+        formStackView.addArrangedSubview(fieldsStackView)
+        formStackView.setCustomSpacing(Spacing.large, after: fieldsStackView)
 
-        // Google Sign In Button
-        googleSignInButton
-            .addTo(contentView)
-            .pinTop(to: dividerView.bottomAnchor, constant: Spacing.standard)
-            .pinHorizontal(padding: Spacing.extraLarge)
-            .pinBottom(constant: 40)
+        formStackView.addArrangedSubview(loginButton)
+        formStackView.setCustomSpacing(Spacing.large, after: loginButton)
+
+        formStackView.addArrangedSubview(dividerView)
+        formStackView.setCustomSpacing(Spacing.standard, after: dividerView)
+
+        formStackView.addArrangedSubview(googleSignInButton)
+
+        // Centrar el stack verticalmente en la pantalla
+        NSLayoutConstraint.activate([
+            formStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: -20),
+            formStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Spacing.extraLarge),
+            formStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Spacing.extraLarge),
+
+            // Constraints de altura para divider
+            dividerView.heightAnchor.constraint(equalToConstant: 40)
+        ])
 
         // Loading overlay
         loadingComponents = LayoutPresets.loadingOverlay(in: view, activityIndicatorColor: .liga1Red)

@@ -16,12 +16,19 @@ struct FirebaseUserMapper {
     /// - Parameter firebaseUser: Usuario de Firebase Auth
     /// - Returns: Usuario de dominio
     static func toDomain(from firebaseUser: FirebaseAuth.User) -> User {
+        // Obtener el proveedor principal (el primero en la lista)
+        let primaryProvider = firebaseUser.providerData.first?.providerID
+
         return User(
             id: firebaseUser.uid,
             email: firebaseUser.email,
             displayName: firebaseUser.displayName,
             photoURL: firebaseUser.photoURL?.absoluteString,
-            isEmailVerified: firebaseUser.isEmailVerified
+            phoneNumber: firebaseUser.phoneNumber,
+            isEmailVerified: firebaseUser.isEmailVerified,
+            creationDate: firebaseUser.metadata.creationDate,
+            lastSignInDate: firebaseUser.metadata.lastSignInDate,
+            providerID: primaryProvider
         )
     }
 
