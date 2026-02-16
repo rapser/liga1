@@ -118,14 +118,6 @@ class ProfileViewModel {
                     action: .notificationHistory
                 )
             ]),
-            ProfileSection(title: "Usuario", options: [
-                ProfileOption(
-                    title: "Nombre de usuario",
-                    icon: UIImage(systemName: "person.fill"),
-                    subtitle: nil,
-                    action: .editUsername
-                )
-            ]),
             ProfileSection(title: "Otros", options: [
                 ProfileOption(
                     title: "Envía tus comentarios",
