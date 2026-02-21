@@ -9,28 +9,6 @@ import Foundation
 import FirebaseFirestore
 import Combine
 
-/// Helper para parsear IDs compuestos de partidos
-private struct MatchIdComponents {
-    let jornadaId: String
-    let matchId: String
-
-    /// Parsea un fullMatchId con formato "torneo_numero_equipoA_equipoB" (ej: "apertura_01_atl_uni")
-    /// - Returns: MatchIdComponents o nil si el formato es inválido
-    static func parse(_ fullMatchId: String) -> MatchIdComponents? {
-        let components = fullMatchId.split(separator: "_", maxSplits: 2)
-        guard components.count == 3 else {
-            return nil
-        }
-
-        let torneo = String(components[0])      // "apertura" o "clausura"
-        let numero = String(components[1])       // "01"
-        let matchId = String(components[2])      // "atl_uni"
-        let jornadaId = "\(torneo)_\(numero)"   // "apertura_01"
-
-        return MatchIdComponents(jornadaId: jornadaId, matchId: matchId)
-    }
-}
-
 /// Implementación del protocolo MatchesRepositoryProtocol
 class MatchesRepository: MatchesRepositoryProtocol {
 
@@ -56,32 +34,57 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 return
             }
 
-            
             let query = self.db.collection(FirestoreConstants.Collection.jornadas)
                 .document(jornadaId)
                 .collection(FirestoreConstants.Collection.matches)
-            
-            // Intentar ordenar por fecha, pero si falla, obtener sin ordenar
-            query
                 .order(by: FirestoreConstants.MatchField.fecha)
-                .getDocuments(source: .default) { [weak self] snapshot, error in
-                    // Si hay un error relacionado con índice faltante, intentar sin ordenar
-                    if let error = error as NSError?,
-                       error.domain == "FIRFirestoreErrorDomain",
-                       error.code == 9 { // Error de índice faltante
-                        self?.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
-                        return
-                    }
 
-                    if let error = error {
-                        promise(.failure(error))
-                        return
+            // Estrategia: Intentar caché primero (rápido), luego servidor si falla
+            query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
+                guard let self = self else { return }
+
+                // Si hay datos en caché, úsalos inmediatamente
+                if cacheError == nil, let documents = cacheSnapshot?.documents, !documents.isEmpty {
+                    self.processMatches(snapshot: cacheSnapshot, jornadaId: jornadaId, promise: promise)
+
+                    // Actualizar desde servidor en background
+                    self.fetchMatchesFromServer(query: query, jornadaId: jornadaId)
+                } else {
+                    // No hay caché, obtener del servidor
+                    query.getDocuments(source: .server) { [weak self] snapshot, error in
+                        // Si hay un error relacionado con índice faltante, intentar sin ordenar
+                        if let error = error as NSError?,
+                           error.domain == "FIRFirestoreErrorDomain",
+                           error.code == 9 { // Error de índice faltante
+                            self?.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
+                            return
+                        }
+
+                        if let error = error {
+                            promise(.failure(error))
+                            return
+                        }
+
+                        self?.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
                     }
-                    
-                    self?.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
                 }
+            }
         }
         .eraseToAnyPublisher()
+    }
+
+    private func fetchMatchesFromServer(query: Query, jornadaId: String) {
+        query.getDocuments(source: .server) { [weak self] snapshot, error in
+            guard let self = self,
+                  error == nil,
+                  let documents = snapshot?.documents else {
+                return
+            }
+
+            let matches = self.processMatchDocuments(documents)
+            let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
+            self.getOrCreateSubject(for: jornadaId).send(sortedMatches)
+        }
     }
     
     private func fetchMatchesWithoutOrder(query: Query, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
@@ -102,14 +105,19 @@ class MatchesRepository: MatchesRepositoryProtocol {
             return
         }
 
+        let matches = processMatchDocuments(documents)
+        let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
 
-        // Convertir MatchDTO a Match usando el mapper
+        getOrCreateSubject(for: jornadaId).send(sortedMatches)
+        promise(.success(sortedMatches))
+    }
+
+    private func processMatchDocuments(_ documents: [QueryDocumentSnapshot]) -> [Match] {
         var matchDTOs: [MatchDTO] = []
         for doc in documents {
-            
             let documentID = doc.documentID
             let data = doc.data()
-            
+
             // Extraer equipoLocalId y equipoVisitanteId del documentID
             // Format: "equipoLocal_equipoVisitante" (ej: "adt_utc", "atl_uni")
             let (equipoLocalId, equipoVisitanteId): (String?, String?) = {
@@ -118,7 +126,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
                    let visitante = data["equipoVisitanteId"] as? String {
                     return (local, visitante)
                 }
-                
+
                 // Si no están en el documento, extraer del documentID
                 let components = documentID.split(separator: "_")
                 if components.count >= 2 {
@@ -129,15 +137,12 @@ class MatchesRepository: MatchesRepositoryProtocol {
 
                 return (nil, nil)
             }()
-            
+
             // Mapear campos alternativos de goles desde Firestore
-            // Los documentos tienen "golesEquipoLocal" y "golesEquipoVisitante"
-            // pero el DTO espera "golesTeamA" y "golesTeamB"
             let golesTeamA = data["golesTeamA"] as? Int ?? data["golesEquipoLocal"] as? Int
             let golesTeamB = data["golesTeamB"] as? Int ?? data["golesEquipoVisitante"] as? Int
-            
+
             // Crear DTO manualmente desde los datos
-            // Esto evita problemas con @DocumentID y maneja correctamente los campos alternativos
             let dto = MatchDTO(
                 id: documentID,
                 equipoLocalId: equipoLocalId,
@@ -148,16 +153,11 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 estado: data["estado"] as? String,
                 suspendido: data["suspendido"] as? Bool
             )
-            
+
             matchDTOs.append(dto)
         }
-        
-        
-        let matches = MatchMapper.toDomain(from: matchDTOs, logger: self.logger)
-        let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
 
-        getOrCreateSubject(for: jornadaId).send(sortedMatches)
-        promise(.success(sortedMatches))
+        return MatchMapper.toDomain(from: matchDTOs, logger: self.logger)
     }
 
     func fetchMatchesByIds(matchIds: [String]) -> AnyPublisher<[Match], Error> {
@@ -276,6 +276,30 @@ class MatchesRepository: MatchesRepositoryProtocol {
             let subject = CurrentValueSubject<[Match], Never>([])
             matchSubjects[jornadaId] = subject
             return subject
+        }
+    }
+
+    // MARK: - Helper Types
+
+    /// Helper para parsear IDs compuestos de partidos
+    private struct MatchIdComponents {
+        let jornadaId: String
+        let matchId: String
+
+        /// Parsea un fullMatchId con formato "torneo_numero_equipoA_equipoB" (ej: "apertura_01_atl_uni")
+        /// - Returns: MatchIdComponents o nil si el formato es inválido
+        static func parse(_ fullMatchId: String) -> MatchIdComponents? {
+            let components = fullMatchId.split(separator: "_", maxSplits: 2)
+            guard components.count == 3 else {
+                return nil
+            }
+
+            let torneo = String(components[0])      // "apertura" o "clausura"
+            let numero = String(components[1])       // "01"
+            let matchId = String(components[2])      // "atl_uni"
+            let jornadaId = "\(torneo)_\(numero)"   // "apertura_01"
+
+            return MatchIdComponents(jornadaId: jornadaId, matchId: matchId)
         }
     }
 }

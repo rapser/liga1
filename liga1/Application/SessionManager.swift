@@ -50,9 +50,8 @@ final class SessionManager {
             return
         }
         let logger = container.makeLogger()
-        let logoutUseCase = container.makeLogoutUseCase()
 
-        logoutUseCase.execute()
+        AuthManager.shared.logout()
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in

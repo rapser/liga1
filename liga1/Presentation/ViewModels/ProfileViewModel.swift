@@ -3,7 +3,7 @@
 //  liga1
 //
 //  Created by miguel tomairo on 02/01/26.
-//  Refactored on 03/01/26.
+//  Refactored on 15/02/26 to use AuthManager instead of LogoutUseCase.
 //
 
 import Foundation
@@ -19,16 +19,21 @@ class ProfileViewModel {
     @Published private(set) var error: Error?
     @Published var logoutSuccessful: Bool = false
 
+    // User profile data
+    @Published private(set) var displayName: String = "Usuario"
+    @Published private(set) var email: String = ""
+    @Published private(set) var photoURL: String?
+    @Published private(set) var profileImageData: Data?
+
     // MARK: - Private Properties
 
-    private let logoutUseCase: LogoutUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
-    init(logoutUseCase: LogoutUseCaseProtocol) {
-        self.logoutUseCase = logoutUseCase
+    init() {
         setupSections()
+        observeAuthState()
     }
 
     // MARK: - Public Methods
@@ -37,7 +42,8 @@ class ProfileViewModel {
         isLoading = true
         error = nil
 
-        logoutUseCase.execute()
+        // Llamar directamente a AuthManager
+        AuthManager.shared.logout()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -51,6 +57,46 @@ class ProfileViewModel {
     }
 
     // MARK: - Private Methods
+
+    private func observeAuthState() {
+        AuthManager.shared.observeAuthState()
+            .compactMap { $0 } // Solo cuando hay usuario
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] user in
+                self?.updateUserInfo(from: user)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateUserInfo(from user: User) {
+        // Actualizar display name
+        self.displayName = user.displayName ?? "Usuario"
+
+        // Actualizar email
+        self.email = user.email ?? ""
+
+        // Actualizar photo URL
+        self.photoURL = user.photoURL
+
+        // Descargar imagen de perfil si existe
+        if let photoURLString = user.photoURL,
+           let url = URL(string: photoURLString) {
+            downloadProfileImage(from: url)
+        } else {
+            // Usar imagen por defecto
+            self.profileImageData = nil
+        }
+    }
+
+    private func downloadProfileImage(from url: URL) {
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            if let data = data, error == nil {
+                DispatchQueue.main.async {
+                    self?.profileImageData = data
+                }
+            }
+        }.resume()
+    }
 
     private func setupSections() {
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "N/A"
@@ -72,34 +118,12 @@ class ProfileViewModel {
                     action: .notificationHistory
                 )
             ]),
-            ProfileSection(title: "Usuario", options: [
-                ProfileOption(
-                    title: "Nombre de usuario",
-                    icon: UIImage(systemName: "person.fill"),
-                    subtitle: nil,
-                    action: .editUsername
-                )
-            ]),
-            ProfileSection(title: "Administración", options: [
-                ProfileOption(
-                    title: "Registrar Partidos",
-                    icon: UIImage(systemName: "football.fill"),
-                    subtitle: "Herramienta para registro masivo",
-                    action: .registrarPartidos
-                )
-            ]),
             ProfileSection(title: "Otros", options: [
                 ProfileOption(
                     title: "Envía tus comentarios",
                     icon: UIImage(systemName: "envelope.fill"),
                     subtitle: nil,
                     action: .feedback
-                ),
-                ProfileOption(
-                    title: "Ver Logs",
-                    icon: UIImage(systemName: "doc.text.fill"),
-                    subtitle: "Logs de la aplicación",
-                    action: .viewLogs
                 ),
                 ProfileOption(
                     title: "Condiciones de uso",
@@ -114,7 +138,7 @@ class ProfileViewModel {
                     action: .privacy
                 ),
                 ProfileOption(
-title: "Ajustes de privacidad",
+                    title: "Ajustes de privacidad",
                     icon: UIImage(systemName: "gearshape.fill"),
                     subtitle: nil,
                     action: .privacySettings
@@ -160,8 +184,6 @@ title: "Ajustes de privacidad",
         case terms
         case privacy
         case privacySettings
-        case registrarPartidos
-        case viewLogs
         case none
     }
 }
