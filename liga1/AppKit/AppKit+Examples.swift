@@ -3,333 +3,390 @@
 //  liga1
 //
 //  Created by AppKit
-//  Ejemplos de uso de AppKit
+//  Ejemplos de uso de AppKit v2
 //
 
 import UIKit
 
 /*
 
-# AppKit - UI Programática Simplificada
+# AppKit v2 - UI Programática Simplificada
 
 AppKit es una librería interna que proporciona helpers y builders para construir
-UI programática de manera rápida y legible, similar a SnapKit pero más simple.
+UI programática de manera rápida y legible.
 
-## Ejemplos de Uso
+## Estructura
 
-### 1. Constraints Básicos
-
-```swift
-// Llenar completamente el superview
-view.fillSuperview()
-
-// Llenar con padding
-view.fillSuperview(padding: 16)
-view.fillSuperview(padding: .init(top: 0, left: 16, bottom: 0, right: 16))
-
-// Llenar respetando safe area
-view.fillSuperviewSafeArea()
-
-// Anchors manuales
-view.anchor(
-    top: containerView.topAnchor,
-    leading: containerView.leadingAnchor,
-    bottom: containerView.bottomAnchor,
-    trailing: containerView.trailingAnchor,
-    padding: .init(top: 16, left: 16, bottom: 16, right: 16)
-)
-
-// Centrar en superview
-view.centerInSuperview()
-view.centerXInSuperview()
-view.centerYInSuperview()
-
-// Tamaño
-view.size(CGSize(width: 200, height: 100))
-view.width(200)
-view.height(100)
-
-// Aspect ratio
-imageView.aspectRatio(16/9)
+```
+AppKit/
+├── Theme/
+│   ├── AppTheme.swift          - Typography, corner radius, heights, shadows
+│   └── AppColors.swift         - Colores semánticos + marca Liga 1
+├── Components/
+│   ├── ContainerView.swift     - Container entre nav bar y tab bar
+│   ├── DividerView.swift       - Divider con texto central
+│   ├── HeaderViews.swift       - Headers pre-construidos
+│   ├── NavigationBar+Builder.swift - Configurador de nav bar
+│   ├── TableView+Builder.swift     - Builder para UITableView
+│   ├── CollectionView+Builder.swift - Builder para UICollectionView
+│   ├── CompositionalLayout+Presets.swift - Layouts pre-armados
+│   ├── ScrollView+Builder.swift    - ScrollView + ScrollableStackView
+│   └── FormBuilder.swift           - Constructor de formularios
+├── Extensions/
+│   ├── UIView+Layout.swift         - Layout system + ConstraintGroup
+│   ├── UIStackView+Builder.swift   - Stack views + ViewBuilder
+│   ├── UIViewController+Alert.swift - Alertas
+│   └── UIControl+Builder.swift     - Switch, Segment, Slider
+└── Presets/
+    └── ComponentPresets.swift      - Factories de componentes
 ```
 
-### 2. Builder Pattern para Vistas
+---
+
+## 1. Layout Básico
+
+```swift
+// Agregar vista y posicionar
+label.addTo(containerView)
+    .pinTop(constant: 16)
+    .pinLeading(constant: 16)
+    .pinTrailing(constant: 16)
+
+// Llenar superview
+tableView.addTo(containerView).fillSuperview()
+
+// Con safe area
+view.fillSuperviewSafeArea()
+
+// Centrar
+loadingIndicator.addTo(view).centerInSuperview()
+
+// Tamaño
+imageView.square(48)
+button.height(52)
+avatar.size(width: 80, height: 80)
+
+// Con prioridad
+label.height(44, priority: .defaultHigh)
+view.width(200, priority: .defaultLow)
+
+// Min/Max
+textView.minHeight(100)
+container.maxWidth(600)
+```
+
+## 2. Builder Pattern para Vistas
 
 ```swift
 // Label
 let titleLabel = UILabel()
-    .text("Título")
-    .font(.boldSystemFont(ofSize: 18))
-    .textColor(.liga1Red)
-    .textAlignment(.center)
-    .numberOfLines(0)
+    .text("Liga 1 2024")
+    .font(AppTheme.title2)
+    .textColor(.label)
+    .alignment(.center)
+    .lines(0)
 
 // Button
-let button = UIButton()
+let saveButton = UIButton()
     .title("Guardar")
     .titleColor(.white)
-    .backgroundColor(.liga1Red)
-    .cornerRadius(8)
-    .addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+    .background(.appTint)
+    .corner(AppTheme.CornerRadius.medium)
 
 // ImageView
-let imageView = UIImageView()
-    .image(UIImage(systemName: "star.fill"))
+let logo = UIImageView()
+    .image(UIImage(named: "liga1"))
     .contentMode(.scaleAspectFit)
     .tintColor(.liga1Red)
+
+// TextField
+let emailField = UITextField()
+    .placeholder("Correo electrónico")
+    .font(AppTheme.body)
+    .textColor(.label)
+    .borderStyle(.none)
+    .leftPadding(16)
 ```
 
-### 3. Navigation Bar
+## 3. Stack Views con @resultBuilder
 
 ```swift
-// En viewDidLoad
+// Vertical stack declarativo
+let formStack = UIStackView.vStack(spacing: Spacing.medium) {
+    titleLabel
+    emailField
+    passwordField
+    loginButton
+}
+
+// Horizontal stack
+let scoreRow = UIStackView.hStack(spacing: Spacing.small, alignment: .center) {
+    teamLogo
+    teamName
+    Spacer()
+    scoreLabel
+}
+
+// Con padding
+formStack.padding(Spacing.standard)
+```
+
+## 4. Navigation Bar
+
+```swift
+// Configuración básica
 setupNavigationBar()
     .title("Inicio")
     .prefersLargeTitles(true)
-    .largeTitleDisplayMode(.always)
     .tintColor(.liga1Red)
 
 // Con botones
 setupNavigationBar()
-    .title("Configuración")
-    .rightBarButton(
-        systemImage: "gear",
-        target: self,
-        action: #selector(settingsTapped)
-    )
-    .leftBarButton(
-        systemImage: "arrow.left",
-        target: self,
-        action: #selector(backTapped)
-    )
+    .title("Perfil")
+    .rightBarButton(systemImage: "gear", target: self, action: #selector(openSettings))
 
-// Background personalizado
+// Personalizar appearance (ya no hay bug de sobreescritura)
 setupNavigationBar()
     .backgroundColor(.white)
     .titleColor(.black)
-
-// Transparente
-setupNavigationBar()
-    .transparent()
+    .tintColor(.liga1Red)
 ```
 
-### 4. TableView
+## 5. TableView
 
 ```swift
+// Configurar con builder
 let tableView = UITableView()
     .delegate(self)
     .dataSource(self)
     .registerCell(MatchTableViewCell.self)
-    .registerCell(NewsTableViewCell.self)
+    .registerCell(TeamTableViewCell.self)
     .separatorStyle(.none)
     .enableAutomaticDimensions()
     .removeEmptyCellSeparators()
 
-// Dequeue type-safe
+// Dequeue type-safe (sin guard let, sin identifier strings)
 let cell = tableView.dequeueReusableCell(MatchTableViewCell.self, for: indexPath)
+cell.configure(with: match, logoLocal: logo1, logoVisitante: logo2)
 ```
 
-### 5. Container View
+## 6. CollectionView
+
+```swift
+// Configurar con builder
+let collectionView = UICollectionView(
+    frame: .zero,
+    collectionViewLayout: .grid(columns: 2)
+)
+    .delegate(self)
+    .dataSource(self)
+    .registerCell(TeamGridCell.self)
+    .registerHeader(SectionHeader.self)
+    .showsVerticalScrollIndicator(false)
+
+// Dequeue type-safe
+let cell = collectionView.dequeueReusableCell(TeamGridCell.self, for: indexPath)
+let header = collectionView.dequeueReusableHeader(SectionHeader.self, for: indexPath)
+```
+
+## 7. Compositional Layout Presets
+
+```swift
+// Lista vertical (reemplaza UITableView)
+let layout = UICollectionViewCompositionalLayout.list(appearance: .plain)
+
+// Grid de 3 columnas
+let layout = UICollectionViewCompositionalLayout.grid(columns: 3, itemSpacing: 8)
+
+// Carrusel horizontal
+let layout = UICollectionViewCompositionalLayout.carousel(itemWidth: 200, itemHeight: 120)
+
+// Lista con self-sizing
+let layout = UICollectionViewCompositionalLayout.verticalList(estimatedHeight: 80)
+```
+
+## 8. Container View
 
 ```swift
 // Crear container entre navigation bar y tab bar
-let containerView = view.addContainerViewBetweenBars(hasTabBar: true)
-containerView.backgroundColor(.systemBackground)
-
-// O manualmente
 let containerView = ContainerView()
-    .attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
-    .backgroundColor(.white)
+containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
-// Añadir tableView dentro del container
-containerView.addSubview(tableView)
-tableView.fillSuperview()
+// Agregar contenido dentro del container
+tableView.addTo(containerView).fillSuperview()
 ```
 
-### 6. Stack Views
+## 9. ScrollableStackView (para formularios)
 
 ```swift
-// Vertical stack
-let vStack = StackViewFactory.vStack(
-    spacing: 12,
-    alignment: .fill,
-    distribution: .fill,
-    views: [titleLabel, subtitleLabel, button]
-)
+let scrollableForm = ScrollableStackView(spacing: Spacing.standard)
+scrollableForm
+    .addTo(containerView)
+    .fillSuperview()
 
-// Horizontal stack
-let hStack = StackViewFactory.hStack(
-    spacing: 8,
-    views: [iconView, label]
-)
-
-// Con builders
-let stack = UIStackView(axis: .vertical, spacing: 12)
-    .alignment(.center)
-    .distribution(.fillEqually)
-    .padding(16)
-    .addArrangedSubviews(view1, view2, view3)
-
-// Añadir spacers
-stack.addFlexibleSpacer()
+scrollableForm
+    .addContent(titleLabel)
+    .addContent(emailTextField)
+    .addContent(passwordTextField)
+    .addSpace(Spacing.large)
+    .addContent(loginButton)
 ```
 
-### 7. Header Views
+## 10. FormBuilder (secciones de formulario)
+
+```swift
+let section = FormSection(title: "Cuenta")
+
+let emailField = section.addTextField(
+    label: "Correo",
+    placeholder: "tu@email.com",
+    keyboardType: .emailAddress
+)
+
+let notificationsSwitch = section.addSwitch(label: "Notificaciones", isOn: true)
+
+section.addSeparator()
+section.addInfoLabel(text: "Las notificaciones te mantienen al día con los resultados.")
+
+let deleteButton = section.addButton(title: "Eliminar cuenta", style: .destructive)
+```
+
+## 11. UIControl Builders
+
+```swift
+// Switch
+let toggle = UISwitch()
+    .isOn(true)
+    .onTintColor(.liga1Red)
+    .onValueChanged(self, action: #selector(toggleChanged))
+
+// SegmentedControl
+let segment = UISegmentedControl(items: ["Partidos", "Equipos"])
+    .selectedIndex(0)
+    .selectedTintColor(.liga1Red)
+    .onValueChanged(self, action: #selector(segmentChanged))
+
+// Button con target
+let button = UIButton()
+    .title("Guardar")
+    .onTap(self, action: #selector(saveTapped))
+```
+
+## 12. ConstraintGroup (layouts adaptativos)
+
+```swift
+let compactConstraints = ConstraintGroup()
+    .add(view.heightAnchor.constraint(equalToConstant: 44))
+    .add(view.widthAnchor.constraint(equalTo: superview.widthAnchor))
+
+let expandedConstraints = ConstraintGroup()
+    .add(view.heightAnchor.constraint(equalToConstant: 200))
+    .add(view.widthAnchor.constraint(equalToConstant: 300))
+
+// Activar un grupo
+compactConstraints.activate()
+
+// Alternar con animación
+compactConstraints.replace(with: expandedConstraints)
+UIView.animate(withDuration: 0.3) { self.view.layoutIfNeeded() }
+```
+
+## 13. Theme System
+
+```swift
+// Typography
+label.font = AppTheme.title1       // 24pt bold
+label.font = AppTheme.headline     // 16pt semibold
+label.font = AppTheme.body         // 16pt regular
+label.font = AppTheme.caption1     // 12pt regular
+
+// Corner Radius
+view.corner(AppTheme.CornerRadius.medium)  // 12pt
+
+// Heights
+button.height(AppTheme.Heights.button)     // 52pt
+
+// Shadows
+cardView.shadow(.light)
+cardView.shadow(.medium)
+
+// Colores semánticos
+view.background(.appBackground)
+label.textColor(.appTint)
+button.background(.appDestructive)
+```
+
+## 14. Component Presets (factories)
+
+```swift
+// Botón primario pre-configurado
+let loginButton = ComponentPresets.primaryButton(title: "Iniciar Sesión")
+
+// TextField estilizado
+let emailField = ComponentPresets.styledTextField(placeholder: "Correo")
+
+// Label de título
+let title = ComponentPresets.titleLabel(text: "Bienvenido", fontSize: 28)
+
+// Loading overlay
+let (overlay, indicator) = ComponentPresets.loadingOverlay(in: view)
+
+// Divider
+let divider = ComponentPresets.dividerView(text: "o continuar con")
+```
+
+## 15. Header Views
 
 ```swift
 // Date Header
 let dateHeader = DateHeaderView()
-dateHeader.configure(with: Date())
-// O con texto personalizado
-dateHeader.configure(with: "Hoy")
+dateHeader.configure(with: Date())       // "Hoy", "Mañana", "Lunes, 3 de marzo"
 
 // Jornada Header
 let jornadaHeader = JornadaHeaderView()
-jornadaHeader.configure(jornada: "Jornada 10", torneo: "Torneo Apertura 2024")
+jornadaHeader.configure(jornada: "Jornada 10", torneo: "Apertura 2024")
 
 // Title Header
 let titleHeader = TitleHeaderView()
-titleHeader.configure(title: "Apertura")
+titleHeader.configure(title: "Tabla de Posiciones")
 
 // Empty State
 let emptyState = EmptyStateView()
 emptyState.configure(
-    systemImage: "heart.slash",
-    title: "No hay favoritos",
-    message: "Agrega equipos o partidos a tus favoritos"
+    systemImage: "star.slash",
+    title: "Sin favoritos",
+    message: "Agrega equipos a tus favoritos"
 )
 ```
 
-### 8. Ejemplo Completo: Vista con TableView
+## 16. Ejemplo Completo: ViewController
 
 ```swift
-class HomeViewController: UIViewController {
+class ExampleViewController: UIViewController {
 
     private let containerView = ContainerView()
     private let tableView = UITableView()
-    private let dateHeader = DateHeaderView()
-    private let jornadaHeader = JornadaHeaderView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupNavigationBar()
-        setupUI()
-    }
 
-    private func setupNavigationBar() {
+        // Navigation Bar
         setupNavigationBar()
-            .title("Inicio")
+            .title("Ejemplo")
             .prefersLargeTitles(true)
-            .largeTitleDisplayMode(.always)
             .tintColor(.liga1Red)
-    }
 
-    private func setupUI() {
-        view.backgroundColor = .systemBackground
-
-        // Container entre navigation y tab bar
+        // UI
+        view.backgroundColor = .appBackground
         containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
-        // TableView dentro del container
-        containerView.addSubview(tableView)
-        tableView.fillSuperview()
-
-        // Configurar tableView
         tableView
+            .addTo(containerView)
+            .fillSuperview()
             .delegate(self)
             .dataSource(self)
-            .registerCell(MatchCell.self)
+            .registerCell(MatchTableViewCell.self)
             .separatorStyle(.none)
-            .enableAutomaticDimensions()
-            .removeEmptyCellSeparators()
-
-        // Headers
-        dateHeader.configure(with: Date())
-        dateHeader.height(50)
-
-        jornadaHeader.configure(jornada: "Jornada 1", torneo: "Apertura 2024")
-        jornadaHeader.height(60)
-
-        tableView.tableHeaderView = createHeaderStack()
-    }
-
-    private func createHeaderStack() -> UIView {
-        let container = UIView()
-        container.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 110)
-
-        let stack = StackViewFactory.vStack(
-            spacing: 0,
-            views: [dateHeader, jornadaHeader]
-        )
-
-        container.addSubview(stack)
-        stack.fillSuperview()
-
-        return container
-    }
-}
-```
-
-### 9. Ejemplo: Vista con Label y Constraints
-
-```swift
-class TablaViewController: UIViewController {
-
-    private let containerView = ContainerView()
-    private let titleLabel = UILabel()
-    private let tableView = UITableView()
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupNavigationBar()
-        setupUI()
-    }
-
-    private func setupNavigationBar() {
-        setupNavigationBar()
-            .title("Tabla de Posiciones")
-            .prefersLargeTitles(true)
-            .largeTitleDisplayMode(.always)
-    }
-
-    private func setupUI() {
-        view.backgroundColor = .systemBackground
-
-        // Container
-        containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
-
-        // Label de torneo (dentro del container, no del navbar)
-        containerView.addSubview(titleLabel)
-        titleLabel
-            .text("Apertura")
-            .font(.boldSystemFont(ofSize: 18))
-            .textColor(.label)
-            .textAlignment(.center)
-
-        // Constraints del label
-        titleLabel.anchor(
-            top: containerView.topAnchor,
-            leading: containerView.leadingAnchor,
-            trailing: containerView.trailingAnchor,
-            padding: .init(top: 16, left: 16, bottom: 0, right: 16)
-        )
-        titleLabel.height(30)
-
-        // TableView
-        containerView.addSubview(tableView)
-        tableView.anchor(
-            top: titleLabel.bottomAnchor,
-            leading: containerView.leadingAnchor,
-            bottom: containerView.bottomAnchor,
-            trailing: containerView.trailingAnchor,
-            padding: .init(top: 12, left: 0, bottom: 0, right: 0)
-        )
-
-        tableView
-            .delegate(self)
-            .dataSource(self)
-            .registerCell(PositionCell.self)
-            .separatorStyle(.singleLine)
             .enableAutomaticDimensions()
     }
 }
@@ -337,20 +394,12 @@ class TablaViewController: UIViewController {
 
 ## Mejores Prácticas
 
-1. **Siempre usar prepareForAutoLayout()**: Se llama automáticamente en los helpers
-2. **Encadenar métodos**: Aprovechar el builder pattern
-3. **Type-safe dequeue**: Usar los métodos helper para dequeue
-4. **Container views**: Usar para separar concerns entre navigation/tab bar
-5. **Stack views**: Preferir stack views sobre constraints complejos
-6. **Reutilizar headers**: Usar las clases de header proporcionadas
-
-## Ventajas
-
-- ✅ Código más limpio y legible
-- ✅ Menos boilerplate
-- ✅ Type-safe
-- ✅ Consistencia visual
-- ✅ Fácil mantenimiento
-- ✅ Performance optimizado
+1. **Builder pattern**: Encadenar métodos para configurar vistas
+2. **Type-safe dequeue**: Usar `registerCell()` y `dequeueReusableCell(Cell.self, for:)`
+3. **Container views**: Usar para separar concerns entre navigation/tab bar
+4. **Stack views**: Preferir stack views sobre constraints manuales
+5. **Spacing constants**: Usar `Spacing.small`, `.medium`, `.standard` en vez de números
+6. **Theme system**: Usar `AppTheme` para fonts y `AppColors` para colores
+7. **ConstraintGroup**: Para layouts que cambian dinámicamente
 
 */

@@ -306,6 +306,103 @@ extension UIView {
         self.isHidden = isHidden
         return self
     }
+
+    // MARK: - Size with Priority
+
+    /// Establece el ancho con prioridad
+    @discardableResult
+    func width(_ width: CGFloat, priority: UILayoutPriority) -> Self {
+        let constraint = widthAnchor.constraint(equalToConstant: width)
+        constraint.priority = priority
+        constraint.isActive = true
+        return self
+    }
+
+    /// Establece el alto con prioridad
+    @discardableResult
+    func height(_ height: CGFloat, priority: UILayoutPriority) -> Self {
+        let constraint = heightAnchor.constraint(equalToConstant: height)
+        constraint.priority = priority
+        constraint.isActive = true
+        return self
+    }
+
+    /// Establece el alto mínimo
+    @discardableResult
+    func minHeight(_ height: CGFloat) -> Self {
+        heightAnchor.constraint(greaterThanOrEqualToConstant: height).isActive = true
+        return self
+    }
+
+    /// Establece el alto máximo
+    @discardableResult
+    func maxHeight(_ height: CGFloat) -> Self {
+        heightAnchor.constraint(lessThanOrEqualToConstant: height).isActive = true
+        return self
+    }
+
+    /// Establece el ancho mínimo
+    @discardableResult
+    func minWidth(_ width: CGFloat) -> Self {
+        widthAnchor.constraint(greaterThanOrEqualToConstant: width).isActive = true
+        return self
+    }
+
+    /// Establece el ancho máximo
+    @discardableResult
+    func maxWidth(_ width: CGFloat) -> Self {
+        widthAnchor.constraint(lessThanOrEqualToConstant: width).isActive = true
+        return self
+    }
+}
+
+// MARK: - ConstraintGroup
+
+/// Permite agrupar constraints para activar/desactivar conjuntos completos
+/// Útil para layouts adaptativos y animaciones
+class ConstraintGroup {
+
+    private var constraints: [NSLayoutConstraint] = []
+
+    var isActive: Bool = false {
+        didSet {
+            if isActive {
+                NSLayoutConstraint.activate(constraints)
+            } else {
+                NSLayoutConstraint.deactivate(constraints)
+            }
+        }
+    }
+
+    /// Agrega un constraint al grupo (sin activarlo)
+    @discardableResult
+    func add(_ constraint: NSLayoutConstraint) -> Self {
+        constraints.append(constraint)
+        return self
+    }
+
+    /// Agrega múltiples constraints al grupo (sin activarlos)
+    @discardableResult
+    func add(_ constraints: [NSLayoutConstraint]) -> Self {
+        self.constraints.append(contentsOf: constraints)
+        return self
+    }
+
+    /// Activa todos los constraints del grupo
+    func activate() {
+        isActive = true
+    }
+
+    /// Desactiva todos los constraints del grupo
+    func deactivate() {
+        isActive = false
+    }
+
+    /// Reemplaza este grupo por otro (desactiva este, activa el otro)
+    func replace(with other: ConstraintGroup) {
+        deactivate()
+        other.activate()
+    }
 }
 
 // MARK: - UILabel Extensions

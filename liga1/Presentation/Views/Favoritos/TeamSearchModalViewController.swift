@@ -110,7 +110,7 @@ class TeamSearchModalViewController: UIViewController {
     }
 
     private func setupTableView() {
-        tableView.register(TeamTableViewCell.self, forCellReuseIdentifier: TeamTableViewCell.identifier)
+        tableView.registerCell(TeamTableViewCell.self)
         tableView.delegate = self
         tableView.dataSource = self
     }
@@ -193,9 +193,7 @@ extension TeamSearchModalViewController: UITableViewDataSource, UITableViewDeleg
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: TeamTableViewCell.identifier, for: indexPath) as? TeamTableViewCell else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueReusableCell(TeamTableViewCell.self, for: indexPath)
 
         let team = filteredTeams[indexPath.row]
         let logo = UIImage(named: team.logo)

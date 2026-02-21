@@ -14,7 +14,6 @@ protocol MatchTableViewCellDelegate: AnyObject {
 
 class MatchTableViewCell: UITableViewCell {
 
-    static let identifier = "MatchTableViewCell"
     weak var delegate: MatchTableViewCellDelegate?
 
     // MARK: - UI Components
@@ -28,81 +27,43 @@ class MatchTableViewCell: UITableViewCell {
         return btn
     }()
 
-    private lazy var equiposStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.prepareForAutoLayout()
-        stack.axis = .vertical
-        stack.spacing = 8
-        stack.distribution = .fillEqually
-        return stack
-    }()
+    private lazy var equiposStackView = UIStackView()
+        .axis(.vertical)
+        .spacing(8)
+        .distribution(.fillEqually)
+        .prepareForAutoLayout()
 
     // Equipo Local
-    private lazy var equipoLocalContainer: UIView = {
-        let view = UIView()
-        view.prepareForAutoLayout()
-        return view
-    }()
-
-    private lazy var logoLocalImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.prepareForAutoLayout()
-        iv.contentMode = .scaleAspectFit
-        return iv
-    }()
-
-    private lazy var nombreLocalLabel: UILabel = {
-        let label = UILabel()
-        label.prepareForAutoLayout()
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        return label
-    }()
-
-    private lazy var marcadorLocalLabel: UILabel = {
-        let label = UILabel()
-        label.prepareForAutoLayout()
-        label.font = .systemFont(ofSize: 16)
-        label.textAlignment = .center
-        return label
-    }()
+    private let equipoLocalContainer = UIView().prepareForAutoLayout()
+    private let logoLocalImageView = UIImageView()
+        .contentMode(.scaleAspectFit)
+        .prepareForAutoLayout()
+    private let nombreLocalLabel = UILabel()
+        .font(.systemFont(ofSize: 14, weight: .medium))
+        .prepareForAutoLayout()
+    private let marcadorLocalLabel = UILabel()
+        .font(.systemFont(ofSize: 16))
+        .alignment(.center)
+        .prepareForAutoLayout()
 
     // Equipo Visitante
-    private lazy var equipoVisitanteContainer: UIView = {
-        let view = UIView()
-        view.prepareForAutoLayout()
-        return view
-    }()
+    private let equipoVisitanteContainer = UIView().prepareForAutoLayout()
+    private let logoVisitanteImageView = UIImageView()
+        .contentMode(.scaleAspectFit)
+        .prepareForAutoLayout()
+    private let nombreVisitanteLabel = UILabel()
+        .font(.systemFont(ofSize: 14))
+        .prepareForAutoLayout()
+    private let marcadorVisitanteLabel = UILabel()
+        .font(.systemFont(ofSize: 16))
+        .alignment(.center)
+        .prepareForAutoLayout()
 
-    private lazy var logoVisitanteImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.prepareForAutoLayout()
-        iv.contentMode = .scaleAspectFit
-        return iv
-    }()
-
-    private lazy var nombreVisitanteLabel: UILabel = {
-        let label = UILabel()
-        label.prepareForAutoLayout()
-        label.font = .systemFont(ofSize: 14)
-        return label
-    }()
-
-    private lazy var marcadorVisitanteLabel: UILabel = {
-        let label = UILabel()
-        label.prepareForAutoLayout()
-        label.font = .systemFont(ofSize: 16)
-        label.textAlignment = .center
-        return label
-    }()
-
-    private lazy var horaLabel: UILabel = {
-        let label = UILabel()
-        label.prepareForAutoLayout()
-        label.font = .systemFont(ofSize: 11, weight: .regular)
-        label.textAlignment = .right
-        label.textColor = .secondaryLabel
-        return label
-    }()
+    private let horaLabel = UILabel()
+        .font(.systemFont(ofSize: 11, weight: .regular))
+        .alignment(.right)
+        .textColor(.secondaryLabel)
+        .prepareForAutoLayout()
 
     // MARK: - Init
 

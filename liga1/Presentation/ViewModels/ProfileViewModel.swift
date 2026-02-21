@@ -138,7 +138,7 @@ class ProfileViewModel {
                     action: .privacy
                 ),
                 ProfileOption(
-title: "Ajustes de privacidad",
+                    title: "Ajustes de privacidad",
                     icon: UIImage(systemName: "gearshape.fill"),
                     subtitle: nil,
                     action: .privacySettings
