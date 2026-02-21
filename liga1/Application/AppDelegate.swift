@@ -26,7 +26,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // 1. Configurar Firebase (debe ser primero)
         FirebaseApp.configure()
+
+        // 2. Configurar AuthKit con Firebase (reutiliza la configuración de Firebase)
+        AuthManager.shared.configure(provider: .firebase)
 
         // Habilitar persistencia offline de Firestore
         let settings = FirestoreSettings()

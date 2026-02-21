@@ -21,8 +21,6 @@ protocol UserPreferencesServiceProtocol {
 class UserPreferencesService: UserPreferencesServiceProtocol {
 
     private let database: DatabaseProtocol
-    private let authProvider: AuthProvider
-    private let authRepository: AuthRepository
     private let logger: LoggerProtocol
     private let preferencesSubject = CurrentValueSubject<UserPreferences?, Never>(nil)
 
@@ -32,13 +30,12 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(database: DatabaseProtocol, authProvider: AuthProvider, authRepository: AuthRepository, logger: LoggerProtocol) {
+    init(database: DatabaseProtocol, logger: LoggerProtocol) {
         self.database = database
-        self.authProvider = authProvider
-        self.authRepository = authRepository
         self.logger = logger
 
-        authRepository.observeAuthState()
+        // Observar cambios de autenticación con AuthManager
+        AuthManager.shared.observeAuthState()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
                 if user != nil {
@@ -53,7 +50,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
     // MARK: - Private Helpers
 
     private func getUserId() -> String? {
-        return authProvider.currentUserId
+        return AuthManager.shared.currentUserId
     }
 
     private func getPreferencesDocumentRef() -> DocumentReference? {

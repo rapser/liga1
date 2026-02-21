@@ -17,25 +17,22 @@ final class AppCoordinator: Coordinator {
     private let container: DIContainer
     private let eventBus: AppEventBusProtocol
     private let logger: LoggerProtocol
-    private let authProvider: AuthProvider
-    private let logoutUseCase: LogoutUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
+    private var hasReceivedInitialAuthState = false
 
     init(
         window: UIWindow,
         container: DIContainer,
         eventBus: AppEventBusProtocol,
-        logger: LoggerProtocol,
-        authProvider: AuthProvider,
-        logoutUseCase: LogoutUseCaseProtocol
+        logger: LoggerProtocol
     ) {
         self.window = window
         self.container = container
         self.eventBus = eventBus
         self.logger = logger
-        self.authProvider = authProvider
-        self.logoutUseCase = logoutUseCase
         self.navigationController = UINavigationController()
+
+        // Observar eventos del EventBus
         eventBus.events()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
@@ -49,47 +46,77 @@ final class AppCoordinator: Coordinator {
                 }
             }
             .store(in: &cancellables)
+
+        // Observar cambios en el estado de autenticación
+        AuthManager.shared.observeAuthState()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] user in
+                self?.handleAuthStateChange(user: user)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func handleAuthStateChange(user: User?) {
+        // Marcar que hemos recibido el estado inicial
+        let isInitialState = !hasReceivedInitialAuthState
+        hasReceivedInitialAuthState = true
+
+        if user != nil {
+            // Usuario autenticado - mostrar main flow si aún no está mostrándose
+            if !(window.rootViewController is MainTabBarController) {
+                logger.info(isInitialState ? "✅ Estado inicial: Usuario autenticado - navegando a Main Flow" : "✅ Usuario autenticado - navegando a Main Flow")
+                childCoordinators.removeAll()
+                showMainFlow()
+            }
+        } else {
+            // No hay usuario - mostrar login flow si aún no está mostrándose
+            if !(window.rootViewController is UINavigationController) {
+                logger.info(isInitialState ? "ℹ️ Estado inicial: No hay usuario - navegando a Login Flow" : "ℹ️ No hay usuario autenticado - navegando a Login Flow")
+                childCoordinators.removeAll()
+                showLoginFlow()
+            }
+        }
     }
 
     private func handleLoginSuccess() {
+        // Este método ahora es manejado principalmente por observeAuthState
+        // Pero lo mantenemos para limpieza de coordinadores
         childCoordinators.removeAll()
-        guard authProvider.currentUserId != nil else {
-            self.logger.error("❌ AppCoordinator: No hay usuario autenticado después del login", error: nil)
-            return
-        }
-        DispatchQueue.main.async { [weak self] in
-            self?.showMainFlow()
-        }
+        logger.info("📱 Login exitoso recibido via EventBus")
     }
 
     private func handleLogoutRequested() {
+        // Este método ya no navega directamente - el observeAuthState se encarga
+        // Solo limpiamos los coordinadores
         childCoordinators.removeAll()
-        if authProvider.currentUserId != nil {
-            self.logger.warning("⚠️ AppCoordinator: Aún hay usuario autenticado después del logout")
-            logoutUseCase.execute()
-                .sink(
-                    receiveCompletion: { [weak self] completion in
-                        if case .failure(let error) = completion {
-                            self?.logger.error("❌ AppCoordinator: Error al cerrar sesión forzadamente", error: error)
-                        }
-                    },
-                    receiveValue: { }
-                )
-                .store(in: &cancellables)
-        }
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.showLoginFlow()
-        }
+        logger.info("📱 Logout solicitado - la navegación será manejada por observeAuthState")
     }
 
     func start() {
-        // Verificar si hay usuario autenticado usando AuthProvider
-        if authProvider.currentUserId != nil {
-            showMainFlow()
-        } else {
-            showLoginFlow()
-        }
+        // Mostrar una pantalla de carga mientras esperamos el estado de autenticación
+        // El observeAuthState() navegará a login o main según corresponda
+        showLoadingScreen()
+        logger.info("🚀 AppCoordinator iniciado - esperando estado de autenticación")
+    }
+
+    private func showLoadingScreen() {
+        let loadingVC = UIViewController()
+        loadingVC.view.backgroundColor = .appBackground
+
+        // Agregar activity indicator
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.color = .liga1Red
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.startAnimating()
+
+        loadingVC.view.addSubview(activityIndicator)
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: loadingVC.view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: loadingVC.view.centerYAnchor)
+        ])
+
+        window.rootViewController = loadingVC
+        window.makeKeyAndVisible()
     }
 
     func showLoginFlow() {

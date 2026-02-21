@@ -41,7 +41,7 @@ final class HomeTableViewAdapter: NSObject {
     private func setupTableView() {
         tableView?.dataSource = self
         tableView?.delegate = self
-        tableView?.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
+        tableView?.registerCell(MatchTableViewCell.self)
     }
 }
 
@@ -59,9 +59,7 @@ extension HomeTableViewAdapter: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let match = sections[indexPath.section].matches[indexPath.row]
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueReusableCell(MatchTableViewCell.self, for: indexPath)
 
         // Cargar logos según el equipo (usando optional binding)
         let logoLocal = match.equipoLocalId.flatMap { UIImage(named: $0) }

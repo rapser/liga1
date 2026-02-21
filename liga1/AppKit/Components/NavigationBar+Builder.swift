@@ -24,8 +24,29 @@ class NavigationBarConfigurator {
 
     private weak var viewController: UIViewController?
 
+    /// Appearance compartido para evitar que métodos encadenados se sobreescriban
+    private lazy var appearance: UINavigationBarAppearance = {
+        let existing = viewController?.navigationController?.navigationBar.standardAppearance
+        return existing?.copy() as? UINavigationBarAppearance ?? UINavigationBarAppearance()
+    }()
+
+    /// Indica si se modificó el appearance y necesita aplicarse
+    private var needsAppearanceUpdate = false
+
     init(viewController: UIViewController) {
         self.viewController = viewController
+    }
+
+    deinit {
+        applyAppearanceIfNeeded()
+    }
+
+    /// Aplica el appearance acumulado al navigation bar
+    private func applyAppearanceIfNeeded() {
+        guard needsAppearanceUpdate, let navBar = viewController?.navigationController?.navigationBar else { return }
+        navBar.standardAppearance = appearance
+        navBar.scrollEdgeAppearance = appearance
+        navBar.compactAppearance = appearance
     }
 
     /// Establece el título del navigation bar
@@ -139,39 +160,26 @@ class NavigationBarConfigurator {
     /// Establece el color de fondo del navigation bar
     @discardableResult
     func backgroundColor(_ color: UIColor) -> Self {
-        let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = color
-
-        viewController?.navigationController?.navigationBar.standardAppearance = appearance
-        viewController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        viewController?.navigationController?.navigationBar.compactAppearance = appearance
-
+        needsAppearanceUpdate = true
         return self
     }
 
     /// Establece el color del texto del título
     @discardableResult
     func titleColor(_ color: UIColor) -> Self {
-        let appearance = UINavigationBarAppearance()
         appearance.titleTextAttributes = [.foregroundColor: color]
         appearance.largeTitleTextAttributes = [.foregroundColor: color]
-
-        viewController?.navigationController?.navigationBar.standardAppearance = appearance
-        viewController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
-
+        needsAppearanceUpdate = true
         return self
     }
 
     /// Hace el navigation bar transparente
     @discardableResult
     func transparent() -> Self {
-        let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
-
-        viewController?.navigationController?.navigationBar.standardAppearance = appearance
-        viewController?.navigationController?.navigationBar.scrollEdgeAppearance = appearance
-
+        needsAppearanceUpdate = true
         return self
     }
 

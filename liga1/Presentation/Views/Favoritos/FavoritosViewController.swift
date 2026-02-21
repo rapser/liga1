@@ -120,8 +120,8 @@ class FavoritosViewController: UIViewController {
 
     private func setupTableView() {
         tableView.prepareForAutoLayout()
-        tableView.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
-        tableView.register(TeamTableViewCell.self, forCellReuseIdentifier: TeamTableViewCell.identifier)
+        tableView.registerCell(MatchTableViewCell.self)
+        tableView.registerCell(TeamTableViewCell.self)
         tableView.delegate = self
         tableView.dataSource = self
 
@@ -284,9 +284,7 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
 
     private func configureMatchCell(at indexPath: IndexPath) -> UITableViewCell {
         let matchUI = viewModel.matches[indexPath.row]
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueReusableCell(MatchTableViewCell.self, for: indexPath)
 
         let logoLocal = UIImage(named: matchUI.equipoLocalId ?? "shield.fill")
         let logoVisitante = UIImage(named: matchUI.equipoVisitanteId ?? "shield.fill")
@@ -298,9 +296,7 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
 
     private func configureTeamCell(at indexPath: IndexPath) -> UITableViewCell {
         let team = viewModel.teams[indexPath.row]
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: TeamTableViewCell.identifier, for: indexPath) as? TeamTableViewCell else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueReusableCell(TeamTableViewCell.self, for: indexPath)
 
         let logo = UIImage(named: team.logo)
         cell.delegate = self

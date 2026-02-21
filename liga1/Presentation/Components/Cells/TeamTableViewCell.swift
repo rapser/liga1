@@ -13,8 +13,6 @@ protocol TeamTableViewCellDelegate: AnyObject {
 
 class TeamTableViewCell: UITableViewCell {
 
-    static let identifier = "TeamTableViewCell"
-
     weak var delegate: TeamTableViewCellDelegate?
 
     // MARK: - UI Components

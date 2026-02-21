@@ -42,27 +42,12 @@ final class DIContainer {
         return NewsRepository(database: makeDatabase(), logger: makeLogger())
     }
 
-    func makeAdminMatchRepository() -> AdminMatchRepositoryProtocol {
-        return AdminMatchRepository(database: makeDatabase(), logger: makeLogger())
-    }
+    // MARK: - Services
 
     // MARK: - Services
 
-    // Auth Module - usar AuthRepository en lugar de AuthServiceProtocol
-    private lazy var authService: AuthService = {
-        return AuthService(logger: makeLogger())
-    }()
-
-    func makeAuthRepository() -> AuthRepository {
-        return authService
-    }
-
-    func makeAuthProvider() -> AuthProvider {
-        return authService
-    }
-
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        return FavoritesService(database: makeDatabase(), authProvider: makeAuthProvider(), logger: makeLogger())
+        return FavoritesService(database: makeDatabase(), logger: makeLogger())
     }()
 
     func makeFavoritesService() -> FavoritesServiceProtocol {
@@ -80,8 +65,6 @@ final class DIContainer {
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
         return UserPreferencesService(
             database: makeDatabase(),
-            authProvider: makeAuthProvider(),
-            authRepository: makeAuthRepository(),
             logger: makeLogger()
         )
     }()
@@ -207,27 +190,8 @@ final class DIContainer {
     }
 
     // MARK: - Use Cases - Auth
-
-    func makeLoginUseCase() -> LoginUseCaseProtocol {
-        return LoginUseCase(
-            authRepository: makeAuthRepository()
-        )
-    }
-
-    func makeLogoutUseCase() -> LogoutUseCaseProtocol {
-        return LogoutUseCase(
-            authRepository: makeAuthRepository()
-        )
-    }
-
-    // MARK: - Use Cases - Admin
-
-    func makeRegisterMatchesUseCase() -> RegisterMatchesUseCaseProtocol {
-        return RegisterMatchesUseCase(
-            adminMatchRepository: makeAdminMatchRepository(),
-            logger: makeLogger()
-        )
-    }
+    // AuthKit ahora se usa directamente vía AuthManager.shared
+    // No se necesitan UseCases separados
 
     // MARK: - Use Cases - Notifications
 
@@ -282,21 +246,11 @@ final class DIContainer {
     }
 
     func makeProfileViewModel() -> ProfileViewModel {
-        return ProfileViewModel(
-            logoutUseCase: makeLogoutUseCase()
-        )
+        return ProfileViewModel()
     }
 
     func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            loginUseCase: makeLoginUseCase(),
-            logger: makeLogger()
-        )
-    }
-
-    func makeRegistrarPartidosViewModel() -> RegistrarPartidosViewModel {
-        return RegistrarPartidosViewModel(
-            registerMatchesUseCase: makeRegisterMatchesUseCase(),
             logger: makeLogger()
         )
     }
@@ -345,14 +299,6 @@ final class DIContainer {
         )
     }
 
-    func makeRegistrarPartidosViewController() -> RegistrarPartidosViewController {
-        return RegistrarPartidosViewController(viewModel: makeRegistrarPartidosViewModel())
-    }
-
-    func makeLogsViewController() -> LogsViewController {
-        return LogsViewController(logger: makeLogger())
-    }
-
     func makeNotificationHistoryViewController() -> NotificationHistoryViewController {
         return NotificationHistoryViewController()
     }
@@ -364,9 +310,7 @@ final class DIContainer {
             window: window,
             container: self,
             eventBus: makeAppEventBus(),
-            logger: makeLogger(),
-            authProvider: makeAuthProvider(),
-            logoutUseCase: makeLogoutUseCase()
+            logger: makeLogger()
         )
     }
 
