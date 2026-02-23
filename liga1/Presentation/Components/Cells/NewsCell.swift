@@ -10,6 +10,8 @@ import Kingfisher
 
 class NewsCell: UITableViewCell {
 
+    static let reuseIdentifier = "NewsCell"
+
     private lazy var newsImageView = UIImageView()
         .prepareForAutoLayout()
         .contentMode(.scaleAspectFill)

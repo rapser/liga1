@@ -57,17 +57,18 @@ class FeaturedNewsContentCell: UITableViewCell {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 
-// MARK: - Header para categorías (Liga 1, etc)
-class CategoryHeaderView: UITableViewHeaderFooterView {
-    static let reuseIdentifier = "CategoryHeaderView"
+// MARK: - Celda de cabecera de categoría (reemplaza el viewForHeaderInSection)
+class CategoryHeaderCell: UITableViewCell {
+    static let reuseIdentifier = "CategoryHeaderCell"
 
     private lazy var label = UILabel()
         .prepareForAutoLayout()
         .font(.systemFont(ofSize: 12, weight: .semibold))
         .textColor(.secondaryLabel)
 
-    override init(reuseIdentifier: String?) {
-        super.init(reuseIdentifier: reuseIdentifier)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
         contentView.backgroundColor = .systemBackground
 
         label
