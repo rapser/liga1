@@ -147,8 +147,8 @@ class HomeViewModel {
             tempSections.append(section)
         }
 
-        // Ordenar secciones por número de jornada descendente
-        jornadaSections = tempSections.sorted { $0.numero > $1.numero }
+        // Ordenar secciones por número de jornada ascendente (fecha más próxima primero)
+        jornadaSections = tempSections.sorted { $0.numero < $1.numero }
         
         // Actualizar el estado de favoritos después de crear las secciones
         updateMatchesFavoriteStatus()
