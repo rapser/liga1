@@ -5,6 +5,31 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.0.0 (16)] - 2026-03-07
+
+### ✨ Added
+- **GetJornadaToDisplayUseCase**: Nuevo Use Case en Domain que encapsula la regla de negocio "mostrar solo la jornada con menor fecha de inicio entre las activas (mostrar == true)". Expone `execute() -> AnyPublisher<Jornada?, Error>` y `observe() -> AnyPublisher<Jornada?, Never>`.
+- **JornadaSection**: Modelo de presentación extraído a `Presentation/Models/Jornada/JornadaSection.swift` (jornadaId, numero, torneo, matches) para homogeneizar con MatchUI, NewsItemUI.
+- **NewsCategory.sortedForNewsDisplay**: Extensión en Core/Utils que ordena categorías para el listado de noticias (Destacado siempre primero, resto por fecha representativa).
+
+### 🔧 Changed
+- **Home - Una sola jornada**: En pantalla principal solo se muestra la jornada con `mostrar == true` y menor `fechaInicio`. La selección se realiza en Domain (GetJornadaToDisplayUseCase); HomeViewModel ya no contiene la regla.
+- **Noticias - Filtro publicada**: El listado solo incluye noticias con `publicada == true` (filtro en NewsRepository).
+- **Noticias - Categorías**: Categorías actualizadas a: destacado, partidos, fichajes, equipos, jugadores, tabla, estadísticas. "Destacado" es una categoría, no un booleano.
+- **Noticias - Orden**: La categoría Destacado siempre aparece primera; las demás ordenadas por fecha de la noticia más reciente (uso de `sortedForNewsDisplay` en NewsViewModel).
+- **Noticias - Layout destacado**: Las vistas (NewsViewController+TableView, NewsCell) usan `NewsItemUI.esDestacada` (categoría == .destacado) como única fuente para celda destacada y altura; se eliminó la duplicación de la condición.
+
+### 🏗️ Refactor
+- **HomeViewModel**: Sustitución de `fetchActiveJornadasUseCase` y `observeActiveJornadasUseCase` por `getJornadaToDisplayUseCase`; eliminado el método `jornadaToDisplay(from:)` (regla movida a Domain).
+- **DIContainer**: Registro de `makeGetJornadaToDisplayUseCase()`; `makeHomeViewModel()` inyecta el nuevo Use Case.
+- **NewsItem / NewsItemUI**: Eliminado el campo booleano `featured`/`destacada`; el criterio "destacado" para la UI es la categoría `.destacado` (propiedad calculada `esDestacada` en NewsItemUI).
+- **HomeTableViewAdapter**: Uso del tipo `JornadaSection` desde Presentation/Models en lugar de `HomeViewModel.JornadaSection`.
+
+### 📝 Docs
+- **README**: Actualizado con el estado actual: una jornada en Home (GetJornadaToDisplayUseCase), noticias publicadas y categorías, orden destacado primero, modelos JornadaSection y esDestacada, estructura Firestore de news (publicada en lugar de destacada), lista de Use Cases y estructura de archivos.
+
+---
+
 ## [1.0.0 (5)] - 2026-01-XX
 
 ### ✨ Added

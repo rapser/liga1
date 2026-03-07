@@ -86,6 +86,21 @@ public enum NewsCategory: Equatable, Hashable {
     }
 }
 
+// MARK: - Orden para listado de noticias
+
+extension Array where Element == NewsCategory {
+    /// Ordena categorías para el listado: destacado siempre primero; el resto por fecha (más reciente primero).
+    /// - Parameter dateForCategory: Función que devuelve la fecha representativa de cada categoría (p. ej. fecha de la noticia más reciente).
+    /// - Returns: Categorías ordenadas.
+    public func sortedForNewsDisplay(dateForCategory: (NewsCategory) -> Date) -> [NewsCategory] {
+        return sorted { category1, category2 in
+            if category1 == .destacado { return true }
+            if category2 == .destacado { return false }
+            return dateForCategory(category1) > dateForCategory(category2)
+        }
+    }
+}
+
 // MARK: - Codable
 
 extension NewsCategory: Codable {

@@ -46,7 +46,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
 
-        if newsItem.category == .destacado {
+        if newsItem.esDestacada {
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: FeaturedNewsContentCell.reuseIdentifier,
                 for: indexPath
@@ -77,7 +77,7 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row - 1] else {
             return 90
         }
-        return newsItem.category == .destacado ? UITableView.automaticDimension : 90
+        return newsItem.esDestacada ? UITableView.automaticDimension : 90
     }
 
     // MARK: - Section Headers (desactivados — se usan celdas en su lugar)

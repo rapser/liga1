@@ -55,15 +55,8 @@ class NewsViewModel {
                     organizedGroupedNews[category] = sortedNews
                 }
                 self.groupedNews = organizedGroupedNews
-                // Destacado siempre primero; el resto ordenado por fecha (más reciente primero)
-                self.sortedCategories = organizedGroupedNews.keys.sorted { category1, category2 in
-                    if category1 == .destacado { return true }
-                    if category2 == .destacado { return false }
-                    let news1 = organizedGroupedNews[category1] ?? []
-                    let news2 = organizedGroupedNews[category2] ?? []
-                    let date1 = news1.first?.publishedDate ?? Date.distantPast
-                    let date2 = news2.first?.publishedDate ?? Date.distantPast
-                    return date1 > date2
+                self.sortedCategories = Array(organizedGroupedNews.keys).sortedForNewsDisplay { category in
+                    organizedGroupedNews[category]?.first?.publishedDate ?? Date.distantPast
                 }
             }
             .store(in: &cancellables)
