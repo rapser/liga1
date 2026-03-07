@@ -127,6 +127,13 @@ final class DIContainer {
         )
     }
 
+    func makeGetJornadaToDisplayUseCase() -> GetJornadaToDisplayUseCaseProtocol {
+        return GetJornadaToDisplayUseCase(
+            fetchActiveJornadasUseCase: makeFetchActiveJornadasUseCase(),
+            observeActiveJornadasUseCase: makeObserveActiveJornadasUseCase()
+        )
+    }
+
     // MARK: - Use Cases - Matches
 
     func makeFetchMatchesUseCase() -> FetchMatchesUseCaseProtocol {
@@ -213,8 +220,7 @@ final class DIContainer {
 
     func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(
-            fetchActiveJornadasUseCase: makeFetchActiveJornadasUseCase(),
-            observeActiveJornadasUseCase: makeObserveActiveJornadasUseCase(),
+            getJornadaToDisplayUseCase: makeGetJornadaToDisplayUseCase(),
             fetchMatchesUseCase: makeFetchMatchesUseCase(),
             toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
             observeFavoritesUseCase: makeObserveFavoritesUseCase()

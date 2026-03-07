@@ -109,6 +109,7 @@
 		46CDF4852F1061FC00F280E6 /* TeamDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4802F1061FC00F280E6 /* TeamDTO.swift */; };
 		46CDF4882F10623000F280E6 /* JornadaUIMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4862F10623000F280E6 /* JornadaUIMapper.swift */; };
 		46CDF48E2F10625B00F280E6 /* JornadaUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4892F10625B00F280E6 /* JornadaUI.swift */; };
+		46CDF4C02F10625C00F280E6 /* JornadaSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4BF2F10625C00F280E6 /* JornadaSection.swift */; };
 		46CDF4992F10685700F280E6 /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4982F10685700F280E6 /* Match.swift */; };
 		46CDF49B2F10686F00F280E6 /* MatchUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF49A2F10686F00F280E6 /* MatchUI.swift */; };
 		46CDF4A12F1068A300F280E6 /* TeamMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF49F2F1068A300F280E6 /* TeamMapper.swift */; };
@@ -142,6 +143,7 @@
 		46D995AE2C6E925600D4951C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 46D995AD2C6E925600D4951C /* FirebaseStorage */; };
 		46EC8E1A2F1325EC006A838D /* AperturaFixtureData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */; };
 		46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */; };
+		46EC8E1D2F133476006A838D /* GetJornadaToDisplayUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1E2F133476006A838D /* GetJornadaToDisplayUseCase.swift */; };
 		46EC8E1E2F133DA0006A838D /* ObserveMatchesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */; };
 		65948435DFACA7759EC32637 /* CompositionalLayout+Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */; };
 		98255077D821F2CCA95CA559 /* CollectionView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */; };
@@ -261,6 +263,7 @@
 		46CDF4802F1061FC00F280E6 /* TeamDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamDTO.swift; sourceTree = "<group>"; };
 		46CDF4862F10623000F280E6 /* JornadaUIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaUIMapper.swift; sourceTree = "<group>"; };
 		46CDF4892F10625B00F280E6 /* JornadaUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaUI.swift; sourceTree = "<group>"; };
+		46CDF4BF2F10625C00F280E6 /* JornadaSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaSection.swift; sourceTree = "<group>"; };
 		46CDF4982F10685700F280E6 /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		46CDF49A2F10686F00F280E6 /* MatchUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchUI.swift; sourceTree = "<group>"; };
 		46CDF49C2F1068A300F280E6 /* JornadaMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaMapper.swift; sourceTree = "<group>"; };
@@ -292,6 +295,7 @@
 		46D995A02C6E90EE00D4951C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		46EC8E182F1325EC006A838D /* AperturaFixtureData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AperturaFixtureData.swift; sourceTree = "<group>"; };
 		46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveActiveJornadasUseCase.swift; sourceTree = "<group>"; };
+		46EC8E1E2F133476006A838D /* GetJornadaToDisplayUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetJornadaToDisplayUseCase.swift; sourceTree = "<group>"; };
 		46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveMatchesUseCase.swift; sourceTree = "<group>"; };
 		49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CollectionView+Builder.swift"; sourceTree = "<group>"; };
 		5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CompositionalLayout+Presets.swift"; sourceTree = "<group>"; };
@@ -650,6 +654,7 @@
 			children = (
 				46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */,
 				464009C72F098D8D00A8C905 /* FetchActiveJornadasUseCase.swift */,
+				46EC8E1E2F133476006A838D /* GetJornadaToDisplayUseCase.swift */,
 			);
 			path = Jornadas;
 			sourceTree = "<group>";
@@ -929,6 +934,7 @@
 			isa = PBXGroup;
 			children = (
 				46CDF4892F10625B00F280E6 /* JornadaUI.swift */,
+				46CDF4BF2F10625C00F280E6 /* JornadaSection.swift */,
 			);
 			path = Jornada;
 			sourceTree = "<group>";
@@ -1192,6 +1198,7 @@
 				464009D42F098D8D00A8C905 /* FetchNewsUseCase.swift in Sources */,
 				464009D52F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift in Sources */,
 				46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */,
+				46EC8E1D2F133476006A838D /* GetJornadaToDisplayUseCase.swift in Sources */,
 				461461702F1EA4A700BBC929 /* NotificationSettingsViewController.swift in Sources */,
 				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
@@ -1222,6 +1229,7 @@
 				464001C02F08853F00A8C905 /* JornadasRepository.swift in Sources */,
 				464001C12F08853F00A8C905 /* EquipoTableViewCell.swift in Sources */,
 				46CDF48E2F10625B00F280E6 /* JornadaUI.swift in Sources */,
+				46CDF4C02F10625C00F280E6 /* JornadaSection.swift in Sources */,
 				464001C22F08853F00A8C905 /* HeaderView.swift in Sources */,
 				46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */,
 				464001C32F08853F00A8C905 /* TorneoType.swift in Sources */,

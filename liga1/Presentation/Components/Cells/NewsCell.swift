@@ -10,6 +10,8 @@ import Kingfisher
 
 class NewsCell: UITableViewCell {
 
+    static let reuseIdentifier = "NewsCell"
+
     private lazy var newsImageView = UIImageView()
         .prepareForAutoLayout()
         .contentMode(.scaleAspectFill)
@@ -65,7 +67,7 @@ class NewsCell: UITableViewCell {
             newsImageView.kf.setImage(with: url)
         }
         fechaLabel.text = item.fechaFormateada
-        if item.featured {
+        if item.esDestacada {
             contentView.backgroundColor = UIColor(red: 1, green: 0.95, blue: 0.8, alpha: 1)
         } else {
             contentView.backgroundColor = .systemBackground

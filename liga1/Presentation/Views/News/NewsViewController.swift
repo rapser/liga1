@@ -60,22 +60,19 @@ class NewsViewController: UIViewController {
     }
 
     private func setupTableView() {
-        // Configurar tableView
         tableView.prepareForAutoLayout()
         tableView.backgroundColor = .appBackground
-        tableView.register(NewsCell.self, forCellReuseIdentifier: "NewsCell")
+        tableView.register(NewsCell.self, forCellReuseIdentifier: NewsCell.reuseIdentifier)
         tableView.register(FeaturedNewsContentCell.self, forCellReuseIdentifier: FeaturedNewsContentCell.reuseIdentifier)
-        tableView.register(FeaturedNewsTitleHeaderView.self, forHeaderFooterViewReuseIdentifier: FeaturedNewsTitleHeaderView.reuseIdentifier)
-        tableView.register(CategoryHeaderView.self, forHeaderFooterViewReuseIdentifier: CategoryHeaderView.reuseIdentifier)
-        tableView.estimatedSectionHeaderHeight = 40
-        tableView.sectionHeaderHeight = UITableView.automaticDimension
+        tableView.register(CategoryHeaderCell.self, forCellReuseIdentifier: CategoryHeaderCell.reuseIdentifier)
+        tableView.sectionHeaderHeight = 0
+        tableView.sectionFooterHeight = 0
+        tableView.estimatedRowHeight = 90
+        tableView.rowHeight = UITableView.automaticDimension
         tableView.delegate = self
         tableView.dataSource = self
 
-        // Agregar al container
         containerView.addSubview(tableView)
-
-        // Constraints: llenar todo el container
         tableView.fillSuperview()
     }
 

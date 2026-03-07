@@ -15,16 +15,14 @@ struct NewsItem {
     let url: String
     let source: String
     let category: NewsCategory
-    let featured: Bool
     let publishedDate: Date
 
-    init(title: String, imageUrl: String, url: String, source: String, category: NewsCategory, featured: Bool, publishedDate: Date) {
+    init(title: String, imageUrl: String, url: String, source: String, category: NewsCategory, publishedDate: Date) {
         self.title = title
         self.imageUrl = imageUrl
         self.url = url
         self.source = source
         self.category = category
-        self.featured = featured
         self.publishedDate = publishedDate
     }
 }
