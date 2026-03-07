@@ -20,7 +20,6 @@ struct NewsItemUIMapper {
             url: domain.url,
             source: domain.source,
             category: domain.category,
-            featured: domain.featured,
             publishedDate: domain.publishedDate
         )
     }
@@ -42,7 +41,6 @@ struct NewsItemUIMapper {
             url: ui.url,
             source: ui.source,
             category: ui.category,
-            featured: ui.featured,
             publishedDate: ui.publishedDate
         )
     }

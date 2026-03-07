@@ -83,7 +83,7 @@ public enum FirestoreConstants {
         public static let descripcion = "descripcion"
         public static let imageUrl = "imageUrl"
         public static let fecha = "fecha"
-        public static let destacado = "destacado"
+        public static let publicada = "publicada"
     }
 
     // MARK: - User Preferences

@@ -22,7 +22,6 @@ struct NewsItemMapper {
             url: dto.url ?? "",
             source: dto.periodico ?? "",
             category: category,
-            featured: dto.destacada ?? false,
             publishedDate: dto.fecha?.dateValue() ?? Date()
         )
     }
@@ -36,7 +35,6 @@ struct NewsItemMapper {
             url: domain.url,
             periodico: domain.source,
             categoria: domain.category.rawValue,
-            destacada: domain.featured,
             fecha: Timestamp(date: domain.publishedDate)
         )
     }

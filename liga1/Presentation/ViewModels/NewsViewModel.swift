@@ -51,20 +51,18 @@ class NewsViewModel {
                 let grouped = Dictionary(grouping: newsItemsUI, by: { $0.category })
                 var organizedGroupedNews: [NewsCategory: [NewsItemUI]] = [:]
                 for (category, categoryNews) in grouped {
-                    let featuredNews = categoryNews.filter { $0.featured }
-                        .sorted { $0.publishedDate > $1.publishedDate }
-                    let regularNews = categoryNews.filter { !$0.featured }
-                        .sorted { $0.publishedDate > $1.publishedDate }
-                    organizedGroupedNews[category] = featuredNews + regularNews
+                    let sortedNews = categoryNews.sorted { $0.publishedDate > $1.publishedDate }
+                    organizedGroupedNews[category] = sortedNews
                 }
                 self.groupedNews = organizedGroupedNews
+                // Destacado siempre primero; el resto ordenado por fecha (más reciente primero)
                 self.sortedCategories = organizedGroupedNews.keys.sorted { category1, category2 in
+                    if category1 == .destacado { return true }
+                    if category2 == .destacado { return false }
                     let news1 = organizedGroupedNews[category1] ?? []
                     let news2 = organizedGroupedNews[category2] ?? []
-                    let featuredNews1 = news1.filter { $0.featured }
-                    let featuredNews2 = news2.filter { $0.featured }
-                    let date1 = featuredNews1.first?.publishedDate ?? news1.first?.publishedDate ?? Date.distantPast
-                    let date2 = featuredNews2.first?.publishedDate ?? news2.first?.publishedDate ?? Date.distantPast
+                    let date1 = news1.first?.publishedDate ?? Date.distantPast
+                    let date2 = news2.first?.publishedDate ?? Date.distantPast
                     return date1 > date2
                 }
             }

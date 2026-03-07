@@ -9,21 +9,33 @@ import Foundation
 
 /// Enum que representa las categorías de noticias disponibles en la aplicación
 public enum NewsCategory: Equatable, Hashable {
-    case liga1
-    case seleccion
-    case internacional
+    case destacado
+    case partidos
+    case fichajes
+    case equipos
+    case jugadores
+    case tabla
+    case estadisticas
     case other(String)
 
     /// Inicializa NewsCategory desde un String
     /// - Parameter rawValue: String que representa la categoría
     public init(rawValue: String) {
-        switch rawValue.lowercased() {
-        case "liga 1", "liga1":
-            self = .liga1
-        case "selección", "seleccion":
-            self = .seleccion
-        case "internacional":
-            self = .internacional
+        switch rawValue.lowercased().trimmingCharacters(in: .whitespaces) {
+        case "destacado":
+            self = .destacado
+        case "partidos":
+            self = .partidos
+        case "fichajes":
+            self = .fichajes
+        case "equipos":
+            self = .equipos
+        case "jugadores":
+            self = .jugadores
+        case "tabla":
+            self = .tabla
+        case "estadisticas", "estadísticas":
+            self = .estadisticas
         default:
             self = .other(rawValue)
         }
@@ -32,20 +44,45 @@ public enum NewsCategory: Equatable, Hashable {
     /// Devuelve el valor String de la categoría para usar con Firestore
     public var rawValue: String {
         switch self {
-        case .liga1:
-            return "Liga 1"
-        case .seleccion:
-            return "Selección"
-        case .internacional:
-            return "Internacional"
+        case .destacado:
+            return "destacado"
+        case .partidos:
+            return "partidos"
+        case .fichajes:
+            return "fichajes"
+        case .equipos:
+            return "equipos"
+        case .jugadores:
+            return "jugadores"
+        case .tabla:
+            return "tabla"
+        case .estadisticas:
+            return "estadisticas"
         case .other(let value):
             return value
         }
     }
 
-    /// Devuelve el nombre para mostrar en la UI
+    /// Devuelve el nombre para mostrar en la UI (capitalizado)
     public var displayName: String {
-        return rawValue
+        switch self {
+        case .destacado:
+            return "Destacado"
+        case .partidos:
+            return "Partidos"
+        case .fichajes:
+            return "Fichajes"
+        case .equipos:
+            return "Equipos"
+        case .jugadores:
+            return "Jugadores"
+        case .tabla:
+            return "Tabla"
+        case .estadisticas:
+            return "Estadísticas"
+        case .other(let value):
+            return value.isEmpty ? value : value.prefix(1).uppercased() + value.dropFirst().lowercased()
+        }
     }
 }
 

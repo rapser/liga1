@@ -14,7 +14,6 @@ struct NewsItemUI {
     let url: String
     let source: String
     let category: NewsCategory
-    let featured: Bool
     let publishedDate: Date
 
     // MARK: - Computed Properties for UI
@@ -55,12 +54,12 @@ struct NewsItemUI {
 
     /// Categoría formateada para mostrar
     var categoriaTexto: String {
-        return category.rawValue.capitalized
+        return category.displayName
     }
 
-    /// Indicador si es noticia destacada
+    /// Indica si la noticia pertenece a la categoría Destacado (para layout destacado en la UI)
     var esDestacada: Bool {
-        return featured
+        return category == .destacado
     }
 }
 

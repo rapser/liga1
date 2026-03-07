@@ -33,6 +33,7 @@ class NewsRepository: NewsRepositoryProtocol {
 
 
             self.db.collection(FirestoreConstants.Collection.news)
+                .whereField(FirestoreConstants.NewsField.publicada, isEqualTo: true)
                 .order(by: FirestoreConstants.NewsField.fecha, descending: true)
                 .getDocuments { snapshot, error in
                     if let error = error {
@@ -61,7 +62,6 @@ class NewsRepository: NewsRepositoryProtocol {
                                 url: dto.url,
                                 periodico: dto.periodico,
                                 categoria: dto.categoria,
-                                destacada: dto.destacada,
                                 fecha: dto.fecha
                             )
                         }

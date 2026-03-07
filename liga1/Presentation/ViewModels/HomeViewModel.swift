@@ -62,7 +62,7 @@ class HomeViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] jornadas in
-                self?.loadMatchesForJornadas(jornadas)
+                self?.loadMatchesForJornadas(Self.jornadaToDisplay(from: jornadas))
             }
             .store(in: &cancellables)
     }
@@ -86,9 +86,17 @@ class HomeViewModel {
         observeActiveJornadasUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] jornadas in
-                self?.loadMatchesForJornadas(jornadas)
+                self?.loadMatchesForJornadas(Self.jornadaToDisplay(from: jornadas))
             }
             .store(in: &cancellables)
+    }
+
+    /// De las jornadas con `mostrar == true`, devuelve solo la que tiene la menor fecha de inicio.
+    private static func jornadaToDisplay(from jornadas: [Jornada]) -> [Jornada] {
+        guard let earliest = jornadas.min(by: { $0.fechaInicio < $1.fechaInicio }) else {
+            return []
+        }
+        return [earliest]
     }
 
     private func observeFavorites() {

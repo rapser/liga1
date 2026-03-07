@@ -67,7 +67,7 @@ class NewsCell: UITableViewCell {
             newsImageView.kf.setImage(with: url)
         }
         fechaLabel.text = item.fechaFormateada
-        if item.featured {
+        if item.category == .destacado {
             contentView.backgroundColor = UIColor(red: 1, green: 0.95, blue: 0.8, alpha: 1)
         } else {
             contentView.backgroundColor = .systemBackground
