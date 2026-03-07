@@ -18,7 +18,7 @@ final class HomeTableViewAdapter: NSObject {
     // MARK: - Properties
 
     private weak var tableView: UITableView?
-    private var sections: [HomeViewModel.JornadaSection] = []
+    private var sections: [JornadaSection] = []
     weak var delegate: HomeTableViewAdapterDelegate?
 
     // MARK: - Initialization
@@ -31,7 +31,7 @@ final class HomeTableViewAdapter: NSObject {
 
     // MARK: - Public Methods
 
-    func update(with sections: [HomeViewModel.JornadaSection]) {
+    func update(with sections: [JornadaSection]) {
         self.sections = sections
         tableView?.reloadData()
     }

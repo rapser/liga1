@@ -16,7 +16,6 @@ struct NewsItemDTO: Codable {
     let url: String?
     let periodico: String?
     let categoria: String?
-    let destacada: Bool?
     let fecha: Timestamp?
 
     enum CodingKeys: String, CodingKey {
@@ -26,18 +25,16 @@ struct NewsItemDTO: Codable {
         case url
         case periodico
         case categoria
-        case destacada
         case fecha
     }
 
-    init(id: String? = nil, title: String?, image: String?, url: String?, periodico: String?, categoria: String?, destacada: Bool?, fecha: Timestamp?) {
+    init(id: String? = nil, title: String?, image: String?, url: String?, periodico: String?, categoria: String?, fecha: Timestamp?) {
         self.id = id
         self.title = title
         self.image = image
         self.url = url
         self.periodico = periodico
         self.categoria = categoria
-        self.destacada = destacada
         self.fecha = fecha
     }
 }

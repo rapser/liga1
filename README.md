@@ -7,7 +7,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario
 - **Tabla de Posiciones**: Consulta las tablas de Apertura, Clausura y Acumulado con estadísticas detalladas. Indicador visual especial (cuadrado amarillo) para el puesto 1 (campeón)
 - **Favoritos**: Marca tus partidos favoritos para seguimiento rápido con sincronización en tiempo real
-- **Noticias**: Mantente informado con las últimas noticias del fútbol peruano, agrupadas por categoría con ordenamiento inteligente por fecha de noticia destacada
+- **Noticias**: Mantente informado con las últimas noticias del fútbol peruano (solo publicadas), agrupadas por categoría; la categoría Destacado siempre primero, el resto ordenadas por fecha
 - **Autenticación**: Ingresa con Google o correo electrónico para sincronizar tus favoritos
 - **Modo Oscuro**: Soporte completo para Dark Mode que sigue automáticamente la configuración del sistema
 - **UI Programático**: Interfaz construida 100% con código (sin Storyboards) usando APIs modernas de iOS 18
@@ -21,7 +21,8 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 ### 🏠 Home - Partidos por Jornada
 
 #### Visualización de Partidos
-- **Sistema de Jornadas**: Visualización de jornadas activas con estructura anidada en Firestore
+- **Una Jornada en Home**: Solo se muestra la jornada con `mostrar == true` y **menor fecha de inicio** (regla de negocio en Domain vía `GetJornadaToDisplayUseCase`)
+- **Sistema de Jornadas**: Estructura anidada en Firestore (`jornadas/{jornadaId}/matches/{matchId}`)
 - **Headers Duales**:
   - **Header de Fecha**: Muestra la fecha del próximo partido con formato inteligente
     - Si es hoy: "Hoy 30.01"
@@ -36,8 +37,8 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
   - Botón de favorito por partido
 
 #### Gestión de Datos
-- **Actualización Reactiva**: Uso de listeners de Firestore para actualización automática
-- **Filtrado Inteligente**: Solo muestra partidos del día más próximo (hoy o futuro)
+- **Actualización Reactiva**: Listeners de Firestore para jornada a mostrar y favoritos
+- **Filtrado en Domain**: `GetJornadaToDisplayUseCase` devuelve la única jornada a mostrar; `FetchMatchesUseCase` filtra partidos al día más próximo (hoy o futuro)
 - **Recarga Automática**: Al entrar a la tab se recargan los datos (`viewWillAppear`)
 
 ### 📊 Tabla de Posiciones
@@ -59,17 +60,18 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 ### 📰 Noticias
 
-#### Agrupación Inteligente
-- **Agrupación por Categoría**: Noticias agrupadas por categoría (Liga 1, General, etc.)
-- **Ordenamiento por Fecha**:
-  - **Entre categorías**: Ordenadas por fecha de noticia destacada más reciente (no alfabético)
-  - **Dentro de categoría**: Primero destacadas (ordenadas por fecha), luego normales (ordenadas por fecha)
+#### Filtrado y Categorías
+- **Solo publicadas**: El listado muestra únicamente noticias con `publicada == true` (filtro en Data layer)
+- **Categorías**: destacado, partidos, fichajes, equipos, jugadores, tabla, estadísticas (definidas en `NewsCategory`)
+- **Orden de secciones**: La categoría **Destacado** siempre aparece primera; el resto ordenadas por fecha de la noticia más reciente (`sortedForNewsDisplay` en Core/Utils)
+
+#### Agrupación y Celdas
+- **Agrupación por Categoría**: Noticias agrupadas por categoría; dentro de cada categoría ordenadas por fecha (más reciente primero)
 - **Tipos de Celdas**:
-  - **FeaturedNewsContentCell**: Para noticias destacadas (imagen grande + título)
-  - **NewsCell**: Para noticias normales (formato compacto)
+  - **FeaturedNewsContentCell**: Para noticias de categoría Destacado (imagen grande + título)
+  - **NewsCell**: Para el resto (formato compacto). El criterio "destacado" para el layout viene de `NewsItemUI.esDestacada` (categoría == .destacado)
 
 #### Características
-- **Noticias Destacadas**: Se muestran primero en su categoría con celda especial
 - **Navegación Web**: Al tocar una noticia se abre Safari (`SFSafariViewController`)
 - **Recarga Automática**: Al entrar a la tab se recargan las noticias
 
@@ -238,8 +240,8 @@ View → ViewModel → UseCase → Repository → Firestore
   - `Admin/` - Registro de partidos (administradores)
 
 - **ViewModels/**: Lógica de presentación con `@Published` properties
-  - `HomeViewModel` - Gestión de jornadas activas y partidos
-  - `NewsViewModel` - Gestión de noticias
+  - `HomeViewModel` - Usa `GetJornadaToDisplayUseCase` para la jornada a mostrar; gestión de partidos y favoritos
+  - `NewsViewModel` - Gestión de noticias (agrupación por categoría, orden vía `NewsCategory.sortedForNewsDisplay`)
   - `TorneoViewModel` - Gestión de tabla de posiciones
   - `FavoritosViewModel` - Gestión de favoritos
   - `ProfileViewModel` - Gestión de configuración
@@ -252,7 +254,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `DividerView` - Separadores
 
 - **Models/**: Modelos específicos de UI
-  - `MatchUI`, `TeamUI`, `NewsItemUI`, `JornadaUI`
+  - `MatchUI`, `TeamUI`, `NewsItemUI`, `JornadaUI`, `JornadaSection` (sección jornada + partidos para Home)
 
 - **Mappers/**: Transformación de Domain Entities a UI Models
   - `MatchUIMapper`, `TeamUIMapper`, `NewsItemUIMapper`, `JornadaUIMapper`
@@ -268,7 +270,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `NewsItem` - Noticia
 
 - **UseCases/**: Casos de uso (lógica de negocio)
-  - **Jornadas/**: `FetchActiveJornadasUseCase`, `ObserveActiveJornadasUseCase`
+  - **Jornadas/**: `FetchActiveJornadasUseCase`, `ObserveActiveJornadasUseCase`, `GetJornadaToDisplayUseCase` (jornada única a mostrar: menor `fechaInicio` entre activas)
   - **Matches/**: `FetchMatchesUseCase`, `ObserveMatchesUseCase`
   - **Teams/**: `FetchTeamsUseCase`
   - **News/**: `FetchNewsUseCase`
@@ -338,7 +340,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `EquipoPeruano` - Enum con códigos y nombres de equipos
   - `TorneoType` - Enum para tipos de torneo (Apertura, Clausura, Acumulado)
   - `TablePosition` - Cálculo de zonas de clasificación
-  - `NewsCategory` - Categorías de noticias
+  - `NewsCategory` - Categorías de noticias (destacado, partidos, fichajes, equipos, jugadores, tabla, estadísticas); incluye `sortedForNewsDisplay` para orden de secciones
 
 - **Constants/**: Constantes de la aplicación
   - `FirestoreConstants` - Nombres de colecciones y campos
@@ -378,10 +380,11 @@ final class DIContainer {
     
     // Crea Use Cases
     func makeFetchActiveJornadasUseCase() -> FetchActiveJornadasUseCaseProtocol
+    func makeGetJornadaToDisplayUseCase() -> GetJornadaToDisplayUseCaseProtocol
     // ...
     
     // Crea ViewModels
-    func makeHomeViewModel() -> HomeViewModel
+    func makeHomeViewModel() -> HomeViewModel  // Inyecta getJornadaToDisplayUseCase, fetchMatchesUseCase, etc.
     // ...
     
     // Crea ViewControllers
@@ -411,14 +414,14 @@ final class DIContainer {
 
 **Ejemplo de flujo**:
 ```swift
-// ViewModel
+// ViewModel (Home): la jornada a mostrar viene del Domain
 class HomeViewModel {
     @Published private(set) var jornadaSections: [JornadaSection] = []
     
     func fetchActiveJornadas() {
-        fetchActiveJornadasUseCase.execute()
-            .sink { [weak self] jornadas in
-                self?.loadMatchesForJornadas(jornadas)
+        getJornadaToDisplayUseCase.execute()
+            .sink { [weak self] jornada in
+                self?.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
             }
             .store(in: &cancellables)
     }
@@ -494,9 +497,10 @@ liga1/
 │   │   ├── Team/
 │   │   │   └── TeamUI.swift                 # Modelo UI de equipo
 │   │   ├── NewsItem/
-│   │   │   └── NewsItemUI.swift             # Modelo UI con fecha formateada
+│   │   │   └── NewsItemUI.swift             # Modelo UI con fecha formateada y esDestacada (categoría == .destacado)
 │   │   └── Jornada/
-│   │       └── JornadaUI.swift              # Modelo UI de jornada
+│   │       ├── JornadaUI.swift              # Modelo UI de jornada
+│   │       └── JornadaSection.swift         # Sección para Home (jornadaId, numero, torneo, matches)
 │   │
 │   ├── Mappers/
 │   │   ├── MatchUIMapper.swift              # Domain Entity → UI Model (Match)
@@ -535,8 +539,9 @@ liga1/
 │   │
 │   └── UseCases/ (Casos de Uso - Lógica de Negocio)
 │       ├── Jornadas/
-│       │   ├── FetchActiveJornadasUseCase.swift      # Obtener jornadas activas
-│       │   └── ObserveActiveJornadasUseCase.swift    # Observar cambios en jornadas
+│       │   ├── FetchActiveJornadasUseCase.swift      # Obtener jornadas activas (mostrar == true)
+│       │   ├── ObserveActiveJornadasUseCase.swift   # Observar cambios en jornadas activas
+│       │   └── GetJornadaToDisplayUseCase.swift     # Jornada única a mostrar (menor fechaInicio)
 │       ├── Matches/
 │       │   ├── FetchMatchesUseCase.swift             # Obtener partidos de una jornada
 │       │   └── ObserveMatchesUseCase.swift           # Observar cambios en partidos
@@ -602,7 +607,7 @@ liga1/
 │   │   ├── EquipoPeruano.swift              # Enum con códigos de 18 equipos (ali, utc, etc.)
 │   │   ├── TorneoType.swift                 # Enum: .apertura, .clausura, .acumulado
 │   │   ├── TablePosition.swift              # Enum y lógica de zonas (libertadores, sudamericana, descenso)
-│   │   └── NewsCategory.swift               # Enum: .liga1, .seleccion, .internacional, .other
+│   │   └── NewsCategory.swift               # Categorías: destacado, partidos, fichajes, equipos, jugadores, tabla, estadísticas; sortedForNewsDisplay
 │   │
 │   ├── Constants/
 │   │   └── FirestoreConstants.swift         # Nombres de colecciones y campos
@@ -673,9 +678,9 @@ news/
     ├── image: String
     ├── url: String
     ├── fecha: Timestamp
-    ├── categoria: String
+    ├── categoria: String    # destacado, partidos, fichajes, equipos, jugadores, tabla, estadísticas
     ├── periodico: String
-    └── destacada: Int       # 0 o 1
+    └── publicada: Bool      # Solo se listan noticias con publicada == true
 ```
 
 ## 🎨 Características de UI/UX

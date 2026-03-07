@@ -10,45 +10,56 @@ import SafariServices
 
 extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
 
+    // MARK: - Sections
+
     func numberOfSections(in tableView: UITableView) -> Int {
-        // Solo secciones por categoría (ya no hay sección global de destacadas)
         return viewModel.sortedCategories.count
     }
 
+    // MARK: - Rows
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let categoria = viewModel.sortedCategories[section]
-        return viewModel.groupedNews[categoria]?.count ?? 0
+        let count = viewModel.groupedNews[categoria]?.count ?? 0
+        return count + 1 // fila 0 = cabecera de categoría, filas 1..n = noticias
     }
 
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CategoryHeaderView.reuseIdentifier) as? CategoryHeaderView else {
-            return nil
-        }
-        let categoria = viewModel.sortedCategories[section]
-        header.configure(with: categoria)
-        return header
-    }
-
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return UITableView.automaticDimension
-    }
+    // MARK: - Cells
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let categoria = viewModel.sortedCategories[indexPath.section]
-        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row] else {
+
+        // Fila 0: cabecera de categoría como celda
+        if indexPath.row == 0 {
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: CategoryHeaderCell.reuseIdentifier,
+                for: indexPath
+            ) as? CategoryHeaderCell else {
+                return UITableViewCell()
+            }
+            cell.configure(with: categoria)
+            return cell
+        }
+
+        // Filas 1..n: contenido de noticias
+        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row - 1] else {
             return UITableViewCell()
         }
-        
-        // Si es noticia destacada, usar FeaturedNewsContentCell
-        if newsItem.featured {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: FeaturedNewsContentCell.reuseIdentifier, for: indexPath) as? FeaturedNewsContentCell else {
+
+        if newsItem.esDestacada {
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: FeaturedNewsContentCell.reuseIdentifier,
+                for: indexPath
+            ) as? FeaturedNewsContentCell else {
                 return UITableViewCell()
             }
             cell.configure(with: newsItem)
             return cell
         } else {
-            // Noticia normal, usar NewsCell
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "NewsCell", for: indexPath) as? NewsCell else {
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: NewsCell.reuseIdentifier,
+                for: indexPath
+            ) as? NewsCell else {
                 return UITableViewCell()
             }
             cell.configure(with: newsItem)
@@ -56,29 +67,42 @@ extension NewsViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 
+    // MARK: - Heights
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 0 {
+            return UITableView.automaticDimension
+        }
+        let categoria = viewModel.sortedCategories[indexPath.section]
+        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row - 1] else {
+            return 90
+        }
+        return newsItem.esDestacada ? UITableView.automaticDimension : 90
+    }
+
+    // MARK: - Section Headers (desactivados — se usan celdas en su lugar)
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return nil
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+
+    // MARK: - Selection
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
+        guard indexPath.row > 0 else { return } // la cabecera no es seleccionable
+
         let categoria = viewModel.sortedCategories[indexPath.section]
-        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row] else { return }
+        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row - 1] else { return }
 
         if let url = URL(string: newsItem.url) {
             let safariVC = SFSafariViewController(url: url)
             present(safariVC, animated: true)
         }
-    }
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let categoria = viewModel.sortedCategories[indexPath.section]
-        guard let newsItem = viewModel.groupedNews[categoria]?[indexPath.row] else {
-            return 90
-        }
-        
-        // Si es noticia destacada, altura dinámica
-        if newsItem.featured {
-            return UITableView.automaticDimension
-        }
-        // Noticia normal, altura fija
-        return 90
     }
 }

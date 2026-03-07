@@ -19,8 +19,7 @@ class HomeViewModel {
 
     // MARK: - Dependencies
 
-    private let fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol
-    private let observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol
+    private let getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol
     private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
     private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
     private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
@@ -32,19 +31,17 @@ class HomeViewModel {
     // MARK: - Initialization
 
     init(
-        fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol,
-        observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol,
+        getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol,
         fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
         toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
         observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
     ) {
-        self.fetchActiveJornadasUseCase = fetchActiveJornadasUseCase
-        self.observeActiveJornadasUseCase = observeActiveJornadasUseCase
+        self.getJornadaToDisplayUseCase = getJornadaToDisplayUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
         self.observeFavoritesUseCase = observeFavoritesUseCase
 
-        observeActiveJornadas()
+        observeJornadaToDisplay()
         observeFavorites()
     }
 
@@ -54,15 +51,15 @@ class HomeViewModel {
         isLoading = true
         error = nil
 
-        fetchActiveJornadasUseCase.execute()
+        getJornadaToDisplayUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case .failure(let error) = completion {
                     self?.error = error
                 }
-            } receiveValue: { [weak self] jornadas in
-                self?.loadMatchesForJornadas(jornadas)
+            } receiveValue: { [weak self] jornada in
+                self?.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
             }
             .store(in: &cancellables)
     }
@@ -82,11 +79,11 @@ class HomeViewModel {
 
     // MARK: - Private Methods
 
-    private func observeActiveJornadas() {
-        observeActiveJornadasUseCase.execute()
+    private func observeJornadaToDisplay() {
+        getJornadaToDisplayUseCase.observe()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] jornadas in
-                self?.loadMatchesForJornadas(jornadas)
+            .sink { [weak self] jornada in
+                self?.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
             }
             .store(in: &cancellables)
     }
@@ -147,8 +144,8 @@ class HomeViewModel {
             tempSections.append(section)
         }
 
-        // Ordenar secciones por número de jornada descendente
-        jornadaSections = tempSections.sorted { $0.numero > $1.numero }
+        // Ordenar secciones por número de jornada ascendente (fecha más próxima primero)
+        jornadaSections = tempSections.sorted { $0.numero < $1.numero }
         
         // Actualizar el estado de favoritos después de crear las secciones
         updateMatchesFavoriteStatus()
@@ -166,14 +163,5 @@ class HomeViewModel {
             }
             jornadaSections[index].matches = updatedMatches
         }
-    }
-
-    // MARK: - Nested Types
-
-    struct JornadaSection {
-        let jornadaId: String
-        let numero: Int
-        let torneo: String
-        var matches: [MatchUI]
     }
 }
