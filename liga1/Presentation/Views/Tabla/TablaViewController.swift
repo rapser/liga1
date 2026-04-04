@@ -38,10 +38,16 @@ class TablaViewController: UIViewController {
         setupUI()
         bindViewModel()
         loadInitialData()
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.reloadTeams(for: .apertura)
+    }
+
+    // MARK: - Actions
+    @objc private func appWillEnterForeground() {
         viewModel.reloadTeams(for: .apertura)
     }
 

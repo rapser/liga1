@@ -97,4 +97,26 @@ public enum FirestoreConstants {
         public static let subscribedTopics = "subscribedTopics"
         public static let updatedAt = "updatedAt"
     }
+
+    // MARK: - Push Notification Payload Keys
+
+    /// Claves del payload `data` de FCM para actualizaciones de marcador
+    public enum PushPayload {
+        /// Tipo de notificación. Valor "score_update" indica actualización de marcador.
+        public static let type = "type"
+        public static let scoreUpdateType = "score_update"
+        public static let matchId = "matchId"
+        public static let jornadaId = "jornadaId"
+        public static let golesTeamA = "golesTeamA"
+        public static let golesTeamB = "golesTeamB"
+        public static let estado = "estado"
+    }
+}
+
+// MARK: - Internal Notification Names
+
+extension Notification.Name {
+    /// Se emite internamente cuando llega un push de tipo score_update.
+    /// HomeViewController lo escucha para refrescar los marcadores sin banner visible.
+    static let scoreUpdateReceived = Notification.Name("liga1.scoreUpdateReceived")
 }

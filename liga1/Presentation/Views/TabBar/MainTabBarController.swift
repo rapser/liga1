@@ -24,6 +24,7 @@ class MainTabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        delegate = self
 
         configureNavigationBarAppearance()
         configureTabBarAppearance()
@@ -124,5 +125,16 @@ class MainTabBarController: UITabBarController {
                                                      image: UIImage(systemName: imageSystemName),
                                                      tag: 0)
         return nav
+    }
+}
+
+extension MainTabBarController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        guard let nav = viewController as? UINavigationController,
+              let homeVC = nav.viewControllers.first as? HomeViewController else {
+            return
+        }
+
+        homeVC.refreshContent()
     }
 }

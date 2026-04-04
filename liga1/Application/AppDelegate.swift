@@ -119,6 +119,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         }
 
         Messaging.messaging().appDidReceiveMessage(userInfo)
+
+        // Data-only push de actualización de marcador
+        if let type = userInfo[FirestoreConstants.PushPayload.type] as? String,
+           type == FirestoreConstants.PushPayload.scoreUpdateType {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .scoreUpdateReceived, object: nil)
+            }
+            completionHandler(.newData)
+            return
+        }
+
         completionHandler(.newData)
     }
 
@@ -139,6 +150,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         }
 
         Messaging.messaging().appDidReceiveMessage(userInfo)
+
+        // Si es actualización de marcador: no mostrar banner y actualizar en silencio
+        if let type = userInfo[FirestoreConstants.PushPayload.type] as? String,
+           type == FirestoreConstants.PushPayload.scoreUpdateType {
+            NotificationCenter.default.post(name: .scoreUpdateReceived, object: nil)
+            completionHandler([])
+            return
+        }
+
         completionHandler([.banner, .sound, .badge])
     }
 
