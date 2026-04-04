@@ -36,10 +36,16 @@ class NewsViewController: UIViewController {
         setupUI()
         bindViewModel()
         viewModel.fetchNews()
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.fetchNews()
+    }
+
+    // MARK: - Actions
+    @objc private func appWillEnterForeground() {
         viewModel.fetchNews()
     }
 
