@@ -47,7 +47,9 @@ class HomeViewModel {
 
     // MARK: - Public Methods
 
-    func fetchActiveJornadas() {
+    func fetchActiveJornadas(force: Bool = false) {
+        guard !isLoading else { return }
+
         isLoading = true
         error = nil
 
@@ -59,7 +61,14 @@ class HomeViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] jornada in
-                self?.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
+                guard let self = self else { return }
+
+                guard self.shouldReloadMatches(for: jornada, force: force) else {
+                    self.isLoading = false
+                    return
+                }
+
+                self.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
             }
             .store(in: &cancellables)
     }
@@ -96,6 +105,22 @@ class HomeViewModel {
                 self?.updateMatchesFavoriteStatus()
             }
             .store(in: &cancellables)
+    }
+
+    private func shouldReloadMatches(for jornada: Jornada?, force: Bool) -> Bool {
+        if force { return true }
+
+        let currentJornadaId = jornadaSections.first?.jornadaId
+        let incomingJornadaId = jornada?.id
+
+        switch (incomingJornadaId, currentJornadaId) {
+        case let (newId?, currentId?):
+            return newId != currentId
+        case (nil, nil):
+            return false
+        default:
+            return true
+        }
     }
 
     private func loadMatchesForJornadas(_ jornadas: [Jornada]) {

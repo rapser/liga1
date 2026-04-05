@@ -59,10 +59,16 @@ class FavoritosViewController: UIViewController {
         setupUI()
         bindViewModel()
         updateView()
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        viewModel.refreshFavoriteTeamsIfNeeded()
+    }
+
+    // MARK: - Actions
+    @objc private func appWillEnterForeground() {
         viewModel.refreshFavoriteTeamsIfNeeded()
     }
 
