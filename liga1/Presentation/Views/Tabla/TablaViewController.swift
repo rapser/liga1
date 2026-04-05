@@ -39,6 +39,7 @@ class TablaViewController: UIViewController {
         bindViewModel()
         loadInitialData()
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleScoreUpdate), name: .scoreUpdateReceived, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -49,6 +50,10 @@ class TablaViewController: UIViewController {
     // MARK: - Actions
     @objc private func appWillEnterForeground() {
         viewModel.reloadTeams(for: .apertura)
+    }
+
+    @objc private func handleScoreUpdate() {
+        viewModel.reloadTeams(for: viewModel.selectedTorneo)
     }
 
     // MARK: - Setup Methods
@@ -151,5 +156,9 @@ class TablaViewController: UIViewController {
                 self?.showError(error)
             }
             .store(in: &cancellables)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }

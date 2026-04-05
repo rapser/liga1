@@ -111,6 +111,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         didReceiveRemoteNotification userInfo: [AnyHashable: Any],
         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
+        // score_update debe procesarse siempre para mantener UI sincronizada con Firebase.
+        if let type = userInfo[FirestoreConstants.PushPayload.type] as? String,
+           type == FirestoreConstants.PushPayload.scoreUpdateType {
+            Messaging.messaging().appDidReceiveMessage(userInfo)
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .scoreUpdateReceived, object: nil)
+            }
+            completionHandler(.newData)
+            return
+        }
+
         if let eventId = userInfo["event_id"] as? String {
             guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
                 completionHandler(.noData)
@@ -119,16 +130,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         }
 
         Messaging.messaging().appDidReceiveMessage(userInfo)
-
-        // Data-only push de actualización de marcador
-        if let type = userInfo[FirestoreConstants.PushPayload.type] as? String,
-           type == FirestoreConstants.PushPayload.scoreUpdateType {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .scoreUpdateReceived, object: nil)
-            }
-            completionHandler(.newData)
-            return
-        }
 
         completionHandler(.newData)
     }
@@ -142,6 +143,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     ) {
         let userInfo = notification.request.content.userInfo
 
+        // score_update en foreground: actualizar en silencio siempre.
+        if let type = userInfo[FirestoreConstants.PushPayload.type] as? String,
+           type == FirestoreConstants.PushPayload.scoreUpdateType {
+            Messaging.messaging().appDidReceiveMessage(userInfo)
+            NotificationCenter.default.post(name: .scoreUpdateReceived, object: nil)
+            completionHandler([])
+            return
+        }
+
         if let eventId = userInfo["event_id"] as? String {
             guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
                 completionHandler([])
@@ -150,14 +160,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         }
 
         Messaging.messaging().appDidReceiveMessage(userInfo)
-
-        // Si es actualización de marcador: no mostrar banner y actualizar en silencio
-        if let type = userInfo[FirestoreConstants.PushPayload.type] as? String,
-           type == FirestoreConstants.PushPayload.scoreUpdateType {
-            NotificationCenter.default.post(name: .scoreUpdateReceived, object: nil)
-            completionHandler([])
-            return
-        }
 
         completionHandler([.banner, .sound, .badge])
     }

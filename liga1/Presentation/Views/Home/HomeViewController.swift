@@ -48,12 +48,13 @@ class HomeViewController: UIViewController {
         bindViewModel()
         refreshContent()
         NotificationCenter.default.addObserver(self, selector: #selector(handleScoreUpdate), name: .scoreUpdateReceived, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         title = "Inicio"
-        refreshContent()
+        refreshContent(force: true)
     }
 
     // MARK: - Setup
@@ -84,8 +85,16 @@ class HomeViewController: UIViewController {
         refreshContent(force: true)
     }
 
+    @objc private func handleWillEnterForeground() {
+        refreshContent(force: true)
+    }
+
     func refreshContent(force: Bool = false) {
         viewModel.fetchActiveJornadas(force: force)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     private func bindViewModel() {
