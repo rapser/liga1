@@ -44,7 +44,6 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         title = "Inicio"
         setupUI()
-        setupAdapter()
         bindViewModel()
         refreshContent()
         NotificationCenter.default.addObserver(self, selector: #selector(handleScoreUpdate), name: .scoreUpdateReceived, object: nil)
@@ -77,10 +76,6 @@ class HomeViewController: UIViewController {
             .centerInSuperview()
     }
     
-    private func setupAdapter() {
-        tableViewAdapter.delegate = self
-    }
-
     @objc private func handleScoreUpdate() {
         refreshContent(force: true)
     }
@@ -131,13 +126,5 @@ class HomeViewController: UIViewController {
                 self?.showError(error)
             }
             .store(in: &cancellables)
-    }
-}
-
-// MARK: - HomeTableViewAdapterDelegate
-
-extension HomeViewController: HomeTableViewAdapterDelegate {
-    func didTapFavorite(matchId: String, in jornadaId: String) {
-        viewModel.toggleFavorite(matchId: matchId)
     }
 }

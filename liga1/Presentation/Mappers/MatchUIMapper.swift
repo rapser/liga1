@@ -13,7 +13,7 @@ struct MatchUIMapper {
     /// Convierte una entidad de dominio Match a un modelo de presentación MatchUI
     /// - Parameter domain: La entidad de dominio
     /// - Returns: El modelo de presentación
-    static func toUI(from domain: Match, isFavorite: Bool = false) -> MatchUI {
+    static func toUI(from domain: Match) -> MatchUI {
         return MatchUI(
             id: domain.id,
             equipoLocalId: domain.equipoLocalId,
@@ -22,8 +22,7 @@ struct MatchUIMapper {
             golesEquipoLocal: domain.golesEquipoLocal,
             golesEquipoVisitante: domain.golesEquipoVisitante,
             estado: domain.estado,
-            suspendido: domain.suspendido,
-            isFavorite: isFavorite
+            suspendido: domain.suspendido
         )
     }
 
@@ -48,10 +47,5 @@ struct MatchUIMapper {
             estado: ui.estado,
             suspendido: ui.suspendido
         )
-    }
-    
-    /// Actualiza el estado de favorito de un MatchUI
-    static func updateFavorite(_ matchUI: inout MatchUI, isFavorite: Bool) {
-        matchUI.isFavorite = isFavorite
     }
 }

@@ -58,10 +58,7 @@
 		464009BD2F098D4F00A8C905 /* FirestoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009B72F098D4F00A8C905 /* FirestoreManager.swift */; };
 		464009D12F098D8D00A8C905 /* FetchTeamsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009CD2F098D8D00A8C905 /* FetchTeamsUseCase.swift */; };
 		464009D22F098D8D00A8C905 /* FetchActiveJornadasUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009C72F098D8D00A8C905 /* FetchActiveJornadasUseCase.swift */; };
-		464009D32F098D8D00A8C905 /* ObserveFavoritesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009C42F098D8D00A8C905 /* ObserveFavoritesUseCase.swift */; };
 		464009D42F098D8D00A8C905 /* FetchNewsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009CB2F098D8D00A8C905 /* FetchNewsUseCase.swift */; };
-		464009D52F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009C32F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift */; };
-		464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009C52F098D8D00A8C905 /* ToggleFavoriteUseCase.swift */; };
 		464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009C92F098D8D00A8C905 /* FetchMatchesUseCase.swift */; };
 		464009F12F098DF600A8C905 /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009E62F098DF600A8C905 /* NewsViewController.swift */; };
 		464009F42F098DF600A8C905 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009DF2F098DF600A8C905 /* HomeViewController.swift */; };
@@ -211,9 +208,6 @@
 		464009B52F098D4F00A8C905 /* FirestoreConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConstants.swift; sourceTree = "<group>"; };
 		464009B72F098D4F00A8C905 /* FirestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreManager.swift; sourceTree = "<group>"; };
 		464009B92F098D4F00A8C905 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		464009C32F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchFavoriteMatchesUseCase.swift; sourceTree = "<group>"; };
-		464009C42F098D8D00A8C905 /* ObserveFavoritesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveFavoritesUseCase.swift; sourceTree = "<group>"; };
-		464009C52F098D8D00A8C905 /* ToggleFavoriteUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleFavoriteUseCase.swift; sourceTree = "<group>"; };
 		464009C72F098D8D00A8C905 /* FetchActiveJornadasUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchActiveJornadasUseCase.swift; sourceTree = "<group>"; };
 		464009C92F098D8D00A8C905 /* FetchMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMatchesUseCase.swift; sourceTree = "<group>"; };
 		464009CB2F098D8D00A8C905 /* FetchNewsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchNewsUseCase.swift; sourceTree = "<group>"; };
@@ -642,9 +636,6 @@
 			children = (
 				46C874552F1C053E008C3619 /* ObserveFavoriteTeamsUseCase.swift */,
 				46C874562F1C053E008C3619 /* ToggleFavoriteTeamUseCase.swift */,
-				464009C32F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift */,
-				464009C42F098D8D00A8C905 /* ObserveFavoritesUseCase.swift */,
-				464009C52F098D8D00A8C905 /* ToggleFavoriteUseCase.swift */,
 			);
 			path = Favorites;
 			sourceTree = "<group>";
@@ -1194,13 +1185,10 @@
 				464009D22F098D8D00A8C905 /* FetchActiveJornadasUseCase.swift in Sources */,
 				464B95B32F287601001C4049 /* UpdatePushNotificationsEnabledUseCase.swift in Sources */,
 				464B95B42F287601001C4049 /* ObserveUserPreferencesUseCase.swift in Sources */,
-				464009D32F098D8D00A8C905 /* ObserveFavoritesUseCase.swift in Sources */,
 				464009D42F098D8D00A8C905 /* FetchNewsUseCase.swift in Sources */,
-				464009D52F098D8D00A8C905 /* FetchFavoriteMatchesUseCase.swift in Sources */,
 				46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */,
 				46EC8E1D2F133476006A838D /* GetJornadaToDisplayUseCase.swift in Sources */,
 				461461702F1EA4A700BBC929 /* NotificationSettingsViewController.swift in Sources */,
-				464009D72F098D8D00A8C905 /* ToggleFavoriteUseCase.swift in Sources */,
 				464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */,
 				46C8745B2F1C055D008C3619 /* TeamTableViewCell.swift in Sources */,
 				46CDF4B72F10882800F280E6 /* MatchUIMapper.swift in Sources */,

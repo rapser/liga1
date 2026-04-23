@@ -15,14 +15,11 @@ class HomeViewModel {
     @Published private(set) var jornadaSections: [JornadaSection] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: Error?
-    @Published private(set) var favoriteMatchIds: Set<String> = []
 
     // MARK: - Dependencies
 
     private let getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol
     private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
-    private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
-    private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
 
     // MARK: - Private Properties
 
@@ -32,17 +29,12 @@ class HomeViewModel {
 
     init(
         getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol,
-        fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
-        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
-        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
+        fetchMatchesUseCase: FetchMatchesUseCaseProtocol
     ) {
         self.getJornadaToDisplayUseCase = getJornadaToDisplayUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase
-        self.toggleFavoriteUseCase = toggleFavoriteUseCase
-        self.observeFavoritesUseCase = observeFavoritesUseCase
 
         observeJornadaToDisplay()
-        observeFavorites()
     }
 
     // MARK: - Public Methods
@@ -73,19 +65,6 @@ class HomeViewModel {
             .store(in: &cancellables)
     }
 
-    func toggleFavorite(matchId: String) {
-        toggleFavoriteUseCase.execute(matchId: matchId)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                if case .failure = completion {
-                    // Error silently handled
-                }
-            } receiveValue: { _ in
-                // Favorite toggled successfully
-            }
-            .store(in: &cancellables)
-    }
-
     // MARK: - Private Methods
 
     private func observeJornadaToDisplay() {
@@ -93,16 +72,6 @@ class HomeViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] jornada in
                 self?.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
-            }
-            .store(in: &cancellables)
-    }
-
-    private func observeFavorites() {
-        observeFavoritesUseCase.execute()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] favoriteIds in
-                self?.favoriteMatchIds = favoriteIds
-                self?.updateMatchesFavoriteStatus()
             }
             .store(in: &cancellables)
     }
@@ -129,7 +98,6 @@ class HomeViewModel {
             return
         }
 
-        
         let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
             return fetchMatchesUseCase.execute(for: jornada.id)
                 .map { matches in
@@ -155,9 +123,6 @@ class HomeViewModel {
         var tempSections: [JornadaSection] = []
 
         for (jornada, matches) in results {
-            
-            // Convertir Match a MatchUI usando el mapper
-            // Primero convertir sin favoriteIds, luego actualizar en updateMatchesFavoriteStatus
             let matchUIs = MatchUIMapper.toUI(from: matches)
 
             let section = JornadaSection(
@@ -169,24 +134,6 @@ class HomeViewModel {
             tempSections.append(section)
         }
 
-        // Ordenar secciones por número de jornada ascendente (fecha más próxima primero)
         jornadaSections = tempSections.sorted { $0.numero < $1.numero }
-        
-        // Actualizar el estado de favoritos después de crear las secciones
-        updateMatchesFavoriteStatus()
-    }
-
-    private func updateMatchesFavoriteStatus() {
-        // Actualizar el estado de favoritos en cada sección
-        for (index, section) in jornadaSections.enumerated() {
-            var updatedMatches = section.matches
-            for (matchIndex, matchUI) in updatedMatches.enumerated() {
-                // El ID completo incluye la jornada
-                let fullMatchId = "\(section.jornadaId)_\(matchUI.id)"
-                let isFav = favoriteMatchIds.contains(fullMatchId)
-                updatedMatches[matchIndex].isFavorite = isFav
-            }
-            jornadaSections[index].matches = updatedMatches
-        }
     }
 }

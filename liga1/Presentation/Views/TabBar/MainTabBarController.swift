@@ -36,14 +36,11 @@ class MainTabBarController: UITabBarController {
         let torneoVC = container.makeTablaViewController()
         torneoVC.title = "Tabla"
 
-        let favoritosVC = container.makeFavoritosViewController()
-        favoritosVC.title = "Favoritos"
-
         let newsVC = container.makeNewsViewController()
         newsVC.title = "Noticias"
 
         let perfilVC = container.makeProfileViewController(eventBus: eventBus)
-        perfilVC.title = "Configuración"
+        perfilVC.title = "Ajustes"
 
         // Crear NavControllers con estilo Large Title
         let homeNav = createNavController(
@@ -58,12 +55,6 @@ class MainTabBarController: UITabBarController {
             imageSystemName: "chart.bar.doc.horizontal"
         )
 
-        let favoritosNav = createNavController(
-            rootViewController: favoritosVC,
-            title: "favoritos",
-            imageSystemName: "star"
-        )
-
         let newsNav = createNavController(
             rootViewController: newsVC,
             title: "noticias",
@@ -71,11 +62,11 @@ class MainTabBarController: UITabBarController {
 
         let perfilNav = createNavController(
             rootViewController: perfilVC,
-            title: "configuración",
+            title: "ajustes",
             imageSystemName: "gearshape"
         )
 
-        viewControllers = [homeNav, torneoNav, favoritosNav, newsNav, perfilNav]
+        viewControllers = [homeNav, torneoNav, newsNav, perfilNav]
     }
     
     private func configureNavigationBarAppearance() {

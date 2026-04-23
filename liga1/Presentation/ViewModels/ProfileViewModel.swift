@@ -106,6 +106,12 @@ class ProfileViewModel {
         sections = [
             ProfileSection(title: "Notificaciones Push", options: [
                 ProfileOption(
+                    title: "Favoritos",
+                    icon: UIImage(systemName: "star.fill"),
+                    subtitle: nil,
+                    action: .favorites
+                ),
+                ProfileOption(
                     title: "Ajustes de notificaciones",
                     icon: UIImage(systemName: "bell.fill"),
                     subtitle: nil,
@@ -176,6 +182,7 @@ class ProfileViewModel {
     }
 
     enum ProfileAction {
+        case favorites
         case notification
         case notificationHistory
         case editUsername

@@ -7,11 +7,6 @@
 
 import UIKit
 
-/// Protocolo para comunicar eventos del adapter al ViewController
-protocol HomeTableViewAdapterDelegate: AnyObject {
-    func didTapFavorite(matchId: String, in jornadaId: String)
-}
-
 /// Adapter para separar la lógica de TableView del HomeViewController
 final class HomeTableViewAdapter: NSObject {
 
@@ -19,7 +14,6 @@ final class HomeTableViewAdapter: NSObject {
 
     private weak var tableView: UITableView?
     private var sections: [JornadaSection] = []
-    weak var delegate: HomeTableViewAdapterDelegate?
 
     // MARK: - Initialization
 
@@ -61,11 +55,9 @@ extension HomeTableViewAdapter: UITableViewDataSource {
         let match = sections[indexPath.section].matches[indexPath.row]
         let cell = tableView.dequeueReusableCell(MatchTableViewCell.self, for: indexPath)
 
-        // Cargar logos según el equipo (usando optional binding)
         let logoLocal = match.equipoLocalId.flatMap { UIImage(named: $0) }
         let logoVisitante = match.equipoVisitanteId.flatMap { UIImage(named: $0) }
 
-        cell.delegate = self
         cell.configure(with: match, logoLocal: logoLocal, logoVisitante: logoVisitante)
         return cell
     }
@@ -151,47 +143,26 @@ extension HomeTableViewAdapter: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 104 // 44 (header fecha) + 60 (header jornada)
+        return 104
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
     }
 
-    // Helper para formatear la fecha del header
     private func formatDateForHeader(_ date: Date) -> String {
         let calendar = Calendar.current
-        
+
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "es_PE")
-        
-        // Si es hoy, mostrar "Hoy"
+
         if calendar.isDateInToday(date) {
             formatter.dateFormat = "dd.MM"
             return "Hoy \(formatter.string(from: date))"
         } else {
-            // Mostrar día de la semana + fecha
             formatter.dateFormat = "EEEE dd.MM"
             let fechaString = formatter.string(from: date)
-            // Capitalizar primera letra
             return fechaString.capitalized
         }
-    }
-}
-
-// MARK: - MatchTableViewCellDelegate
-
-extension HomeTableViewAdapter: MatchTableViewCellDelegate {
-    func didTapFavorite(cell: MatchTableViewCell) {
-        guard let tableView = tableView,
-              let indexPath = tableView.indexPath(for: cell) else { return }
-
-        let jornadaSection = sections[indexPath.section]
-        let match = jornadaSection.matches[indexPath.row]
-
-        // El ID completo incluye la jornada: "clausura_01_adt_utc"
-        let fullMatchId = "\(jornadaSection.jornadaId)_\(match.id)"
-
-        delegate?.didTapFavorite(matchId: fullMatchId, in: jornadaSection.jornadaId)
     }
 }
