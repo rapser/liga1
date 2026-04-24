@@ -25,6 +25,8 @@ class HomeViewModel {
     @Published private(set) var jornadaSections: [JornadaSection] = []
     /// `true` al crear el VM evita mostrar el placeholder vacío un instante antes de la primera carga.
     @Published private(set) var isLoading: Bool = true
+    /// Solo `true` tras al menos un ciclo de carga conocido; evita el placeholder si `observe` emite `[]` antes del fetch explícito.
+    @Published private(set) var canShowNoMatchesPlaceholder: Bool = false
     @Published private(set) var error: Error?
     @Published private(set) var matchDayMode: MatchDayMode = .today
 
@@ -40,6 +42,7 @@ class HomeViewModel {
     private var loadMatchesCancellable: AnyCancellable?
     /// Evita aplicar resultados de cargas obsoletas si el usuario refresca seguido o cambia de fecha.
     private var loadGeneration: Int = 0
+    private var hasReceivedFetchJornadasResponse = false
 
     // MARK: - Initialization
 
@@ -82,20 +85,24 @@ class HomeViewModel {
                 guard let self else { return }
                 if case .failure(let err) = completion {
                     self.error = err
+                    self.hasReceivedFetchJornadasResponse = true
                     self.isLoading = false
+                    self.canShowNoMatchesPlaceholder = true
                 }
             } receiveValue: { [weak self] jornadas in
                 guard let self else { return }
+                self.hasReceivedFetchJornadasResponse = true
 
                 guard self.shouldReloadMatches(for: jornadas, force: force) else {
                     self.isLoading = false
+                    self.canShowNoMatchesPlaceholder = true
                     return
                 }
 
                 self.loadMatchesCancellable?.cancel()
                 self.loadGeneration += 1
                 let generation = self.loadGeneration
-                self.loadMatchesForJornadas(jornadas, generation: generation)
+                self.loadMatchesForJornadas(jornadas, generation: generation, fromObserve: false)
             }
     }
 
@@ -109,7 +116,7 @@ class HomeViewModel {
                 self.loadMatchesCancellable?.cancel()
                 self.loadGeneration += 1
                 let generation = self.loadGeneration
-                self.loadMatchesForJornadas(jornadas, generation: generation)
+                self.loadMatchesForJornadas(jornadas, generation: generation, fromObserve: true)
             }
             .store(in: &cancellables)
     }
@@ -122,14 +129,18 @@ class HomeViewModel {
         return incoming != current
     }
 
-    private func loadMatchesForJornadas(_ jornadas: [Jornada], generation: Int) {
+    private func loadMatchesForJornadas(_ jornadas: [Jornada], generation: Int, fromObserve: Bool) {
         loadMatchesCancellable?.cancel()
 
         guard !jornadas.isEmpty else {
             if generation == loadGeneration {
                 jornadaSections = []
             }
-            isLoading = false
+            let shouldRevealEmptyState = !fromObserve || hasReceivedFetchJornadasResponse
+            if shouldRevealEmptyState {
+                isLoading = false
+                canShowNoMatchesPlaceholder = true
+            }
             return
         }
 
@@ -150,10 +161,12 @@ class HomeViewModel {
                     self.error = err
                 }
                 self.isLoading = false
+                self.canShowNoMatchesPlaceholder = true
             } receiveValue: { [weak self] results in
                 guard let self else { return }
                 guard generation == self.loadGeneration else { return }
                 self.processJornadasWithMatches(results)
+                self.canShowNoMatchesPlaceholder = true
             }
     }
 

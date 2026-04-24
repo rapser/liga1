@@ -27,17 +27,9 @@ class HomeViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private lazy var tableViewAdapter = HomeTableViewAdapter(tableView: tableView)
     private let emptyMatchesView = HomeEmptyMatchesPlaceholderView()
+    private let skeletonView = HomeMatchesListSkeletonView()
     /// Evita doble `refresh` en el primer ciclo (viewDidLoad ya carga); reduce parpadeos y cancelaciones.
     private var hasSkippedFirstWillAppearRefresh = false
-
-    // Loader para la carga inicial
-    private lazy var loadingIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.prepareForAutoLayout()
-        indicator.hidesWhenStopped = true
-        indicator.color = .label
-        return indicator
-    }()
 
     // MARK: - Initialization
 
@@ -118,10 +110,9 @@ class HomeViewController: UIViewController {
             self?.calendarBarTapped()
         }
 
-        // Agregar loading indicator
-        loadingIndicator
-            .addTo(containerView)
-            .centerInSuperview()
+        skeletonView.prepareForAutoLayout()
+        skeletonView.addTo(containerView).fillSuperview()
+        skeletonView.stopAnimating()
     }
     
     @objc private func handleScoreUpdate() {
@@ -191,6 +182,14 @@ class HomeViewController: UIViewController {
             }
             .store(in: &cancellables)
 
+        viewModel.$canShowNoMatchesPlaceholder
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.applyHomeContentVisibility(isLoading: self.viewModel.isLoading)
+            }
+            .store(in: &cancellables)
+
         viewModel.$error
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
@@ -200,21 +199,24 @@ class HomeViewController: UIViewController {
             .store(in: &cancellables)
     }
 
-    /// Tabla con partidos, placeholder alusivo o loader según estado.
+    /// Tabla con partidos, skeleton durante carga inicial o placeholder solo cuando ya hubo un resultado vacío real.
     private func applyHomeContentVisibility(isLoading: Bool) {
         let empty = viewModel.jornadaSections.isEmpty
+        let canShowEmpty = viewModel.canShowNoMatchesPlaceholder
+        let showSkeleton = empty && (isLoading || !canShowEmpty)
+        let showPlaceholder = empty && canShowEmpty && !isLoading
 
-        if isLoading && empty {
-            loadingIndicator.startAnimating()
+        if showSkeleton {
+            skeletonView.startAnimating()
             tableView.isHidden = true
             emptyMatchesView.isHidden = true
         } else if isLoading && !empty {
-            loadingIndicator.stopAnimating()
+            skeletonView.stopAnimating()
             tableView.isHidden = false
             emptyMatchesView.isHidden = true
         } else {
-            loadingIndicator.stopAnimating()
-            if empty {
+            skeletonView.stopAnimating()
+            if showPlaceholder {
                 tableView.isHidden = true
                 emptyMatchesView.isHidden = false
             } else {

@@ -62,7 +62,6 @@
 		464009D82F098D8D00A8C905 /* FetchMatchesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009C92F098D8D00A8C905 /* FetchMatchesUseCase.swift */; };
 		464009F12F098DF600A8C905 /* NewsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009E62F098DF600A8C905 /* NewsViewController.swift */; };
 		464009F42F098DF600A8C905 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009DF2F098DF600A8C905 /* HomeViewController.swift */; };
-		46F5E0022F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */; };
 		464009F52F098DF600A8C905 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009EC2F098DF600A8C905 /* MainTabBarController.swift */; };
 		464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009E92F098DF600A8C905 /* ProfileViewController.swift */; };
 		464009F72F098DF600A8C905 /* NewsHeaderWrapperCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464009E52F098DF600A8C905 /* NewsHeaderWrapperCell.swift */; };
@@ -126,12 +125,6 @@
 		46CDF4BD2F10885000F280E6 /* TeamUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4BC2F10885000F280E6 /* TeamUI.swift */; };
 		46CDF4BF2F10A09D00F280E6 /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4BE2F10A09D00F280E6 /* DividerView.swift */; };
 		46CDF4C02F10625C00F280E6 /* JornadaSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CDF4BF2F10625C00F280E6 /* JornadaSection.swift */; };
-		46F5A2B02F50000100BBC901 /* MatchLiveStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5A2A02F50000100BBC901 /* MatchLiveStats.swift */; };
-		46F5A2B12F50000100BBC902 /* MatchDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5A2A12F50000100BBC902 /* MatchDetailViewModel.swift */; };
-		46F5A2B22F50000100BBC903 /* MatchDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */; };
-		46F5B0E12F50000100BBC904 /* MatchDetailComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */; };
-		46F5C0F12F50000100BBC906 /* MatchLineupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */; };
-		46F5C0F32F50000100BBC907 /* MatchLineupComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */; };
 		46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */; };
 		46D820A62F09DD0500FAA836 /* LoginCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D820A42F09DD0500FAA836 /* LoginCoordinator.swift */; };
 		46D820A72F09DD0500FAA836 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D820A22F09DD0500FAA836 /* AppCoordinator.swift */; };
@@ -149,6 +142,14 @@
 		46EC8E1C2F133475006A838D /* ObserveActiveJornadasUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */; };
 		46EC8E1D2F133476006A838D /* GetJornadaToDisplayUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1E2F133476006A838D /* GetJornadaToDisplayUseCase.swift */; };
 		46EC8E1E2F133DA0006A838D /* ObserveMatchesUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */; };
+		46F5A2B02F50000100BBC901 /* MatchLiveStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5A2A02F50000100BBC901 /* MatchLiveStats.swift */; };
+		46F5A2B12F50000100BBC902 /* MatchDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5A2A12F50000100BBC902 /* MatchDetailViewModel.swift */; };
+		46F5A2B22F50000100BBC903 /* MatchDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */; };
+		46F5B0E12F50000100BBC904 /* MatchDetailComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */; };
+		46F5C0F12F50000100BBC906 /* MatchLineupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */; };
+		46F5C0F32F50000100BBC907 /* MatchLineupComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */; };
+		46F5E0022F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */; };
+		46F604042F60000300BBC912 /* HomeMatchesListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */; };
 		65948435DFACA7759EC32637 /* CompositionalLayout+Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */; };
 		98255077D821F2CCA95CA559 /* CollectionView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */; };
 		B05D895EF08F1124F534A87B /* ScrollView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B972D8BAD626F164CEA3B5 /* ScrollView+Builder.swift */; };
@@ -208,7 +209,6 @@
 		464001932F08853F00A8C905 /* NewsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsHeaderView.swift; sourceTree = "<group>"; };
 		464001972F08853F00A8C905 /* FavoritosViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosViewModel.swift; sourceTree = "<group>"; };
 		464001982F08853F00A8C905 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
-		46F5A2A12F50000100BBC902 /* MatchDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailViewModel.swift; sourceTree = "<group>"; };
 		4640019A2F08853F00A8C905 /* NewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewModel.swift; sourceTree = "<group>"; };
 		4640019B2F08853F00A8C905 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		4640019C2F08853F00A8C905 /* TorneoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorneoViewModel.swift; sourceTree = "<group>"; };
@@ -222,11 +222,6 @@
 		464009CD2F098D8D00A8C905 /* FetchTeamsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchTeamsUseCase.swift; sourceTree = "<group>"; };
 		464009DD2F098DF600A8C905 /* FavoritosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosViewController.swift; sourceTree = "<group>"; };
 		464009DF2F098DF600A8C905 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEmptyMatchesPlaceholderView.swift; sourceTree = "<group>"; };
-		46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailViewController.swift; sourceTree = "<group>"; };
-		46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailComponents.swift; sourceTree = "<group>"; };
-		46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupModels.swift; sourceTree = "<group>"; };
-		46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupComponents.swift; sourceTree = "<group>"; };
 		464009E52F098DF600A8C905 /* NewsHeaderWrapperCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsHeaderWrapperCell.swift; sourceTree = "<group>"; };
 		464009E62F098DF600A8C905 /* NewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewController.swift; sourceTree = "<group>"; };
 		464009E72F098DF600A8C905 /* NewsViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsViewController+TableView.swift"; sourceTree = "<group>"; };
@@ -271,7 +266,6 @@
 		46CDF4862F10623000F280E6 /* JornadaUIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaUIMapper.swift; sourceTree = "<group>"; };
 		46CDF4892F10625B00F280E6 /* JornadaUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaUI.swift; sourceTree = "<group>"; };
 		46CDF4982F10685700F280E6 /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
-		46F5A2A02F50000100BBC901 /* MatchLiveStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveStats.swift; sourceTree = "<group>"; };
 		46CDF49A2F10686F00F280E6 /* MatchUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchUI.swift; sourceTree = "<group>"; };
 		46CDF49C2F1068A300F280E6 /* JornadaMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JornadaMapper.swift; sourceTree = "<group>"; };
 		46CDF49D2F1068A300F280E6 /* MatchMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchMapper.swift; sourceTree = "<group>"; };
@@ -305,6 +299,14 @@
 		46EC8E1B2F133475006A838D /* ObserveActiveJornadasUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveActiveJornadasUseCase.swift; sourceTree = "<group>"; };
 		46EC8E1D2F133DA0006A838D /* ObserveMatchesUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveMatchesUseCase.swift; sourceTree = "<group>"; };
 		46EC8E1E2F133476006A838D /* GetJornadaToDisplayUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetJornadaToDisplayUseCase.swift; sourceTree = "<group>"; };
+		46F5A2A02F50000100BBC901 /* MatchLiveStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLiveStats.swift; sourceTree = "<group>"; };
+		46F5A2A12F50000100BBC902 /* MatchDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailViewModel.swift; sourceTree = "<group>"; };
+		46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailViewController.swift; sourceTree = "<group>"; };
+		46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailComponents.swift; sourceTree = "<group>"; };
+		46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupModels.swift; sourceTree = "<group>"; };
+		46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupComponents.swift; sourceTree = "<group>"; };
+		46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEmptyMatchesPlaceholderView.swift; sourceTree = "<group>"; };
+		46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMatchesListSkeletonView.swift; sourceTree = "<group>"; };
 		49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CollectionView+Builder.swift"; sourceTree = "<group>"; };
 		5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CompositionalLayout+Presets.swift"; sourceTree = "<group>"; };
 		742E5D7ABC53132ABE23C086 /* FormBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormBuilder.swift; sourceTree = "<group>"; };
@@ -704,6 +706,7 @@
 			children = (
 				46C3EB242F2B12AB00E9EA0C /* HomeViewController+Refactored.swift */,
 				46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */,
+				46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */,
 				46D820A92F09DD2F00FAA836 /* HomeTableViewAdapter.swift */,
 				464009DF2F098DF600A8C905 /* HomeViewController.swift */,
 				46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */,
@@ -1289,6 +1292,7 @@
 				46CDF49B2F10686F00F280E6 /* MatchUI.swift in Sources */,
 				464009F42F098DF600A8C905 /* HomeViewController.swift in Sources */,
 				46F5E0022F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift in Sources */,
+				46F604042F60000300BBC912 /* HomeMatchesListSkeletonView.swift in Sources */,
 				46F5A2B22F50000100BBC903 /* MatchDetailViewController.swift in Sources */,
 				46F5B0E12F50000100BBC904 /* MatchDetailComponents.swift in Sources */,
 				46F5C0F12F50000100BBC906 /* MatchLineupModels.swift in Sources */,
@@ -1463,7 +1467,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
@@ -1496,7 +1500,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
