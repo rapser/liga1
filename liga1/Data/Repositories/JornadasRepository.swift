@@ -33,9 +33,9 @@ class JornadasRepository: JornadasRepositoryProtocol {
                 return
             }
 
+            // Solo `mostrar == true`. No ordenar por `fechaInicio` (el Home usa el calendario / fechas de partido).
             let query = self.db.collection(FirestoreConstants.Collection.jornadas)
                 .whereField(FirestoreConstants.JornadaField.mostrar, isEqualTo: true)
-                .order(by: FirestoreConstants.JornadaField.fechaInicio, descending: true)
 
             // Estrategia: Intentar caché primero (rápido), luego servidor si falla
             query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in

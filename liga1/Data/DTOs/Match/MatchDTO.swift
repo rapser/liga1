@@ -13,6 +13,7 @@ struct MatchDTO {
     let id: String?
     let equipoLocalId: String?
     let equipoVisitanteId: String?
+    /// Valores almacenados según hora Perú (UTC−5); `dateValue()` es el instante correcto en la app.
     let fecha: Timestamp?
     let golesTeamA: Int?
     let golesTeamB: Int?

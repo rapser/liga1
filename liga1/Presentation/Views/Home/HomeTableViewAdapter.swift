@@ -17,6 +17,8 @@ final class HomeTableViewAdapter: NSObject {
 
     /// Se dispara al pulsar una fila de partido.
     var onMatchSelected: ((JornadaSection, MatchUI) -> Void)?
+    /// Pulsar la franja de fecha en la cabecera de sección (el calendario principal está en la barra de navegación).
+    var onCalendarHeaderTapped: (() -> Void)?
 
     // MARK: - Initialization
 
@@ -39,6 +41,10 @@ final class HomeTableViewAdapter: NSObject {
         tableView?.dataSource = self
         tableView?.delegate = self
         tableView?.registerCell(MatchTableViewCell.self)
+    }
+
+    @objc private func handleCalendarHeaderTap() {
+        onCalendarHeaderTapped?()
     }
 }
 
@@ -95,19 +101,18 @@ extension HomeTableViewAdapter: UITableViewDelegate {
         fechaDiaLabel.font = .systemFont(ofSize: 16)
         fechaDiaLabel.textColor = .label
 
-        let calendarIcon = UIImageView(image: UIImage(systemName: "calendar"))
-        calendarIcon.tintColor = .secondaryLabel
-        calendarIcon.contentMode = .scaleAspectFit
-
         fechaDiaLabel
             .addTo(dateHeaderView)
             .pinLeading(constant: Spacing.standard)
-            .centerY()
-        calendarIcon
-            .addTo(dateHeaderView)
-            .square(20)
             .pinTrailing(constant: Spacing.standard)
             .centerY()
+
+        dateHeaderView.isUserInteractionEnabled = true
+        dateHeaderView.accessibilityTraits.insert(.button)
+        dateHeaderView.accessibilityLabel = "Elegir fecha de partidos"
+        dateHeaderView.accessibilityHint = "Muestra el calendario para ver partidos de otro día"
+        let tap = UITapGestureRecognizer(target: self, action: #selector(HomeTableViewAdapter.handleCalendarHeaderTap))
+        dateHeaderView.addGestureRecognizer(tap)
 
         let jornadaHeaderView = UIView()
         jornadaHeaderView.backgroundColor = .secondarySystemBackground
@@ -160,11 +165,18 @@ extension HomeTableViewAdapter: UITableViewDelegate {
         return 70
     }
 
+    private static var limaCalendar: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "America/Lima") ?? .current
+        return c
+    }
+
     private func formatDateForHeader(_ date: Date) -> String {
-        let calendar = Calendar.current
+        let calendar = Self.limaCalendar
 
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "es_PE")
+        formatter.timeZone = calendar.timeZone
 
         if calendar.isDateInToday(date) {
             formatter.dateFormat = "dd.MM"

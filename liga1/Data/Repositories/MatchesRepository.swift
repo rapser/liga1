@@ -39,52 +39,34 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 .collection(FirestoreConstants.Collection.matches)
                 .order(by: FirestoreConstants.MatchField.fecha)
 
-            // Estrategia: Intentar caché primero (rápido), luego servidor si falla
-            query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
+            /// Servidor primero: la caché puede estar desactualizada (p. ej. partido ya jugado el mismo día)
+            /// y el `Future` solo se completa una vez; antes se devolvía caché vieja y el Home quedaba vacío hasta el próximo refresh.
+            query.getDocuments(source: .server) { [weak self] snapshot, error in
                 guard let self = self else { return }
 
-                // Si hay datos en caché, úsalos inmediatamente
-                if cacheError == nil, let documents = cacheSnapshot?.documents, !documents.isEmpty {
-                    self.processMatches(snapshot: cacheSnapshot, jornadaId: jornadaId, promise: promise)
+                if let error = error as NSError?,
+                   error.domain == "FIRFirestoreErrorDomain",
+                   error.code == 9 {
+                    self.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
+                    return
+                }
 
-                    // Actualizar desde servidor en background
-                    self.fetchMatchesFromServer(query: query, jornadaId: jornadaId)
-                } else {
-                    // No hay caché, obtener del servidor
-                    query.getDocuments(source: .server) { [weak self] snapshot, error in
-                        // Si hay un error relacionado con índice faltante, intentar sin ordenar
-                        if let error = error as NSError?,
-                           error.domain == "FIRFirestoreErrorDomain",
-                           error.code == 9 { // Error de índice faltante
-                            self?.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
-                            return
-                        }
-
-                        if let error = error {
+                if let error = error {
+                    query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
+                        guard let self = self else { return }
+                        if cacheError != nil {
                             promise(.failure(error))
                             return
                         }
-
-                        self?.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
+                        self.processMatches(snapshot: cacheSnapshot, jornadaId: jornadaId, promise: promise)
                     }
+                    return
                 }
+
+                self.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
             }
         }
         .eraseToAnyPublisher()
-    }
-
-    private func fetchMatchesFromServer(query: Query, jornadaId: String) {
-        query.getDocuments(source: .server) { [weak self] snapshot, error in
-            guard let self = self,
-                  error == nil,
-                  let documents = snapshot?.documents else {
-                return
-            }
-
-            let matches = self.processMatchDocuments(documents)
-            let sortedMatches = matches.sorted { $0.fecha < $1.fecha }
-            self.getOrCreateSubject(for: jornadaId).send(sortedMatches)
-        }
     }
     
     private func fetchMatchesWithoutOrder(query: Query, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {

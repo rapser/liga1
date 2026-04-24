@@ -12,6 +12,7 @@ struct Match {
     let id: String
     let equipoLocalId: String?
     let equipoVisitanteId: String?
+    /// Instante del partido; en datos se usa hora Perú (UTC−5 / PET).
     let fecha: Date
     var golesEquipoLocal: Int
     var golesEquipoVisitante: Int

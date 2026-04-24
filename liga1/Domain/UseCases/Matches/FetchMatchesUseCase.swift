@@ -10,7 +10,8 @@ import Combine
 
 /// Use Case para obtener partidos de una jornada
 protocol FetchMatchesUseCaseProtocol {
-    func execute(for jornadaId: String) -> AnyPublisher<[Match], Error>
+    /// Partidos cuyo día de juego en Perú (UTC−5, `America/Lima`) coincide con el de `calendarDay`.
+    func execute(for jornadaId: String, calendarDay: Date) -> AnyPublisher<[Match], Error>
 }
 
 class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
@@ -21,7 +22,7 @@ class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
         self.repository = repository
     }
 
-    func execute(for jornadaId: String) -> AnyPublisher<[Match], Error> {
+    func execute(for jornadaId: String, calendarDay: Date) -> AnyPublisher<[Match], Error> {
         // Validación de negocio
         guard !jornadaId.isEmpty else {
             return Fail(error: NSError(
@@ -33,40 +34,33 @@ class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
 
         return repository.fetchMatches(for: jornadaId)
             .map { [weak self] matches in
-                return self?.filterMatchesByClosestDate(matches) ?? matches
+                guard let self else { return matches }
+                return self.filterMatches(on: calendarDay, matches: matches)
             }
             .eraseToAnyPublisher()
     }
 
     // MARK: - Private Methods
 
-    /// Filtra los partidos para mostrar solo los del día más próximo, bajo estas reglas:
-    /// - Se muestra el grupo de partidos del día más cercano que sea HOY o futuro.
-    /// - Un partido del día X ya es visible desde el día X-1 (1 día de anticipación natural,
-    ///   porque X >= hoy cuando hoy = X-1).
-    /// - Si todos los partidos de la jornada ya pasaron, no se muestra ninguno.
-    private func filterMatchesByClosestDate(_ matches: [Match]) -> [Match] {
-        guard !matches.isEmpty else { return [] }
+    /// Día del calendario en Perú (PET, UTC−5). Los partidos se registran en ese huso; agrupamos por año/mes/día en `America/Lima`.
+    private static var limaCalendar: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "America/Lima") ?? .current
+        return c
+    }
 
-        let now = Date()
-        let calendar = Calendar.current
+    private static func ymdLima(_ date: Date) -> (Int, Int, Int) {
+        let p = limaCalendar.dateComponents([.year, .month, .day], from: date)
+        return (p.year ?? 0, p.month ?? 0, p.day ?? 0)
+    }
 
-        // Agrupar partidos por día
-        let matchesByDate = Dictionary(grouping: matches) { match -> Date in
-            return calendar.startOfDay(for: match.fecha)
-        }
-
-        // Obtener todas las fechas únicas y ordenarlas
-        let sortedDates = matchesByDate.keys.sorted()
-
-        let todayStart = calendar.startOfDay(for: now)
-
-        // Primera fecha que sea hoy o posterior
-        guard let closestDate = sortedDates.first(where: { $0 >= todayStart }) else {
-            // Todos los partidos ya pasaron → no mostrar nada
-            return []
-        }
-
-        return (matchesByDate[closestDate] ?? []).sorted { $0.fecha < $1.fecha }
+    /// Incluye partidos finalizados: todo el día civil en Perú hasta medianoche; no se ocultan por hora ni por estado.
+    private func filterMatches(on day: Date, matches: [Match]) -> [Match] {
+        let lima = Self.limaCalendar
+        let dayStart = lima.startOfDay(for: day)
+        let target = Self.ymdLima(dayStart)
+        return matches
+            .filter { Self.ymdLima($0.fecha) == target }
+            .sorted { $0.fecha < $1.fecha }
     }
 }
