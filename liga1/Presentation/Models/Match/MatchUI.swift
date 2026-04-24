@@ -17,6 +17,11 @@ struct MatchUI {
     var golesEquipoVisitante: Int
     var estado: Match.EstadoMatch
     var suspendido: Bool
+    let arbitro: String?
+    let estadio: String?
+    let capacidad: String?
+    let canalesTV: [String]
+    let liveStats: MatchLiveStats?
 
     init(
         id: String,
@@ -26,7 +31,12 @@ struct MatchUI {
         golesEquipoLocal: Int = 0,
         golesEquipoVisitante: Int = 0,
         estado: Match.EstadoMatch = .pendiente,
-        suspendido: Bool = false
+        suspendido: Bool = false,
+        arbitro: String? = nil,
+        estadio: String? = nil,
+        capacidad: String? = nil,
+        canalesTV: [String] = [],
+        liveStats: MatchLiveStats? = nil
     ) {
         self.id = id
         if let localId = equipoLocalId {
@@ -48,6 +58,11 @@ struct MatchUI {
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
         self.suspendido = suspendido
+        self.arbitro = arbitro
+        self.estadio = estadio
+        self.capacidad = capacidad
+        self.canalesTV = canalesTV
+        self.liveStats = liveStats
     }
 
     var fechaFormateada: String {
@@ -86,17 +101,21 @@ struct MatchUI {
     }
 }
 
-// MARK: - Extensions
 extension MatchUI: Identifiable {}
 
 extension MatchUI: Equatable {
     static func == (lhs: MatchUI, rhs: MatchUI) -> Bool {
-        return lhs.id == rhs.id &&
-               lhs.fecha == rhs.fecha &&
-               lhs.golesEquipoLocal == rhs.golesEquipoLocal &&
-               lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
-               lhs.estado == rhs.estado &&
-               lhs.suspendido == rhs.suspendido
+        lhs.id == rhs.id &&
+            lhs.fecha == rhs.fecha &&
+            lhs.golesEquipoLocal == rhs.golesEquipoLocal &&
+            lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
+            lhs.estado == rhs.estado &&
+            lhs.suspendido == rhs.suspendido &&
+            lhs.arbitro == rhs.arbitro &&
+            lhs.estadio == rhs.estadio &&
+            lhs.capacidad == rhs.capacidad &&
+            lhs.canalesTV == rhs.canalesTV &&
+            lhs.liveStats == rhs.liveStats
     }
 }
 

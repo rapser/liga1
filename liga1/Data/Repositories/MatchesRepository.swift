@@ -138,11 +138,15 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 return (nil, nil)
             }()
 
-            // Mapear campos alternativos de goles desde Firestore
             let golesTeamA = data["golesTeamA"] as? Int ?? data["golesEquipoLocal"] as? Int
             let golesTeamB = data["golesTeamB"] as? Int ?? data["golesEquipoVisitante"] as? Int
 
-            // Crear DTO manualmente desde los datos
+            let arbitro = data["arbitro"] as? String ?? data["nombreArbitro"] as? String
+            let estadio = data["estadio"] as? String ?? data["nombreEstadio"] as? String
+            let capacidad = Self.stringFromFirestoreValue(data["capacidad"])
+            let canalesTV = Self.parseCanalesTV(from: data)
+            let liveStats = Self.parseLiveStatsDTO(from: data)
+
             let dto = MatchDTO(
                 id: documentID,
                 equipoLocalId: equipoLocalId,
@@ -151,13 +155,96 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 golesTeamA: golesTeamA,
                 golesTeamB: golesTeamB,
                 estado: data["estado"] as? String,
-                suspendido: data["suspendido"] as? Bool
+                suspendido: data["suspendido"] as? Bool,
+                arbitro: arbitro,
+                estadio: estadio,
+                capacidad: capacidad,
+                canalesTV: canalesTV,
+                liveStats: liveStats
             )
 
             matchDTOs.append(dto)
         }
 
         return MatchMapper.toDomain(from: matchDTOs, logger: self.logger)
+    }
+
+    private static func stringFromFirestoreValue(_ value: Any?) -> String? {
+        if let s = value as? String, !s.isEmpty { return s }
+        if let n = value as? NSNumber { return n.stringValue }
+        if let i = value as? Int { return String(i) }
+        return nil
+    }
+
+    private static func parseCanalesTV(from data: [String: Any]) -> [String]? {
+        if let arr = data["canalesTV"] as? [String], !arr.isEmpty { return arr }
+        if let arr = data["canalesTV"] as? [Any] {
+            let strings = arr.compactMap { $0 as? String }
+            return strings.isEmpty ? nil : strings
+        }
+        if let s = data["canalTV"] as? String, !s.isEmpty { return [s] }
+        return nil
+    }
+
+    private static func parseLiveStatsDTO(from data: [String: Any]) -> MatchLiveStatsDTO? {
+        let nested = data["stats"] as? [String: Any]
+        let src = nested ?? data
+
+        func intVal(_ key: String) -> Int? {
+            if let i = src[key] as? Int { return i }
+            if let n = src[key] as? NSNumber { return n.intValue }
+            return nil
+        }
+
+        func pair(prefix: String) -> (Int?, Int?) {
+            let l = intVal("\(prefix)Local") ?? intVal("\(prefix)_local")
+            let v = intVal("\(prefix)Visitante") ?? intVal("\(prefix)_visitante")
+            return (l, v)
+        }
+
+        func nestedPair(_ key: String) -> (Int?, Int?) {
+            guard let o = src[key] as? [String: Any] else { return (nil, nil) }
+            let l = o["local"] as? Int ?? (o["local"] as? NSNumber)?.intValue
+            let r = o["visitante"] as? Int ?? (o["visitante"] as? NSNumber)?.intValue
+            return (l, r)
+        }
+
+        var pl: Int?
+        var pv: Int?
+        (pl, pv) = pair(prefix: "posesion")
+        if pl == nil && pv == nil { (pl, pv) = nestedPair("posesion") }
+
+        var rl: Int?
+        var rv: Int?
+        (rl, rv) = pair(prefix: "remates")
+        if rl == nil && rv == nil { (rl, rv) = nestedPair("remates") }
+
+        var tl: Int?
+        var tv: Int?
+        (tl, tv) = pair(prefix: "tirosAPuerta")
+        if tl == nil && tv == nil { (tl, tv) = pair(prefix: "tirosPuerta") }
+        if tl == nil && tv == nil { (tl, tv) = nestedPair("tirosAPuerta") }
+
+        var cl: Int?
+        var cv: Int?
+        (cl, cv) = pair(prefix: "corners")
+        if cl == nil && cv == nil { (cl, cv) = nestedPair("corners") }
+
+        let dto = MatchLiveStatsDTO(
+            posesionLocal: pl,
+            posesionVisitante: pv,
+            rematesLocal: rl,
+            rematesVisitante: rv,
+            tirosAPuertaLocal: tl,
+            tirosAPuertaVisitante: tv,
+            cornersLocal: cl,
+            cornersVisitante: cv
+        )
+        let empty = dto.posesionLocal == nil && dto.posesionVisitante == nil
+            && dto.rematesLocal == nil && dto.rematesVisitante == nil
+            && dto.tirosAPuertaLocal == nil && dto.tirosAPuertaVisitante == nil
+            && dto.cornersLocal == nil && dto.cornersVisitante == nil
+        return empty ? nil : dto
     }
 
     func observeMatches(for jornadaId: String) -> AnyPublisher<[Match], Never> {

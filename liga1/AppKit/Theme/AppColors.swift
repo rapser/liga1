@@ -48,6 +48,17 @@ public extension UIColor {
     /// Color principal de Liga 1
     static let liga1Red = UIColor(red: 0.9, green: 0.1, blue: 0.2, alpha: 1.0)  // #E61A33
 
+    /// Barra comparativa de estadísticas: equipo local (izquierda), estilo teal.
+    static let statComparisonLocal: UIColor = UIColor { traitCollection in
+        if traitCollection.userInterfaceStyle == .dark {
+            return UIColor(red: 0.22, green: 0.62, blue: 0.56, alpha: 1)
+        }
+        return UIColor(red: 0.12, green: 0.48, blue: 0.44, alpha: 1)
+    }
+
+    /// Barra comparativa de estadísticas: equipo visitante (derecha).
+    static let statComparisonVisitante: UIColor = liga1Red
+
     // MARK: - Competition Colors
 
     static let libertadoresGold = UIColor(red: 1.0, green: 0.8, blue: 0.0, alpha: 1.0)        // #FFCC00

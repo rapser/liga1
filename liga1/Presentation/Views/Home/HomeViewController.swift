@@ -15,6 +15,7 @@ class HomeViewController: UIViewController {
     private let containerView = ContainerView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let viewModel: HomeViewModel
+    private let container: DIContainer
     private var cancellables = Set<AnyCancellable>()
     private lazy var tableViewAdapter = HomeTableViewAdapter(tableView: tableView)
 
@@ -29,8 +30,9 @@ class HomeViewController: UIViewController {
 
     // MARK: - Initialization
 
-    init(viewModel: HomeViewModel) {
+    init(viewModel: HomeViewModel, container: DIContainer) {
         self.viewModel = viewModel
+        self.container = container
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -45,6 +47,17 @@ class HomeViewController: UIViewController {
         title = "Inicio"
         setupUI()
         bindViewModel()
+        tableViewAdapter.onMatchSelected = { [weak self] section, match in
+            guard let self else { return }
+            let ctx = MatchDetailContext(
+                jornadaId: section.jornadaId,
+                jornadaNumero: section.numero,
+                torneo: section.torneo,
+                match: match
+            )
+            let detail = self.container.makeMatchDetailViewController(context: ctx)
+            self.navigationController?.pushViewController(detail, animated: true)
+        }
         refreshContent()
         NotificationCenter.default.addObserver(self, selector: #selector(handleScoreUpdate), name: .scoreUpdateReceived, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)

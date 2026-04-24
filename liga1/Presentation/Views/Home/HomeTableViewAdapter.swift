@@ -15,6 +15,9 @@ final class HomeTableViewAdapter: NSObject {
     private weak var tableView: UITableView?
     private var sections: [JornadaSection] = []
 
+    /// Se dispara al pulsar una fila de partido.
+    var onMatchSelected: ((JornadaSection, MatchUI) -> Void)?
+
     // MARK: - Initialization
 
     init(tableView: UITableView) {
@@ -66,6 +69,13 @@ extension HomeTableViewAdapter: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension HomeTableViewAdapter: UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let section = sections[indexPath.section]
+        let match = section.matches[indexPath.row]
+        onMatchSelected?(section, match)
+    }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let jornadaSection = sections[section]

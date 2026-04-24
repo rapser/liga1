@@ -248,7 +248,12 @@ final class DIContainer {
     // MARK: - ViewControllers
 
     func makeHomeViewController() -> HomeViewController {
-        return HomeViewController(viewModel: makeHomeViewModel())
+        return HomeViewController(viewModel: makeHomeViewModel(), container: self)
+    }
+
+    func makeMatchDetailViewController(context: MatchDetailContext) -> MatchDetailViewController {
+        let vm = MatchDetailViewModel(context: context)
+        return MatchDetailViewController(viewModel: vm)
     }
 
     func makeTablaViewController() -> TablaViewController {
