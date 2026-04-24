@@ -130,6 +130,7 @@
 		46F5A2B22F50000100BBC903 /* MatchDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */; };
 		46F5B0E12F50000100BBC904 /* MatchDetailComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */; };
 		46F5C0F12F50000100BBC906 /* MatchLineupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */; };
+		46F5C0F32F50000100BBC907 /* MatchLineupComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */; };
 		46D8209B2F09D40900FAA836 /* DatabaseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D8209A2F09D40900FAA836 /* DatabaseProtocol.swift */; };
 		46D820A62F09DD0500FAA836 /* LoginCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D820A42F09DD0500FAA836 /* LoginCoordinator.swift */; };
 		46D820A72F09DD0500FAA836 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D820A22F09DD0500FAA836 /* AppCoordinator.swift */; };
@@ -223,6 +224,7 @@
 		46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailViewController.swift; sourceTree = "<group>"; };
 		46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailComponents.swift; sourceTree = "<group>"; };
 		46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupModels.swift; sourceTree = "<group>"; };
+		46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupComponents.swift; sourceTree = "<group>"; };
 		464009E52F098DF600A8C905 /* NewsHeaderWrapperCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsHeaderWrapperCell.swift; sourceTree = "<group>"; };
 		464009E62F098DF600A8C905 /* NewsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsViewController.swift; sourceTree = "<group>"; };
 		464009E72F098DF600A8C905 /* NewsViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsViewController+TableView.swift"; sourceTree = "<group>"; };
@@ -703,6 +705,7 @@
 				464009DF2F098DF600A8C905 /* HomeViewController.swift */,
 				46F5A2A22F50000100BBC903 /* MatchDetailViewController.swift */,
 				46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */,
+				46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -1285,6 +1288,7 @@
 				46F5A2B22F50000100BBC903 /* MatchDetailViewController.swift in Sources */,
 				46F5B0E12F50000100BBC904 /* MatchDetailComponents.swift in Sources */,
 				46F5C0F12F50000100BBC906 /* MatchLineupModels.swift in Sources */,
+				46F5C0F32F50000100BBC907 /* MatchLineupComponents.swift in Sources */,
 				464009F52F098DF600A8C905 /* MainTabBarController.swift in Sources */,
 				464009F62F098DF600A8C905 /* ProfileViewController.swift in Sources */,
 				46400A002F098EB800A8C905 /* DIContainer.swift in Sources */,
