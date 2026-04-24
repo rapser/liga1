@@ -23,6 +23,12 @@ final class MatchDetailViewController: UIViewController {
     private let estadisticasHost = MatchDetailScrollStackView(scrollBackgroundColor: .appBackground)
     private let estadisticasPlaceholder = UIView()
     private let alineacionesPlaceholder = UIView()
+    private let alineacionesHost = MatchDetailScrollStackView(
+        scrollBackgroundColor: .appBackground,
+        contentTopInset: 0,
+        contentBottomInset: 0,
+        contentHorizontalInset: Spacing.tiny
+    )
 
     init(viewModel: MatchDetailViewModel) {
         self.viewModel = viewModel
@@ -77,6 +83,7 @@ final class MatchDetailViewController: UIViewController {
         setupResumen()
         setupPlaceholders()
         setupEstadisticasTab()
+        setupAlineacionesTab()
         segmentChanged()
     }
 
@@ -322,6 +329,28 @@ final class MatchDetailViewController: UIViewController {
         stack.setCustomSpacing(Spacing.small, after: listTitle)
 
         stack.addArrangedStatRows(viewModel.estadisticasTabRows)
+    }
+
+    private func setupAlineacionesTab() {
+        alineacionesHost.prepareForAutoLayout()
+        alineacionesPlaceholder.addSubview(alineacionesHost)
+        NSLayoutConstraint.activate([
+            alineacionesHost.topAnchor.constraint(equalTo: alineacionesPlaceholder.topAnchor),
+            alineacionesHost.leadingAnchor.constraint(equalTo: alineacionesPlaceholder.leadingAnchor),
+            alineacionesHost.trailingAnchor.constraint(equalTo: alineacionesPlaceholder.trailingAnchor),
+            alineacionesHost.bottomAnchor.constraint(equalTo: alineacionesPlaceholder.bottomAnchor)
+        ])
+
+        alineacionesHost.scrollView.isScrollEnabled = true
+        alineacionesHost.scrollView.alwaysBounceVertical = true
+
+        let pitch = MatchPitchLineupRootView(model: viewModel.lineupTabModel)
+        pitch.prepareForAutoLayout()
+        alineacionesHost.contentStack.addArrangedSubview(pitch)
+
+        NSLayoutConstraint.activate([
+            pitch.heightAnchor.constraint(equalTo: pitch.widthAnchor, multiplier: MatchPitchLineupRootView.heightPerWidth)
+        ])
     }
 
     @objc private func segmentChanged() {

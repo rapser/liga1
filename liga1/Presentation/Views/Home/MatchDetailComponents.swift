@@ -14,7 +14,12 @@ final class MatchDetailScrollStackView: UIView {
     let scrollView = UIScrollView()
     let contentStack = UIStackView()
 
-    init(scrollBackgroundColor: UIColor = .clear) {
+    init(
+        scrollBackgroundColor: UIColor = .clear,
+        contentTopInset: CGFloat = Spacing.standard,
+        contentBottomInset: CGFloat = Spacing.large,
+        contentHorizontalInset: CGFloat = Spacing.standard
+    ) {
         super.init(frame: .zero)
         prepareForAutoLayout()
         scrollView.prepareForAutoLayout()
@@ -33,10 +38,11 @@ final class MatchDetailScrollStackView: UIView {
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: Spacing.standard),
-            contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: Spacing.standard),
-            contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -Spacing.standard),
-            contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -Spacing.large)
+            contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: contentTopInset),
+            contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: contentHorizontalInset),
+            contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -contentHorizontalInset),
+            contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -contentBottomInset),
+            contentStack.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -2 * contentHorizontalInset)
         ])
     }
 

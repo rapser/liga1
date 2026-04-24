@@ -199,4 +199,54 @@ final class MatchDetailViewModel {
     var shareText: String {
         "\(localTeamName) vs \(visitTeamName) · \(scoreDisplay) · \(dateTimeLine)"
     }
+
+    // MARK: - Alineaciones (dummy; `FootballFormation` admite 4-4-2, 3-5-2, etc.)
+
+    var lineupTabModel: MatchLineupTabModel {
+        let visitFormation = FootballFormation.parseCode("3-4-2-1")!
+        let localFormation = FootballFormation.parseCode("4-2-3-1")!
+
+        let visitPlayers: [LineupPlayerUIData] = [
+            LineupPlayerUIData(number: 1, shortName: "Duarte", rating: 6.2),
+            LineupPlayerUIData(number: 2, shortName: "Ibarra", rating: 6.4),
+            LineupPlayerUIData(number: 4, shortName: "Rodríguez", rating: 6.5),
+            LineupPlayerUIData(number: 15, shortName: "Soto", rating: 6.1),
+            LineupPlayerUIData(number: 8, shortName: "Fernández", rating: 6.6),
+            LineupPlayerUIData(number: 16, shortName: "Castro", rating: 6.3),
+            LineupPlayerUIData(number: 21, shortName: "Vera", rating: 6.7),
+            LineupPlayerUIData(number: 11, shortName: "López", rating: 7.0),
+            LineupPlayerUIData(number: 10, shortName: "Ramírez", rating: 6.8),
+            LineupPlayerUIData(number: 7, shortName: "Díaz", rating: 7.1),
+            LineupPlayerUIData(number: 9, shortName: "Giménez", rating: 7.2, scoredGoal: true)
+        ]
+
+        let localPlayers: [LineupPlayerUIData] = [
+            LineupPlayerUIData(number: 12, shortName: "García", rating: 6.5),
+            LineupPlayerUIData(number: 3, shortName: "Paredes", rating: 6.4),
+            LineupPlayerUIData(number: 5, shortName: "Mendoza", rating: 6.6),
+            LineupPlayerUIData(number: 6, shortName: "Torres", rating: 6.2),
+            LineupPlayerUIData(number: 14, shortName: "Ríos", rating: 6.3),
+            LineupPlayerUIData(number: 18, shortName: "Salas", rating: 6.7),
+            LineupPlayerUIData(number: 19, shortName: "Flores", rating: 6.5),
+            LineupPlayerUIData(number: 22, shortName: "Hurtado", rating: 6.8),
+            LineupPlayerUIData(number: 17, shortName: "Cruz", rating: 7.0),
+            LineupPlayerUIData(number: 20, shortName: "Peña", rating: 6.9),
+            LineupPlayerUIData(number: 11, shortName: "Reyna", rating: 6.6)
+        ]
+
+        return MatchLineupTabModel(
+            visitTop: TeamLineupSideModel(
+                teamName: visitTeamName,
+                formation: visitFormation,
+                players: visitPlayers,
+                averageRating: 6.4
+            )!,
+            localBottom: TeamLineupSideModel(
+                teamName: localTeamName,
+                formation: localFormation,
+                players: localPlayers,
+                averageRating: 6.7
+            )!
+        )
+    }
 }
