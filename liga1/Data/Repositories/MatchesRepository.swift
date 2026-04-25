@@ -123,7 +123,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
             let golesTeamA = data["golesTeamA"] as? Int ?? data["golesEquipoLocal"] as? Int
             let golesTeamB = data["golesTeamB"] as? Int ?? data["golesEquipoVisitante"] as? Int
 
-            let arbitro = data["arbitro"] as? String ?? data["nombreArbitro"] as? String
+            let arbitro = Self.parseArbitro(from: data)
             let estadio = data["estadio"] as? String ?? data["nombreEstadio"] as? String
             let capacidad = Self.stringFromFirestoreValue(data["capacidad"])
             let canalesTV = Self.parseCanalesTV(from: data)
@@ -149,6 +149,21 @@ class MatchesRepository: MatchesRepositoryProtocol {
         }
 
         return MatchMapper.toDomain(from: matchDTOs, logger: self.logger)
+    }
+
+    /// Campo opcional en el documento del partido. Prioridad: `arbitro` → `nombreArbitro` → `referee`.
+    private static func parseArbitro(from data: [String: Any]) -> String? {
+        let keys = [
+            FirestoreConstants.MatchField.arbitro,
+            "nombreArbitro",
+            "referee"
+        ]
+        for key in keys {
+            guard let s = data[key] as? String else { continue }
+            let trimmed = s.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty { return trimmed }
+        }
+        return nil
     }
 
     private static func stringFromFirestoreValue(_ value: Any?) -> String? {

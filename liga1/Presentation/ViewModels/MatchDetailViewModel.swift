@@ -192,6 +192,13 @@ final class MatchDetailViewModel {
         return v
     }
 
+    /// Nombre a mostrar si el documento trae dato; `nil` en jornadas sin campo o vacío.
+    var arbitroSiExiste: String? {
+        guard let a = match.arbitro else { return nil }
+        let t = a.trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? nil : t
+    }
+
     var arbitroDisplay: String { displayOrConfirm(match.arbitro) }
     var estadioDisplay: String { displayOrConfirm(match.estadio) }
     var capacidadDisplay: String { displayOrConfirm(match.capacidad) }

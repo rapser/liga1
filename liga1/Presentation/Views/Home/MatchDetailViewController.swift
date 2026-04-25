@@ -249,11 +249,17 @@ final class MatchDetailViewController: UIViewController {
         inner.axis = .vertical
         inner.spacing = 0
 
-        inner.addArrangedSubview(infoRow(key: "Árbitro", value: viewModel.arbitroDisplay))
-        inner.addArrangedSubview(separatorLine())
-        inner.addArrangedSubview(infoRow(key: "Estadio", value: viewModel.estadioDisplay))
-        inner.addArrangedSubview(separatorLine())
-        inner.addArrangedSubview(infoRow(key: "Capacidad", value: viewModel.capacidadDisplay))
+        var rows: [UIView] = []
+        if let nombreArbitro = viewModel.arbitroSiExiste {
+            rows.append(infoRow(key: "Árbitro", value: nombreArbitro))
+        }
+        rows.append(infoRow(key: "Estadio", value: viewModel.estadioDisplay))
+        rows.append(infoRow(key: "Capacidad", value: viewModel.capacidadDisplay))
+
+        for (index, row) in rows.enumerated() {
+            if index > 0 { inner.addArrangedSubview(separatorLine()) }
+            inner.addArrangedSubview(row)
+        }
 
         return MatchDetailTitledSectionView(title: "Información adicional", uppercaseTitle: true, content: inner)
     }
