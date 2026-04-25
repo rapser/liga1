@@ -29,9 +29,9 @@ class TeamsRepository: TeamsRepositoryProtocol {
                 return
             }
 
+            // El orden de Firestore es solo orientativo; el orden final aplica criterios Liga 1 en memoria.
             self.db.collection(torneo.rawValue)
                 .order(by: FirestoreConstants.TeamField.points, descending: true)
-                .order(by: FirestoreConstants.TeamField.goalDifference, descending: true)
                 .getDocuments { snapshot, error in
                     if let error = error {
                         promise(.failure(error))
@@ -85,14 +85,7 @@ class TeamsRepository: TeamsRepositoryProtocol {
                         // Ordenar alfabéticamente por nombre
                         teams.sort { $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending }
                     } else {
-                        // Ordenar por puntos (descendente) y diferencia de goles (descendente)
-                        // Este es el ordenamiento estándar que ya estaba funcionando
-                        teams.sort {
-                            if $0.puntos == $1.puntos {
-                                return $0.diferenciaGoles > $1.diferenciaGoles
-                            }
-                            return $0.puntos > $1.puntos
-                        }
+                        teams.sort { Team.isOrderedAboveInStandings($0, $1) }
                     }
 
                     promise(.success(teams))

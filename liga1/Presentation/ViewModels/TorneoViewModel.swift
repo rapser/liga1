@@ -137,6 +137,8 @@ class TorneoViewModel {
 
                 for team in clausuraTeams {
                     if let existing = teamsDict[team.nombre] {
+                        let gf = existing.golesFavor + team.golesFavor
+                        let gc = existing.golesContra + team.golesContra
                         let combined = Team(
                             nombre: existing.nombre,
                             ciudad: existing.ciudad,
@@ -146,9 +148,9 @@ class TorneoViewModel {
                             partidosGanados: existing.partidosGanados + team.partidosGanados,
                             partidosEmpatados: existing.partidosEmpatados + team.partidosEmpatados,
                             partidosPerdidos: existing.partidosPerdidos + team.partidosPerdidos,
-                            golesFavor: existing.golesFavor + team.golesFavor,
-                            golesContra: existing.golesContra + team.golesContra,
-                            diferenciaGoles: existing.diferenciaGoles + team.diferenciaGoles,
+                            golesFavor: gf,
+                            golesContra: gc,
+                            diferenciaGoles: gf - gc,
                             puntos: existing.puntos + team.puntos
                         )
                         teamsDict[team.nombre] = combined
@@ -169,14 +171,7 @@ class TorneoViewModel {
                         $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending
                     }
                 } else {
-                    // Ordenar por puntos (descendente) y diferencia de goles (descendente)
-                    // Este es el ordenamiento estándar que ya estaba funcionando
-                    acumuladoTeams = acumuladoTeamsArray.sorted {
-                        if $0.puntos == $1.puntos {
-                            return $0.diferenciaGoles > $1.diferenciaGoles
-                        }
-                        return $0.puntos > $1.puntos
-                    }
+                    acumuladoTeams = acumuladoTeamsArray.sorted { Team.isOrderedAboveInStandings($0, $1) }
                 }
 
                 let acumuladoTeamsUI = TeamUIMapper.toUI(from: acumuladoTeams)
