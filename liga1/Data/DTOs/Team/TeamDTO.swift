@@ -13,7 +13,6 @@ struct TeamDTO: Codable {
     let id: String?
     let name: String?
     let city: String?
-    let stadium: String?
     let logo: String?
     let matchesPlayed: Int?
     let matchesWon: Int?
@@ -28,7 +27,6 @@ struct TeamDTO: Codable {
         case id
         case name
         case city
-        case stadium
         case logo
         case matchesPlayed
         case matchesWon
@@ -40,11 +38,10 @@ struct TeamDTO: Codable {
         case points
     }
 
-    init(id: String? = nil, name: String?, city: String?, stadium: String?, logo: String?, matchesPlayed: Int?, matchesWon: Int?, matchesDrawn: Int?, matchesLost: Int?, goalsScored: Int?, goalsAgainst: Int?, goalDifference: Int?, points: Int?) {
+    init(id: String? = nil, name: String?, city: String?, logo: String?, matchesPlayed: Int?, matchesWon: Int?, matchesDrawn: Int?, matchesLost: Int?, goalsScored: Int?, goalsAgainst: Int?, goalDifference: Int?, points: Int?) {
         self.id = id
         self.name = name
         self.city = city
-        self.stadium = stadium
         self.logo = logo
         self.matchesPlayed = matchesPlayed
         self.matchesWon = matchesWon

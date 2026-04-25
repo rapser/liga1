@@ -150,6 +150,8 @@
 		46F5C0F32F50000100BBC907 /* MatchLineupComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */; };
 		46F5E0022F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */; };
 		46F604042F60000300BBC912 /* HomeMatchesListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */; };
+		46F710A12F71000100BBC901 /* TeamVenueCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */; };
+		46F710A32F71000100BBC901 /* TeamVenues.json in Resources */ = {isa = PBXBuildFile; fileRef = 46F710A22F71000100BBC901 /* TeamVenues.json */; };
 		65948435DFACA7759EC32637 /* CompositionalLayout+Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */; };
 		98255077D821F2CCA95CA559 /* CollectionView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */; };
 		B05D895EF08F1124F534A87B /* ScrollView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B972D8BAD626F164CEA3B5 /* ScrollView+Builder.swift */; };
@@ -305,6 +307,8 @@
 		46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailComponents.swift; sourceTree = "<group>"; };
 		46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupModels.swift; sourceTree = "<group>"; };
 		46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupComponents.swift; sourceTree = "<group>"; };
+		46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamVenueCatalog.swift; sourceTree = "<group>"; };
+		46F710A22F71000100BBC901 /* TeamVenues.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TeamVenues.json; sourceTree = "<group>"; };
 		46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEmptyMatchesPlaceholderView.swift; sourceTree = "<group>"; };
 		46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMatchesListSkeletonView.swift; sourceTree = "<group>"; };
 		49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CollectionView+Builder.swift"; sourceTree = "<group>"; };
@@ -481,6 +485,7 @@
 				464001742F08853F00A8C905 /* EquipoPeruano.swift */,
 				464001762F08853F00A8C905 /* LayoutPresets.swift */,
 				464001772F08853F00A8C905 /* TablePosition.swift */,
+				46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */,
 				464001782F08853F00A8C905 /* TorneoType.swift */,
 			);
 			path = Utils;
@@ -1073,6 +1078,7 @@
 				46D995A02C6E90EE00D4951C /* Info.plist */,
 				46D9959D2C6E90EE00D4951C /* LaunchScreen.storyboard */,
 				46D9959B2C6E90EE00D4951C /* Assets.xcassets */,
+				46F710A22F71000100BBC901 /* TeamVenues.json */,
 				4635E3682EFDEF93004A541C /* GoogleService-Info.plist */,
 			);
 			path = Resources;
@@ -1173,6 +1179,7 @@
 			files = (
 				46D9959C2C6E90EE00D4951C /* Assets.xcassets in Resources */,
 				46D9959F2C6E90EE00D4951C /* Base in Resources */,
+				46F710A32F71000100BBC901 /* TeamVenues.json in Resources */,
 				4635E3692EFDEF93004A541C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1287,6 +1294,7 @@
 				46D820A82F09DD0500FAA836 /* Coordinator.swift in Sources */,
 				464001D42F08853F00A8C905 /* LayoutPresets.swift in Sources */,
 				464001D52F08853F00A8C905 /* HomeViewModel.swift in Sources */,
+				46F710A12F71000100BBC901 /* TeamVenueCatalog.swift in Sources */,
 				46F5A2B12F50000100BBC902 /* MatchDetailViewModel.swift in Sources */,
 				464009F12F098DF600A8C905 /* NewsViewController.swift in Sources */,
 				46CDF49B2F10686F00F280E6 /* MatchUI.swift in Sources */,

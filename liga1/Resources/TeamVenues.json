@@ -1,0 +1,20 @@
+[
+  { "id": "adt", "estadio": "Unión Tarma", "capacidad": 25000 },
+  { "id": "ali", "estadio": "Alejandro Villanueva", "capacidad": 35000 },
+  { "id": "atl", "estadio": "Campeones del 36", "capacidad": 12000 },
+  { "id": "caj", "estadio": "Héroes de San Ramón", "capacidad": 12000 },
+  { "id": "cha", "estadio": "Los Chankas", "capacidad": 20000 },
+  { "id": "cou", "estadio": "Juan Maldonado Gamarra", "capacidad": 12000 },
+  { "id": "cie", "estadio": "Inca Garcilaso de la Vega", "capacidad": 42000 },
+  { "id": "cri", "estadio": "Alberto Gallardo", "capacidad": 18000 },
+  { "id": "cus", "estadio": "Inca Garcilaso de la Vega", "capacidad": 42000 },
+  { "id": "gar", "estadio": "Inca Garcilaso de la Vega", "capacidad": 42000 },
+  { "id": "gra", "estadio": "Campeones del 36", "capacidad": 12000 },
+  { "id": "hua", "estadio": "IPD Huancayo", "capacidad": 20000 },
+  { "id": "jpa", "estadio": "CD Juan Pablo", "capacidad": 25000 },
+  { "id": "mel", "estadio": "Monumental de la UNSA", "capacidad": 60000 },
+  { "id": "moq", "estadio": "25 de Noviembre", "capacidad": 21000 },
+  { "id": "sba", "estadio": "Miguel Grau", "capacidad": 17000 },
+  { "id": "uni", "estadio": "Monumental U", "capacidad": 80000 },
+  { "id": "utc", "estadio": "Héroes de San Ramón", "capacidad": 12000 }
+]

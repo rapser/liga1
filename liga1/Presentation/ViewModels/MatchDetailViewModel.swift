@@ -200,8 +200,24 @@ final class MatchDetailViewModel {
     }
 
     var arbitroDisplay: String { displayOrConfirm(match.arbitro) }
-    var estadioDisplay: String { displayOrConfirm(match.estadio) }
-    var capacidadDisplay: String { displayOrConfirm(match.capacidad) }
+
+    /// Firestore gana si trae dato; si no, catálogo local por equipo local.
+    var estadioDisplay: String {
+        if let s = nonEmptyString(match.estadio) { return s }
+        if let s = TeamVenueCatalog.info(forLocalTeamId: match.equipoLocalId)?.estadio { return s }
+        return "Por confirmar"
+    }
+
+    var capacidadDisplay: String {
+        if let s = nonEmptyString(match.capacidad) { return s }
+        if let s = TeamVenueCatalog.info(forLocalTeamId: match.equipoLocalId)?.capacidadTexto { return s }
+        return "Por confirmar"
+    }
+
+    private func nonEmptyString(_ value: String?) -> String? {
+        guard let t = value?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty else { return nil }
+        return t
+    }
 
     var shareText: String {
         "\(localTeamName) vs \(visitTeamName) · \(scoreDisplay) · \(dateTimeLine)"

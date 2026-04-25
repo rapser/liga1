@@ -59,7 +59,6 @@ class TeamsRepository: TeamsRepositoryProtocol {
                             id: doc.documentID,
                             name: nombreCompleto,
                             city: dto.city,
-                            stadium: dto.stadium,
                             logo: logo,
                             matchesPlayed: dto.matchesPlayed,
                             matchesWon: dto.matchesWon,

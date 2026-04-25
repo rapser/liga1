@@ -58,7 +58,6 @@ public enum FirestoreConstants {
     public enum TeamField {
         public static let name = "name"
         public static let city = "city"
-        public static let stadium = "stadium"
         public static let matchesPlayed = "matchesPlayed"
         public static let matchesWon = "matchesWon"
         public static let matchesDrawn = "matchesDrawn"

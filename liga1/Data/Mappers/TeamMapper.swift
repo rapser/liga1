@@ -20,10 +20,10 @@ struct TeamMapper {
         
         let golesFavor = dto.goalsScored ?? 0
         let golesContra = dto.goalsAgainst ?? 0
+        // `stadium` ya no se lee de Firestore; cancha se muestra vía `TeamVenues` en el detalle de partido.
         return Team(
             nombre: dto.name ?? "",
             ciudad: dto.city ?? "",
-            estadio: dto.stadium ?? "",
             logo: logo,
             partidosJugados: dto.matchesPlayed ?? 0,
             partidosGanados: dto.matchesWon ?? 0,
@@ -42,7 +42,6 @@ struct TeamMapper {
             id: nil,  // ID se genera en Firestore
             name: domain.nombre,
             city: domain.ciudad,
-            stadium: domain.estadio,
             logo: domain.logo,
             matchesPlayed: domain.partidosJugados,
             matchesWon: domain.partidosGanados,
