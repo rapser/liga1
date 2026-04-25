@@ -307,10 +307,10 @@
 		46F5B0E02F50000100BBC904 /* MatchDetailComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchDetailComponents.swift; sourceTree = "<group>"; };
 		46F5C0F02F50000100BBC906 /* MatchLineupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupModels.swift; sourceTree = "<group>"; };
 		46F5C0F22F50000100BBC907 /* MatchLineupComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchLineupComponents.swift; sourceTree = "<group>"; };
-		46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamVenueCatalog.swift; sourceTree = "<group>"; };
-		46F710A22F71000100BBC901 /* TeamVenues.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TeamVenues.json; sourceTree = "<group>"; };
 		46F5E0012F60000100BBC910 /* HomeEmptyMatchesPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEmptyMatchesPlaceholderView.swift; sourceTree = "<group>"; };
 		46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMatchesListSkeletonView.swift; sourceTree = "<group>"; };
+		46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamVenueCatalog.swift; sourceTree = "<group>"; };
+		46F710A22F71000100BBC901 /* TeamVenues.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TeamVenues.json; sourceTree = "<group>"; };
 		49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CollectionView+Builder.swift"; sourceTree = "<group>"; };
 		5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CompositionalLayout+Presets.swift"; sourceTree = "<group>"; };
 		742E5D7ABC53132ABE23C086 /* FormBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormBuilder.swift; sourceTree = "<group>"; };
@@ -1475,7 +1475,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
@@ -1508,7 +1508,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
