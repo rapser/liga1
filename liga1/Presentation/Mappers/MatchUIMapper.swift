@@ -10,10 +10,7 @@ import Foundation
 /// Mapper para convertir entre Match (Domain layer) y MatchUI (Presentation layer)
 struct MatchUIMapper {
 
-    /// Convierte una entidad de dominio Match a un modelo de presentación MatchUI
-    /// - Parameter domain: La entidad de dominio
-    /// - Returns: El modelo de presentación
-    static func toUI(from domain: Match, isFavorite: Bool = false) -> MatchUI {
+    static func toUI(from domain: Match) -> MatchUI {
         return MatchUI(
             id: domain.id,
             equipoLocalId: domain.equipoLocalId,
@@ -23,20 +20,18 @@ struct MatchUIMapper {
             golesEquipoVisitante: domain.golesEquipoVisitante,
             estado: domain.estado,
             suspendido: domain.suspendido,
-            isFavorite: isFavorite
+            arbitro: domain.arbitro,
+            estadio: domain.estadio,
+            capacidad: domain.capacidad,
+            canalesTV: domain.canalesTV,
+            liveStats: domain.liveStats
         )
     }
 
-    /// Convierte múltiples entidades de dominio a modelos de presentación
-    /// - Parameter domains: Array de entidades de dominio
-    /// - Returns: Array de modelos de presentación
     static func toUI(from domains: [Match]) -> [MatchUI] {
         return domains.map { toUI(from: $0) }
     }
 
-    /// Convierte un modelo de presentación MatchUI a una entidad de dominio Match
-    /// - Parameter ui: El modelo de presentación
-    /// - Returns: La entidad de dominio
     static func toDomain(from ui: MatchUI) -> Match {
         return Match(
             id: ui.id,
@@ -46,12 +41,12 @@ struct MatchUIMapper {
             golesEquipoLocal: ui.golesEquipoLocal,
             golesEquipoVisitante: ui.golesEquipoVisitante,
             estado: ui.estado,
-            suspendido: ui.suspendido
+            suspendido: ui.suspendido,
+            arbitro: ui.arbitro,
+            estadio: ui.estadio,
+            capacidad: ui.capacidad,
+            canalesTV: ui.canalesTV,
+            liveStats: ui.liveStats
         )
-    }
-    
-    /// Actualiza el estado de favorito de un MatchUI
-    static func updateFavorite(_ matchUI: inout MatchUI, isFavorite: Bool) {
-        matchUI.isFavorite = isFavorite
     }
 }

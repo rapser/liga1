@@ -14,14 +14,6 @@ class FavoritosViewController: UIViewController {
 
     // MARK: - UI Components
     private let containerView = ContainerView()
-    private let segmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["Partidos", "Equipos"])
-        control.selectedSegmentIndex = 0
-        control.selectedSegmentTintColor = .liga1Red
-        control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
-        control.setTitleTextAttributes([.foregroundColor: UIColor.liga1Red], for: .normal)
-        return control
-    }()
     private let tableView = UITableView(frame: .zero, style: .plain)
 
     // MARK: - Properties
@@ -29,7 +21,6 @@ class FavoritosViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Empty States
-    private let emptyMatchesView = EmptyStateView()
     private let emptyTeamsView = EmptyStateView()
     private let searchTeamButton: UIButton = {
         var config = UIButton.Configuration.filled()
@@ -87,82 +78,26 @@ class FavoritosViewController: UIViewController {
         )
         addButton.tintColor = .liga1Red
         navigationItem.rightBarButtonItem = addButton
-        navigationItem.rightBarButtonItem?.isHidden = true // Inicialmente oculto
     }
 
     private func setupUI() {
-        // Container principal
         containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
-        // Segmented Control
-        setupSegmentedControl()
-
-        // TableView
         setupTableView()
-
-        // Empty States
         setupEmptyStates()
-    }
-
-    private func setupSegmentedControl() {
-        segmentedControl.prepareForAutoLayout()
-        segmentedControl.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
-
-        containerView.addSubview(segmentedControl)
-
-        segmentedControl.anchor(
-            top: containerView.topAnchor,
-            leading: containerView.leadingAnchor,
-            trailing: containerView.trailingAnchor,
-            padding: UIEdgeInsets(
-                top: Spacing.medium,
-                left: Spacing.standard,
-                bottom: 0,
-                right: Spacing.standard
-            )
-        )
-        segmentedControl.height(32)
     }
 
     private func setupTableView() {
         tableView.prepareForAutoLayout()
-        tableView.registerCell(MatchTableViewCell.self)
         tableView.registerCell(TeamTableViewCell.self)
         tableView.delegate = self
         tableView.dataSource = self
 
         containerView.addSubview(tableView)
-
-        tableView.anchor(
-            top: segmentedControl.bottomAnchor,
-            leading: containerView.leadingAnchor,
-            bottom: containerView.bottomAnchor,
-            trailing: containerView.trailingAnchor,
-            padding: UIEdgeInsets(top: Spacing.medium, left: 0, bottom: 0, right: 0)
-        )
+        tableView.fillSuperview()
     }
 
     private func setupEmptyStates() {
-        // Configure empty matches
-        emptyMatchesView.configure(
-            systemImage: "star",
-            title: "Agrega tu primer partido",
-            message: "Ten todos los partidos importantes\nen un solo lugar"
-        )
-        emptyMatchesView.prepareForAutoLayout()
-        emptyMatchesView.isHidden = true
-
-        containerView.addSubview(emptyMatchesView)
-
-        emptyMatchesView.anchor(
-            top: segmentedControl.bottomAnchor,
-            leading: containerView.leadingAnchor,
-            bottom: containerView.bottomAnchor,
-            trailing: containerView.trailingAnchor,
-            padding: UIEdgeInsets(top: Spacing.medium, left: 0, bottom: 0, right: 0)
-        )
-
-        // Configure empty teams with button
         emptyTeamsView.configure(
             systemImage: "star",
             title: "Agrega tu primer equipo",
@@ -171,31 +106,16 @@ class FavoritosViewController: UIViewController {
         emptyTeamsView.prepareForAutoLayout()
         emptyTeamsView.isHidden = true
 
-        // Add search button to empty teams view
         searchTeamButton.prepareForAutoLayout()
         searchTeamButton.addTarget(self, action: #selector(searchTeamTapped), for: .touchUpInside)
         emptyTeamsView.addCustomView(searchTeamButton)
 
         containerView.addSubview(emptyTeamsView)
-
-        emptyTeamsView.anchor(
-            top: segmentedControl.bottomAnchor,
-            leading: containerView.leadingAnchor,
-            bottom: containerView.bottomAnchor,
-            trailing: containerView.trailingAnchor,
-            padding: UIEdgeInsets(top: Spacing.medium, left: 0, bottom: 0, right: 0)
-        )
+        emptyTeamsView.fillSuperview()
     }
 
     // MARK: - Data & Binding
     private func bindViewModel() {
-        viewModel.$matches
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.updateView()
-            }
-            .store(in: &cancellables)
-
         viewModel.$teams
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -222,30 +142,12 @@ class FavoritosViewController: UIViewController {
     private func updateView() {
         tableView.reloadData()
 
-        let isMatchesSegment = viewModel.selectedSegment == .matches
-        let hasMatches = !viewModel.matches.isEmpty
         let hasTeams = !viewModel.teams.isEmpty
-
-        // Mostrar botón "+" solo en la sección de Equipos
-        navigationItem.rightBarButtonItem?.isHidden = isMatchesSegment
-
-        if isMatchesSegment {
-            emptyMatchesView.isHidden = hasMatches
-            emptyTeamsView.isHidden = true
-            tableView.isHidden = !hasMatches
-        } else {
-            emptyMatchesView.isHidden = true
-            emptyTeamsView.isHidden = hasTeams
-            tableView.isHidden = !hasTeams
-        }
+        emptyTeamsView.isHidden = hasTeams
+        tableView.isHidden = !hasTeams
     }
 
     // MARK: - Actions
-
-    @objc private func segmentChanged() {
-        viewModel.selectedSegment = FavoritesSegment(rawValue: segmentedControl.selectedSegmentIndex) ?? .matches
-        updateView()
-    }
 
     @objc private func addTeamTapped() {
         searchTeamTapped()
@@ -277,30 +179,10 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.selectedSegment == .matches ? viewModel.matches.count : viewModel.teams.count
+        return viewModel.teams.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if viewModel.selectedSegment == .matches {
-            return configureMatchCell(at: indexPath)
-        } else {
-            return configureTeamCell(at: indexPath)
-        }
-    }
-
-    private func configureMatchCell(at indexPath: IndexPath) -> UITableViewCell {
-        let matchUI = viewModel.matches[indexPath.row]
-        let cell = tableView.dequeueReusableCell(MatchTableViewCell.self, for: indexPath)
-
-        let logoLocal = UIImage(named: matchUI.equipoLocalId ?? "shield.fill")
-        let logoVisitante = UIImage(named: matchUI.equipoVisitanteId ?? "shield.fill")
-
-        cell.delegate = self
-        cell.configure(with: matchUI, logoLocal: logoLocal, logoVisitante: logoVisitante)
-        return cell
-    }
-
-    private func configureTeamCell(at indexPath: IndexPath) -> UITableViewCell {
         let team = viewModel.teams[indexPath.row]
         let cell = tableView.dequeueReusableCell(TeamTableViewCell.self, for: indexPath)
 
@@ -311,40 +193,26 @@ extension FavoritosViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard (viewModel.selectedSegment == .matches && !viewModel.matches.isEmpty) ||
-              (viewModel.selectedSegment == .teams && !viewModel.teams.isEmpty) else {
+        guard !viewModel.teams.isEmpty else {
             return nil
         }
 
-        let containerView = UIView().background(.appBackground)
-        let titleText = viewModel.selectedSegment == .matches ? "Mis Partidos Favoritos" : "Mis Equipos Favoritos"
-
-        LayoutPresets.titleLabel(text: titleText, fontSize: 18)
-            .addTo(containerView)
+        let containerHeader = UIView().background(.appBackground)
+        LayoutPresets.titleLabel(text: "Mis Equipos Favoritos", fontSize: 18)
+            .addTo(containerHeader)
             .pinLeading(constant: Spacing.standard)
             .pinTop(constant: Spacing.small)
             .pinBottom(constant: Spacing.small)
 
-        return containerView
+        return containerHeader
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        let hasContent = viewModel.selectedSegment == .matches ? !viewModel.matches.isEmpty : !viewModel.teams.isEmpty
-        return hasContent ? 50 : 0
+        return viewModel.teams.isEmpty ? 0 : 50
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
-    }
-}
-
-// MARK: - MatchTableViewCellDelegate
-
-extension FavoritosViewController: MatchTableViewCellDelegate {
-    func didTapFavorite(cell: MatchTableViewCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let matchUI = viewModel.matches[indexPath.row]
-        viewModel.toggleFavorite(matchId: matchUI.id)
     }
 }
 
@@ -354,8 +222,6 @@ extension FavoritosViewController: TeamTableViewCellDelegate {
     func didTapFavorite(cell: TeamTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let team = viewModel.teams[indexPath.row]
-        // IMPORTANTE: Usar logo (código corto) en lugar de nombre para los topics
-        // Normalizar a minúsculas para asegurar consistencia con el backend
         let teamCode = team.logo.lowercased()
         viewModel.toggleFavoriteTeam(teamId: teamCode)
     }
@@ -365,8 +231,6 @@ extension FavoritosViewController: TeamTableViewCellDelegate {
 
 extension FavoritosViewController: TeamSearchModalDelegate {
     func didSelectTeam(_ team: TeamUI) {
-        // IMPORTANTE: Usar logo (código corto) en lugar de nombre para los topics
-        // Normalizar a minúsculas para asegurar consistencia con el backend
         let teamCode = team.logo.lowercased()
         viewModel.toggleFavoriteTeam(teamId: teamCode)
     }

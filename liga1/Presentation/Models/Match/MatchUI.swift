@@ -17,8 +17,12 @@ struct MatchUI {
     var golesEquipoVisitante: Int
     var estado: Match.EstadoMatch
     var suspendido: Bool
-    var isFavorite: Bool
-    
+    let arbitro: String?
+    let estadio: String?
+    let capacidad: String?
+    let canalesTV: [String]
+    let liveStats: MatchLiveStats?
+
     init(
         id: String,
         equipoLocalId: String? = nil,
@@ -28,30 +32,37 @@ struct MatchUI {
         golesEquipoVisitante: Int = 0,
         estado: Match.EstadoMatch = .pendiente,
         suspendido: Bool = false,
-        isFavorite: Bool = false
+        arbitro: String? = nil,
+        estadio: String? = nil,
+        capacidad: String? = nil,
+        canalesTV: [String] = [],
+        liveStats: MatchLiveStats? = nil
     ) {
         self.id = id
-        // Si no vienen los IDs pero tenemos el id, los extraemos
         if let localId = equipoLocalId {
             self.equipoLocalId = localId
         } else {
             let components = id.split(separator: "_")
             self.equipoLocalId = components.first.map(String.init)
         }
-        
+
         if let visitanteId = equipoVisitanteId {
             self.equipoVisitanteId = visitanteId
         } else {
             let components = id.split(separator: "_")
             self.equipoVisitanteId = components.count >= 2 ? String(components[1]) : nil
         }
-        
+
         self.fecha = fecha
         self.golesEquipoLocal = golesEquipoLocal
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
         self.suspendido = suspendido
-        self.isFavorite = isFavorite
+        self.arbitro = arbitro
+        self.estadio = estadio
+        self.capacidad = capacidad
+        self.canalesTV = canalesTV
+        self.liveStats = liveStats
     }
 
     var fechaFormateada: String {
@@ -90,18 +101,21 @@ struct MatchUI {
     }
 }
 
-// MARK: - Extensions
 extension MatchUI: Identifiable {}
 
 extension MatchUI: Equatable {
     static func == (lhs: MatchUI, rhs: MatchUI) -> Bool {
-        return lhs.id == rhs.id &&
-               lhs.fecha == rhs.fecha &&
-               lhs.golesEquipoLocal == rhs.golesEquipoLocal &&
-               lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
-               lhs.estado == rhs.estado &&
-               lhs.suspendido == rhs.suspendido &&
-               lhs.isFavorite == rhs.isFavorite
+        lhs.id == rhs.id &&
+            lhs.fecha == rhs.fecha &&
+            lhs.golesEquipoLocal == rhs.golesEquipoLocal &&
+            lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
+            lhs.estado == rhs.estado &&
+            lhs.suspendido == rhs.suspendido &&
+            lhs.arbitro == rhs.arbitro &&
+            lhs.estadio == rhs.estadio &&
+            lhs.capacidad == rhs.capacidad &&
+            lhs.canalesTV == rhs.canalesTV &&
+            lhs.liveStats == rhs.liveStats
     }
 }
 
@@ -113,6 +127,5 @@ extension MatchUI: Hashable {
         hasher.combine(golesEquipoVisitante)
         hasher.combine(estado)
         hasher.combine(suspendido)
-        hasher.combine(isFavorite)
     }
 }

@@ -7,11 +7,6 @@
 
 import UIKit
 
-/// Protocolo para comunicar eventos del adapter al ViewController
-protocol HomeTableViewAdapterDelegate: AnyObject {
-    func didTapFavorite(matchId: String, in jornadaId: String)
-}
-
 /// Adapter para separar la lógica de TableView del HomeViewController
 final class HomeTableViewAdapter: NSObject {
 
@@ -19,7 +14,11 @@ final class HomeTableViewAdapter: NSObject {
 
     private weak var tableView: UITableView?
     private var sections: [JornadaSection] = []
-    weak var delegate: HomeTableViewAdapterDelegate?
+
+    /// Se dispara al pulsar una fila de partido.
+    var onMatchSelected: ((JornadaSection, MatchUI) -> Void)?
+    /// Pulsar la franja de fecha en la cabecera de sección (el calendario principal está en la barra de navegación).
+    var onCalendarHeaderTapped: (() -> Void)?
 
     // MARK: - Initialization
 
@@ -43,6 +42,10 @@ final class HomeTableViewAdapter: NSObject {
         tableView?.delegate = self
         tableView?.registerCell(MatchTableViewCell.self)
     }
+
+    @objc private func handleCalendarHeaderTap() {
+        onCalendarHeaderTapped?()
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -61,11 +64,9 @@ extension HomeTableViewAdapter: UITableViewDataSource {
         let match = sections[indexPath.section].matches[indexPath.row]
         let cell = tableView.dequeueReusableCell(MatchTableViewCell.self, for: indexPath)
 
-        // Cargar logos según el equipo (usando optional binding)
         let logoLocal = match.equipoLocalId.flatMap { UIImage(named: $0) }
         let logoVisitante = match.equipoVisitanteId.flatMap { UIImage(named: $0) }
 
-        cell.delegate = self
         cell.configure(with: match, logoLocal: logoLocal, logoVisitante: logoVisitante)
         return cell
     }
@@ -74,6 +75,13 @@ extension HomeTableViewAdapter: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension HomeTableViewAdapter: UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let section = sections[indexPath.section]
+        let match = section.matches[indexPath.row]
+        onMatchSelected?(section, match)
+    }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let jornadaSection = sections[section]
@@ -93,19 +101,18 @@ extension HomeTableViewAdapter: UITableViewDelegate {
         fechaDiaLabel.font = .systemFont(ofSize: 16)
         fechaDiaLabel.textColor = .label
 
-        let calendarIcon = UIImageView(image: UIImage(systemName: "calendar"))
-        calendarIcon.tintColor = .secondaryLabel
-        calendarIcon.contentMode = .scaleAspectFit
-
         fechaDiaLabel
             .addTo(dateHeaderView)
             .pinLeading(constant: Spacing.standard)
-            .centerY()
-        calendarIcon
-            .addTo(dateHeaderView)
-            .square(20)
             .pinTrailing(constant: Spacing.standard)
             .centerY()
+
+        dateHeaderView.isUserInteractionEnabled = true
+        dateHeaderView.accessibilityTraits.insert(.button)
+        dateHeaderView.accessibilityLabel = "Elegir fecha de partidos"
+        dateHeaderView.accessibilityHint = "Muestra el calendario para ver partidos de otro día"
+        let tap = UITapGestureRecognizer(target: self, action: #selector(HomeTableViewAdapter.handleCalendarHeaderTap))
+        dateHeaderView.addGestureRecognizer(tap)
 
         let jornadaHeaderView = UIView()
         jornadaHeaderView.backgroundColor = .secondarySystemBackground
@@ -151,47 +158,33 @@ extension HomeTableViewAdapter: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 104 // 44 (header fecha) + 60 (header jornada)
+        return 104
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
     }
 
-    // Helper para formatear la fecha del header
+    private static var limaCalendar: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "America/Lima") ?? .current
+        return c
+    }
+
     private func formatDateForHeader(_ date: Date) -> String {
-        let calendar = Calendar.current
-        
+        let calendar = Self.limaCalendar
+
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "es_PE")
-        
-        // Si es hoy, mostrar "Hoy"
+        formatter.timeZone = calendar.timeZone
+
         if calendar.isDateInToday(date) {
             formatter.dateFormat = "dd.MM"
             return "Hoy \(formatter.string(from: date))"
         } else {
-            // Mostrar día de la semana + fecha
             formatter.dateFormat = "EEEE dd.MM"
             let fechaString = formatter.string(from: date)
-            // Capitalizar primera letra
             return fechaString.capitalized
         }
-    }
-}
-
-// MARK: - MatchTableViewCellDelegate
-
-extension HomeTableViewAdapter: MatchTableViewCellDelegate {
-    func didTapFavorite(cell: MatchTableViewCell) {
-        guard let tableView = tableView,
-              let indexPath = tableView.indexPath(for: cell) else { return }
-
-        let jornadaSection = sections[indexPath.section]
-        let match = jornadaSection.matches[indexPath.row]
-
-        // El ID completo incluye la jornada: "clausura_01_adt_utc"
-        let fullMatchId = "\(jornadaSection.jornadaId)_\(match.id)"
-
-        delegate?.didTapFavorite(matchId: fullMatchId, in: jornadaSection.jornadaId)
     }
 }

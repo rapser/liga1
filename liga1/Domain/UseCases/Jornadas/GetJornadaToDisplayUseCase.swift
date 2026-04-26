@@ -8,10 +8,10 @@
 import Foundation
 import Combine
 
-/// Use Case que devuelve la única jornada a mostrar en Home: la de menor fecha de inicio entre las activas (mostrar == true).
+/// Todas las jornadas con `mostrar == true` (el repositorio ya las filtra) para cargar partidos en Home.
 protocol GetJornadaToDisplayUseCaseProtocol {
-    func execute() -> AnyPublisher<Jornada?, Error>
-    func observe() -> AnyPublisher<Jornada?, Never>
+    func execute() -> AnyPublisher<[Jornada], Error>
+    func observe() -> AnyPublisher<[Jornada], Never>
 }
 
 final class GetJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol {
@@ -27,20 +27,24 @@ final class GetJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol {
         self.observeActiveJornadasUseCase = observeActiveJornadasUseCase
     }
 
-    func execute() -> AnyPublisher<Jornada?, Error> {
+    func execute() -> AnyPublisher<[Jornada], Error> {
         return fetchActiveJornadasUseCase.execute()
-            .map { Self.selectJornadaToDisplay(from: $0) }
+            .map { Self.orderJornadasForHome($0) }
             .eraseToAnyPublisher()
     }
 
-    func observe() -> AnyPublisher<Jornada?, Never> {
+    func observe() -> AnyPublisher<[Jornada], Never> {
         return observeActiveJornadasUseCase.execute()
-            .map { Self.selectJornadaToDisplay(from: $0) }
+            .map { Self.orderJornadasForHome($0) }
             .eraseToAnyPublisher()
     }
 
-    /// Regla de negocio: de las jornadas con mostrar == true, la de menor fecha de inicio.
-    static func selectJornadaToDisplay(from jornadas: [Jornada]) -> Jornada? {
-        return jornadas.min(by: { $0.fechaInicio < $1.fechaInicio })
+    /// Orden solo por torneo, número e id — sin usar `fechaInicio` (la fecha visible la elige el usuario en el calendario).
+    static func orderJornadasForHome(_ jornadas: [Jornada]) -> [Jornada] {
+        jornadas.sorted {
+            if $0.torneo != $1.torneo { return $0.torneo < $1.torneo }
+            if $0.numero != $1.numero { return $0.numero < $1.numero }
+            return $0.id < $1.id
+        }
     }
 }

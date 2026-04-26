@@ -8,82 +8,102 @@
 import Foundation
 import Combine
 
+extension HomeViewModel {
+    /// Cómo filtrar partidos en Inicio (estilo calendario por día, p. ej. Flashscore).
+    enum MatchDayMode: Equatable {
+        /// Hoy en Perú (UTC−5); puede quedar vacío si no hay partidos. Se recalcula en cada carga.
+        case today
+        /// Día elegido en el calendario (siempre interpretado en hora Perú).
+        case specificDay(Date)
+    }
+}
+
 class HomeViewModel {
 
     // MARK: - Published Properties
 
     @Published private(set) var jornadaSections: [JornadaSection] = []
-    @Published private(set) var isLoading: Bool = false
+    /// `true` al crear el VM evita mostrar el placeholder vacío un instante antes de la primera carga.
+    @Published private(set) var isLoading: Bool = true
+    /// Solo `true` tras al menos un ciclo de carga conocido; evita el placeholder si `observe` emite `[]` antes del fetch explícito.
+    @Published private(set) var canShowNoMatchesPlaceholder: Bool = false
     @Published private(set) var error: Error?
-    @Published private(set) var favoriteMatchIds: Set<String> = []
+    @Published private(set) var matchDayMode: MatchDayMode = .today
 
     // MARK: - Dependencies
 
     private let getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol
     private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
-    private let toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol
-    private let observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
 
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
+    private var fetchJornadaCancellable: AnyCancellable?
+    private var loadMatchesCancellable: AnyCancellable?
+    /// Evita aplicar resultados de cargas obsoletas si el usuario refresca seguido o cambia de fecha.
+    private var loadGeneration: Int = 0
+    private var hasReceivedFetchJornadasResponse = false
 
     // MARK: - Initialization
 
     init(
         getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol,
-        fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
-        toggleFavoriteUseCase: ToggleFavoriteUseCaseProtocol,
-        observeFavoritesUseCase: ObserveFavoritesUseCaseProtocol
+        fetchMatchesUseCase: FetchMatchesUseCaseProtocol
     ) {
         self.getJornadaToDisplayUseCase = getJornadaToDisplayUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase
-        self.toggleFavoriteUseCase = toggleFavoriteUseCase
-        self.observeFavoritesUseCase = observeFavoritesUseCase
 
         observeJornadaToDisplay()
-        observeFavorites()
     }
 
     // MARK: - Public Methods
 
+    func setMatchDayMode(_ mode: MatchDayMode) {
+        switch mode {
+        case .today:
+            matchDayMode = .today
+        case .specificDay(let d):
+            let norm = Self.limaStartOfDay(d)
+            let today = Self.limaStartOfDay(Date())
+            matchDayMode = (norm == today) ? .today : .specificDay(norm)
+        }
+        fetchActiveJornadas(force: true)
+    }
+
     func fetchActiveJornadas(force: Bool = false) {
-        guard !isLoading else { return }
+        fetchJornadaCancellable?.cancel()
+        /// No incrementar `loadGeneration` ni cancelar `loadMatches` aquí: si `observe()` emite
+        /// antes del `receiveValue` del fetch, la guarda antigua hacía que el fetch no cargara partidos
+        /// y el listado quedaba vacío hasta volver a disparar (p. ej. abriendo el calendario).
 
         isLoading = true
         error = nil
 
-        getJornadaToDisplayUseCase.execute()
+        fetchJornadaCancellable = getJornadaToDisplayUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    self?.error = error
-                }
-            } receiveValue: { [weak self] jornada in
-                guard let self = self else { return }
-
-                guard self.shouldReloadMatches(for: jornada, force: force) else {
+                guard let self else { return }
+                if case .failure(let err) = completion {
+                    self.error = err
+                    self.hasReceivedFetchJornadasResponse = true
                     self.isLoading = false
+                    self.canShowNoMatchesPlaceholder = true
+                }
+            } receiveValue: { [weak self] jornadas in
+                guard let self else { return }
+                self.hasReceivedFetchJornadasResponse = true
+
+                guard self.shouldReloadMatches(for: jornadas, force: force) else {
+                    self.isLoading = false
+                    self.canShowNoMatchesPlaceholder = true
                     return
                 }
 
-                self.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
+                self.loadMatchesCancellable?.cancel()
+                self.loadGeneration += 1
+                let generation = self.loadGeneration
+                self.loadMatchesForJornadas(jornadas, generation: generation, fromObserve: false)
             }
-            .store(in: &cancellables)
-    }
-
-    func toggleFavorite(matchId: String) {
-        toggleFavoriteUseCase.execute(matchId: matchId)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                if case .failure = completion {
-                    // Error silently handled
-                }
-            } receiveValue: { _ in
-                // Favorite toggled successfully
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: - Private Methods
@@ -91,73 +111,84 @@ class HomeViewModel {
     private func observeJornadaToDisplay() {
         getJornadaToDisplayUseCase.observe()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] jornada in
-                self?.loadMatchesForJornadas(jornada.map { [$0] } ?? [])
+            .sink { [weak self] jornadas in
+                guard let self else { return }
+                self.loadMatchesCancellable?.cancel()
+                self.loadGeneration += 1
+                let generation = self.loadGeneration
+                self.loadMatchesForJornadas(jornadas, generation: generation, fromObserve: true)
             }
             .store(in: &cancellables)
     }
 
-    private func observeFavorites() {
-        observeFavoritesUseCase.execute()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] favoriteIds in
-                self?.favoriteMatchIds = favoriteIds
-                self?.updateMatchesFavoriteStatus()
-            }
-            .store(in: &cancellables)
-    }
-
-    private func shouldReloadMatches(for jornada: Jornada?, force: Bool) -> Bool {
+    private func shouldReloadMatches(for jornadas: [Jornada], force: Bool) -> Bool {
         if force { return true }
 
-        let currentJornadaId = jornadaSections.first?.jornadaId
-        let incomingJornadaId = jornada?.id
-
-        switch (incomingJornadaId, currentJornadaId) {
-        case let (newId?, currentId?):
-            return newId != currentId
-        case (nil, nil):
-            return false
-        default:
-            return true
-        }
+        let incoming = Set(jornadas.map(\.id))
+        let current = Set(jornadaSections.map(\.jornadaId))
+        return incoming != current
     }
 
-    private func loadMatchesForJornadas(_ jornadas: [Jornada]) {
+    private func loadMatchesForJornadas(_ jornadas: [Jornada], generation: Int, fromObserve: Bool) {
+        loadMatchesCancellable?.cancel()
+
         guard !jornadas.isEmpty else {
-            jornadaSections = []
+            if generation == loadGeneration {
+                jornadaSections = []
+            }
+            let shouldRevealEmptyState = !fromObserve || hasReceivedFetchJornadasResponse
+            if shouldRevealEmptyState {
+                isLoading = false
+                canShowNoMatchesPlaceholder = true
+            }
             return
         }
 
-        
+        let day = calendarDayForFetch()
         let publishers = jornadas.map { jornada -> AnyPublisher<(Jornada, [Match]), Error> in
-            return fetchMatchesUseCase.execute(for: jornada.id)
-                .map { matches in
-                    return (jornada, matches)
-                }
+            fetchMatchesUseCase.execute(for: jornada.id, calendarDay: day)
+                .map { matches in (jornada, matches) }
                 .eraseToAnyPublisher()
         }
 
-        Publishers.MergeMany(publishers)
+        loadMatchesCancellable = Publishers.MergeMany(publishers)
             .collect()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.error = error
+                guard let self else { return }
+                guard generation == self.loadGeneration else { return }
+                if case .failure(let err) = completion {
+                    self.error = err
                 }
+                self.isLoading = false
+                self.canShowNoMatchesPlaceholder = true
             } receiveValue: { [weak self] results in
-                self?.processJornadasWithMatches(results)
+                guard let self else { return }
+                guard generation == self.loadGeneration else { return }
+                self.processJornadasWithMatches(results)
+                self.canShowNoMatchesPlaceholder = true
             }
-            .store(in: &cancellables)
+    }
+
+    private static func limaStartOfDay(_ date: Date) -> Date {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "America/Lima") ?? .current
+        return cal.startOfDay(for: date)
+    }
+
+    private func calendarDayForFetch() -> Date {
+        switch matchDayMode {
+        case .today:
+            return Self.limaStartOfDay(Date())
+        case .specificDay(let d):
+            return d
+        }
     }
 
     private func processJornadasWithMatches(_ results: [(Jornada, [Match])]) {
         var tempSections: [JornadaSection] = []
 
         for (jornada, matches) in results {
-            
-            // Convertir Match a MatchUI usando el mapper
-            // Primero convertir sin favoriteIds, luego actualizar en updateMatchesFavoriteStatus
             let matchUIs = MatchUIMapper.toUI(from: matches)
 
             let section = JornadaSection(
@@ -169,24 +200,8 @@ class HomeViewModel {
             tempSections.append(section)
         }
 
-        // Ordenar secciones por número de jornada ascendente (fecha más próxima primero)
-        jornadaSections = tempSections.sorted { $0.numero < $1.numero }
-        
-        // Actualizar el estado de favoritos después de crear las secciones
-        updateMatchesFavoriteStatus()
-    }
-
-    private func updateMatchesFavoriteStatus() {
-        // Actualizar el estado de favoritos en cada sección
-        for (index, section) in jornadaSections.enumerated() {
-            var updatedMatches = section.matches
-            for (matchIndex, matchUI) in updatedMatches.enumerated() {
-                // El ID completo incluye la jornada
-                let fullMatchId = "\(section.jornadaId)_\(matchUI.id)"
-                let isFav = favoriteMatchIds.contains(fullMatchId)
-                updatedMatches[matchIndex].isFavorite = isFav
-            }
-            jornadaSections[index].matches = updatedMatches
-        }
+        jornadaSections = tempSections
+            .sorted { $0.numero < $1.numero }
+            .filter { !$0.matches.isEmpty }
     }
 }
