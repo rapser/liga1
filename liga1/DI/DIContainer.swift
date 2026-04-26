@@ -166,24 +166,6 @@ final class DIContainer {
 
     // MARK: - Use Cases - Favorites
 
-    func makeToggleFavoriteUseCase() -> ToggleFavoriteUseCaseProtocol {
-        return ToggleFavoriteUseCase(
-            service: makeFavoritesService()
-        )
-    }
-
-    func makeObserveFavoritesUseCase() -> ObserveFavoritesUseCaseProtocol {
-        return ObserveFavoritesUseCase(
-            service: makeFavoritesService()
-        )
-    }
-
-    func makeFetchFavoriteMatchesUseCase() -> FetchFavoriteMatchesUseCaseProtocol {
-        return FetchFavoriteMatchesUseCase(
-            matchesRepository: makeMatchesRepository()
-        )
-    }
-
     func makeToggleFavoriteTeamUseCase() -> ToggleFavoriteTeamUseCaseProtocol {
         return ToggleFavoriteTeamUseCase(
             service: makeFavoritesService()
@@ -221,9 +203,7 @@ final class DIContainer {
     func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(
             getJornadaToDisplayUseCase: makeGetJornadaToDisplayUseCase(),
-            fetchMatchesUseCase: makeFetchMatchesUseCase(),
-            toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
-            observeFavoritesUseCase: makeObserveFavoritesUseCase()
+            fetchMatchesUseCase: makeFetchMatchesUseCase()
         )
     }
 
@@ -241,9 +221,6 @@ final class DIContainer {
 
     func makeFavoritosViewModel() -> FavoritosViewModel {
         return FavoritosViewModel(
-            fetchFavoriteMatchesUseCase: makeFetchFavoriteMatchesUseCase(),
-            toggleFavoriteUseCase: makeToggleFavoriteUseCase(),
-            observeFavoritesUseCase: makeObserveFavoritesUseCase(),
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
             toggleFavoriteTeamUseCase: makeToggleFavoriteTeamUseCase(),
             observeFavoriteTeamsUseCase: makeObserveFavoriteTeamsUseCase(),
@@ -271,7 +248,12 @@ final class DIContainer {
     // MARK: - ViewControllers
 
     func makeHomeViewController() -> HomeViewController {
-        return HomeViewController(viewModel: makeHomeViewModel())
+        return HomeViewController(viewModel: makeHomeViewModel(), container: self)
+    }
+
+    func makeMatchDetailViewController(context: MatchDetailContext) -> MatchDetailViewController {
+        let vm = MatchDetailViewModel(context: context)
+        return MatchDetailViewController(viewModel: vm)
     }
 
     func makeTablaViewController() -> TablaViewController {

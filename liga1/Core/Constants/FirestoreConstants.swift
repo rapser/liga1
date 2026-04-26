@@ -39,6 +39,8 @@ public enum FirestoreConstants {
         public static let golesTeamB = "golesTeamB"
         public static let estado = "estado"
         public static let suspendido = "suspendido"
+        /// Opcional. Nombre del árbitro por partido (mismo documento que `moq_caj`, etc.). No requerido en jornadas antiguas.
+        public static let arbitro = "arbitro"
     }
 
     // MARK: - Match States
@@ -56,7 +58,6 @@ public enum FirestoreConstants {
     public enum TeamField {
         public static let name = "name"
         public static let city = "city"
-        public static let stadium = "stadium"
         public static let matchesPlayed = "matchesPlayed"
         public static let matchesWon = "matchesWon"
         public static let matchesDrawn = "matchesDrawn"

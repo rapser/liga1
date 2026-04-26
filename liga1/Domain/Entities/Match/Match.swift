@@ -12,11 +12,17 @@ struct Match {
     let id: String
     let equipoLocalId: String?
     let equipoVisitanteId: String?
+    /// Instante del partido; en datos se usa hora Perú (UTC−5 / PET).
     let fecha: Date
     var golesEquipoLocal: Int
     var golesEquipoVisitante: Int
     var estado: EstadoMatch
     var suspendido: Bool
+    let arbitro: String?
+    let estadio: String?
+    let capacidad: String?
+    let canalesTV: [String]
+    let liveStats: MatchLiveStats?
 
     init(
         id: String,
@@ -26,16 +32,19 @@ struct Match {
         golesEquipoLocal: Int = 0,
         golesEquipoVisitante: Int = 0,
         estado: EstadoMatch = .pendiente,
-        suspendido: Bool = false
+        suspendido: Bool = false,
+        arbitro: String? = nil,
+        estadio: String? = nil,
+        capacidad: String? = nil,
+        canalesTV: [String] = [],
+        liveStats: MatchLiveStats? = nil
     ) {
-        // Si el id viene vacío pero tenemos los IDs de equipos, construimos el id
         if id.isEmpty, let localId = equipoLocalId, let visitanteId = equipoVisitanteId {
             self.id = "\(localId)_\(visitanteId)"
             self.equipoLocalId = localId
             self.equipoVisitanteId = visitanteId
         } else {
             self.id = id
-            // Si no vienen los IDs de equipos pero tenemos el id, los extraemos
             if equipoLocalId == nil || equipoVisitanteId == nil {
                 let components = id.split(separator: "_")
                 self.equipoLocalId = components.first.map(String.init)
@@ -45,15 +54,19 @@ struct Match {
                 self.equipoVisitanteId = equipoVisitanteId
             }
         }
-        
+
         self.fecha = fecha
         self.golesEquipoLocal = golesEquipoLocal
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
         self.suspendido = suspendido
+        self.arbitro = arbitro
+        self.estadio = estadio
+        self.capacidad = capacidad
+        self.canalesTV = canalesTV
+        self.liveStats = liveStats
     }
 
-    // Enum para estado del partido
     enum EstadoMatch: String, Codable {
         case pendiente
         case envivo
@@ -63,15 +76,19 @@ struct Match {
     }
 }
 
-// MARK: - Extensions
 extension Match: Equatable {
     static func == (lhs: Match, rhs: Match) -> Bool {
-        return lhs.id == rhs.id &&
-               lhs.fecha == rhs.fecha &&
-               lhs.golesEquipoLocal == rhs.golesEquipoLocal &&
-               lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
-               lhs.estado == rhs.estado &&
-               lhs.suspendido == rhs.suspendido
+        lhs.id == rhs.id &&
+            lhs.fecha == rhs.fecha &&
+            lhs.golesEquipoLocal == rhs.golesEquipoLocal &&
+            lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
+            lhs.estado == rhs.estado &&
+            lhs.suspendido == rhs.suspendido &&
+            lhs.arbitro == rhs.arbitro &&
+            lhs.estadio == rhs.estadio &&
+            lhs.capacidad == rhs.capacidad &&
+            lhs.canalesTV == rhs.canalesTV &&
+            lhs.liveStats == rhs.liveStats
     }
 }
 

@@ -18,18 +18,20 @@ struct TeamMapper {
         // Ignorar dto.logo porque puede contener el nombre completo en lugar del código
         let logo = documentID ?? dto.logo ?? ""
         
+        let golesFavor = dto.goalsScored ?? 0
+        let golesContra = dto.goalsAgainst ?? 0
+        // `stadium` ya no se lee de Firestore; cancha se muestra vía `TeamVenues` en el detalle de partido.
         return Team(
             nombre: dto.name ?? "",
             ciudad: dto.city ?? "",
-            estadio: dto.stadium ?? "",
             logo: logo,
             partidosJugados: dto.matchesPlayed ?? 0,
             partidosGanados: dto.matchesWon ?? 0,
             partidosEmpatados: dto.matchesDrawn ?? 0,
             partidosPerdidos: dto.matchesLost ?? 0,
-            golesFavor: dto.goalsScored ?? 0,
-            golesContra: dto.goalsAgainst ?? 0,
-            diferenciaGoles: dto.goalDifference ?? 0,
+            golesFavor: golesFavor,
+            golesContra: golesContra,
+            diferenciaGoles: golesFavor - golesContra,
             puntos: dto.points ?? 0
         )
     }
@@ -40,7 +42,6 @@ struct TeamMapper {
             id: nil,  // ID se genera en Firestore
             name: domain.nombre,
             city: domain.ciudad,
-            stadium: domain.estadio,
             logo: domain.logo,
             matchesPlayed: domain.partidosJugados,
             matchesWon: domain.partidosGanados,

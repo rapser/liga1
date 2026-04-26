@@ -50,7 +50,7 @@ class ProfileViewController: UIViewController {
     // MARK: - Setup Methods
     private func configureNavigationBar() {
         view.backgroundColor = .appBackground
-        title = "Configuración"
+        title = "Ajustes"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
     }
@@ -217,6 +217,9 @@ class ProfileViewController: UIViewController {
     // MARK: - Actions
     func handleAction(_ action: ProfileViewModel.ProfileAction) {
         switch action {
+        case .favorites:
+            let favoritosVC = container.makeFavoritosViewController()
+            navigationController?.pushViewController(favoritosVC, animated: true)
         case .notification:
             openNotificationSettings()
         case .notificationHistory:

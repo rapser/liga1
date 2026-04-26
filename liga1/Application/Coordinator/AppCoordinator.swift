@@ -69,13 +69,27 @@ final class AppCoordinator: Coordinator {
                 showMainFlow()
             }
         } else {
-            // No hay usuario - mostrar login flow si aún no está mostrándose
-            if !(window.rootViewController is UINavigationController) {
-                logger.info(isInitialState ? "ℹ️ Estado inicial: No hay usuario - navegando a Login Flow" : "ℹ️ No hay usuario autenticado - navegando a Login Flow")
-                childCoordinators.removeAll()
-                showLoginFlow()
+            // Firebase puede emitir nil un instante antes de restaurar la sesión en frío.
+            // Diferir la decisión de login evita un flash de Login → Main al abrir la app.
+            if isInitialState {
+                DispatchQueue.main.async { [weak self] in
+                    self?.attemptShowLoginIfStillLoggedOut()
+                }
+                return
             }
+            attemptShowLoginIfStillLoggedOut()
         }
+    }
+
+    /// Solo muestra login si `currentUser` sigue siendo nil y no estamos ya en el nav de login.
+    private func attemptShowLoginIfStillLoggedOut() {
+        guard AuthManager.shared.currentUserId == nil else { return }
+        if window.rootViewController is UINavigationController {
+            return
+        }
+        logger.info("ℹ️ No hay usuario autenticado - navegando a Login Flow")
+        childCoordinators.removeAll()
+        showLoginFlow()
     }
 
     private func handleLoginSuccess() {

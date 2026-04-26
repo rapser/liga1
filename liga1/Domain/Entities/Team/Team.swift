@@ -65,3 +65,15 @@ extension Team: Hashable {
         hasher.combine(ciudad)
     }
 }
+
+// MARK: - Tabla de posiciones (Liga 1)
+extension Team {
+    /// Orden: puntos (↓) > diferencia de goles (↓) > goles a favor (↓) > menos partidos jugados (↑) > nombre.
+    static func isOrderedAboveInStandings(_ a: Team, _ b: Team) -> Bool {
+        if a.puntos != b.puntos { return a.puntos > b.puntos }
+        if a.diferenciaGoles != b.diferenciaGoles { return a.diferenciaGoles > b.diferenciaGoles }
+        if a.golesFavor != b.golesFavor { return a.golesFavor > b.golesFavor }
+        if a.partidosJugados != b.partidosJugados { return a.partidosJugados < b.partidosJugados }
+        return a.nombre.localizedCaseInsensitiveCompare(b.nombre) == .orderedAscending
+    }
+}
