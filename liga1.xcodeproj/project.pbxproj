@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -84,6 +84,7 @@
 		46B2E9432F2DB2C800EB66B3 /* AppEventBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */; };
 		46B2E9442F2DB2C800EB66B3 /* AppEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */; };
 		46B2E9452F2DB2C800EB66B3 /* AppEventBusProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */; };
+		46B3EF412FBA7F8400F1453E /* FavoritosSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3EF402FBA7F8400F1453E /* FavoritosSkeletonView.swift */; };
 		46C3EB082F2942BF00E9EA0C /* NotificationDeduplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */; };
 		46C3EB1C2F2B128D00E9EA0C /* AppKit+Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB162F2B128D00E9EA0C /* AppKit+Examples.swift */; };
 		46C3EB1D2F2B128D00E9EA0C /* UIStackView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C3EB142F2B128D00E9EA0C /* UIStackView+Builder.swift */; };
@@ -159,6 +160,16 @@
 		D1B1041D3319FD746525F468 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916B96B6731A88F34AC09FDD /* AppColors.swift */; };
 		FF409DC8133AFDA3B8ED267E /* FormBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742E5D7ABC53132ABE23C086 /* FormBuilder.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		46B3EF4A2FBAAA8A00F1453E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46D995872C6E90EC00D4951C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 46D9958E2C6E90EC00D4951C;
+			remoteInfo = liga1;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		46C8746F2F1C2BC7008C3619 /* Embed Foundation Extensions */ = {
@@ -245,6 +256,8 @@
 		46B2E93F2F2DB2C800EB66B3 /* AppEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEvent.swift; sourceTree = "<group>"; };
 		46B2E9402F2DB2C800EB66B3 /* AppEventBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEventBus.swift; sourceTree = "<group>"; };
 		46B2E9412F2DB2C800EB66B3 /* AppEventBusProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEventBusProtocol.swift; sourceTree = "<group>"; };
+		46B3EF402FBA7F8400F1453E /* FavoritosSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritosSkeletonView.swift; sourceTree = "<group>"; };
+		46B3EF462FBAAA8A00F1453E /* liga1Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = liga1Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		46C3EB062F2942BF00E9EA0C /* NotificationDeduplicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeduplicator.swift; sourceTree = "<group>"; };
 		46C3EB0C2F2B128D00E9EA0C /* ContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerView.swift; sourceTree = "<group>"; };
 		46C3EB0D2F2B128D00E9EA0C /* HeaderViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderViews.swift; sourceTree = "<group>"; };
@@ -320,7 +333,18 @@
 		CAE86397D312558B0952F475 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		46B3EF472FBAAA8A00F1453E /* liga1Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = liga1Tests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		46B3EF432FBAAA8A00F1453E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		46D9958C2C6E90EC00D4951C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -700,6 +724,7 @@
 		464009DE2F098DF600A8C905 /* Favoritos */ = {
 			isa = PBXGroup;
 			children = (
+				46B3EF402FBA7F8400F1453E /* FavoritosSkeletonView.swift */,
 				46C8745C2F1C0576008C3619 /* TeamSearchModalViewController.swift */,
 				464009DD2F098DF600A8C905 /* FavoritosViewController.swift */,
 			);
@@ -1031,6 +1056,7 @@
 			isa = PBXGroup;
 			children = (
 				46D995912C6E90EC00D4951C /* liga1 */,
+				46B3EF472FBAAA8A00F1453E /* liga1Tests */,
 				46D995902C6E90EC00D4951C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1039,6 +1065,7 @@
 			isa = PBXGroup;
 			children = (
 				46D9958F2C6E90EC00D4951C /* liga1.app */,
+				46B3EF462FBAAA8A00F1453E /* liga1Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1103,6 +1130,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		46B3EF452FBAAA8A00F1453E /* liga1Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 46B3EF4C2FBAAA8A00F1453E /* Build configuration list for PBXNativeTarget "liga1Tests" */;
+			buildPhases = (
+				46B3EF422FBAAA8A00F1453E /* Sources */,
+				46B3EF432FBAAA8A00F1453E /* Frameworks */,
+				46B3EF442FBAAA8A00F1453E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				46B3EF4B2FBAAA8A00F1453E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				46B3EF472FBAAA8A00F1453E /* liga1Tests */,
+			);
+			name = liga1Tests;
+			packageProductDependencies = (
+			);
+			productName = liga1Tests;
+			productReference = 46B3EF462FBAAA8A00F1453E /* liga1Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		46D9958E2C6E90EC00D4951C /* liga1 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 46D995A32C6E90EE00D4951C /* Build configuration list for PBXNativeTarget "liga1" */;
@@ -1141,9 +1191,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					46B3EF452FBAAA8A00F1453E = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 46D9958E2C6E90EC00D4951C;
+					};
 					46D9958E2C6E90EC00D4951C = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -1168,11 +1222,19 @@
 			projectRoot = "";
 			targets = (
 				46D9958E2C6E90EC00D4951C /* liga1 */,
+				46B3EF452FBAAA8A00F1453E /* liga1Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		46B3EF442FBAAA8A00F1453E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		46D9958D2C6E90EC00D4951C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1187,6 +1249,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		46B3EF422FBAAA8A00F1453E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		46D9958B2C6E90EC00D4951C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1285,6 +1354,7 @@
 				464001CD2F08853F00A8C905 /* MatchesRepository.swift in Sources */,
 				46CDF4AB2F1086F100F280E6 /* NewsRepositoryProtocol.swift in Sources */,
 				46CDF4AD2F1086F100F280E6 /* MatchesRepositoryProtocol.swift in Sources */,
+				46B3EF412FBA7F8400F1453E /* FavoritosSkeletonView.swift in Sources */,
 				46C8745D2F1C0576008C3619 /* TeamSearchModalViewController.swift in Sources */,
 				46CDF4AE2F1086F100F280E6 /* JornadasRepositoryProtocol.swift in Sources */,
 				46CDF4AF2F1086F100F280E6 /* TeamsRepositoryProtocol.swift in Sources */,
@@ -1332,6 +1402,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		46B3EF4B2FBAAA8A00F1453E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 46D9958E2C6E90EC00D4951C /* liga1 */;
+			targetProxy = 46B3EF4A2FBAAA8A00F1453E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		46D9959D2C6E90EE00D4951C /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -1344,6 +1422,50 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		46B3EF4D2FBAAA8A00F1453E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8AJBS923B3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rapser.liga1Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/liga1.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/liga1";
+			};
+			name = Debug;
+		};
+		46B3EF4E2FBAAA8A00F1453E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8AJBS923B3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rapser.liga1Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/liga1.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/liga1";
+			};
+			name = Release;
+		};
 		46D995A12C6E90EE00D4951C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1536,6 +1658,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		46B3EF4C2FBAAA8A00F1453E /* Build configuration list for PBXNativeTarget "liga1Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				46B3EF4D2FBAAA8A00F1453E /* Debug */,
+				46B3EF4E2FBAAA8A00F1453E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		46D9958A2C6E90EC00D4951C /* Build configuration list for PBXProject "liga1" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -5,6 +5,33 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.0.0 (20)] - 2026-05-19
+
+### ✨ Added
+- **FavoritosSkeletonView**: Nueva vista de carga animada (pulse opacity) en la pantalla Favoritos que imita el layout de `TeamTableViewCell` (logo + nombre + estrella) para eliminar el flash de "sin datos" durante la carga inicial.
+- **Unit Tests — Use Cases**: Suite completa de 21 archivos de test en `liga1Tests/` que cubre los 11 use cases del dominio:
+  - Mocks: `MockJornadasRepository`, `MockMatchesRepository`, `MockTeamsRepository`, `MockNewsRepository`, `MockFavoritesService`, `MockUserPreferencesService`, `MockNotificationTopicManager`, `MockLogger`.
+  - Helpers: `XCTestCase+Combine` (helpers `awaitValue`, `awaitFirstValue`, `awaitCompletion`, `awaitFailure`) y `EntityFixtures` (factories de entidades + `limaDate(year:month:day:hour:minute:)`).
+  - Tests: `FetchActiveJornadasUseCaseTests`, `ObserveActiveJornadasUseCaseTests`, `GetJornadaToDisplayUseCaseTests`, `FetchMatchesUseCaseTests`, `ObserveMatchesUseCaseTests`, `FetchTeamsUseCaseTests`, `FetchNewsUseCaseTests`, `ObserveFavoriteTeamsUseCaseTests`, `ToggleFavoriteTeamUseCaseTests`, `ObserveUserPreferencesUseCaseTests`, `UpdatePushNotificationsEnabledUseCaseTests`.
+
+### 🔧 Changed
+- **Tabla de Posiciones — Leyenda de Campeón**: La posición 1 muestra un cuadrado dorado alrededor del número (sin punto) con fondo dorado y texto en negrita. Se agrega un footer con la leyenda "Campeón del Torneo Apertura" al final de la tabla.
+- **Favoritos — Carga inicial**: `FavoritosViewModel.isLoading` arranca en `true` para que el skeleton aparezca de inmediato sin parpadear el estado vacío.
+- **FavoritesService — Caché primero**: `fetchFavoriteTeams()` consulta Firestore en `.cache` primero; si hay datos los emite de inmediato y actualiza en background con `.server`. Elimina el flash de pantalla vacía.
+- **TeamsRepository — Caché primero**: `fetchTeams(for:)` sigue la misma estrategia: caché instantánea + refresh en background desde `.server`.
+- **Modal de Calendario**: El selector de fechas del Home ahora respeta el modo claro/oscuro del sistema. Se eliminaron todos los colores hardcodeados (enum `Palette` y `overrideUserInterfaceStyle = .dark`) y se reemplazaron por colores semánticos de UIKit (`.systemBackground`, `.label`, `.separator`, `.secondarySystemFill`, `.liga1Red`).
+
+### 🐛 Fixed
+- **Carga de partidos al primer arranque**: El primer arranque de la app mostraba la pantalla vacía; había una condición de carrera entre `JornadasRepository.fetchFromServer()` (refresh en background de caché) y `HomeViewModel.observeJornadaToDisplay()` que cancelaba la carga en vuelo y dejaba `isLoading = true` sin resolverse. Soluciones aplicadas:
+  - `JornadasRepository.fetchFromServer()`: solo envía a `jornadasSubject` si los IDs de jornadas cambian (evita disparos spurios del observer).
+  - `HomeViewModel.observeJornadaToDisplay()`: deduplica por IDs de jornadas antes de cancelar la carga en vuelo.
+  - `HomeViewModel.loadMatchesForJornadas()`: establece `isLoading = false` en `receiveValue` además de en `receiveCompletion` para evitar que una generación obsoleta deje el estado colgado.
+
+### 🏗️ Refactor
+- **HomeViewModel**: Añadido `lastObservedJornadaIds: Set<String>` para deduplicar actualizaciones del observer sin cancelar cargas válidas en progreso.
+
+---
+
 ## [1.0.0 (16)] - 2026-03-07
 
 ### ✨ Added
