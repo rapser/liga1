@@ -227,15 +227,9 @@ class HomeViewController: UIViewController {
     }
 }
 
-// MARK: - Calendario lista nativa (±7 días, estilo oscuro tipo referencia)
+// MARK: - Calendario lista nativa (±7 días)
 
 private final class HomeCalendarDayListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-
-    private enum Palette {
-        static let sheetBackground = UIColor(red: 11 / 255, green: 22 / 255, blue: 33 / 255, alpha: 1)
-        static let rowSelected = UIColor(red: 20 / 255, green: 40 / 255, blue: 61 / 255, alpha: 1)
-        static let separator = UIColor.white.withAlphaComponent(0.12)
-    }
 
     private static var limaCalendar: Calendar {
         var c = Calendar(identifier: .gregorian)
@@ -268,8 +262,7 @@ private final class HomeCalendarDayListViewController: UIViewController, UITable
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        overrideUserInterfaceStyle = .dark
-        view.backgroundColor = Palette.sheetBackground
+        view.backgroundColor = .systemBackground
         title = "Calendario"
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(
@@ -278,7 +271,7 @@ private final class HomeCalendarDayListViewController: UIViewController, UITable
             target: self,
             action: #selector(closeTapped)
         )
-        navigationItem.rightBarButtonItem?.tintColor = .white
+        navigationItem.rightBarButtonItem?.tintColor = .label
 
         buildDayRange()
         if !dayRange.contains(where: { calendar.startOfDay(for: $0) == highlightedDay }) {
@@ -286,8 +279,8 @@ private final class HomeCalendarDayListViewController: UIViewController, UITable
         }
 
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.backgroundColor = Palette.sheetBackground
-        tableView.separatorColor = Palette.separator
+        tableView.backgroundColor = .systemBackground
+        tableView.separatorColor = .separator
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         tableView.dataSource = self
         tableView.delegate = self
@@ -312,16 +305,14 @@ private final class HomeCalendarDayListViewController: UIViewController, UITable
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        configureNavBarDark()
-        navigationController?.navigationBar.tintColor = .white
+        configureNavBar()
+        navigationController?.navigationBar.tintColor = .liga1Red
     }
 
-    private func configureNavBarDark() {
+    private func configureNavBar() {
         let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = Palette.sheetBackground
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.shadowColor = .clear
+        appearance.configureWithDefaultBackground()
+        appearance.shadowColor = .separator
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
         navigationItem.compactAppearance = appearance
@@ -348,7 +339,7 @@ private final class HomeCalendarDayListViewController: UIViewController, UITable
         let button = UIButton(type: .system)
         button.setTitle("Volver a hoy", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
-        button.setTitleColor(UIColor.white.withAlphaComponent(0.85), for: .normal)
+        button.tintColor = .liga1Red
         button.addAction(UIAction { [weak self] _ in
             guard let self else { return }
             let reset = self.onResetToToday
@@ -380,7 +371,7 @@ private final class HomeCalendarDayListViewController: UIViewController, UITable
         let isToday = dayStart == todayStart
         let isHighlighted = dayStart == highlightedDay
         cell.configure(isToday: isToday, subtitleDate: day, isHighlighted: isHighlighted)
-        cell.backgroundColor = isHighlighted ? Palette.rowSelected : Palette.sheetBackground
+        cell.backgroundColor = isHighlighted ? .secondarySystemFill : .systemBackground
         return cell
     }
 
@@ -409,11 +400,11 @@ private final class CalendarDayPickerCell: UITableViewCell {
         contentView.backgroundColor = .clear
 
         accentBar.translatesAutoresizingMaskIntoConstraints = false
-        accentBar.backgroundColor = .white
+        accentBar.backgroundColor = .liga1Red
         accentBar.isHidden = true
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.textColor = .white
+        titleLabel.textColor = .label
         titleLabel.font = .systemFont(ofSize: 16, weight: .regular)
 
         contentView.addSubview(accentBar)
@@ -441,6 +432,7 @@ private final class CalendarDayPickerCell: UITableViewCell {
         if isToday {
             titleLabel.text = "HOY"
             titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+            titleLabel.textColor = isHighlighted ? .liga1Red : .label
         } else {
             let df = DateFormatter()
             df.locale = Locale(identifier: "es_PE")
@@ -451,6 +443,7 @@ private final class CalendarDayPickerCell: UITableViewCell {
             let wPart = df.string(from: subtitleDate).capitalized
             titleLabel.text = "\(dPart) \(wPart)"
             titleLabel.font = .systemFont(ofSize: 16, weight: .regular)
+            titleLabel.textColor = .label
         }
     }
 }
