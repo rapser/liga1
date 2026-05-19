@@ -84,6 +84,12 @@ class JornadasRepository: JornadasRepositoryProtocol {
             }
 
             let jornadas = self.processJornadaDocuments(documents)
+            // Solo notificar si el conjunto de jornadas activas cambió; si el servidor devuelve
+            // los mismos datos que ya hay en caché, evitar disparar el observer y cancelar
+            // cargas de partidos que ya están en vuelo.
+            let currentIds = Set(self.jornadasSubject.value.map(\.id))
+            let newIds = Set(jornadas.map(\.id))
+            guard newIds != currentIds else { return }
             self.jornadasSubject.send(jornadas)
         }
     }
