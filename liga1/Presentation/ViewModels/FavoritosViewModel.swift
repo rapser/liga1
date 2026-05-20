@@ -16,7 +16,9 @@ class FavoritosViewModel {
 
     @Published private(set) var teams: [TeamUI] = []
     @Published private(set) var allTeams: [TeamUI] = []
-    @Published private(set) var isLoading: Bool = false
+    /// `true` desde el init para que el skeleton aparezca de inmediato y nunca
+    /// se vea el placeholder de "sin favoritos" antes de conocer el resultado real.
+    @Published private(set) var isLoading: Bool = true
     @Published private(set) var error: Error?
     @Published private(set) var favoriteTeamIds: Set<String> = []
 
@@ -83,7 +85,6 @@ class FavoritosViewModel {
     }
 
     private func fetchAllTeams() {
-        isLoading = true
         error = nil
 
         fetchTeamsUseCase.execute(for: .apertura)

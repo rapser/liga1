@@ -15,6 +15,7 @@ class FavoritosViewController: UIViewController {
     // MARK: - UI Components
     private let containerView = ContainerView()
     private let tableView = UITableView(frame: .zero, style: .plain)
+    private let skeletonView = FavoritosSkeletonView()
 
     // MARK: - Properties
     let viewModel: FavoritosViewModel
@@ -48,8 +49,9 @@ class FavoritosViewController: UIViewController {
         super.viewDidLoad()
         configureNavigationBar()
         setupUI()
+        // El skeleton arranca de inmediato (isLoading = true desde el VM); bindViewModel lo detendrá.
+        skeletonView.startAnimating()
         bindViewModel()
-        updateView()
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
@@ -85,6 +87,7 @@ class FavoritosViewController: UIViewController {
 
         setupTableView()
         setupEmptyStates()
+        setupSkeleton()
     }
 
     private func setupTableView() {
@@ -92,9 +95,16 @@ class FavoritosViewController: UIViewController {
         tableView.registerCell(TeamTableViewCell.self)
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.isHidden = true
 
         containerView.addSubview(tableView)
         tableView.fillSuperview()
+    }
+
+    private func setupSkeleton() {
+        skeletonView.prepareForAutoLayout()
+        containerView.addSubview(skeletonView)
+        skeletonView.fillSuperview()
     }
 
     private func setupEmptyStates() {
@@ -116,6 +126,13 @@ class FavoritosViewController: UIViewController {
 
     // MARK: - Data & Binding
     private func bindViewModel() {
+        viewModel.$isLoading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.applyLoadingState(isLoading)
+            }
+            .store(in: &cancellables)
+
         viewModel.$teams
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -139,9 +156,20 @@ class FavoritosViewController: UIViewController {
             .store(in: &cancellables)
     }
 
-    private func updateView() {
-        tableView.reloadData()
+    private func applyLoadingState(_ isLoading: Bool) {
+        if isLoading {
+            skeletonView.startAnimating()
+            tableView.isHidden = true
+            emptyTeamsView.isHidden = true
+        } else {
+            skeletonView.stopAnimating()
+            updateView()
+        }
+    }
 
+    private func updateView() {
+        guard !viewModel.isLoading else { return }
+        tableView.reloadData()
         let hasTeams = !viewModel.teams.isEmpty
         emptyTeamsView.isHidden = hasTeams
         tableView.isHidden = !hasTeams

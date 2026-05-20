@@ -92,21 +92,20 @@ class EquipoTableViewCell: UITableViewCell {
     }
     
     func configure(with model: TeamUI, position: Int, positionColor: UIColor? = nil, isChampion: Bool = false) {
-        posicionLabel.text = "\(position)."
-
-        // Si es campeón (puesto 1), aplicar fondo amarillo solo al número
         if isChampion {
+            posicionLabel.text = "\(position)"
             posicionLabel.backgroundColor = .libertadoresGold
             posicionLabel.textColor = .black
-            posicionLabel.font = UIFont.boldSystemFont(ofSize: 12)
-            posicionLabel.layer.cornerRadius = 4
+            posicionLabel.font = UIFont.boldSystemFont(ofSize: 13)
+            posicionLabel.layer.cornerRadius = 5
+            posicionLabel.layer.borderWidth = 0
             posicionLabel.clip(true)
         } else {
-            // Resetear estilos si no es campeón
+            posicionLabel.text = "\(position)."
             posicionLabel.backgroundColor = .clear
             posicionLabel.layer.cornerRadius = 0
-            
-            // Aplicar color a la posición si se proporciona (modo oscuro)
+            posicionLabel.layer.borderWidth = 0
+
             if let color = positionColor {
                 posicionLabel.textColor = color
                 posicionLabel.font = UIFont.boldSystemFont(ofSize: 14)

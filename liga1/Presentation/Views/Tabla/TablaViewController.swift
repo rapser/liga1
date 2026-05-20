@@ -117,6 +117,7 @@ class TablaViewController: UIViewController {
         tableView.allowsSelection = false
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.tableFooterView = makeLegendFooter()
 
         // Agregar al container
         containerView.addSubview(tableView)
@@ -134,6 +135,64 @@ class TablaViewController: UIViewController {
                 right: 0
             )
         )
+    }
+
+    private func makeLegendFooter() -> UIView {
+        let footer = UIView()
+        footer.backgroundColor = .clear
+
+        let separator = UIView()
+        separator.backgroundColor = .separator
+        separator.prepareForAutoLayout()
+
+        let badgeView = UIView()
+        badgeView.backgroundColor = .libertadoresGold
+        badgeView.layer.cornerRadius = 5
+        badgeView.prepareForAutoLayout()
+
+        let badgeLabel = UILabel()
+        badgeLabel.text = "1"
+        badgeLabel.font = .boldSystemFont(ofSize: 11)
+        badgeLabel.textColor = .black
+        badgeLabel.textAlignment = .center
+        badgeLabel.prepareForAutoLayout()
+
+        let descLabel = UILabel()
+        descLabel.text = "Campeón del Torneo Apertura"
+        descLabel.font = .systemFont(ofSize: 12)
+        descLabel.textColor = .secondaryLabel
+        descLabel.prepareForAutoLayout()
+
+        let row = UIStackView(arrangedSubviews: [badgeView, descLabel])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = 8
+        row.prepareForAutoLayout()
+
+        badgeView.addSubview(badgeLabel)
+        badgeLabel.centerInSuperview()
+        badgeView.widthAnchor.constraint(equalToConstant: 22).isActive = true
+        badgeView.heightAnchor.constraint(equalToConstant: 22).isActive = true
+
+        footer.addSubview(separator)
+        footer.addSubview(row)
+
+        separator.anchor(
+            top: footer.topAnchor,
+            leading: footer.leadingAnchor,
+            trailing: footer.trailingAnchor
+        )
+        separator.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+
+        row.anchor(
+            top: separator.bottomAnchor,
+            leading: footer.leadingAnchor,
+            bottom: footer.bottomAnchor,
+            padding: UIEdgeInsets(top: 10, left: Spacing.standard, bottom: 10, right: Spacing.standard)
+        )
+
+        footer.frame = CGRect(x: 0, y: 0, width: 0, height: 44)
+        return footer
     }
 
     // MARK: - Data & Binding

@@ -43,6 +43,9 @@ class HomeViewModel {
     /// Evita aplicar resultados de cargas obsoletas si el usuario refresca seguido o cambia de fecha.
     private var loadGeneration: Int = 0
     private var hasReceivedFetchJornadasResponse = false
+    /// Últimos IDs procesados por observe(); evita recargar partidos cuando el background server
+    /// refresh de JornadasRepository reenvía los mismos datos y cancela una carga ya en vuelo.
+    private var lastObservedJornadaIds: Set<String> = []
 
     // MARK: - Initialization
 
@@ -113,6 +116,12 @@ class HomeViewModel {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] jornadas in
                 guard let self else { return }
+                let incomingIds = Set(jornadas.map(\.id))
+                // Ignorar si es la emisión inicial vacía del CurrentValueSubject o si los datos
+                // son idénticos (p. ej. el background server refresh de JornadasRepository reenvía
+                // las mismas jornadas), evitando cancelar una carga de partidos ya en vuelo.
+                guard incomingIds != self.lastObservedJornadaIds else { return }
+                self.lastObservedJornadaIds = incomingIds
                 self.loadMatchesCancellable?.cancel()
                 self.loadGeneration += 1
                 let generation = self.loadGeneration
@@ -166,6 +175,10 @@ class HomeViewModel {
                 guard let self else { return }
                 guard generation == self.loadGeneration else { return }
                 self.processJornadasWithMatches(results)
+                // Limpiar isLoading aquí también: si completion llega con un loadGeneration más
+                // nuevo (por un observe concurrente), la guarda devuelve sin resetear el estado
+                // y el skeleton quedaría congelado aunque los datos ya llegaron.
+                self.isLoading = false
                 self.canShowNoMatchesPlaceholder = true
             }
     }

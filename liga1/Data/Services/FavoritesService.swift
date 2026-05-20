@@ -58,19 +58,42 @@ class FavoritesService: FavoritesServiceProtocol {
                 promise(.failure(NSError(domain: "FavoritesService", code: 401, userInfo: [NSLocalizedDescriptionKey: "Usuario no autenticado"])))
                 return
             }
-            self.db.collection(FirestoreConstants.Collection.users)
+
+            let ref = self.db
+                .collection(FirestoreConstants.Collection.users)
                 .document(userId)
                 .collection("favoriteTeams")
-                .getDocuments { snapshot, error in
-                    if let error = error {
-                        self.logger.error("Error fetching favorite teams", error: error)
-                        promise(.failure(error))
-                        return
-                    }
-                    let ids = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
+
+            // Caché primero: resolve inmediato si hay datos locales, luego
+            // refresca en background para que la próxima visita también sea rápida.
+            ref.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
+                guard let self = self else { return }
+
+                if cacheError == nil, let docs = cacheSnapshot?.documents {
+                    let ids = Set(docs.compactMap { $0.documentID })
                     self.favoriteTeamsSubject.send(ids)
                     promise(.success(()))
+
+                    ref.getDocuments(source: .server) { [weak self] serverSnapshot, _ in
+                        guard let self = self, let docs = serverSnapshot?.documents else { return }
+                        let serverIds = Set(docs.compactMap { $0.documentID })
+                        if serverIds != ids { self.favoriteTeamsSubject.send(serverIds) }
+                    }
+                } else {
+                    // Sin caché (primera carga), ir al servidor directamente.
+                    ref.getDocuments(source: .server) { [weak self] snapshot, error in
+                        guard let self = self else { return }
+                        if let error = error {
+                            self.logger.error("Error fetching favorite teams", error: error)
+                            promise(.failure(error))
+                            return
+                        }
+                        let ids = Set(snapshot?.documents.compactMap { $0.documentID } ?? [])
+                        self.favoriteTeamsSubject.send(ids)
+                        promise(.success(()))
+                    }
                 }
+            }
         }
         .eraseToAnyPublisher()
     }

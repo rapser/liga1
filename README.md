@@ -4,12 +4,12 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 ## 📱 Características
 
-- **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario
-- **Tabla de Posiciones**: Consulta las tablas de Apertura, Clausura y Acumulado con estadísticas detalladas. Indicador visual especial (cuadrado amarillo) para el puesto 1 (campeón)
-- **Favoritos**: Marca tus partidos favoritos para seguimiento rápido con sincronización en tiempo real
+- **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario; carga fiable desde el primer arranque
+- **Tabla de Posiciones**: Consulta las tablas de Apertura, Clausura y Acumulado con estadísticas detalladas. Indicador visual especial (cuadrado dorado) para el puesto 1 y leyenda de campeón al pie de la tabla
+- **Favoritos**: Carga instantánea gracias a caché Firestore; skeleton animado durante la carga inicial; sincronización en tiempo real con equipos favoritos
 - **Noticias**: Mantente informado con las últimas noticias del fútbol peruano (solo publicadas), agrupadas por categoría; la categoría Destacado siempre primero, el resto ordenadas por fecha
 - **Autenticación**: Ingresa con Google o correo electrónico para sincronizar tus favoritos
-- **Modo Oscuro**: Soporte completo para Dark Mode que sigue automáticamente la configuración del sistema
+- **Modo Oscuro**: Soporte completo para Dark Mode que sigue automáticamente la configuración del sistema (incluido el selector de fechas del Home)
 - **UI Programático**: Interfaz construida 100% con código (sin Storyboards) usando APIs modernas de iOS 18
 - **Recarga Automática**: Datos se actualizan automáticamente al entrar a las tabs de Torneo y Noticias
 - **Gestión de Notificaciones**: Badge de notificaciones se limpia automáticamente al abrir la app
@@ -38,19 +38,21 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 #### Gestión de Datos
 - **Actualización Reactiva**: Listeners de Firestore para jornada a mostrar y favoritos
-- **Filtrado en Domain**: `GetJornadaToDisplayUseCase` devuelve la única jornada a mostrar; `FetchMatchesUseCase` filtra partidos al día más próximo (hoy o futuro)
+- **Filtrado en Domain**: `GetJornadaToDisplayUseCase` devuelve la única jornada a mostrar; `FetchMatchesUseCase` filtra partidos al día más próximo (hoy o futuro) usando la zona horaria de Lima (UTC−5)
+- **Carga fiable**: Deduplicación de IDs en `JornadasRepository.fetchFromServer()` y en `HomeViewModel.observeJornadaToDisplay()` para evitar cancelaciones spurias de carga; `isLoading` siempre se resuelve en `receiveValue`
 - **Recarga Automática**: Al entrar a la tab se recargan los datos (`viewWillAppear`)
 
 ### 📊 Tabla de Posiciones
 
 #### Características Visuales
-- **Indicador de Campeón**: Cuadrado amarillo dorado alrededor del número 1 (no fondo en toda la celda)
+- **Indicador de Campeón**: Cuadrado dorado alrededor del número 1 con texto en negrita (sin punto); el resto de posiciones muestran número con punto sin fondo
+- **Leyenda de Campeón**: Footer al pie de la tabla con ícono dorado "1" y la etiqueta "Campeón del Torneo Apertura"
 - **Zonas de Clasificación** (modo claro):
-  - 🟡 **Puesto 1**: Cuadrado amarillo en el número de posición
+  - 🟡 **Puesto 1**: Cuadrado dorado en el número de posición
   - 🟢 **Zona Libertadores**: Fondo dorado (puestos 1-4 según torneo)
   - 🔵 **Zona Sudamericana**: Fondo azul (puestos 5-8)
   - 🔴 **Zona Descenso**: Fondo rojo (últimos 3 puestos)
-- **Modo Oscuro Optimizado**: Sin fondos de colores, solo indicador amarillo para campeón
+- **Modo Oscuro Optimizado**: Sin fondos de colores, solo indicador dorado para campeón
 - **Header Personalizado**: Columnas "Equipo", "PJ", "GF-GC", "DG", "Pts"
 
 #### Lógica de Ordenamiento
@@ -83,6 +85,11 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Sincronización en Tiempo Real**: Listeners de Firestore para actualización automática
 - **ID Completo**: `{jornadaId}_{matchId}` (ej: "apertura_01_adt_utc")
 - **Actualización Automática**: UI se actualiza reactivamente con Combine
+
+#### Carga de la Pantalla Favoritos (Equipos)
+- **Skeleton Animado**: `FavoritosSkeletonView` muestra un placeholder pulsante (fade opacity) que imita el layout de `TeamTableViewCell` mientras se cargan los datos, evitando el flash de estado vacío
+- **Caché Primero**: `FavoritesService.fetchFavoriteTeams()` y `TeamsRepository.fetchTeams(for:)` leen de la caché local de Firestore al instante y actualizan en background desde el servidor; las visitas sucesivas son inmediatas
+- **Estado Inicial Correcto**: `isLoading` arranca en `true` para que el skeleton sea visible desde el primer frame
 
 ### 🔐 Autenticación
 
@@ -627,6 +634,67 @@ liga1/
     ├── Info.plist                           # Configuración de la app (URL schemes, etc.)
     └── [Archivos JSON de datos]             # Datos estáticos si los hay
 ```
+
+## 🧪 Testing
+
+### Estructura de Tests (`liga1Tests/`)
+
+```
+liga1Tests/
+├── Mocks/
+│   ├── MockJornadasRepository.swift
+│   ├── MockMatchesRepository.swift
+│   ├── MockTeamsRepository.swift
+│   ├── MockNewsRepository.swift
+│   ├── MockFavoritesService.swift
+│   ├── MockUserPreferencesService.swift
+│   ├── MockNotificationTopicManager.swift
+│   └── MockLogger.swift
+├── Helpers/
+│   ├── XCTestCase+Combine.swift   # awaitValue, awaitFirstValue, awaitCompletion, awaitFailure
+│   └── EntityFixtures.swift       # Factories de entidades + limaDate(year:month:day:hour:minute:)
+└── UseCases/
+    ├── Jornadas/
+    │   ├── FetchActiveJornadasUseCaseTests.swift
+    │   ├── ObserveActiveJornadasUseCaseTests.swift
+    │   └── GetJornadaToDisplayUseCaseTests.swift
+    ├── Matches/
+    │   ├── FetchMatchesUseCaseTests.swift
+    │   └── ObserveMatchesUseCaseTests.swift
+    ├── Teams/
+    │   └── FetchTeamsUseCaseTests.swift
+    ├── News/
+    │   └── FetchNewsUseCaseTests.swift
+    ├── Favorites/
+    │   ├── ObserveFavoriteTeamsUseCaseTests.swift
+    │   └── ToggleFavoriteTeamUseCaseTests.swift
+    └── Notifications/
+        ├── ObserveUserPreferencesUseCaseTests.swift
+        └── UpdatePushNotificationsEnabledUseCaseTests.swift
+```
+
+### Casos de test cubiertos (~45 tests)
+
+| Use Case | Comportamientos verificados |
+|---|---|
+| `FetchActiveJornadasUseCase` | Delega al repository, propaga error, loguea en fallo |
+| `ObserveActiveJornadasUseCase` | Reenvía valor inicial vacío y actualizaciones múltiples |
+| `GetJornadaToDisplayUseCase` | Ordenamiento puro `orderJornadasForHome`, `execute` y `observe` devuelven ordenados, propaga error |
+| `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
+| `ObserveMatchesUseCase` | Reenvía actualizaciones del repository |
+| `FetchTeamsUseCase` | `.acumulado` falla sin llamar repository, apertura/clausura delegan correctamente |
+| `FetchNewsUseCase` | Delega y propaga resultado/error |
+| `ObserveFavoriteTeamsUseCase` | `execute` reenvía IDs, `refreshFavoriteTeams` delega fetch al service |
+| `ToggleFavoriteTeamUseCase` | Retorna `true`/`false` según service, propaga error |
+| `ObserveUserPreferencesUseCase` | Reenvía preferencias y `nil` |
+| `UpdatePushNotificationsEnabledUseCase` | enabled→`resubscribeToSavedTopics`, disabled→`unsubscribeFromAllTeamTopics`, fallo loguea y no llama topic manager |
+
+### Setup en Xcode
+
+Para ejecutar los tests debes añadir el target en Xcode:
+1. `File → New → Target → Unit Testing Bundle` con nombre `liga1Tests`
+2. Arrastrar todos los archivos de `liga1Tests/` al nuevo target
+3. Asegurarse de que `@testable import liga1` compile (`ENABLE_TESTABILITY = YES` ya está activo en Debug)
 
 ## 🗄 Estructura de Datos en Firestore
 
