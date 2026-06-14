@@ -24,6 +24,12 @@ final class DIContainer {
         return FirestoreManager.shared
     }
 
+    // MARK: - Auth
+
+    func makeAuthService() -> AuthServiceProtocol {
+        return AuthManager.shared
+    }
+
     // MARK: - Repositories
 
     func makeJornadasRepository() -> JornadasRepositoryProtocol {
@@ -34,8 +40,12 @@ final class DIContainer {
         return MatchesRepository(database: makeDatabase(), logger: makeLogger())
     }
 
+    private lazy var teamsRepository: TeamsRepositoryProtocol = {
+        return CachingTeamsRepository(wrapping: TeamsRepository(database: makeDatabase()))
+    }()
+
     func makeTeamsRepository() -> TeamsRepositoryProtocol {
-        return TeamsRepository(database: makeDatabase())
+        return teamsRepository
     }
 
     func makeNewsRepository() -> NewsRepositoryProtocol {
@@ -44,10 +54,8 @@ final class DIContainer {
 
     // MARK: - Services
 
-    // MARK: - Services
-
     private lazy var favoritesService: FavoritesServiceProtocol = {
-        return FavoritesService(database: makeDatabase(), logger: makeLogger())
+        return FavoritesService(database: makeDatabase(), logger: makeLogger(), authService: makeAuthService())
     }()
 
     func makeFavoritesService() -> FavoritesServiceProtocol {
@@ -65,7 +73,8 @@ final class DIContainer {
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
         return UserPreferencesService(
             database: makeDatabase(),
-            logger: makeLogger()
+            logger: makeLogger(),
+            authService: makeAuthService()
         )
     }()
 
@@ -179,8 +188,22 @@ final class DIContainer {
     }
 
     // MARK: - Use Cases - Auth
-    // AuthKit ahora se usa directamente vía AuthManager.shared
-    // No se necesitan UseCases separados
+
+    func makeLoginWithEmailUseCase() -> LoginWithEmailUseCaseProtocol {
+        return LoginWithEmailUseCase(authService: makeAuthService())
+    }
+
+    func makeLoginWithGoogleUseCase() -> LoginWithGoogleUseCaseProtocol {
+        return LoginWithGoogleUseCase(authService: makeAuthService())
+    }
+
+    func makeObserveAuthStateUseCase() -> ObserveAuthStateUseCaseProtocol {
+        return ObserveAuthStateUseCase(authService: makeAuthService())
+    }
+
+    func makeLogoutUseCase() -> LogoutUseCaseProtocol {
+        return LogoutUseCase(authService: makeAuthService())
+    }
 
     // MARK: - Use Cases - Notifications
 
@@ -229,11 +252,15 @@ final class DIContainer {
     }
 
     func makeProfileViewModel() -> ProfileViewModel {
-        return ProfileViewModel()
+        return ProfileViewModel(
+            authService: makeAuthService(),
+            logoutUseCase: makeLogoutUseCase()
+        )
     }
 
     func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
+            authService: makeAuthService(),
             logger: makeLogger()
         )
     }
@@ -298,6 +325,8 @@ final class DIContainer {
             window: window,
             container: self,
             eventBus: makeAppEventBus(),
+            authService: makeAuthService(),
+            logoutUseCase: makeLogoutUseCase(),
             logger: makeLogger()
         )
     }

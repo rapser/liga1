@@ -32,7 +32,6 @@ final class LoginCoordinator: Coordinator {
     }
 
     func didFinishLogin() {
-        eventBus.publish(.loginSuccess)
         delegate?.loginCoordinatorDidFinish(self)
     }
 }

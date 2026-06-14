@@ -88,6 +88,10 @@ public final class AuthManager {
     }
 }
 
+// MARK: - AuthServiceProtocol Conformance
+
+extension AuthManager: AuthServiceProtocol {}
+
 // MARK: - Auth Errors
 
 /// Errores específicos de AuthKit
