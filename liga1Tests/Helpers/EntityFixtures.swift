@@ -82,6 +82,24 @@ extension UserPreferences {
     }
 }
 
+// MARK: - User fixtures
+
+extension User {
+    static func fixture(
+        id: String = "user-123",
+        email: String? = "test@liga1.pe",
+        displayName: String? = "Test User"
+    ) -> User {
+        User(
+            id: id,
+            email: email,
+            displayName: displayName,
+            photoURL: nil,
+            isEmailVerified: true
+        )
+    }
+}
+
 // MARK: - Test errors
 
 enum TestError: Error, Equatable {

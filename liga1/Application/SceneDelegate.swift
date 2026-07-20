@@ -32,8 +32,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Crear DIContainer
         let container = DIContainer.shared
 
-        // Configurar SessionManager
-        SessionManager.shared.configure(with: window, container: container)
+        // Configurar SessionManager con el EventBus (InactivityManager vive dentro)
+        let eventBus = container.makeAppEventBus()
+        SessionManager.shared.configure(eventBus: eventBus)
 
         // Iniciar AppCoordinator
         let appCoordinator = container.makeAppCoordinator(window: window)
@@ -41,7 +42,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         appCoordinator.start() // AppCoordinator maneja window.makeKeyAndVisible()
 
         // Tap en notificación → EventBus → AppCoordinator maneja .navigateToMatch
-        let eventBus = container.makeAppEventBus()
         SessionManager.shared.onNotificationTap = { matchId in
             eventBus.publish(.navigateToMatch(matchId: matchId))
         }

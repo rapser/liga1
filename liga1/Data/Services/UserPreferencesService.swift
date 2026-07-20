@@ -30,12 +30,14 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(database: DatabaseProtocol, logger: LoggerProtocol) {
+    private let authService: AuthServiceProtocol
+
+    init(database: DatabaseProtocol, logger: LoggerProtocol, authService: AuthServiceProtocol) {
         self.database = database
         self.logger = logger
+        self.authService = authService
 
-        // Observar cambios de autenticación con AuthManager
-        AuthManager.shared.observeAuthState()
+        authService.observeAuthState()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
                 if user != nil {
@@ -50,7 +52,7 @@ class UserPreferencesService: UserPreferencesServiceProtocol {
     // MARK: - Private Helpers
 
     private func getUserId() -> String? {
-        return AuthManager.shared.currentUserId
+        return authService.currentUserId
     }
 
     private func getPreferencesDocumentRef() -> DocumentReference? {

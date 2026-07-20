@@ -31,11 +31,14 @@ class FavoritesService: FavoritesServiceProtocol {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(database: DatabaseProtocol, logger: LoggerProtocol) {
+    private let authService: AuthServiceProtocol
+
+    init(database: DatabaseProtocol, logger: LoggerProtocol, authService: AuthServiceProtocol) {
         self.database = database
         self.logger = logger
+        self.authService = authService
 
-        AuthManager.shared.observeAuthState()
+        authService.observeAuthState()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
                 guard let self = self else { return }
@@ -49,7 +52,7 @@ class FavoritesService: FavoritesServiceProtocol {
     }
 
     private func getUserId() -> String? {
-        return AuthManager.shared.currentUserId
+        return authService.currentUserId
     }
 
     func fetchFavoriteTeams() -> AnyPublisher<Void, Error> {
