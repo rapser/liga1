@@ -4,87 +4,39 @@
 //
 //  Created by miguel tomairo on 13/09/25.
 //
+//  Responsabilidad actual: bridge para notificaciones push y configuración de InactivityManager.
+//  Auth y navegación por expiración de sesión se delegan a AppCoordinator via InactivityManager.
+//
 
 import UIKit
-import Combine
 
 final class SessionManager {
 
     static let shared = SessionManager()
     private init() {}
 
-    private var inactivityTimer: Timer?
-    private let inactivityTimeLimit: TimeInterval = 432000 // 5 días (5 * 24 * 60 * 60)
-
-    weak var window: UIWindow?
-    private var container: DIContainer?
-    private var cancellables = Set<AnyCancellable>()
+    private var inactivityManager: InactivityManager?
 
     /// Se invoca cuando el usuario toca una notificación push (matchId).
     var onNotificationTap: ((String) -> Void)?
 
-    // MARK: - Configuración inicial
-    func configure(with window: UIWindow?, container: DIContainer) {
-        self.window = window
-        self.container = container
+    // MARK: - Configuración
+
+    func configure(eventBus: AppEventBusProtocol) {
+        inactivityManager = InactivityManager(eventBus: eventBus)
     }
 
     // MARK: - Inactividad
+
     func startInactivityTimer() {
-        resetTimer()
+        inactivityManager?.reset()
     }
 
     func resetTimer() {
-        inactivityTimer?.invalidate()
-        inactivityTimer = Timer.scheduledTimer(timeInterval: inactivityTimeLimit,
-                                               target: self,
-                                               selector: #selector(showSessionExpiredAlert),
-                                               userInfo: nil,
-                                               repeats: false)
+        inactivityManager?.reset()
     }
 
-    // MARK: - Logout
-    func logout() {
-        guard let container = container else {
-            DIContainer.shared.makeLogger().error("❌ SessionManager: Container no configurado", error: nil)
-            return
-        }
-        let logger = container.makeLogger()
-
-        AuthManager.shared.logout()
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    if case .failure(let error) = completion {
-                        logger.error("❌ Error al cerrar sesión", error: error)
-                    }
-                    self?.navigateToLogin()
-                },
-                receiveValue: { }
-            )
-            .store(in: &cancellables)
-    }
-
-    private func navigateToLogin() {
-        guard let container = container else { return }
-        let nav = UINavigationController()
-        let loginVC = container.makeLoginViewController(presentingViewController: nav)
-        nav.setViewControllers([loginVC], animated: false)
-        window?.rootViewController = nav
-    }
-
-    // MARK: - Alerta de expiración
-    @objc private func showSessionExpiredAlert() {
-        logout()
-
-        guard let rootVC = window?.rootViewController else { return }
-
-        let alert = UIAlertController(title: "Sesión Expirada",
-                                      message: "Tu sesión ha terminado por inactividad.",
-                                      preferredStyle: .alert)
-
-        alert.addAction(UIAlertAction(title: "Aceptar", style: .default))
-
-        rootVC.present(alert, animated: true)
+    func stopTimer() {
+        inactivityManager?.invalidate()
     }
 }

@@ -25,9 +25,6 @@ class TorneoViewModel {
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
-    private var cachedApertura: [TeamUI] = []
-    private var cachedClausura: [TeamUI] = []
-    private var cachedAcumulado: [TeamUI] = []
 
     // MARK: - Initialization
 
@@ -39,48 +36,22 @@ class TorneoViewModel {
 
     func loadTeams(for torneo: TorneoType) {
         selectedTorneo = torneo
-
-        switch torneo {
-        case .apertura:
-            if !cachedApertura.isEmpty {
-                displayedTeams = cachedApertura
-            } else {
-                fetchTeams(for: torneo)
-            }
-
-        case .clausura:
-            if !cachedClausura.isEmpty {
-                displayedTeams = cachedClausura
-            } else {
-                fetchTeams(for: torneo)
-            }
-
-        case .acumulado:
-            if !cachedAcumulado.isEmpty {
-                displayedTeams = cachedAcumulado
-            } else {
-                fetchAcumulado()
-            }
+        if torneo == .acumulado {
+            fetchAcumulado()
+        } else {
+            fetchTeams(for: torneo)
         }
     }
-    
-    /// Fuerza la recarga de los equipos sin usar caché
+
+    /// Fuerza recarga ignorando la caché en memoria
     func reloadTeams(for torneo: TorneoType) {
         selectedTorneo = torneo
-        
-        switch torneo {
-        case .apertura:
-            cachedApertura = [] // Limpiar caché
-            fetchTeams(for: torneo)
-        case .clausura:
-            cachedClausura = [] // Limpiar caché
-            fetchTeams(for: torneo)
-        case .acumulado:
-            cachedAcumulado = [] // Limpiar caché
-            cachedApertura = [] // También limpiar los cachés de apertura y clausura
-            cachedClausura = []
-            fetchAcumulado()
+        if torneo == .acumulado {
+            fetchTeamsUseCase.invalidateCache(for: nil)
+        } else {
+            fetchTeamsUseCase.invalidateCache(for: torneo)
         }
+        loadTeams(for: torneo)
     }
 
     // MARK: - Private Methods
@@ -97,17 +68,7 @@ class TorneoViewModel {
                     self?.error = error
                 }
             } receiveValue: { [weak self] teams in
-                guard let self = self else { return }
-                let teamsUI = TeamUIMapper.toUI(from: teams)
-                self.displayedTeams = teamsUI
-                switch torneo {
-                case .apertura:
-                    self.cachedApertura = teamsUI
-                case .clausura:
-                    self.cachedClausura = teamsUI
-                case .acumulado:
-                    break
-                }
+                self?.displayedTeams = TeamUIMapper.toUI(from: teams)
             }
             .store(in: &cancellables)
     }
@@ -130,16 +91,12 @@ class TorneoViewModel {
                 guard let self = self else { return }
 
                 var teamsDict: [String: Team] = [:]
-
-                for team in aperturaTeams {
-                    teamsDict[team.nombre] = team
-                }
-
+                for team in aperturaTeams { teamsDict[team.nombre] = team }
                 for team in clausuraTeams {
                     if let existing = teamsDict[team.nombre] {
                         let gf = existing.golesFavor + team.golesFavor
                         let gc = existing.golesContra + team.golesContra
-                        let combined = Team(
+                        teamsDict[team.nombre] = Team(
                             nombre: existing.nombre,
                             ciudad: existing.ciudad,
                             estadio: existing.estadio,
@@ -153,30 +110,19 @@ class TorneoViewModel {
                             diferenciaGoles: gf - gc,
                             puntos: existing.puntos + team.puntos
                         )
-                        teamsDict[team.nombre] = combined
                     } else {
                         teamsDict[team.nombre] = team
                     }
                 }
 
-                let acumuladoTeamsArray = Array(teamsDict.values)
-                
-                // Si todos los equipos tienen 0 puntos, ordenar alfabéticamente
-                let allHaveZeroPoints = acumuladoTeamsArray.allSatisfy { $0.puntos == 0 }
-                
-                let acumuladoTeams: [Team]
-                if allHaveZeroPoints {
-                    // Ordenar alfabéticamente por nombre
-                    acumuladoTeams = acumuladoTeamsArray.sorted {
-                        $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending
-                    }
+                let merged = Array(teamsDict.values)
+                let sorted: [Team]
+                if merged.allSatisfy({ $0.puntos == 0 }) {
+                    sorted = merged.sorted { $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending }
                 } else {
-                    acumuladoTeams = acumuladoTeamsArray.sorted { Team.isOrderedAboveInStandings($0, $1) }
+                    sorted = merged.sorted { Team.isOrderedAboveInStandings($0, $1) }
                 }
-
-                let acumuladoTeamsUI = TeamUIMapper.toUI(from: acumuladoTeams)
-                self.cachedAcumulado = acumuladoTeamsUI
-                self.displayedTeams = acumuladoTeamsUI
+                self.displayedTeams = TeamUIMapper.toUI(from: sorted)
             }
             .store(in: &cancellables)
     }

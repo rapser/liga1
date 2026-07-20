@@ -3,7 +3,6 @@
 //  liga1
 //
 //  AuthKit/Presentation: ViewModel del flujo de login.
-//  Refactored on 15/02/26 to use AuthManager instead of LoginUseCase.
 //
 
 import Foundation
@@ -35,6 +34,7 @@ final class LoginViewModel {
 
     // MARK: - Dependencies
 
+    private let authService: AuthServiceProtocol
     private let logger: LoggerProtocol
 
     // MARK: - Private Properties
@@ -43,14 +43,14 @@ final class LoginViewModel {
 
     // MARK: - Initialization
 
-    init(logger: LoggerProtocol) {
+    init(authService: AuthServiceProtocol, logger: LoggerProtocol) {
+        self.authService = authService
         self.logger = logger
     }
 
     // MARK: - Methods
 
     func login(email: String, password: String) {
-        // Validar con LoginValidator
         do {
             try LoginValidator.validate(email: email, password: password)
         } catch {
@@ -61,8 +61,7 @@ final class LoginViewModel {
         isLoading = true
         error = nil
 
-        // Llamar directamente a AuthManager
-        AuthManager.shared.login(email: email, password: password)
+        authService.login(email: email, password: password)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -93,13 +92,11 @@ final class LoginViewModel {
         isLoading = true
         error = nil
 
-        // Obtener credencial de Google
         let credentialProvider = GoogleCredentialProviderImpl(presentingViewController: presentingViewController)
 
         credentialProvider.provideCredential()
-            .flatMap { credential in
-                // Autenticar con AuthManager usando la credencial de Google
-                AuthManager.shared.signInWithGoogle(credential: credential)
+            .flatMap { [authService] credential in
+                authService.signInWithGoogle(credential: credential)
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in

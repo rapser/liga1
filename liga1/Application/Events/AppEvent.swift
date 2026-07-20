@@ -7,9 +7,10 @@
 
 import Foundation
 
-/// Eventos de aplicación para el bus (login, logout, navegación).
+/// Eventos de aplicación para el bus (logout, sesión, navegación).
+/// Nota: loginSuccess fue eliminado — AppCoordinator observa AuthServiceProtocol directamente.
 enum AppEvent {
-    case loginSuccess
     case logoutRequested
+    case sessionExpired
     case navigateToMatch(matchId: String)
 }

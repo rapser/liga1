@@ -16,6 +16,8 @@ final class AppCoordinator: Coordinator {
     let window: UIWindow
     private let container: DIContainer
     private let eventBus: AppEventBusProtocol
+    private let authService: AuthServiceProtocol
+    private let logoutUseCase: LogoutUseCaseProtocol
     private let logger: LoggerProtocol
     private var cancellables = Set<AnyCancellable>()
     private var hasReceivedInitialAuthState = false
@@ -24,11 +26,15 @@ final class AppCoordinator: Coordinator {
         window: UIWindow,
         container: DIContainer,
         eventBus: AppEventBusProtocol,
+        authService: AuthServiceProtocol,
+        logoutUseCase: LogoutUseCaseProtocol,
         logger: LoggerProtocol
     ) {
         self.window = window
         self.container = container
         self.eventBus = eventBus
+        self.authService = authService
+        self.logoutUseCase = logoutUseCase
         self.logger = logger
         self.navigationController = UINavigationController()
 
@@ -37,18 +43,18 @@ final class AppCoordinator: Coordinator {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 switch event {
-                case .loginSuccess:
-                    self?.handleLoginSuccess()
                 case .logoutRequested:
                     self?.handleLogoutRequested()
+                case .sessionExpired:
+                    self?.handleSessionExpired()
                 case .navigateToMatch(let matchId):
                     self?.handleNotificationTap(matchId: matchId)
                 }
             }
             .store(in: &cancellables)
 
-        // Observar cambios en el estado de autenticación
-        AuthManager.shared.observeAuthState()
+        // Observar cambios en el estado de autenticación (sin acoplar a AuthManager.shared)
+        authService.observeAuthState()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
                 self?.handleAuthStateChange(user: user)
@@ -57,20 +63,16 @@ final class AppCoordinator: Coordinator {
     }
 
     private func handleAuthStateChange(user: User?) {
-        // Marcar que hemos recibido el estado inicial
         let isInitialState = !hasReceivedInitialAuthState
         hasReceivedInitialAuthState = true
 
         if user != nil {
-            // Usuario autenticado - mostrar main flow si aún no está mostrándose
             if !(window.rootViewController is MainTabBarController) {
                 logger.info(isInitialState ? "✅ Estado inicial: Usuario autenticado - navegando a Main Flow" : "✅ Usuario autenticado - navegando a Main Flow")
                 childCoordinators.removeAll()
                 showMainFlow()
             }
         } else {
-            // Firebase puede emitir nil un instante antes de restaurar la sesión en frío.
-            // Diferir la decisión de login evita un flash de Login → Main al abrir la app.
             if isInitialState {
                 DispatchQueue.main.async { [weak self] in
                     self?.attemptShowLoginIfStillLoggedOut()
@@ -81,34 +83,47 @@ final class AppCoordinator: Coordinator {
         }
     }
 
-    /// Solo muestra login si `currentUser` sigue siendo nil y no estamos ya en el nav de login.
     private func attemptShowLoginIfStillLoggedOut() {
-        guard AuthManager.shared.currentUserId == nil else { return }
-        if window.rootViewController is UINavigationController {
-            return
-        }
+        guard authService.currentUserId == nil else { return }
+        if window.rootViewController is UINavigationController { return }
         logger.info("ℹ️ No hay usuario autenticado - navegando a Login Flow")
         childCoordinators.removeAll()
         showLoginFlow()
     }
 
-    private func handleLoginSuccess() {
-        // Este método ahora es manejado principalmente por observeAuthState
-        // Pero lo mantenemos para limpieza de coordinadores
-        childCoordinators.removeAll()
-        logger.info("📱 Login exitoso recibido via EventBus")
-    }
-
     private func handleLogoutRequested() {
-        // Este método ya no navega directamente - el observeAuthState se encarga
-        // Solo limpiamos los coordinadores
         childCoordinators.removeAll()
         logger.info("📱 Logout solicitado - la navegación será manejada por observeAuthState")
     }
 
+    private func handleSessionExpired() {
+        logger.info("⏰ Sesión expirada por inactividad - ejecutando logout")
+        logoutUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case .failure(let error) = completion {
+                        self?.logger.error("❌ Error al cerrar sesión por inactividad", error: error)
+                    }
+                    self?.showSessionExpiredAlert()
+                },
+                receiveValue: { }
+            )
+            .store(in: &cancellables)
+    }
+
+    private func showSessionExpiredAlert() {
+        guard let rootVC = window.rootViewController else { return }
+        let alert = UIAlertController(
+            title: "Sesión Expirada",
+            message: "Tu sesión ha terminado por inactividad.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Aceptar", style: .default))
+        rootVC.present(alert, animated: true)
+    }
+
     func start() {
-        // Mostrar una pantalla de carga mientras esperamos el estado de autenticación
-        // El observeAuthState() navegará a login o main según corresponda
         showLoadingScreen()
         logger.info("🚀 AppCoordinator iniciado - esperando estado de autenticación")
     }
@@ -117,7 +132,6 @@ final class AppCoordinator: Coordinator {
         let loadingVC = UIViewController()
         loadingVC.view.backgroundColor = .appBackground
 
-        // Agregar activity indicator
         let activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.color = .liga1Red
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -149,7 +163,6 @@ final class AppCoordinator: Coordinator {
         window.makeKeyAndVisible()
     }
 
-    /// Navegación al abrir la app desde un tap en notificación push (matchId).
     func handleNotificationTap(matchId: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
@@ -159,7 +172,7 @@ final class AppCoordinator: Coordinator {
     }
 }
 
-// MARK: - LoginCoordinatorDelegate (compatibilidad; la lógica principal va por EventBus .loginSuccess)
+// MARK: - LoginCoordinatorDelegate
 
 extension AppCoordinator: LoginCoordinatorDelegate {
     func loginCoordinatorDidFinish(_ coordinator: LoginCoordinator) {

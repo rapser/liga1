@@ -55,6 +55,10 @@ class TeamsRepository: TeamsRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
+    func invalidateCache(for torneo: TorneoType?) {
+        // La caché del SDK de Firestore se gestiona internamente; no hay estado en memoria aquí.
+    }
+
     private func buildTeams(from documents: [QueryDocumentSnapshot]) -> [Team] {
         let teamDTOs = documents.compactMap { doc -> TeamDTO? in
             guard let dto = try? doc.data(as: TeamDTO.self) else { return nil }

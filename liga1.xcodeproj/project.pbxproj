@@ -159,6 +159,13 @@
 		D0063549B126B4E82FC238DD /* UIControl+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BDDF5F80F98732D353F138 /* UIControl+Builder.swift */; };
 		D1B1041D3319FD746525F468 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916B96B6731A88F34AC09FDD /* AppColors.swift */; };
 		FF409DC8133AFDA3B8ED267E /* FormBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742E5D7ABC53132ABE23C086 /* FormBuilder.swift */; };
+		AF257A451ADC4C809BFD09A1 /* AuthServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */; };
+		6B89A9ABC27D4B38B28A5701 /* LogoutUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */; };
+		3DFB364AC66246E998DBC2E9 /* LoginWithEmailUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */; };
+		A76A4167D719438AA4F4251C /* LoginWithGoogleUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */; };
+		623A010AAFBB4DD7BF7D0D95 /* ObserveAuthStateUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */; };
+		DE4689A273B24EF0A2DFD6CC /* InactivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D706A2DD87EA40468D0EDDED /* InactivityManager.swift */; };
+		DAD0218A714640C2A2D1FA8E /* CachingTeamsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -331,6 +338,13 @@
 		916B96B6731A88F34AC09FDD /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		B73A13053D4CC2A0297ECDD1 /* ComponentPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentPresets.swift; sourceTree = "<group>"; };
 		CAE86397D312558B0952F475 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceProtocol.swift; sourceTree = "<group>"; };
+		35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutUseCase.swift; sourceTree = "<group>"; };
+		6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithEmailUseCase.swift; sourceTree = "<group>"; };
+		143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithGoogleUseCase.swift; sourceTree = "<group>"; };
+		40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveAuthStateUseCase.swift; sourceTree = "<group>"; };
+		D706A2DD87EA40468D0EDDED /* InactivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InactivityManager.swift; sourceTree = "<group>"; };
+		694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachingTeamsRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -382,6 +396,7 @@
 				4603CF662F42AD1900F537A4 /* AuthProviderFactory.swift */,
 				4603CF672F42AD1900F537A4 /* AuthProviderStrategy.swift */,
 				4603CF682F42AD1900F537A4 /* AuthProviderType.swift */,
+				27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -534,6 +549,7 @@
 				4640017F2F08853F00A8C905 /* MatchesRepository.swift */,
 				464001802F08853F00A8C905 /* NewsRepository.swift */,
 				464001812F08853F00A8C905 /* TeamsRepository.swift */,
+				694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -560,9 +576,21 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		87DCDBFEACCB404C835152C5 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */,
+				6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */,
+				143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */,
+				40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
 		4640018D2F08853F00A8C905 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
+				87DCDBFEACCB404C835152C5 /* Auth */,
 				464B95B22F287601001C4049 /* Notifications */,
 				464009C62F098D8D00A8C905 /* Favorites */,
 				464009C82F098D8D00A8C905 /* Jornadas */,
@@ -1095,6 +1123,7 @@
 				46D995922C6E90EC00D4951C /* AppDelegate.swift */,
 				469E54322E765141001ECD36 /* SessionManager.swift */,
 				46D995942C6E90EC00D4951C /* SceneDelegate.swift */,
+				D706A2DD87EA40468D0EDDED /* InactivityManager.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -1397,6 +1426,13 @@
 				46CDF4882F10623000F280E6 /* JornadaUIMapper.swift in Sources */,
 				464001E12F08853F00A8C905 /* FavoritesService.swift in Sources */,
 				46D995952C6E90EC00D4951C /* SceneDelegate.swift in Sources */,
+				AF257A451ADC4C809BFD09A1 /* AuthServiceProtocol.swift in Sources */,
+				6B89A9ABC27D4B38B28A5701 /* LogoutUseCase.swift in Sources */,
+				3DFB364AC66246E998DBC2E9 /* LoginWithEmailUseCase.swift in Sources */,
+				A76A4167D719438AA4F4251C /* LoginWithGoogleUseCase.swift in Sources */,
+				623A010AAFBB4DD7BF7D0D95 /* ObserveAuthStateUseCase.swift in Sources */,
+				DE4689A273B24EF0A2DFD6CC /* InactivityManager.swift in Sources */,
+				DAD0218A714640C2A2D1FA8E /* CachingTeamsRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -3,7 +3,6 @@
 //  liga1
 //
 //  Created by miguel tomairo on 02/01/26.
-//  Refactored on 15/02/26 to use AuthManager instead of LogoutUseCase.
 //
 
 import Foundation
@@ -25,13 +24,20 @@ class ProfileViewModel {
     @Published private(set) var photoURL: String?
     @Published private(set) var profileImageData: Data?
 
+    // MARK: - Dependencies
+
+    private let authService: AuthServiceProtocol
+    private let logoutUseCase: LogoutUseCaseProtocol
+
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
 
-    init() {
+    init(authService: AuthServiceProtocol, logoutUseCase: LogoutUseCaseProtocol) {
+        self.authService = authService
+        self.logoutUseCase = logoutUseCase
         setupSections()
         observeAuthState()
     }
@@ -42,8 +48,7 @@ class ProfileViewModel {
         isLoading = true
         error = nil
 
-        // Llamar directamente a AuthManager
-        AuthManager.shared.logout()
+        logoutUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
@@ -59,8 +64,8 @@ class ProfileViewModel {
     // MARK: - Private Methods
 
     private func observeAuthState() {
-        AuthManager.shared.observeAuthState()
-            .compactMap { $0 } // Solo cuando hay usuario
+        authService.observeAuthState()
+            .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] user in
                 self?.updateUserInfo(from: user)
@@ -69,32 +74,22 @@ class ProfileViewModel {
     }
 
     private func updateUserInfo(from user: User) {
-        // Actualizar display name
-        self.displayName = user.displayName ?? "Usuario"
+        displayName = user.displayName ?? "Usuario"
+        email = user.email ?? ""
+        photoURL = user.photoURL
 
-        // Actualizar email
-        self.email = user.email ?? ""
-
-        // Actualizar photo URL
-        self.photoURL = user.photoURL
-
-        // Descargar imagen de perfil si existe
         if let photoURLString = user.photoURL,
            let url = URL(string: photoURLString) {
             downloadProfileImage(from: url)
         } else {
-            // Usar imagen por defecto
-            self.profileImageData = nil
+            profileImageData = nil
         }
     }
 
     private func downloadProfileImage(from url: URL) {
-        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            if let data = data, error == nil {
-                DispatchQueue.main.async {
-                    self?.profileImageData = data
-                }
-            }
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+            guard let data = data, error == nil else { return }
+            DispatchQueue.main.async { self?.profileImageData = data }
         }.resume()
     }
 
