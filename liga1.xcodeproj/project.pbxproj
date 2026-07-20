@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		020D0497B7C1C2C0C30BA02A /* ComponentPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B73A13053D4CC2A0297ECDD1 /* ComponentPresets.swift */; };
 		31BECEF6387A29168CE21173 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE86397D312558B0952F475 /* AppTheme.swift */; };
+		3DFB364AC66246E998DBC2E9 /* LoginWithEmailUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */; };
 		4603CF852F42AD1900F537A4 /* FirebaseUserMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4603CF7A2F42AD1900F537A4 /* FirebaseUserMapper.swift */; };
 		4603CF862F42AD1900F537A4 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4603CF742F42AD1900F537A4 /* LoginViewModel.swift */; };
 		4603CF872F42AD1900F537A4 /* SSLPinningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4603CF7E2F42AD1900F537A4 /* SSLPinningManager.swift */; };
@@ -153,24 +154,23 @@
 		46F604042F60000300BBC912 /* HomeMatchesListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */; };
 		46F710A12F71000100BBC901 /* TeamVenueCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */; };
 		46F710A32F71000100BBC901 /* TeamVenues.json in Resources */ = {isa = PBXBuildFile; fileRef = 46F710A22F71000100BBC901 /* TeamVenues.json */; };
+		623A010AAFBB4DD7BF7D0D95 /* ObserveAuthStateUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */; };
 		65948435DFACA7759EC32637 /* CompositionalLayout+Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */; };
+		6B89A9ABC27D4B38B28A5701 /* LogoutUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */; };
 		98255077D821F2CCA95CA559 /* CollectionView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */; };
 		A1C0F0012FA0000100000001 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = A1C0F0022FA0000100000001 /* FirebaseRemoteConfig */; };
 		A1C0F0112FA0000100000011 /* TournamentConfigRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0102FA0000100000010 /* TournamentConfigRepositoryProtocol.swift */; };
 		A1C0F0132FA0000100000013 /* FirebaseTournamentConfigRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0122FA0000100000012 /* FirebaseTournamentConfigRepository.swift */; };
 		A1C0F0152FA0000100000015 /* GetTournamentAvailabilityUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0142FA0000100000014 /* GetTournamentAvailabilityUseCase.swift */; };
 		A1C0F0172FA0000100000017 /* CalculateAccumulatedStandingsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0162FA0000100000016 /* CalculateAccumulatedStandingsUseCase.swift */; };
+		A76A4167D719438AA4F4251C /* LoginWithGoogleUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */; };
+		AF257A451ADC4C809BFD09A1 /* AuthServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */; };
 		B05D895EF08F1124F534A87B /* ScrollView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B972D8BAD626F164CEA3B5 /* ScrollView+Builder.swift */; };
 		D0063549B126B4E82FC238DD /* UIControl+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BDDF5F80F98732D353F138 /* UIControl+Builder.swift */; };
 		D1B1041D3319FD746525F468 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916B96B6731A88F34AC09FDD /* AppColors.swift */; };
-		FF409DC8133AFDA3B8ED267E /* FormBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742E5D7ABC53132ABE23C086 /* FormBuilder.swift */; };
-		AF257A451ADC4C809BFD09A1 /* AuthServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */; };
-		6B89A9ABC27D4B38B28A5701 /* LogoutUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */; };
-		3DFB364AC66246E998DBC2E9 /* LoginWithEmailUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */; };
-		A76A4167D719438AA4F4251C /* LoginWithGoogleUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */; };
-		623A010AAFBB4DD7BF7D0D95 /* ObserveAuthStateUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */; };
-		DE4689A273B24EF0A2DFD6CC /* InactivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D706A2DD87EA40468D0EDDED /* InactivityManager.swift */; };
 		DAD0218A714640C2A2D1FA8E /* CachingTeamsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */; };
+		DE4689A273B24EF0A2DFD6CC /* InactivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D706A2DD87EA40468D0EDDED /* InactivityManager.swift */; };
+		FF409DC8133AFDA3B8ED267E /* FormBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742E5D7ABC53132ABE23C086 /* FormBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -197,7 +197,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithGoogleUseCase.swift; sourceTree = "<group>"; };
+		27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceProtocol.swift; sourceTree = "<group>"; };
 		34B972D8BAD626F164CEA3B5 /* ScrollView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollView+Builder.swift"; sourceTree = "<group>"; };
+		35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutUseCase.swift; sourceTree = "<group>"; };
+		40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveAuthStateUseCase.swift; sourceTree = "<group>"; };
 		4603CF652F42AD1900F537A4 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		4603CF662F42AD1900F537A4 /* AuthProviderFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProviderFactory.swift; sourceTree = "<group>"; };
 		4603CF672F42AD1900F537A4 /* AuthProviderStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProviderStrategy.swift; sourceTree = "<group>"; };
@@ -338,6 +342,8 @@
 		46F710A22F71000100BBC901 /* TeamVenues.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TeamVenues.json; sourceTree = "<group>"; };
 		49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CollectionView+Builder.swift"; sourceTree = "<group>"; };
 		5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CompositionalLayout+Presets.swift"; sourceTree = "<group>"; };
+		694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachingTeamsRepository.swift; sourceTree = "<group>"; };
+		6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithEmailUseCase.swift; sourceTree = "<group>"; };
 		742E5D7ABC53132ABE23C086 /* FormBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormBuilder.swift; sourceTree = "<group>"; };
 		81BDDF5F80F98732D353F138 /* UIControl+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+Builder.swift"; sourceTree = "<group>"; };
 		916B96B6731A88F34AC09FDD /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
@@ -347,13 +353,7 @@
 		A1C0F0162FA0000100000016 /* CalculateAccumulatedStandingsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculateAccumulatedStandingsUseCase.swift; sourceTree = "<group>"; };
 		B73A13053D4CC2A0297ECDD1 /* ComponentPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentPresets.swift; sourceTree = "<group>"; };
 		CAE86397D312558B0952F475 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
-		27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceProtocol.swift; sourceTree = "<group>"; };
-		35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutUseCase.swift; sourceTree = "<group>"; };
-		6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithEmailUseCase.swift; sourceTree = "<group>"; };
-		143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithGoogleUseCase.swift; sourceTree = "<group>"; };
-		40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserveAuthStateUseCase.swift; sourceTree = "<group>"; };
 		D706A2DD87EA40468D0EDDED /* InactivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InactivityManager.swift; sourceTree = "<group>"; };
-		694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachingTeamsRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -585,17 +585,6 @@
 				464001852F08853F00A8C905 /* Services */,
 			);
 			path = Data;
-			sourceTree = "<group>";
-		};
-		87DCDBFEACCB404C835152C5 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */,
-				6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */,
-				143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */,
-				40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */,
-			);
-			path = Auth;
 			sourceTree = "<group>";
 		};
 		4640018D2F08853F00A8C905 /* UseCases */ = {
@@ -1162,6 +1151,17 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		87DCDBFEACCB404C835152C5 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */,
+				6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */,
+				143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */,
+				40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
 		CD1EB71D0B692DED1FEA09A5 /* Presets */ = {
 			isa = PBXGroup;
 			children = (
@@ -1652,7 +1652,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
@@ -1685,7 +1685,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
