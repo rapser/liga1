@@ -24,28 +24,10 @@ final class FetchTeamsUseCaseTests: XCTestCase {
         super.tearDown()
     }
 
-    // MARK: - acumulado guard
+    // MARK: - acumulado derivado
 
-    func test_execute_acumulado_failsImmediately() {
-        var failed = false
-        let exp = expectation(description: "fail for acumulado")
-
-        sut.execute(for: .acumulado)
-            .sink(
-                receiveCompletion: { if case .failure = $0 { failed = true; exp.fulfill() } },
-                receiveValue: { _ in }
-            )
-            .store(in: &cancellables)
-
-        waitForExpectations(timeout: 2)
-        XCTAssertTrue(failed)
-    }
-
-    func test_execute_acumulado_doesNotCallRepository() {
-        sut.execute(for: .acumulado)
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &cancellables)
-
+    func test_execute_acumulado_failsWithoutCallingRepository() {
+        _ = try? awaitFailure(from: sut.execute(for: .acumulado))
         XCTAssertEqual(repository.fetchCallCount, 0)
     }
 

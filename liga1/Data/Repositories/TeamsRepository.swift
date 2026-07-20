@@ -32,24 +32,13 @@ class TeamsRepository: TeamsRepositoryProtocol {
             let query = self.db.collection(torneo.rawValue)
                 .order(by: FirestoreConstants.TeamField.points, descending: true)
 
-            // Caché primero: muestra equipos al instante en visitas sucesivas;
-            // el refresh en background actualiza la caché para la próxima consulta.
-            query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
+            // Intenta obtener la versión vigente del servidor y conserva el
+            // fallback offline de Firestore. El dato fresco sí llega al caller.
+            query.getDocuments(source: .default) { [weak self] snapshot, error in
                 guard let self = self else { return }
-
-                if cacheError == nil, let docs = cacheSnapshot?.documents, !docs.isEmpty {
-                    promise(.success(self.buildTeams(from: docs)))
-                    // Background: actualiza caché del SDK para la próxima visita.
-                    query.getDocuments(source: .server) { _, _ in }
-                } else {
-                    // Sin caché (primera carga), ir al servidor.
-                    query.getDocuments(source: .server) { [weak self] snapshot, error in
-                        guard let self = self else { return }
-                        if let error = error { promise(.failure(error)); return }
-                        guard let docs = snapshot?.documents else { promise(.success([])); return }
-                        promise(.success(self.buildTeams(from: docs)))
-                    }
-                }
+                if let error = error { promise(.failure(error)); return }
+                guard let docs = snapshot?.documents else { promise(.success([])); return }
+                promise(.success(self.buildTeams(from: docs)))
             }
         }
         .eraseToAnyPublisher()

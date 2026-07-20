@@ -70,6 +70,10 @@ final class DIContainer {
         return notificationService
     }
 
+    func makeTournamentConfigRepository() -> TournamentConfigRepositoryProtocol {
+        return FirebaseTournamentConfigRepository()
+    }
+
     private lazy var userPreferencesService: UserPreferencesServiceProtocol = {
         return UserPreferencesService(
             database: makeDatabase(),
@@ -165,6 +169,16 @@ final class DIContainer {
         )
     }
 
+    func makeGetTournamentAvailabilityUseCase() -> GetTournamentAvailabilityUseCaseProtocol {
+        return GetTournamentAvailabilityUseCase(
+            repository: makeTournamentConfigRepository()
+        )
+    }
+
+    func makeCalculateAccumulatedStandingsUseCase() -> CalculateAccumulatedStandingsUseCaseProtocol {
+        return CalculateAccumulatedStandingsUseCase()
+    }
+
     // MARK: - Use Cases - News
 
     func makeFetchNewsUseCase() -> FetchNewsUseCaseProtocol {
@@ -238,7 +252,9 @@ final class DIContainer {
 
     func makeTorneoViewModel() -> TorneoViewModel {
         return TorneoViewModel(
-            fetchTeamsUseCase: makeFetchTeamsUseCase()
+            fetchTeamsUseCase: makeFetchTeamsUseCase(),
+            tournamentAvailabilityUseCase: makeGetTournamentAvailabilityUseCase(),
+            calculateAccumulatedStandingsUseCase: makeCalculateAccumulatedStandingsUseCase()
         )
     }
 
