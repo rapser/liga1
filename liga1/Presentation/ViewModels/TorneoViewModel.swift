@@ -16,11 +16,14 @@ class TorneoViewModel {
     @Published private(set) var displayedTeams: [TeamUI] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: Error?
-    @Published private(set) var selectedTorneo: TorneoType = .clausura
+    @Published private(set) var selectedTorneo: TorneoType
+    @Published private(set) var availableTorneos: [TorneoType]
 
     // MARK: - Dependencies
 
     private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
+    private let tournamentAvailabilityUseCase: GetTournamentAvailabilityUseCaseProtocol
+    private let calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCaseProtocol
 
     // MARK: - Private Properties
 
@@ -28,13 +31,53 @@ class TorneoViewModel {
 
     // MARK: - Initialization
 
-    init(fetchTeamsUseCase: FetchTeamsUseCaseProtocol) {
+    init(
+        fetchTeamsUseCase: FetchTeamsUseCaseProtocol,
+        tournamentAvailabilityUseCase: GetTournamentAvailabilityUseCaseProtocol,
+        calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCaseProtocol
+    ) {
         self.fetchTeamsUseCase = fetchTeamsUseCase
+        self.tournamentAvailabilityUseCase = tournamentAvailabilityUseCase
+        self.calculateAccumulatedStandingsUseCase = calculateAccumulatedStandingsUseCase
+        let clausuraEnabled = tournamentAvailabilityUseCase.activeClausuraEnabled
+        self.selectedTorneo = clausuraEnabled ? .clausura : .apertura
+        self.availableTorneos = clausuraEnabled
+            ? [.apertura, .clausura, .acumulado]
+            : [.apertura]
     }
 
     // MARK: - Public Methods
 
+    func start() {
+        loadTeams(for: selectedTorneo)
+        refreshTournamentAvailability()
+    }
+
+    func refreshTournamentAvailability() {
+        tournamentAvailabilityUseCase.refreshClausuraEnabled()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isEnabled in
+                guard let self = self else { return }
+                let updatedTorneos: [TorneoType] = isEnabled
+                    ? [.apertura, .clausura, .acumulado]
+                    : [.apertura]
+
+                // Evita reconstruir el selector si Remote Config confirmó el
+                // mismo valor con el que la pantalla ya inició localmente.
+                guard updatedTorneos != self.availableTorneos else { return }
+                self.availableTorneos = updatedTorneos
+
+                if isEnabled {
+                    self.loadTeams(for: .clausura)
+                } else if !self.availableTorneos.contains(self.selectedTorneo) {
+                    self.loadTeams(for: .apertura)
+                }
+            }
+            .store(in: &cancellables)
+    }
+
     func loadTeams(for torneo: TorneoType) {
+        guard availableTorneos.contains(torneo) else { return }
         selectedTorneo = torneo
         if torneo == .acumulado {
             fetchAcumulado()
@@ -45,6 +88,7 @@ class TorneoViewModel {
 
     /// Fuerza recarga ignorando la caché en memoria
     func reloadTeams(for torneo: TorneoType) {
+        guard availableTorneos.contains(torneo) else { return }
         selectedTorneo = torneo
         if torneo == .acumulado {
             fetchTeamsUseCase.invalidateCache(for: nil)
@@ -77,53 +121,24 @@ class TorneoViewModel {
         isLoading = true
         error = nil
 
-        let aperturaPublisher = fetchTeamsUseCase.execute(for: .apertura)
-        let clausuraPublisher = fetchTeamsUseCase.execute(for: .clausura)
-
-        Publishers.Zip(aperturaPublisher, clausuraPublisher)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    self?.error = error
-                }
-            } receiveValue: { [weak self] (aperturaTeams, clausuraTeams) in
-                guard let self = self else { return }
-
-                var teamsDict: [String: Team] = [:]
-                for team in aperturaTeams { teamsDict[team.nombre] = team }
-                for team in clausuraTeams {
-                    if let existing = teamsDict[team.nombre] {
-                        let gf = existing.golesFavor + team.golesFavor
-                        let gc = existing.golesContra + team.golesContra
-                        teamsDict[team.nombre] = Team(
-                            nombre: existing.nombre,
-                            ciudad: existing.ciudad,
-                            estadio: existing.estadio,
-                            logo: existing.logo,
-                            partidosJugados: existing.partidosJugados + team.partidosJugados,
-                            partidosGanados: existing.partidosGanados + team.partidosGanados,
-                            partidosEmpatados: existing.partidosEmpatados + team.partidosEmpatados,
-                            partidosPerdidos: existing.partidosPerdidos + team.partidosPerdidos,
-                            golesFavor: gf,
-                            golesContra: gc,
-                            diferenciaGoles: gf - gc,
-                            puntos: existing.puntos + team.puntos
-                        )
-                    } else {
-                        teamsDict[team.nombre] = team
-                    }
-                }
-
-                let merged = Array(teamsDict.values)
-                let sorted: [Team]
-                if merged.allSatisfy({ $0.puntos == 0 }) {
-                    sorted = merged.sorted { $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending }
-                } else {
-                    sorted = merged.sorted { Team.isOrderedAboveInStandings($0, $1) }
-                }
-                self.displayedTeams = TeamUIMapper.toUI(from: sorted)
+        Publishers.Zip(
+            fetchTeamsUseCase.execute(for: .apertura),
+            fetchTeamsUseCase.execute(for: .clausura)
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] completion in
+            self?.isLoading = false
+            if case .failure(let error) = completion {
+                self?.error = error
             }
-            .store(in: &cancellables)
+        } receiveValue: { [weak self] aperturaTeams, clausuraTeams in
+            guard let self = self else { return }
+            let merged = self.calculateAccumulatedStandingsUseCase.execute(
+                apertura: aperturaTeams,
+                clausura: clausuraTeams
+            )
+            self.displayedTeams = TeamUIMapper.toUI(from: merged)
+        }
+        .store(in: &cancellables)
     }
 }

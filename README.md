@@ -5,7 +5,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 ## 📱 Características
 
 - **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario; carga fiable desde el primer arranque
-- **Tabla de Posiciones**: Consulta las tablas de Apertura, Clausura y Acumulado con estadísticas detalladas. Indicador visual especial (cuadrado dorado) para el puesto 1 y leyenda de campeón al pie de la tabla
+- **Tabla de Posiciones**: Apertura está siempre disponible. Clausura y Acumulado se habilitan juntos mediante Firebase Remote Config cuando comienza el segundo torneo del año
 - **Favoritos**: Carga instantánea gracias a caché Firestore; skeleton animado durante la carga inicial; sincronización en tiempo real con equipos favoritos
 - **Noticias**: Mantente informado con las últimas noticias del fútbol peruano (solo publicadas), agrupadas por categoría; la categoría Destacado siempre primero, el resto ordenadas por fecha
 - **Autenticación**: Ingresa con Google o correo electrónico para sincronizar tus favoritos
@@ -44,20 +44,29 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 ### 📊 Tabla de Posiciones
 
+#### Disponibilidad por etapa del año
+- **Inicio de temporada**: Solo se muestra Apertura
+- **Inicio del Clausura**: El flag remoto `standings_clausura_enabled = true` habilita Clausura y Acumulado sin publicar una nueva versión
+- **Torneo inicial**: Con el flag activo la pantalla abre directamente en Clausura; con el flag inactivo abre en Apertura
+- **Actualización al volver a Tabla**: La app fuerza una consulta remota cuando el usuario regresa a la pestaña, sin exigir cerrar la aplicación
+- **Carga sin saltos visuales**: La pantalla nace con el último valor activado y persistido por Remote Config, y solo cambia si Firebase publica un valor diferente
+- **Fallback seguro**: Sin conexión se conserva el último valor activado; en una instalación nueva o sin clave se muestra solamente Apertura
+- **Acumulado derivado**: Se calcula en el dispositivo sumando las colecciones `apertura` y `clausura` por document ID; no requiere una colección `acumulado`
+
 #### Características Visuales
 - **Indicador de Campeón**: Cuadrado dorado alrededor del número 1 con texto en negrita (sin punto); el resto de posiciones muestran número con punto sin fondo
-- **Leyenda de Campeón**: Footer al pie de la tabla con ícono dorado "1" y la etiqueta "Campeón del Torneo Apertura"
+- **Leyenda dinámica**: Apertura y Clausura muestran campeón; Acumulado muestra las zonas internacionales y de descenso
 - **Zonas de Clasificación** (modo claro):
   - 🟡 **Puesto 1**: Cuadrado dorado en el número de posición
   - 🟢 **Zona Libertadores**: Fondo dorado (puestos 1-4 según torneo)
   - 🔵 **Zona Sudamericana**: Fondo azul (puestos 5-8)
-  - 🔴 **Zona Descenso**: Fondo rojo (últimos 3 puestos)
+  - 🔴 **Zona Descenso**: Fondo rojo (puestos 17-18)
 - **Modo Oscuro Optimizado**: Sin fondos de colores, solo indicador dorado para campeón
 - **Header Personalizado**: Columnas "Equipo", "PJ", "GF-GC", "DG", "Pts"
 
 #### Lógica de Ordenamiento
 - **Orden Alfabético**: Cuando todos los equipos tienen 0 puntos
-- **Orden por Rendimiento**: Por puntos (descendente), luego diferencia de goles (descendente)
+- **Orden por Rendimiento**: Puntos, diferencia de goles, goles a favor, partidos ganados y nombre
 - **Recarga Automática**: Al entrar a la tab se recargan los datos sin usar caché
 
 ### 📰 Noticias
@@ -88,7 +97,8 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 #### Carga de la Pantalla Favoritos (Equipos)
 - **Skeleton Animado**: `FavoritosSkeletonView` muestra un placeholder pulsante (fade opacity) que imita el layout de `TeamTableViewCell` mientras se cargan los datos, evitando el flash de estado vacío
-- **Caché Primero**: `FavoritesService.fetchFavoriteTeams()` y `TeamsRepository.fetchTeams(for:)` leen de la caché local de Firestore al instante y actualizan en background desde el servidor; las visitas sucesivas son inmediatas
+- **Caché Primero en Favoritos**: `FavoritesService.fetchFavoriteTeams()` conserva su carga inmediata desde caché
+- **Posiciones vigentes**: `TeamsRepository.fetchTeams(for:)` intenta servidor y usa el fallback offline de Firestore, para que una recarga no quede una actualización atrás
 - **Estado Inicial Correcto**: `isLoading` arranca en `true` para que el skeleton sea visible desde el primer frame
 
 ### 🔐 Autenticación
@@ -153,6 +163,11 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
   - Persistencia offline habilitada
   - Listeners reactivos para actualización automática
   - Estructura anidada: `jornadas/{jornadaId}/matches/{matchId}`
+
+- **Firebase/Remote Config**: Regla remota de disponibilidad de tablas
+  - Clave booleana: `standings_clausura_enabled`
+  - Valor predeterminado en la app: `false`
+  - Intervalo general de caché: 5 minutos; la pestaña Tabla fuerza una consulta al reaparecer
   
 - **Firebase/Auth**: Sistema de autenticación
   - Soporte para Google Sign-In (OAuth 2.0)
@@ -279,7 +294,7 @@ View → ViewModel → UseCase → Repository → Firestore
 - **UseCases/**: Casos de uso (lógica de negocio)
   - **Jornadas/**: `FetchActiveJornadasUseCase`, `ObserveActiveJornadasUseCase`, `GetJornadaToDisplayUseCase` (jornada única a mostrar: menor `fechaInicio` entre activas)
   - **Matches/**: `FetchMatchesUseCase`, `ObserveMatchesUseCase`
-  - **Teams/**: `FetchTeamsUseCase`
+  - **Teams/**: `FetchTeamsUseCase`, `GetTournamentAvailabilityUseCase`, `CalculateAccumulatedStandingsUseCase`
   - **News/**: `FetchNewsUseCase`
   - **Favorites/**: `ToggleFavoriteUseCase`, `ObserveFavoritesUseCase`, `FetchFavoriteMatchesUseCase`
   - **Auth/**: `LoginUseCase`, `LogoutUseCase`
@@ -289,6 +304,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `JornadasRepositoryProtocol`
   - `MatchesRepositoryProtocol`
   - `TeamsRepositoryProtocol`
+  - `TournamentConfigRepositoryProtocol`
   - `NewsRepositoryProtocol`
   - `AdminMatchRepositoryProtocol`
 
@@ -306,6 +322,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `JornadasRepository` - Implementa `JornadasRepositoryProtocol`
   - `MatchesRepository` - Implementa `MatchesRepositoryProtocol`
   - `TeamsRepository` - Implementa `TeamsRepositoryProtocol`
+  - `FirebaseTournamentConfigRepository` - Adapta Firebase Remote Config al contrato del dominio
   - `NewsRepository` - Implementa `NewsRepositoryProtocol`
   - `AdminMatchRepository` - Implementa `AdminMatchRepositoryProtocol`
 
@@ -682,7 +699,8 @@ liga1Tests/
 | `GetJornadaToDisplayUseCase` | Ordenamiento puro `orderJornadasForHome`, `execute` y `observe` devuelven ordenados, propaga error |
 | `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
 | `ObserveMatchesUseCase` | Reenvía actualizaciones del repository |
-| `FetchTeamsUseCase` | `.acumulado` falla sin llamar repository, apertura/clausura delegan correctamente |
+| `FetchTeamsUseCase` | Acumulado permanece derivado; apertura/clausura delegan correctamente |
+| `TorneoViewModel` | Flag apagado/encendido y suma del Acumulado por ID estable |
 | `FetchNewsUseCase` | Delega y propaga resultado/error |
 | `ObserveFavoriteTeamsUseCase` | `execute` reenvía IDs, `refreshFavoriteTeams` delega fetch al service |
 | `ToggleFavoriteTeamUseCase` | Retorna `true`/`false` según service, propaga error |

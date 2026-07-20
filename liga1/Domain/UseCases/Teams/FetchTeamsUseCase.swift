@@ -27,7 +27,7 @@ class FetchTeamsUseCase: FetchTeamsUseCaseProtocol {
             return Fail(error: NSError(
                 domain: "FetchTeamsUseCase",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Cannot fetch 'acumulado' directly. Use apertura or clausura."]
+                userInfo: [NSLocalizedDescriptionKey: "Acumulado is derived from apertura and clausura."]
             )).eraseToAnyPublisher()
         }
         return repository.fetchTeams(for: torneo)
