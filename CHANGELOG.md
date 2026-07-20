@@ -5,6 +5,22 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [Unreleased]
+
+### ✨ Added
+- **Disponibilidad estacional de tablas**: Firebase Remote Config controla `standings_clausura_enabled`. Apertura siempre se muestra; Clausura y Acumulado aparecen juntos al activar el flag.
+- **Selector de torneo**: La pantalla Tabla permite alternar entre los torneos disponibles y conserva la selección durante recargas y retorno desde background.
+- **Refresco del flag al volver a Tabla**: La consulta omite el caché temporal para reflejar cambios publicados sin reiniciar la app.
+- **Estado offline del flag**: El selector usa directamente el último valor activado y persistido por Remote Config, sin mantener una segunda fuente en `UserDefaults`.
+- **Selección estacional**: Con Clausura habilitado, la tabla inicia en el segmento Clausura en vez de volver siempre a Apertura.
+
+### 🔧 Changed
+- **Acumulado derivado**: Se suma desde Apertura y Clausura por document ID, sin crear una colección adicional en Firestore.
+- **Actualización de posiciones**: Las recargas entregan el resultado vigente del servidor con fallback offline.
+- **Desempates y zonas**: Orden y zonas de clasificación alineados con la tabla del admin.
+- **Presentación de la tabla**: Se elimina el espacio automático sobre las columnas y las referencias se agrupan en una tarjeta compacta con puestos y significado.
+- **Separación por capas**: Remote Config se encapsula en un repositorio de Data y el cálculo del Acumulado pasa a un caso de uso puro del Domain.
+
 ## [1.0.0 (20)] - 2026-05-19
 
 ### ✨ Added

@@ -13,13 +13,13 @@ class TablaViewController: UIViewController {
 
     // MARK: - UI Components
     private let containerView = ContainerView()
-    private let aperturaLabelView = UIView()
-    private let aperturaLabel = UILabel()
+    private let tournamentSelector = UISegmentedControl(items: [TorneoType.apertura.displayName])
     private let tableView = UITableView()
 
     // MARK: - Properties
     let viewModel: TorneoViewModel
     private var cancellables = Set<AnyCancellable>()
+    private var hasStarted = false
 
     // MARK: - Initialization
     init(viewModel: TorneoViewModel) {
@@ -37,23 +37,35 @@ class TablaViewController: UIViewController {
         configureNavigationBar()
         setupUI()
         bindViewModel()
-        loadInitialData()
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleScoreUpdate), name: .scoreUpdateReceived, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        viewModel.reloadTeams(for: .apertura)
+        if hasStarted {
+            viewModel.refreshTournamentAvailability()
+            viewModel.reloadTeams(for: viewModel.selectedTorneo)
+        } else {
+            hasStarted = true
+            viewModel.start()
+        }
     }
 
     // MARK: - Actions
     @objc private func appWillEnterForeground() {
-        viewModel.reloadTeams(for: .apertura)
+        viewModel.refreshTournamentAvailability()
+        viewModel.reloadTeams(for: viewModel.selectedTorneo)
     }
 
     @objc private func handleScoreUpdate() {
         viewModel.reloadTeams(for: viewModel.selectedTorneo)
+    }
+
+    @objc private func tournamentChanged() {
+        let index = tournamentSelector.selectedSegmentIndex
+        guard viewModel.availableTorneos.indices.contains(index) else { return }
+        viewModel.loadTeams(for: viewModel.availableTorneos[index])
     }
 
     // MARK: - Setup Methods
@@ -68,32 +80,21 @@ class TablaViewController: UIViewController {
         // Container principal
         containerView.attachBetweenNavigationAndTabBar(in: view, hasTabBar: true)
 
-        // Label "Apertura" (view rojo)
-        setupAperturaLabel()
+        setupTournamentSelector()
 
         // TableView
         setupTableView()
     }
 
-    private func setupAperturaLabel() {
-        // Configurar el view rojo
-        aperturaLabelView.backgroundColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
-        aperturaLabelView.layer.cornerRadius = 5.0
-        aperturaLabelView.prepareForAutoLayout()
+    private func setupTournamentSelector() {
+        tournamentSelector.selectedSegmentIndex = 0
+        tournamentSelector.selectedSegmentTintColor = UIColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
+        tournamentSelector.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        tournamentSelector.addTarget(self, action: #selector(tournamentChanged), for: .valueChanged)
+        tournamentSelector.prepareForAutoLayout()
 
-        // Configurar el label
-        aperturaLabel.text = "Apertura"
-        aperturaLabel.textColor = .white
-        aperturaLabel.font = .systemFont(ofSize: 14, weight: .bold)
-        aperturaLabel.textAlignment = .center
-        aperturaLabel.prepareForAutoLayout()
-
-        // Agregar al container
-        containerView.addSubview(aperturaLabelView)
-        aperturaLabelView.addSubview(aperturaLabel)
-
-        // Constraints del view rojo
-        aperturaLabelView.anchor(
+        containerView.addSubview(tournamentSelector)
+        tournamentSelector.anchor(
             top: containerView.topAnchor,
             leading: containerView.leadingAnchor,
             trailing: containerView.trailingAnchor,
@@ -104,10 +105,7 @@ class TablaViewController: UIViewController {
                 right: Spacing.standard
             )
         )
-        aperturaLabelView.height(30)
-
-        // Constraints del label dentro del view
-        aperturaLabel.centerInSuperview()
+        tournamentSelector.height(32)
     }
 
     private func setupTableView() {
@@ -117,19 +115,20 @@ class TablaViewController: UIViewController {
         tableView.allowsSelection = false
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.tableFooterView = makeLegendFooter()
+        tableView.sectionHeaderTopPadding = 0
+        tableView.tableFooterView = makeLegendFooter(for: .apertura)
 
         // Agregar al container
         containerView.addSubview(tableView)
 
-        // Constraints: debajo del aperturaLabelView, pegado a los bordes
+        // Constraints: debajo del selector, pegado a los bordes
         tableView.anchor(
-            top: aperturaLabelView.bottomAnchor,
+            top: tournamentSelector.bottomAnchor,
             leading: containerView.leadingAnchor,
             bottom: containerView.bottomAnchor,
             trailing: containerView.trailingAnchor,
             padding: UIEdgeInsets(
-                top: Spacing.small,
+                top: Spacing.tiny,
                 left: 0,
                 bottom: 0,
                 right: 0
@@ -137,70 +136,124 @@ class TablaViewController: UIViewController {
         )
     }
 
-    private func makeLegendFooter() -> UIView {
+    private func makeLegendFooter(for torneo: TorneoType) -> UIView {
         let footer = UIView()
         footer.backgroundColor = .clear
 
-        let separator = UIView()
-        separator.backgroundColor = .separator
-        separator.prepareForAutoLayout()
+        let card = UIView()
+        card.backgroundColor = .secondarySystemBackground
+        card.layer.cornerRadius = 12
+        card.layer.cornerCurve = .continuous
+        card.prepareForAutoLayout()
 
-        let badgeView = UIView()
-        badgeView.backgroundColor = .libertadoresGold
-        badgeView.layer.cornerRadius = 5
-        badgeView.prepareForAutoLayout()
+        let descriptions: [(UIColor, String, String)]
+        if torneo == .acumulado {
+            descriptions = [
+                (.libertadoresGold, "1.º–2.º", "Libertadores · Fase de grupos"),
+                (.libertadoresLightGold, "3.º", "Libertadores · Fase 2"),
+                (.libertadoresLighterGold, "4.º", "Libertadores · Fase 1"),
+                (.sudamericanaBlue, "5.º–8.º", "Copa Sudamericana"),
+                (.relegationRed, "17.º–18.º", "Descenso")
+            ]
+        } else {
+            descriptions = [
+                (.libertadoresGold, "1.º", "Campeón del Torneo \(torneo.displayName)")
+            ]
+        }
 
-        let badgeLabel = UILabel()
-        badgeLabel.text = "1"
-        badgeLabel.font = .boldSystemFont(ofSize: 11)
-        badgeLabel.textColor = .black
-        badgeLabel.textAlignment = .center
-        badgeLabel.prepareForAutoLayout()
+        let titleLabel = UILabel()
+        titleLabel.text = "Leyenda"
+        titleLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        titleLabel.textColor = .label
 
-        let descLabel = UILabel()
-        descLabel.text = "Campeón del Torneo Apertura"
-        descLabel.font = .systemFont(ofSize: 12)
-        descLabel.textColor = .secondaryLabel
-        descLabel.prepareForAutoLayout()
+        let rows = descriptions.map {
+            makeLegendRow(color: $0.0, position: $0.1, text: $0.2)
+        }
+        let stack = UIStackView(arrangedSubviews: [titleLabel] + rows)
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.spacing = 7
+        stack.setCustomSpacing(10, after: titleLabel)
+        stack.prepareForAutoLayout()
 
-        let row = UIStackView(arrangedSubviews: [badgeView, descLabel])
-        row.axis = .horizontal
-        row.alignment = .center
-        row.spacing = 8
-        row.prepareForAutoLayout()
+        footer.addSubview(card)
+        card.addSubview(stack)
 
-        badgeView.addSubview(badgeLabel)
-        badgeLabel.centerInSuperview()
-        badgeView.widthAnchor.constraint(equalToConstant: 22).isActive = true
-        badgeView.heightAnchor.constraint(equalToConstant: 22).isActive = true
-
-        footer.addSubview(separator)
-        footer.addSubview(row)
-
-        separator.anchor(
+        card.anchor(
             top: footer.topAnchor,
             leading: footer.leadingAnchor,
-            trailing: footer.trailingAnchor
-        )
-        separator.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-
-        row.anchor(
-            top: separator.bottomAnchor,
-            leading: footer.leadingAnchor,
             bottom: footer.bottomAnchor,
+            trailing: footer.trailingAnchor,
             padding: UIEdgeInsets(top: 10, left: Spacing.standard, bottom: 10, right: Spacing.standard)
         )
 
-        footer.frame = CGRect(x: 0, y: 0, width: 0, height: 44)
+        stack.anchor(
+            top: card.topAnchor,
+            leading: card.leadingAnchor,
+            bottom: card.bottomAnchor,
+            trailing: card.trailingAnchor,
+            padding: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        )
+
+        let height: CGFloat = torneo == .acumulado ? 174 : 86
+        footer.frame = CGRect(x: 0, y: 0, width: 0, height: height)
         return footer
     }
 
+    private func makeLegendRow(color: UIColor, position: String, text: String) -> UIView {
+        let colorView = UIView()
+        colorView.backgroundColor = color
+        colorView.layer.cornerRadius = 3
+        colorView.prepareForAutoLayout()
+        colorView.widthAnchor.constraint(equalToConstant: 12).isActive = true
+        colorView.heightAnchor.constraint(equalToConstant: 12).isActive = true
+
+        let positionLabel = UILabel()
+        positionLabel.text = position
+        positionLabel.font = .monospacedDigitSystemFont(ofSize: 12, weight: .semibold)
+        positionLabel.textColor = .label
+        positionLabel.widthAnchor.constraint(equalToConstant: 58).isActive = true
+
+        let label = UILabel()
+        label.text = text
+        label.font = .systemFont(ofSize: 12)
+        label.textColor = .label
+        label.numberOfLines = 0
+
+        let row = UIStackView(arrangedSubviews: [colorView, positionLabel, label])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = 8
+        return row
+    }
+
     // MARK: - Data & Binding
-    private func loadInitialData() {
-        viewModel.loadTeams(for: .apertura)
+    private func configureTournamentSelector(with torneos: [TorneoType]) {
+        tournamentSelector.removeAllSegments()
+        for (index, torneo) in torneos.enumerated() {
+            tournamentSelector.insertSegment(withTitle: torneo.displayName, at: index, animated: false)
+        }
+        tournamentSelector.selectedSegmentIndex = torneos.firstIndex(of: viewModel.selectedTorneo) ?? 0
     }
 
     private func bindViewModel() {
+        viewModel.$availableTorneos
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] torneos in
+                self?.configureTournamentSelector(with: torneos)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$selectedTorneo
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] torneo in
+                guard let self = self else { return }
+                self.tournamentSelector.selectedSegmentIndex = self.viewModel.availableTorneos.firstIndex(of: torneo) ?? 0
+                self.tableView.tableFooterView = self.makeLegendFooter(for: torneo)
+                self.tableView.reloadData()
+            }
+            .store(in: &cancellables)
+
         viewModel.$displayedTeams
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
