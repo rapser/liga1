@@ -37,10 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         settings.cacheSettings = PersistentCacheSettings()
         Firestore.firestore().settings = settings
 
-        // TEMPORAL: ingesta única de datos maestros (equipos/stadiums/referees).
-        // Eliminar esta línea y MasterDataSeeder.swift tras ejecutarlo.
-        MasterDataSeeder.runIfNeeded(logger: DIContainer.shared.makeLogger())
-
         // Configurar delegates de notificaciones
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
