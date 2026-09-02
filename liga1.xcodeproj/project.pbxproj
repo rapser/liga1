@@ -383,17 +383,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		46B3EF472FBAAA8A00F1453E /* liga1Tests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = liga1Tests;
-			sourceTree = "<group>";
-		};
+		46B3EF472FBAAA8A00F1453E /* liga1Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = liga1Tests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -431,7 +421,6 @@
 			children = (
 				7CAE4637DE280A49A746F0A3 /* Stadium.swift */,
 			);
-			name = Stadium;
 			path = Stadium;
 			sourceTree = "<group>";
 		};
@@ -449,7 +438,6 @@
 			children = (
 				FEFE726E922EBBF958876C41 /* RefereeDTO.swift */,
 			);
-			name = Referee;
 			path = Referee;
 			sourceTree = "<group>";
 		};
@@ -1223,7 +1211,6 @@
 				0F35E8184FF24A7B9020649E /* GetStadiumForTeamUseCase.swift */,
 				CEABB299CF36DC5446B6B3E6 /* GetRefereeProfileUseCase.swift */,
 			);
-			name = MatchContext;
 			path = MatchContext;
 			sourceTree = "<group>";
 		};
@@ -1232,7 +1219,6 @@
 			children = (
 				6F758F8E714885735502774A /* StadiumDTO.swift */,
 			);
-			name = Stadium;
 			path = Stadium;
 			sourceTree = "<group>";
 		};
@@ -1260,7 +1246,6 @@
 			children = (
 				C01A57BBDF80B7C9374F76C1 /* RefereeProfile.swift */,
 			);
-			name = Referee;
 			path = Referee;
 			sourceTree = "<group>";
 		};
