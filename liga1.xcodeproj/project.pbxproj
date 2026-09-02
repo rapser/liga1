@@ -7,8 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		000FB853D23AA1A3B0A39FA0 /* RefereeMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62383D4A54D2705A1B74A90B /* RefereeMapper.swift */; };
 		020D0497B7C1C2C0C30BA02A /* ComponentPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B73A13053D4CC2A0297ECDD1 /* ComponentPresets.swift */; };
+		0E33F39FE803E52FAC25D2B1 /* StadiumRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B3E5D4E235193D59733902 /* StadiumRepositoryProtocol.swift */; };
+		14B071755732CC623E2DD890 /* RefereeDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFE726E922EBBF958876C41 /* RefereeDTO.swift */; };
+		1BE5E2985A77DF12D283E6D8 /* Stadium.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAE4637DE280A49A746F0A3 /* Stadium.swift */; };
+		2D5F1B70E8E9F794EDB818FA /* GetRefereeProfileUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEABB299CF36DC5446B6B3E6 /* GetRefereeProfileUseCase.swift */; };
 		31BECEF6387A29168CE21173 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE86397D312558B0952F475 /* AppTheme.swift */; };
+		3457A9DE37CC219FDA92092B /* RefereeRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6577F1ECE5C82080149784A4 /* RefereeRepositoryProtocol.swift */; };
 		3DFB364AC66246E998DBC2E9 /* LoginWithEmailUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */; };
 		4603CF852F42AD1900F537A4 /* FirebaseUserMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4603CF7A2F42AD1900F537A4 /* FirebaseUserMapper.swift */; };
 		4603CF862F42AD1900F537A4 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4603CF742F42AD1900F537A4 /* LoginViewModel.swift */; };
@@ -154,9 +160,12 @@
 		46F604042F60000300BBC912 /* HomeMatchesListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F604032F60000300BBC912 /* HomeMatchesListSkeletonView.swift */; };
 		46F710A12F71000100BBC901 /* TeamVenueCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */; };
 		46F710A32F71000100BBC901 /* TeamVenues.json in Resources */ = {isa = PBXBuildFile; fileRef = 46F710A22F71000100BBC901 /* TeamVenues.json */; };
+		5EC66D935FA0B2B7B0B798F3 /* Slug.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15C4BFCE1DA34552E8406C3 /* Slug.swift */; };
 		623A010AAFBB4DD7BF7D0D95 /* ObserveAuthStateUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E109A8BC5549E49F10898A /* ObserveAuthStateUseCase.swift */; };
 		65948435DFACA7759EC32637 /* CompositionalLayout+Presets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */; };
 		6B89A9ABC27D4B38B28A5701 /* LogoutUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AFD27CA71B4321884C39FE /* LogoutUseCase.swift */; };
+		833595A9AF546A552145CB42 /* GetStadiumForTeamUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F35E8184FF24A7B9020649E /* GetStadiumForTeamUseCase.swift */; };
+		8EC76D50DEC9789BF9ECAC52 /* StadiumDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F758F8E714885735502774A /* StadiumDTO.swift */; };
 		98255077D821F2CCA95CA559 /* CollectionView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */; };
 		A1C0F0012FA0000100000001 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = A1C0F0022FA0000100000001 /* FirebaseRemoteConfig */; };
 		A1C0F0112FA0000100000011 /* TournamentConfigRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0102FA0000100000010 /* TournamentConfigRepositoryProtocol.swift */; };
@@ -166,6 +175,10 @@
 		A76A4167D719438AA4F4251C /* LoginWithGoogleUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */; };
 		AF257A451ADC4C809BFD09A1 /* AuthServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */; };
 		B05D895EF08F1124F534A87B /* ScrollView+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B972D8BAD626F164CEA3B5 /* ScrollView+Builder.swift */; };
+		B59B244114D5C20A9E8ED84B /* StadiumMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B40835AA7A98466754AB43 /* StadiumMapper.swift */; };
+		C8D9AD3ED0EFE4DEB4D84033 /* RefereeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6831E038BC3A5B959D796A34 /* RefereeRepository.swift */; };
+		CAD7988BAEAD5F15AAD8C517 /* RefereeProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01A57BBDF80B7C9374F76C1 /* RefereeProfile.swift */; };
+		CC9818519D00D25F8F8D0C1E /* StadiumRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A79E709795275DA929CD971 /* StadiumRepository.swift */; };
 		D0063549B126B4E82FC238DD /* UIControl+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BDDF5F80F98732D353F138 /* UIControl+Builder.swift */; };
 		D1B1041D3319FD746525F468 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916B96B6731A88F34AC09FDD /* AppColors.swift */; };
 		DAD0218A714640C2A2D1FA8E /* CachingTeamsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */; };
@@ -197,6 +210,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0F35E8184FF24A7B9020649E /* GetStadiumForTeamUseCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GetStadiumForTeamUseCase.swift; sourceTree = "<group>"; };
 		143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithGoogleUseCase.swift; sourceTree = "<group>"; };
 		27B64C425E874DCFAAC09301 /* AuthServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceProtocol.swift; sourceTree = "<group>"; };
 		34B972D8BAD626F164CEA3B5 /* ScrollView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrollView+Builder.swift"; sourceTree = "<group>"; };
@@ -341,23 +355,45 @@
 		46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamVenueCatalog.swift; sourceTree = "<group>"; };
 		46F710A22F71000100BBC901 /* TeamVenues.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = TeamVenues.json; sourceTree = "<group>"; };
 		49B2BCDB83512D5BF897906C /* CollectionView+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CollectionView+Builder.swift"; sourceTree = "<group>"; };
+		4A79E709795275DA929CD971 /* StadiumRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StadiumRepository.swift; sourceTree = "<group>"; };
 		5364B7E508EA61C19271D418 /* CompositionalLayout+Presets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CompositionalLayout+Presets.swift"; sourceTree = "<group>"; };
+		62383D4A54D2705A1B74A90B /* RefereeMapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RefereeMapper.swift; sourceTree = "<group>"; };
+		6577F1ECE5C82080149784A4 /* RefereeRepositoryProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RefereeRepositoryProtocol.swift; sourceTree = "<group>"; };
+		6831E038BC3A5B959D796A34 /* RefereeRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RefereeRepository.swift; sourceTree = "<group>"; };
 		694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachingTeamsRepository.swift; sourceTree = "<group>"; };
+		6F758F8E714885735502774A /* StadiumDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StadiumDTO.swift; sourceTree = "<group>"; };
 		6FB8F92B13C54890B57E2DE2 /* LoginWithEmailUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithEmailUseCase.swift; sourceTree = "<group>"; };
 		742E5D7ABC53132ABE23C086 /* FormBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormBuilder.swift; sourceTree = "<group>"; };
+		7CAE4637DE280A49A746F0A3 /* Stadium.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Stadium.swift; sourceTree = "<group>"; };
 		81BDDF5F80F98732D353F138 /* UIControl+Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+Builder.swift"; sourceTree = "<group>"; };
+		86B40835AA7A98466754AB43 /* StadiumMapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StadiumMapper.swift; sourceTree = "<group>"; };
 		916B96B6731A88F34AC09FDD /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		A1C0F0102FA0000100000010 /* TournamentConfigRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentConfigRepositoryProtocol.swift; sourceTree = "<group>"; };
 		A1C0F0122FA0000100000012 /* FirebaseTournamentConfigRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseTournamentConfigRepository.swift; sourceTree = "<group>"; };
 		A1C0F0142FA0000100000014 /* GetTournamentAvailabilityUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetTournamentAvailabilityUseCase.swift; sourceTree = "<group>"; };
 		A1C0F0162FA0000100000016 /* CalculateAccumulatedStandingsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculateAccumulatedStandingsUseCase.swift; sourceTree = "<group>"; };
 		B73A13053D4CC2A0297ECDD1 /* ComponentPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentPresets.swift; sourceTree = "<group>"; };
+		C01A57BBDF80B7C9374F76C1 /* RefereeProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RefereeProfile.swift; sourceTree = "<group>"; };
 		CAE86397D312558B0952F475 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		CEABB299CF36DC5446B6B3E6 /* GetRefereeProfileUseCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GetRefereeProfileUseCase.swift; sourceTree = "<group>"; };
+		D15C4BFCE1DA34552E8406C3 /* Slug.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Slug.swift; sourceTree = "<group>"; };
 		D706A2DD87EA40468D0EDDED /* InactivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InactivityManager.swift; sourceTree = "<group>"; };
+		F7B3E5D4E235193D59733902 /* StadiumRepositoryProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StadiumRepositoryProtocol.swift; sourceTree = "<group>"; };
+		FEFE726E922EBBF958876C41 /* RefereeDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RefereeDTO.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		46B3EF472FBAAA8A00F1453E /* liga1Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = liga1Tests; sourceTree = "<group>"; };
+		46B3EF472FBAAA8A00F1453E /* liga1Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = liga1Tests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -390,6 +426,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2BF4C7D09F3D17468EF4BECE /* Stadium */ = {
+			isa = PBXGroup;
+			children = (
+				7CAE4637DE280A49A746F0A3 /* Stadium.swift */,
+			);
+			name = Stadium;
+			path = Stadium;
+			sourceTree = "<group>";
+		};
 		2F495D343858210080554804 /* Theme */ = {
 			isa = PBXGroup;
 			children = (
@@ -397,6 +442,15 @@
 				CAE86397D312558B0952F475 /* AppTheme.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		429D3F692E502AA7BDF2A9B6 /* Referee */ = {
+			isa = PBXGroup;
+			children = (
+				FEFE726E922EBBF958876C41 /* RefereeDTO.swift */,
+			);
+			name = Referee;
+			path = Referee;
 			sourceTree = "<group>";
 		};
 		4603CF692F42AD1900F537A4 /* Core */ = {
@@ -536,6 +590,7 @@
 				464001772F08853F00A8C905 /* TablePosition.swift */,
 				46F710A02F71000100BBC901 /* TeamVenueCatalog.swift */,
 				464001782F08853F00A8C905 /* TorneoType.swift */,
+				D15C4BFCE1DA34552E8406C3 /* Slug.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -561,6 +616,8 @@
 				464001812F08853F00A8C905 /* TeamsRepository.swift */,
 				694907FBF5CB4113A6E4BC61 /* CachingTeamsRepository.swift */,
 				A1C0F0122FA0000100000012 /* FirebaseTournamentConfigRepository.swift */,
+				4A79E709795275DA929CD971 /* StadiumRepository.swift */,
+				6831E038BC3A5B959D796A34 /* RefereeRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -597,6 +654,7 @@
 				464009CA2F098D8D00A8C905 /* Matches */,
 				464009CC2F098D8D00A8C905 /* News */,
 				464009CE2F098D8D00A8C905 /* Teams */,
+				5450D183C28A64ECE50E5155 /* MatchContext */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -945,6 +1003,8 @@
 				46CDF4742F1061E600F280E6 /* Match */,
 				46CDF4752F1061E600F280E6 /* NewsItem */,
 				46CDF4762F1061E600F280E6 /* Team */,
+				2BF4C7D09F3D17468EF4BECE /* Stadium */,
+				F697F042B4A5A5C62C82535F /* Referee */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -989,6 +1049,8 @@
 				46CDF47B2F1061FC00F280E6 /* Match */,
 				46CDF47C2F1061FC00F280E6 /* NewsItem */,
 				46CDF47D2F1061FC00F280E6 /* Team */,
+				66DD0E6BA0A3B6050AF66847 /* Stadium */,
+				429D3F692E502AA7BDF2A9B6 /* Referee */,
 			);
 			path = DTOs;
 			sourceTree = "<group>";
@@ -1046,6 +1108,8 @@
 				46CDF49D2F1068A300F280E6 /* MatchMapper.swift */,
 				46CDF49E2F1068A300F280E6 /* NewsItemMapper.swift */,
 				46CDF49F2F1068A300F280E6 /* TeamMapper.swift */,
+				86B40835AA7A98466754AB43 /* StadiumMapper.swift */,
+				62383D4A54D2705A1B74A90B /* RefereeMapper.swift */,
 			);
 			path = Mappers;
 			sourceTree = "<group>";
@@ -1058,6 +1122,8 @@
 				46CDF4A82F1086F100F280E6 /* NewsRepositoryProtocol.swift */,
 				46CDF4A92F1086F100F280E6 /* TeamsRepositoryProtocol.swift */,
 				A1C0F0102FA0000100000010 /* TournamentConfigRepositoryProtocol.swift */,
+				F7B3E5D4E235193D59733902 /* StadiumRepositoryProtocol.swift */,
+				6577F1ECE5C82080149784A4 /* RefereeRepositoryProtocol.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -1151,6 +1217,25 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		5450D183C28A64ECE50E5155 /* MatchContext */ = {
+			isa = PBXGroup;
+			children = (
+				0F35E8184FF24A7B9020649E /* GetStadiumForTeamUseCase.swift */,
+				CEABB299CF36DC5446B6B3E6 /* GetRefereeProfileUseCase.swift */,
+			);
+			name = MatchContext;
+			path = MatchContext;
+			sourceTree = "<group>";
+		};
+		66DD0E6BA0A3B6050AF66847 /* Stadium */ = {
+			isa = PBXGroup;
+			children = (
+				6F758F8E714885735502774A /* StadiumDTO.swift */,
+			);
+			name = Stadium;
+			path = Stadium;
+			sourceTree = "<group>";
+		};
 		87DCDBFEACCB404C835152C5 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
@@ -1168,6 +1253,15 @@
 				B73A13053D4CC2A0297ECDD1 /* ComponentPresets.swift */,
 			);
 			path = Presets;
+			sourceTree = "<group>";
+		};
+		F697F042B4A5A5C62C82535F /* Referee */ = {
+			isa = PBXGroup;
+			children = (
+				C01A57BBDF80B7C9374F76C1 /* RefereeProfile.swift */,
+			);
+			name = Referee;
+			path = Referee;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1190,8 +1284,6 @@
 				46B3EF472FBAAA8A00F1453E /* liga1Tests */,
 			);
 			name = liga1Tests;
-			packageProductDependencies = (
-			);
 			productName = liga1Tests;
 			productReference = 46B3EF462FBAAA8A00F1453E /* liga1Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -1452,6 +1544,19 @@
 				623A010AAFBB4DD7BF7D0D95 /* ObserveAuthStateUseCase.swift in Sources */,
 				DE4689A273B24EF0A2DFD6CC /* InactivityManager.swift in Sources */,
 				DAD0218A714640C2A2D1FA8E /* CachingTeamsRepository.swift in Sources */,
+				5EC66D935FA0B2B7B0B798F3 /* Slug.swift in Sources */,
+				1BE5E2985A77DF12D283E6D8 /* Stadium.swift in Sources */,
+				CAD7988BAEAD5F15AAD8C517 /* RefereeProfile.swift in Sources */,
+				0E33F39FE803E52FAC25D2B1 /* StadiumRepositoryProtocol.swift in Sources */,
+				3457A9DE37CC219FDA92092B /* RefereeRepositoryProtocol.swift in Sources */,
+				833595A9AF546A552145CB42 /* GetStadiumForTeamUseCase.swift in Sources */,
+				2D5F1B70E8E9F794EDB818FA /* GetRefereeProfileUseCase.swift in Sources */,
+				8EC76D50DEC9789BF9ECAC52 /* StadiumDTO.swift in Sources */,
+				14B071755732CC623E2DD890 /* RefereeDTO.swift in Sources */,
+				B59B244114D5C20A9E8ED84B /* StadiumMapper.swift in Sources */,
+				000FB853D23AA1A3B0A39FA0 /* RefereeMapper.swift in Sources */,
+				CC9818519D00D25F8F8D0C1E /* StadiumRepository.swift in Sources */,
+				C8D9AD3ED0EFE4DEB4D84033 /* RefereeRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

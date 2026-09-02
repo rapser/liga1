@@ -4,10 +4,21 @@
 //
 
 import UIKit
+import Combine
 
 final class MatchDetailViewController: UIViewController {
 
     private let viewModel: MatchDetailViewModel
+    private var cancellables = Set<AnyCancellable>()
+
+    /// Contenedor de las secciones que dependen de datos remotos (Sabor Local +
+    /// Información adicional). Se reconstruye al llegar `stadium` / `referee`.
+    private let contextSectionsContainer: UIStackView = {
+        let s = UIStackView()
+        s.axis = .vertical
+        s.spacing = Spacing.medium
+        return s
+    }()
 
     private let segmentedControl: UISegmentedControl = {
         let c = UISegmentedControl(items: ["Resumen", "Estadísticas", "Alineaciones"])
@@ -85,6 +96,16 @@ final class MatchDetailViewController: UIViewController {
         setupEstadisticasTab()
         setupAlineacionesTab()
         segmentChanged()
+        bindViewModel()
+        viewModel.load()
+    }
+
+    private func bindViewModel() {
+        viewModel.$stadium
+            .combineLatest(viewModel.$referee)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _, _ in self?.rebuildContextSections() }
+            .store(in: &cancellables)
     }
 
     private func setupResumen() {
@@ -111,7 +132,55 @@ final class MatchDetailViewController: UIViewController {
         stack.addArrangedSubview(makeScoreboardHeader())
         stack.addArrangedSubview(MatchDetailTitledSectionView.statRowsSection(title: "Estadísticas", rows: vm.resumenStatRows))
         stack.addArrangedSubview(makeTVSection())
-        stack.addArrangedSubview(makeInfoAdicionalSection())
+        stack.addArrangedSubview(contextSectionsContainer)
+        rebuildContextSections()
+    }
+
+    /// Reconstruye "Sabor Local" + "Información adicional" con lo que haya cargado el VM.
+    private func rebuildContextSections() {
+        contextSectionsContainer.arrangedSubviews.forEach {
+            contextSectionsContainer.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        if viewModel.saborLocalDisponible {
+            contextSectionsContainer.addArrangedSubview(makeSaborLocalSection())
+        }
+        contextSectionsContainer.addArrangedSubview(makeInfoAdicionalSection())
+    }
+
+    private func makeSaborLocalSection() -> UIView {
+        let inner = UIStackView()
+        inner.prepareForAutoLayout()
+        inner.axis = .vertical
+        inner.spacing = 0
+
+        var rows: [UIView] = []
+        if let factor = viewModel.factorGeograficoDisplay, let alt = viewModel.altitudDisplay {
+            rows.append(infoRow(key: factor, value: alt))
+        } else if let alt = viewModel.altitudDisplay {
+            rows.append(infoRow(key: "Altitud", value: alt))
+        }
+        if let ciudad = viewModel.ciudadDisplay {
+            rows.append(infoRow(key: "Ciudad", value: ciudad))
+        }
+
+        for (index, row) in rows.enumerated() {
+            if index > 0 { inner.addArrangedSubview(separatorLine()) }
+            inner.addArrangedSubview(row)
+        }
+
+        if let dato = viewModel.datoHistorico {
+            let l = UILabel()
+            l.font = .systemFont(ofSize: 13)
+            l.textColor = .secondaryLabel
+            l.numberOfLines = 0
+            l.text = dato
+            if !rows.isEmpty { inner.addArrangedSubview(separatorLine()) }
+            inner.setCustomSpacing(Spacing.small, after: inner.arrangedSubviews.last ?? l)
+            inner.addArrangedSubview(l)
+        }
+
+        return MatchDetailTitledSectionView(title: "Sabor Local", uppercaseTitle: true, content: inner)
     }
 
     private func makeScoreboardHeader() -> UIView {
@@ -250,8 +319,16 @@ final class MatchDetailViewController: UIViewController {
         inner.spacing = 0
 
         var rows: [UIView] = []
-        if let nombreArbitro = viewModel.arbitroSiExiste {
-            rows.append(infoRow(key: "Árbitro", value: nombreArbitro))
+        if let nombreArbitro = viewModel.refereeNombreDisplay {
+            let nacionalidad = viewModel.refereeNacionalidadDisplay
+            rows.append(infoRow(key: "Árbitro",
+                                value: nacionalidad.map { "\(nombreArbitro) · \($0)" } ?? nombreArbitro))
+            if let penales = viewModel.refereePenalesPorPartidoDisplay {
+                rows.append(infoRow(key: "Penales / partido", value: penales))
+            }
+            if let tarjetas = viewModel.refereeTarjetasPorPartidoDisplay {
+                rows.append(infoRow(key: "Tarjetas / partido", value: tarjetas))
+            }
         }
         rows.append(infoRow(key: "Estadio", value: viewModel.estadioDisplay))
         rows.append(infoRow(key: "Capacidad", value: viewModel.capacidadDisplay))

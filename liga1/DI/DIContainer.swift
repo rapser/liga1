@@ -52,6 +52,14 @@ final class DIContainer {
         return NewsRepository(database: makeDatabase(), logger: makeLogger())
     }
 
+    func makeStadiumRepository() -> StadiumRepositoryProtocol {
+        return StadiumRepository(database: makeDatabase(), logger: makeLogger())
+    }
+
+    func makeRefereeRepository() -> RefereeRepositoryProtocol {
+        return RefereeRepository(database: makeDatabase(), logger: makeLogger())
+    }
+
     // MARK: - Services
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
@@ -179,6 +187,16 @@ final class DIContainer {
         return CalculateAccumulatedStandingsUseCase()
     }
 
+    // MARK: - Use Cases - Match Context (Sabor Local)
+
+    func makeGetStadiumForTeamUseCase() -> GetStadiumForTeamUseCaseProtocol {
+        return GetStadiumForTeamUseCase(repository: makeStadiumRepository())
+    }
+
+    func makeGetRefereeProfileUseCase() -> GetRefereeProfileUseCaseProtocol {
+        return GetRefereeProfileUseCase(repository: makeRefereeRepository())
+    }
+
     // MARK: - Use Cases - News
 
     func makeFetchNewsUseCase() -> FetchNewsUseCaseProtocol {
@@ -294,9 +312,16 @@ final class DIContainer {
         return HomeViewController(viewModel: makeHomeViewModel(), container: self)
     }
 
+    func makeMatchDetailViewModel(context: MatchDetailContext) -> MatchDetailViewModel {
+        return MatchDetailViewModel(
+            context: context,
+            getStadiumUseCase: makeGetStadiumForTeamUseCase(),
+            getRefereeProfileUseCase: makeGetRefereeProfileUseCase()
+        )
+    }
+
     func makeMatchDetailViewController(context: MatchDetailContext) -> MatchDetailViewController {
-        let vm = MatchDetailViewModel(context: context)
-        return MatchDetailViewController(viewModel: vm)
+        return MatchDetailViewController(viewModel: makeMatchDetailViewModel(context: context))
     }
 
     func makeTablaViewController() -> TablaViewController {

@@ -22,6 +22,12 @@ public enum FirestoreConstants {
         public static let teams = "equipos"
         public static let preferences = "preferences"
 
+        // Datos maestros (Sabor Local)
+        public static let stadiums = "stadiums"
+        public static let referees = "referees"
+        /// Subcolección de `equipos/{code}`.
+        public static let players = "players"
+
         // Tournaments
         public static let apertura = "apertura"
         public static let clausura = "clausura"
