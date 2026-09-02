@@ -53,13 +53,11 @@ enum MasterDataSeeder {
     @discardableResult
     private static func run() async throws -> Int {
         let db = FirestoreManager.shared.db
-        let batch = db.batch()
         let ts = FieldValue.serverTimestamp()
-        var count = 0
+        var writes: [(ref: DocumentReference, data: [String: Any])] = []
 
         // --- stadiums/{slug} ---
         for s in stadiums {
-            let ref = db.collection("stadiums").document(slug(s.name))
             var data: [String: Any] = [
                 "name": s.name,
                 "city": s.city,
@@ -73,8 +71,7 @@ enum MasterDataSeeder {
                 "updatedAt": ts
             ]
             if let dato = s.dato { data["dato"] = dato }
-            batch.setData(data, forDocument: ref, merge: true)
-            count += 1
+            writes.append((db.collection("stadiums").document(slug(s.name)), data))
         }
 
         // --- equipos/{code} (merge: preserva matchesPlayed/points/etc. si existen) ---
@@ -84,8 +81,7 @@ enum MasterDataSeeder {
                 throw NSError(domain: "MasterDataSeeder", code: -1,
                               userInfo: [NSLocalizedDescriptionKey: "Sin estadio para \(t.code)"])
             }
-            let ref = db.collection("equipos").document(t.code)
-            batch.setData([
+            writes.append((db.collection("equipos").document(t.code), [
                 "name": t.name,
                 "officialName": t.officialName,
                 "city": t.city,
@@ -93,25 +89,55 @@ enum MasterDataSeeder {
                 "coach": ["name": t.coachName, "nat": t.coachNat],
                 "stadiumCode": stadiumCode,
                 "updatedAt": ts
-            ], forDocument: ref, merge: true)
-            count += 1
+            ]))
         }
 
         // --- referees/{slug} ---
         for name in refereeNames {
-            let ref = db.collection("referees").document(slug(name))
-            batch.setData([
+            writes.append((db.collection("referees").document(slug(name)), [
                 "fullName": name,
                 "federation": "FPF",
                 "nationality": "PER",
                 "source": "wikipedia-clausura-2026",
                 "updatedAt": ts
-            ], forDocument: ref, merge: true)
-            count += 1
+            ]))
         }
 
-        try await batch.commit()
-        return count
+        // --- equipos/{code}/players/{slug} ---
+        var seen = Set<String>()
+        for p in players {
+            let id = slug(p.fullName)
+            guard seen.insert("\(p.teamCode)/\(id)").inserted else { continue }
+            writes.append((
+                db.collection("equipos").document(p.teamCode).collection("players").document(id),
+                [
+                    "fullName": p.fullName,
+                    "shortName": Self.shortName(p.fullName),
+                    "number": p.number.map { $0 as Any } ?? NSNull(),
+                    "position": p.position,
+                    "nationality": p.nat,
+                    "photoURL": NSNull(),
+                    "status": "active",
+                    "updatedAt": ts
+                ]
+            ))
+        }
+
+        // Commit en lotes (límite de Firestore: 500 ops por batch).
+        let chunkSize = 450
+        for start in stride(from: 0, to: writes.count, by: chunkSize) {
+            let batch = db.batch()
+            for w in writes[start..<min(start + chunkSize, writes.count)] {
+                batch.setData(w.data, forDocument: w.ref, merge: true)
+            }
+            try await batch.commit()
+        }
+        return writes.count
+    }
+
+    /// Último token del nombre como apellido corto para la UI compacta.
+    static func shortName(_ fullName: String) -> String {
+        fullName.split(separator: " ").last.map(String.init) ?? fullName
     }
 
     // MARK: - Slug determinista (IDs de estadio y árbitro)
