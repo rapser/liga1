@@ -12,9 +12,11 @@
 |---|---|---|
 | **App iOS** | Cliente Firebase puro (Firestore + Auth + FCM + Storage + Remote Config). Sin runtime servidor. | Lectura de datos, UI, simulador en cliente, render de imágenes para compartir, envío de votos/pronósticos. |
 | **Admin web** (`liga1-admin-next`, Next.js/Vercel) | Ingesta de datos curados y tareas **no time-critical**. Ya tiene Firebase Admin SDK y escribe a Firestore. | Catálogo de sedes, alta de árbitros e historial, **ingesta de clima (Open-Meteo)**, carga de XI titular por partido, disparo manual de trabajos. |
-| **Cloud Functions** (repo propio `liga1-functions`, **NO** dentro del repo iOS) | Trabajos programados y triggers de Firestore **time-critical**. | Cierre de pronósticos, cálculo de puntos post-partido, agregación de votos (MVP / encuestas / 11 ideal), fan-out FCM en vivo. |
+| **Cloud Functions** (carpeta `functions/` **dentro de `liga1-admin-next`**, **NO** en el repo iOS) | Trabajos programados y triggers de Firestore **time-critical**. | Cierre de pronósticos, cálculo de puntos post-partido, agregación de votos (MVP / encuestas / 11 ideal), fan-out FCM en vivo. |
 
-**Por qué el clima va en el Admin y no en Cloud Functions (por ahora):** el Admin ya es dueño del dato operativo del partido (sede, fecha, hora), ya tiene credenciales server-side y ya escribe a Firestore. El clima no es time-critical (forecast de partidos a días vista). Cuando entre la Fase 2 se levanta `liga1-functions` y, si conviene, el clima se puede mover allí sin cambiar el contrato de datos (siempre aterriza en `jornadas/{id}/matches/{matchId}.clima`).
+**Por qué el clima va en el Admin y no en Cloud Functions (por ahora):** el Admin ya es dueño del dato operativo del partido (sede, fecha, hora), ya tiene credenciales server-side y ya escribe a Firestore. El clima no es time-critical (forecast de partidos a días vista). Cuando entre la Fase 2 se añade `liga1-admin-next/functions/` y, si conviene, el clima se puede mover allí sin cambiar el contrato de datos (siempre aterriza en `jornadas/{id}/matches/{matchId}.clima`).
+
+**Decisión (2026-09-03):** las Cloud Functions viven en una carpeta `functions/` **dentro del repo `liga1-admin-next`**, no en un repo separado. El admin ya es el "backend" (Admin SDK, service account, `firestore.rules`). `firebase init functions` crea la estructura anidada; Vercel compila solo `src/` e ignora `functions/`, y `firebase deploy --only functions` sube solo `functions/`. `firebase.json` + `.firebaserc` + `firestore.rules` + `firestore.indexes.json` van en la raíz del admin.
 
 **Regla de auth (heredada):** cualquier feature nueva inyecta `AuthServiceProtocol`; nunca `AuthManager.shared` salvo en `DIContainer.makeAuthService()` y `AppDelegate.configure(provider:)`.
 
@@ -234,7 +236,7 @@ https://api.open-meteo.com/v1/forecast
 ```
 `condicion ∈ { despejado, nubes, niebla, lluvia, chubascos, tormenta, nieve }`.
 
-### 1.3 Cloud Functions necesarias (repo `liga1-functions`, firebase-functions v2)
+### 1.3 Cloud Functions necesarias (`liga1-admin-next/functions/`, firebase-functions v2)
 
 | Función | Tipo | Cuándo | Qué hace |
 |---|---|---|---|
@@ -526,7 +528,7 @@ Registrar en `DIContainer` los nuevos repos (con sus decoradores de caché) y us
 *3A. Encuesta arbitral en vivo ("¿fue penal?")*
 - **Modelo Firestore** (implementado en admin):
   - `polls/{pollId}`: `{ matchId, jornadaId, pregunta, opciones:[{id,texto}], estado:'activa'|'cerrada', cierraEn:Timestamp, creadoEn, cerradaEn, numShards:10 }`
-  - `polls/{pollId}/shards/{0..9}`: `{ counts:{opcionId:number} }` — contador distribuido; la app iOS hace `increment` en un shard al azar; el conteo = suma de los 10 shards (1 listener a la subcolección). Cuando exista `liga1-functions`, una `aggregatePollVotes` recalculará un `totales` autoritativo desde `pollVotes`.
+  - `polls/{pollId}/shards/{0..9}`: `{ counts:{opcionId:number} }` — contador distribuido; la app iOS hace `increment` en un shard al azar; el conteo = suma de los 10 shards (1 listener a la subcolección). Cuando exista `liga1-admin-next/functions/`, una `aggregatePollVotes` recalculará un `totales` autoritativo desde `pollVotes`.
   - `pollVotes/{pollId}/votes/{uid}`: `{ opcionId, ts }` — 1 voto/uid, create-only (anti-fraude). La app lo escribe; el admin no lo lee.
 - **Admin ✅** (`liga1-admin-next`, rama develop): stack Clean Arch completo — `poll.entity.ts`, `poll.dto.ts`, `poll.mapper.ts` (incl. `tallyFromShards`), `poll.repository.interface.ts`, `poll.repository.ts` (`createPoll` con batch de shards, `closePoll`, `observePollsForMatch`, `observeTally`), UI `referee-poll-panel.tsx` (crear pregunta+opciones+duración, resultado en vivo con barras, "Cerrar ahora"), montado dentro de `MatchLiveController` (solo con partido `envivo`). `tsc` + `next build` OK.
 - **Reglas ⏳**: `firestore.poll.rules` (snippet para pegar en la consola — polls read público / write admin; shards write si `estado=='activa'` y `now<cierraEn`; `pollVotes` create-only por uid en ventana). **Aún no aplicado.**
@@ -550,10 +552,10 @@ Registrar en `DIContainer` los nuevos repos (con sus decoradores de caché) y us
   - Entrada: botón `slider.horizontal.3` en `TablaViewController` (nav bar) → `onSimulate` cableado en `MainTabBarController` → push del simulador con el torneo activo. DI: `makeStandingsSimulator*`, `makeFetchRemainingFixturesUseCase`, `makeSimulateStandingsUseCase`, `makeProjectQualificationUseCase`.
   - Tests: `FetchRemainingFixturesUseCaseTests` (5) + `StandingsSimulatorViewModelTests` (7). Mocks `MockJornadasRepository.fetchAllJornadas` + `MockMatchesRepository.resultsByJornada`. **Suite completa `TEST EXECUTE SUCCEEDED`** (29 tests del simulador, 0 fallos).
 
-### FASE 2 — Gamificación Core  *(requiere levantar `liga1-functions`)*
+### FASE 2 — Gamificación Core  *(requiere añadir `liga1-admin-next/functions/`)*
 
 **Sprint 4 — Infra de polla + envío**
-- Scaffold `liga1-functions` (TS, firebase-functions v2, ESLint, CI de deploy `firebase deploy --only functions`).
+- Scaffold `liga1-admin-next/functions/` (`firebase init functions`, TS, firebase-functions v2, ESLint; deploy `firebase deploy --only functions`). `firebase.json`/`.firebaserc`/`firestore.rules`/`firestore.indexes.json` en la raíz del admin.
 - Colecciones `predictions`, `predictionScores`, `config/scoring`.
 - Rules: create/update solo `uid==userId` y `request.time < jornada.fechaInicio`, forma estricta.
 - iOS: `PollaViewModel`, `SubmitPredictionUseCase`, `GetServerTimeOffsetUseCase`, `ObserveMyPredictionUseCase`; UI de entrada por jornada con countdown (offset servidor).
@@ -615,10 +617,23 @@ Registrar en `DIContainer` los nuevos repos (con sus decoradores de caché) y us
    - Fuente de historial de árbitros → carga manual inicial desde el Admin; definir dataset mínimo.
    - Planteles para MVP / 11 ideal → dependen de que el Admin cargue el XI titular por partido (módulo de alineaciones ya existe en iOS).
    - Open-Meteo sin SLA → cachear último valor, rotular "estimado".
-   - Vercel Hobby cron 1×/día → si insuficiente, GitHub Action o mover clima a `liga1-functions`.
+   - Vercel Hobby cron 1×/día → si insuficiente, GitHub Action o mover clima a `liga1-admin-next/functions/`.
    - Moderación de encuestas / 11 ideal (reportes, límites de tasa).
 
 ---
+
+## Rediseño visual "Fan Experience" (2026-09-03, componentes nativos)
+
+Aproximación a la captura de referencia usando UIKit nativo (sin librerías de UI):
+- **`AppKit/Components/FanCardView.swift`** — card elevada (`appSecondaryBackground`, esquina continua 16, borde sutil o dorado), encabezado en mayúsculas, `contentStack` + helpers `infoRow`/`separator`. Trait-aware.
+- **`AppKit/Components/PollBarView.swift`** — barra de resultados segmentada (dorado + grises), pesos = votos.
+- **`AppColors`** — `liga1Gold` (#FFCC00) y `cardStroke` (dinámico).
+- **MatchDetail**:
+  - *Termómetro del arbitraje*: card con borde dorado → ficha compacta del juez (foto Kingfisher + "JUEZ" + nombre; a la derecha penales/partido en dorado) · pregunta · botones-pastilla `.filled()` (Sí verde / No rojo / resto dorado) · `PollBarView` + filas nombre/% · footer "En vivo" en dorado. La ficha del árbitro se oculta en "Información adicional" cuando hay encuesta.
+  - *Factor altura & clima*: card → bloque geográfico centrado (ciudad grande + `2,335 MSNM` en dorado + pastilla de factor) · "DATO CALETA" · fila de clima (SF Symbol dorado + `24°C` + condición + ⚠️ si `climaAdvertencia`) con línea de detalle (viento · humedad · lluvia).
+- **Simulador**: cards "Partidos restantes" (con "Reiniciar" dorado, subtítulos "FECHA N", filas con `−`/`+`) y "Tabla proyectada" (filas-cápsula con tinte de zona al 14% + barra de color + `▲/▼` en verde/rojo + puntos en negrita) + leyenda + CTA dorado "Compartir simulación".
+- VM: `climaAdvertencia` (tormenta/nieve, frío/calor extremo, lluvia ≥70%) y `climaDetalleDisplay`.
+- No fuerza tema oscuro: se ve oscuro-primero para usuarios en dark mode y limpio en claro. `xcodebuild build` OK.
 
 ## Anexo — Estado actual del código (2026-09-02)
 
@@ -629,6 +644,6 @@ Registrar en `DIContainer` los nuevos repos (con sus decoradores de caché) y us
   - Módulo de alineaciones: `Presentation/Models/Match/MatchLineupModels`, `MatchLineupComponents`.
   - Convención `Slug.make(...)` para ids de `referees/{id}`.
 - **Admin** (`liga1-admin-next`): Next.js 16 / Vercel. `firebase-admin.ts` hoy solo exporta `adminAuth` + `messaging` (falta `adminDb`). API routes en `src/app/api/**`. Scripts Node con `firebase-admin/firestore` ya funcionando (`scripts/rebuild-clausura-standings.mjs`). Sin `vercel.json`.
-- **`functions/`** dentro del repo iOS: scaffolding retirado. Las Cloud Functions irán en repo aparte `liga1-functions`.
+- **`functions/`** dentro del repo iOS: scaffolding retirado. Las Cloud Functions irán en `liga1-admin-next/functions/` (mismo repo que el admin web).
 </content>
 </invoke>

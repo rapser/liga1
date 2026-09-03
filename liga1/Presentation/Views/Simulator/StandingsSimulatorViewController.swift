@@ -113,26 +113,56 @@ final class StandingsSimulatorViewController: UIViewController {
 
         // Partidos restantes
         if state.fixtures.isEmpty {
-            contentStack.addArrangedSubview(messageLabel("No hay partidos pendientes en este torneo."))
+            let empty = FanCardView(title: "Partidos restantes")
+            empty.contentStack.addArrangedSubview(messageLabel("No hay partidos pendientes en este torneo."))
+            contentStack.addArrangedSubview(empty)
         } else {
-            contentStack.addArrangedSubview(sectionHeader("PARTIDOS RESTANTES", actionTitle: "Reiniciar") { [weak self] in
-                self?.viewModel.send(.resetScores)
-            })
+            let card = FanCardView(title: "Partidos restantes")
+            let reset = UIButton(configuration: {
+                var c = UIButton.Configuration.plain()
+                c.title = "Reiniciar"
+                c.baseForegroundColor = .liga1Gold
+                c.contentInsets = .zero
+                return c
+            }())
+            reset.titleLabel?.font = .systemFont(ofSize: 12, weight: .semibold)
+            reset.addAction(UIAction { [weak self] _ in self?.viewModel.send(.resetScores) }, for: .touchUpInside)
+            let headerRow = UIStackView(arrangedSubviews: [UIView(), reset])
+            headerRow.axis = .horizontal
+            card.contentStack.addArrangedSubview(headerRow)
+
             for group in viewModel.groupedFixtures {
-                contentStack.addArrangedSubview(subHeader("Fecha \(group.jornada)"))
+                card.contentStack.addArrangedSubview(subHeader("FECHA \(group.jornada)"))
                 for fixture in group.fixtures {
-                    contentStack.addArrangedSubview(fixtureRow(fixture))
+                    card.contentStack.addArrangedSubview(fixtureRow(fixture))
                 }
             }
+            contentStack.addArrangedSubview(card)
         }
 
         // Tabla proyectada
         if !state.projected.isEmpty {
-            contentStack.addArrangedSubview(sectionHeader("TABLA PROYECTADA", actionTitle: nil, action: nil))
+            let card = FanCardView(title: "Tabla proyectada")
+            card.contentStack.spacing = 4
             for row in state.projected {
-                contentStack.addArrangedSubview(projectedRow(row))
+                card.contentStack.addArrangedSubview(projectedRow(row))
             }
-            contentStack.addArrangedSubview(zoneLegend())
+            card.contentStack.setCustomSpacing(Spacing.medium, after: card.contentStack.arrangedSubviews.last ?? card)
+            card.contentStack.addArrangedSubview(zoneLegend())
+            contentStack.addArrangedSubview(card)
+
+            let share = UIButton(configuration: {
+                var c = UIButton.Configuration.filled()
+                c.title = "Compartir simulación"
+                c.baseBackgroundColor = .liga1Gold
+                c.baseForegroundColor = .black
+                c.cornerStyle = .large
+                c.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16)
+                return c
+            }())
+            share.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            share.addAction(UIAction { [weak self] _ in self?.share() }, for: .touchUpInside)
+            contentStack.addArrangedSubview(share)
         }
     }
 
@@ -147,34 +177,11 @@ final class StandingsSimulatorViewController: UIViewController {
         return l
     }
 
-    private func sectionHeader(_ title: String, actionTitle: String?, action: (() -> Void)?) -> UIView {
-        let row = UIStackView()
-        row.axis = .horizontal
-        row.alignment = .firstBaseline
-
-        let l = UILabel()
-        l.font = .systemFont(ofSize: 12, weight: .semibold)
-        l.textColor = .secondaryLabel
-        l.text = title
-        row.addArrangedSubview(l)
-
-        if let actionTitle, let action {
-            let b = UIButton(configuration: .plain())
-            b.configuration?.title = actionTitle
-            b.configuration?.contentInsets = .zero
-            b.setContentHuggingPriority(.required, for: .horizontal)
-            b.addAction(UIAction { _ in action() }, for: .touchUpInside)
-            row.addArrangedSubview(UIView()) // spacer
-            row.addArrangedSubview(b)
-        }
-        return row
-    }
-
     private func subHeader(_ text: String) -> UILabel {
         let l = UILabel()
-        l.font = .systemFont(ofSize: 13, weight: .semibold)
-        l.textColor = .label
-        l.text = text
+        l.font = .systemFont(ofSize: 11, weight: .bold)
+        l.textColor = .secondaryLabel
+        l.text = text.uppercased()
         return l
     }
 
@@ -235,19 +242,22 @@ final class StandingsSimulatorViewController: UIViewController {
     }
 
     private func projectedRow(_ row: StandingsSimulatorViewModel.ProjectedRow) -> UIView {
+        let zoneColor = color(for: row.zone)
+        let tinted = row.zone != .none
+
         let bar = UIView()
-        bar.backgroundColor = color(for: row.zone)
-        bar.layer.cornerRadius = 2
-        bar.widthAnchor.constraint(equalToConstant: 4).isActive = true
+        bar.backgroundColor = tinted ? zoneColor : .clear
+        bar.translatesAutoresizingMaskIntoConstraints = false
+        bar.widthAnchor.constraint(equalToConstant: 3).isActive = true
 
         let pos = UILabel()
-        pos.font = .monospacedDigitSystemFont(ofSize: 13, weight: .medium)
-        pos.textColor = .secondaryLabel
+        pos.font = .monospacedDigitSystemFont(ofSize: 13, weight: .semibold)
+        pos.textColor = tinted ? zoneColor : .secondaryLabel
         pos.text = "\(row.pos)"
-        pos.widthAnchor.constraint(equalToConstant: 24).isActive = true
+        pos.widthAnchor.constraint(equalToConstant: 22).isActive = true
 
         let name = UILabel()
-        name.font = .systemFont(ofSize: 14)
+        name.font = .systemFont(ofSize: 14, weight: .medium)
         name.textColor = .label
         name.text = row.name
         name.numberOfLines = 1
@@ -255,38 +265,53 @@ final class StandingsSimulatorViewController: UIViewController {
         name.minimumScaleFactor = 0.8
 
         let delta = UILabel()
-        delta.font = .systemFont(ofSize: 11, weight: .semibold)
-        delta.widthAnchor.constraint(equalToConstant: 34).isActive = true
+        delta.font = .systemFont(ofSize: 11, weight: .bold)
+        delta.setContentHuggingPriority(.required, for: .horizontal)
         if row.deltaVsBase > 0 {
             delta.text = "▲\(row.deltaVsBase)"
-            delta.textColor = .systemGreen
+            delta.textColor = .appSuccess
         } else if row.deltaVsBase < 0 {
             delta.text = "▼\(-row.deltaVsBase)"
-            delta.textColor = .systemRed
+            delta.textColor = .liga1Red
         } else {
             delta.text = ""
         }
 
-        let stats = UILabel()
-        stats.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)
-        stats.textColor = .secondaryLabel
-        stats.textAlignment = .right
-        stats.text = "PJ \(row.pj)   DG \(signed(row.dg))"
+        let dg = UILabel()
+        dg.font = .monospacedDigitSystemFont(ofSize: 12, weight: .regular)
+        dg.textColor = .secondaryLabel
+        dg.textAlignment = .right
+        dg.text = "DG \(signed(row.dg))"
 
         let pts = UILabel()
-        pts.font = .monospacedDigitSystemFont(ofSize: 14, weight: .bold)
+        pts.font = .monospacedDigitSystemFont(ofSize: 15, weight: .bold)
         pts.textColor = .label
         pts.textAlignment = .right
         pts.text = "\(row.pts)"
         pts.widthAnchor.constraint(equalToConstant: 30).isActive = true
 
-        let rowStack = UIStackView(arrangedSubviews: [bar, pos, name, delta, stats, pts])
-        rowStack.axis = .horizontal
-        rowStack.alignment = .center
-        rowStack.spacing = 8
+        let inner = UIStackView(arrangedSubviews: [bar, pos, name, delta, dg, pts])
+        inner.axis = .horizontal
+        inner.alignment = .center
+        inner.spacing = 8
+        inner.isLayoutMarginsRelativeArrangement = true
+        inner.layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 10)
+        inner.translatesAutoresizingMaskIntoConstraints = false
         name.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        bar.heightAnchor.constraint(equalTo: rowStack.heightAnchor, multiplier: 0.7).isActive = true
-        return rowStack
+
+        let capsule = UIView()
+        capsule.backgroundColor = tinted ? zoneColor.withAlphaComponent(0.14) : .clear
+        capsule.layer.cornerRadius = 10
+        capsule.addSubview(inner)
+        NSLayoutConstraint.activate([
+            inner.topAnchor.constraint(equalTo: capsule.topAnchor),
+            inner.bottomAnchor.constraint(equalTo: capsule.bottomAnchor),
+            inner.leadingAnchor.constraint(equalTo: capsule.leadingAnchor),
+            inner.trailingAnchor.constraint(equalTo: capsule.trailingAnchor),
+            bar.topAnchor.constraint(equalTo: inner.topAnchor),
+            bar.bottomAnchor.constraint(equalTo: inner.bottomAnchor)
+        ])
+        return capsule
     }
 
     private func zoneLegend() -> UIView {

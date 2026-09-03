@@ -5,6 +5,7 @@
 
 import UIKit
 import Combine
+import Kingfisher
 
 final class MatchDetailViewController: UIViewController {
 
@@ -163,33 +164,44 @@ final class MatchDetailViewController: UIViewController {
         contextSectionsContainer.addArrangedSubview(makeInfoAdicionalSection())
     }
 
-    // MARK: - Termómetro Arbitral (encuesta en vivo)
+    // MARK: - Termómetro del Arbitraje (rediseño Fan Experience)
 
     private func makeRefereePollSection() -> UIView {
-        let inner = UIStackView()
-        inner.prepareForAutoLayout()
-        inner.axis = .vertical
-        inner.spacing = Spacing.small
+        let card = FanCardView(title: "Termómetro del arbitraje", accentBorder: true)
+        let inner = card.contentStack
+        inner.spacing = Spacing.medium
+
+        // Ficha compacta del árbitro (foto · nombre · penales por partido).
+        if let nombre = viewModel.refereeNombreDisplay {
+            inner.addArrangedSubview(refereeHeaderRow(nombre: nombre))
+            inner.addArrangedSubview(FanCardView.separator())
+        }
 
         if let pregunta = viewModel.refereePollPregunta {
             let q = UILabel()
-            q.font = .systemFont(ofSize: 14, weight: .semibold)
+            q.font = .systemFont(ofSize: 15, weight: .semibold)
             q.textColor = .label
             q.numberOfLines = 0
             q.text = pregunta
             inner.addArrangedSubview(q)
         }
 
-        let puedeVotar = viewModel.puedeVotarRefereePoll
-        for opcion in viewModel.refereePollOpciones {
-            inner.addArrangedSubview(
-                puedeVotar ? pollVoteButton(for: opcion) : pollResultRow(for: opcion)
-            )
+        let opciones = viewModel.refereePollOpciones
+
+        if viewModel.puedeVotarRefereePoll {
+            inner.addArrangedSubview(pollOptionButtons(opciones))
+        } else {
+            for opcion in opciones {
+                inner.addArrangedSubview(pollResultRow(for: opcion))
+            }
+            let bar = PollBarView()
+            bar.setWeights(opciones.map(\.votos))
+            inner.addArrangedSubview(bar)
         }
 
         let footer = UILabel()
-        footer.font = .systemFont(ofSize: 12)
-        footer.textColor = .secondaryLabel
+        footer.font = .systemFont(ofSize: 12, weight: .medium)
+        footer.textColor = viewModel.refereePollAbierta ? .liga1Gold : .secondaryLabel
         footer.text = "\(viewModel.refereePollEstadoDisplay) · \(viewModel.refereePollTotalDisplay)"
         inner.addArrangedSubview(footer)
 
@@ -202,119 +214,242 @@ final class MatchDetailViewController: UIViewController {
             inner.addArrangedSubview(e)
         }
 
-        return MatchDetailTitledSectionView(title: "Termómetro Arbitral", uppercaseTitle: true, content: inner)
+        return card
     }
 
-    private func pollVoteButton(for opcion: MatchDetailViewModel.RefereePollOptionVM) -> UIView {
-        var config = UIButton.Configuration.tinted()
-        config.title = opcion.texto
-        config.cornerStyle = .medium
-        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12)
+    private func refereeHeaderRow(nombre: String) -> UIView {
+        let avatar = UIImageView()
+        avatar.translatesAutoresizingMaskIntoConstraints = false
+        avatar.contentMode = .scaleAspectFill
+        avatar.clipsToBounds = true
+        avatar.layer.cornerRadius = 20
+        avatar.backgroundColor = .tertiarySystemFill
+        avatar.tintColor = .secondaryLabel
+        avatar.image = UIImage(systemName: "person.fill")
+        NSLayoutConstraint.activate([
+            avatar.widthAnchor.constraint(equalToConstant: 40),
+            avatar.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        if let urlString = viewModel.referee?.photoURL, let url = URL(string: urlString) {
+            avatar.kf.setImage(with: url, placeholder: UIImage(systemName: "person.fill"))
+        }
 
-        let button = UIButton(configuration: config)
-        button.contentHorizontalAlignment = .leading
-        button.isEnabled = !viewModel.pollVoteInFlight
-        button.addAction(UIAction { [weak self] _ in
-            self?.viewModel.voteRefereePoll(optionId: opcion.id)
-        }, for: .touchUpInside)
-        return button
+        let rol = UILabel()
+        rol.font = .systemFont(ofSize: 10, weight: .semibold)
+        rol.textColor = .secondaryLabel
+        rol.text = "JUEZ"
+
+        let name = UILabel()
+        name.font = .systemFont(ofSize: 16, weight: .bold)
+        name.textColor = .label
+        name.text = nombre
+        name.numberOfLines = 1
+        name.adjustsFontSizeToFitWidth = true
+        name.minimumScaleFactor = 0.8
+
+        let idStack = UIStackView(arrangedSubviews: [rol, name])
+        idStack.axis = .vertical
+        idStack.spacing = 1
+
+        let statStack = UIStackView()
+        statStack.axis = .vertical
+        statStack.alignment = .trailing
+        statStack.spacing = 1
+        if let penales = viewModel.refereePenalesPorPartidoDisplay {
+            let cap = UILabel()
+            cap.font = .systemFont(ofSize: 10, weight: .semibold)
+            cap.textColor = .secondaryLabel
+            cap.text = "PENALES / PARTIDO"
+            let val = UILabel()
+            val.font = .systemFont(ofSize: 15, weight: .bold)
+            val.textColor = .liga1Gold
+            val.text = penales
+            statStack.addArrangedSubview(cap)
+            statStack.addArrangedSubview(val)
+        }
+
+        let row = UIStackView(arrangedSubviews: [avatar, idStack, statStack])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = Spacing.medium
+        idStack.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        return row
+    }
+
+    private func pollOptionButtons(_ opciones: [MatchDetailViewModel.RefereePollOptionVM]) -> UIView {
+        let row = UIStackView()
+        row.axis = opciones.count <= 3 ? .horizontal : .vertical
+        row.distribution = opciones.count <= 3 ? .fillEqually : .fill
+        row.spacing = Spacing.small
+
+        for opcion in opciones {
+            var config = UIButton.Configuration.filled()
+            config.title = opcion.texto
+            config.baseBackgroundColor = pollButtonColor(for: opcion.id)
+            config.baseForegroundColor = .white
+            config.cornerStyle = .large
+            config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+            let b = UIButton(configuration: config)
+            b.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+            b.isEnabled = !viewModel.pollVoteInFlight
+            b.addAction(UIAction { [weak self] _ in
+                self?.viewModel.voteRefereePoll(optionId: opcion.id)
+            }, for: .touchUpInside)
+            row.addArrangedSubview(b)
+        }
+        return row
+    }
+
+    private func pollButtonColor(for optionId: String) -> UIColor {
+        switch optionId.lowercased() {
+        case "si", "sí", "yes": return .appSuccess
+        case "no": return .liga1Red
+        default: return .liga1Gold
+        }
     }
 
     private func pollResultRow(for opcion: MatchDetailViewModel.RefereePollOptionVM) -> UIView {
-        let container = UIStackView()
-        container.axis = .vertical
-        container.spacing = 4
-
-        let top = UIStackView()
-        top.axis = .horizontal
-        top.alignment = .firstBaseline
-
         let name = UILabel()
         name.font = .systemFont(ofSize: 14, weight: opcion.esMiVoto ? .semibold : .regular)
-        name.textColor = .label
+        name.textColor = opcion.esMiVoto ? .liga1Gold : .label
         name.text = opcion.esMiVoto ? "\(opcion.texto)  ✓" : opcion.texto
 
         let value = UILabel()
-        value.font = .systemFont(ofSize: 13)
-        value.textColor = .secondaryLabel
+        value.font = .monospacedDigitSystemFont(ofSize: 14, weight: .semibold)
+        value.textColor = .label
         value.textAlignment = .right
-        value.text = "\(opcion.votos) · \(opcion.porcentaje)%"
+        value.text = "\(opcion.porcentaje)%"
         value.setContentHuggingPriority(.required, for: .horizontal)
 
-        top.addArrangedSubview(name)
-        top.addArrangedSubview(value)
-
-        let track = UIView()
-        track.backgroundColor = .secondarySystemFill
-        track.layer.cornerRadius = 3
-        track.heightAnchor.constraint(equalToConstant: 6).isActive = true
-
-        let fill = UIView()
-        fill.backgroundColor = opcion.esMiVoto ? .tintColor : .tertiaryLabel
-        fill.layer.cornerRadius = 3
-        fill.translatesAutoresizingMaskIntoConstraints = false
-        track.addSubview(fill)
-        NSLayoutConstraint.activate([
-            fill.leadingAnchor.constraint(equalTo: track.leadingAnchor),
-            fill.topAnchor.constraint(equalTo: track.topAnchor),
-            fill.bottomAnchor.constraint(equalTo: track.bottomAnchor),
-            fill.widthAnchor.constraint(equalTo: track.widthAnchor,
-                                        multiplier: max(0.001, min(1.0, CGFloat(opcion.porcentaje) / 100)))
-        ])
-
-        container.addArrangedSubview(top)
-        container.addArrangedSubview(track)
-        return container
+        let row = UIStackView(arrangedSubviews: [name, value])
+        row.axis = .horizontal
+        row.spacing = Spacing.small
+        row.alignment = .firstBaseline
+        return row
     }
 
     private func makeSaborLocalSection() -> UIView {
-        let inner = UIStackView()
-        inner.prepareForAutoLayout()
-        inner.axis = .vertical
-        inner.spacing = 0
+        let card = FanCardView(title: "Factor altura & clima")
+        let inner = card.contentStack
+        inner.spacing = Spacing.medium
 
-        var rows: [UIView] = []
-        if let factor = viewModel.factorGeograficoDisplay, let alt = viewModel.altitudDisplay {
-            rows.append(infoRow(key: factor, value: alt))
-        } else if let alt = viewModel.altitudDisplay {
-            rows.append(infoRow(key: "Altitud", value: alt))
-        }
-        if let ciudad = viewModel.ciudadDisplay {
-            rows.append(infoRow(key: "Ciudad", value: ciudad))
-        }
-        if let clima = viewModel.climaResumenDisplay {
-            rows.append(infoRow(key: "Clima", value: clima))
-        }
-        if let sensacion = viewModel.climaSensacionDisplay {
-            rows.append(infoRow(key: "Sensación térmica", value: sensacion))
-        }
-        if let viento = viewModel.climaVientoDisplay {
-            rows.append(infoRow(key: "Viento", value: viento))
-        }
-        if let humedad = viewModel.climaHumedadDisplay {
-            rows.append(infoRow(key: "Humedad", value: humedad))
-        }
-        if let precip = viewModel.climaPrecipitacionDisplay {
-            rows.append(infoRow(key: "Prob. lluvia", value: precip))
+        // Bloque geográfico centrado (ciudad + altitud).
+        if viewModel.ciudadDisplay != nil || viewModel.altitudDisplay != nil {
+            let geo = UIStackView()
+            geo.axis = .vertical
+            geo.alignment = .center
+            geo.spacing = 2
+
+            let cap = UILabel()
+            cap.font = .systemFont(ofSize: 10, weight: .semibold)
+            cap.textColor = .secondaryLabel
+            cap.text = "GEOGRAFÍA DEL PARTIDO"
+            geo.addArrangedSubview(cap)
+
+            if let ciudad = viewModel.ciudadDisplay {
+                let c = UILabel()
+                c.font = .systemFont(ofSize: 20, weight: .bold)
+                c.textColor = .label
+                c.textAlignment = .center
+                c.text = ciudad
+                geo.addArrangedSubview(c)
+            }
+            if let alt = viewModel.altitudDisplay {
+                let a = UILabel()
+                a.font = .monospacedDigitSystemFont(ofSize: 16, weight: .bold)
+                a.textColor = .liga1Gold
+                a.text = alt.uppercased()
+                geo.addArrangedSubview(a)
+            }
+            if let factor = viewModel.factorGeograficoDisplay {
+                geo.addArrangedSubview(pill(text: factor))
+            }
+            inner.addArrangedSubview(geo)
         }
 
-        for (index, row) in rows.enumerated() {
-            if index > 0 { inner.addArrangedSubview(separatorLine()) }
-            inner.addArrangedSubview(row)
-        }
-
+        // Dato histórico ("dato caleta").
         if let dato = viewModel.datoHistorico {
-            let l = UILabel()
-            l.font = .systemFont(ofSize: 13)
-            l.textColor = .secondaryLabel
-            l.numberOfLines = 0
-            l.text = dato
-            if !rows.isEmpty { inner.addArrangedSubview(separatorLine()) }
-            inner.setCustomSpacing(Spacing.small, after: inner.arrangedSubviews.last ?? l)
-            inner.addArrangedSubview(l)
+            inner.addArrangedSubview(FanCardView.separator())
+            let cap = UILabel()
+            cap.font = .systemFont(ofSize: 10, weight: .semibold)
+            cap.textColor = .secondaryLabel
+            cap.text = "DATO CALETA"
+            let txt = UILabel()
+            txt.font = .systemFont(ofSize: 13)
+            txt.textColor = .label
+            txt.numberOfLines = 0
+            txt.text = dato
+            let s = UIStackView(arrangedSubviews: [cap, txt])
+            s.axis = .vertical
+            s.spacing = 4
+            inner.addArrangedSubview(s)
         }
 
-        return MatchDetailTitledSectionView(title: "Sabor Local", uppercaseTitle: true, content: inner)
+        // Clima.
+        if let resumen = viewModel.climaResumenDisplay {
+            inner.addArrangedSubview(FanCardView.separator())
+
+            let icon = UIImageView(image: UIImage(systemName: viewModel.climaIconoSF ?? "cloud.fill"))
+            icon.translatesAutoresizingMaskIntoConstraints = false
+            icon.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 26, weight: .regular)
+            icon.contentMode = .scaleAspectFit
+            icon.tintColor = .liga1Gold
+            icon.setContentHuggingPriority(.required, for: .horizontal)
+
+            let temp = UILabel()
+            temp.font = .systemFont(ofSize: 17, weight: .bold)
+            temp.textColor = .label
+            temp.text = resumen
+
+            let warn = UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill"))
+            warn.tintColor = .appWarning
+            warn.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 15, weight: .semibold)
+            warn.isHidden = !viewModel.climaAdvertencia
+            warn.setContentHuggingPriority(.required, for: .horizontal)
+
+            let top = UIStackView(arrangedSubviews: [icon, temp, UIView(), warn])
+            top.axis = .horizontal
+            top.alignment = .center
+            top.spacing = Spacing.small
+
+            let climaStack = UIStackView(arrangedSubviews: [top])
+            climaStack.axis = .vertical
+            climaStack.spacing = 4
+            if let detalle = viewModel.climaDetalleDisplay {
+                let d = UILabel()
+                d.font = .systemFont(ofSize: 12)
+                d.textColor = .secondaryLabel
+                d.text = detalle
+                climaStack.addArrangedSubview(d)
+            }
+            inner.addArrangedSubview(climaStack)
+        }
+
+        return card
+    }
+
+    /// Pequeña "pastilla" de texto (badge) con acento dorado.
+    private func pill(text: String) -> UIView {
+        let l = UILabel()
+        l.text = text.uppercased()
+        l.font = .systemFont(ofSize: 11, weight: .bold)
+        l.textColor = .liga1Gold
+        l.translatesAutoresizingMaskIntoConstraints = false
+
+        let bg = UIView()
+        bg.backgroundColor = UIColor.liga1Gold.withAlphaComponent(0.15)
+        bg.layer.cornerRadius = 8
+        bg.layer.masksToBounds = true
+        bg.translatesAutoresizingMaskIntoConstraints = false
+        bg.addSubview(l)
+        NSLayoutConstraint.activate([
+            l.topAnchor.constraint(equalTo: bg.topAnchor, constant: 4),
+            l.bottomAnchor.constraint(equalTo: bg.bottomAnchor, constant: -4),
+            l.leadingAnchor.constraint(equalTo: bg.leadingAnchor, constant: 10),
+            l.trailingAnchor.constraint(equalTo: bg.trailingAnchor, constant: -10)
+        ])
+        // El padre (`geo`, alignment .center) lo centra usando su ancho intrínseco.
+        return bg
     }
 
     private func makeScoreboardHeader() -> UIView {
@@ -453,7 +588,8 @@ final class MatchDetailViewController: UIViewController {
         inner.spacing = 0
 
         var rows: [UIView] = []
-        if let nombreArbitro = viewModel.refereeNombreDisplay {
+        // Si hay encuesta arbitral, la ficha del juez ya se muestra en esa card.
+        if !viewModel.refereePollDisponible, let nombreArbitro = viewModel.refereeNombreDisplay {
             let nacionalidad = viewModel.refereeNacionalidadDisplay
             rows.append(infoRow(key: "Árbitro",
                                 value: nacionalidad.map { "\(nombreArbitro) · \($0)" } ?? nombreArbitro))

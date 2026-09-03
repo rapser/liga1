@@ -487,6 +487,22 @@ final class MatchDetailViewModel {
         return "\(w.precipitationProbPct)%"
     }
 
+    /// Condición que amerita destacar (⚠️): tormenta/nieve, frío o calor extremo, lluvia muy probable.
+    var climaAdvertencia: Bool {
+        guard let w = weather else { return false }
+        if w.condition == .tormenta || w.condition == .nieve { return true }
+        if w.temperatureC <= 5 || w.temperatureC >= 32 { return true }
+        return w.precipitationProbPct >= 70
+    }
+
+    /// Línea secundaria del clima: "Viento 14 km/h · Humedad 72% · Lluvia 20%".
+    var climaDetalleDisplay: String? {
+        guard let w = weather else { return nil }
+        var parts: [String] = ["Viento \(Int(w.windKmh.rounded())) km/h", "Humedad \(w.humidityPct)%"]
+        if w.precipitationProbPct >= 10 { parts.append("Lluvia \(w.precipitationProbPct)%") }
+        return parts.joined(separator: " · ")
+    }
+
     /// "actualizado hoy 14:30" — contexto de frescura del dato.
     var climaActualizadoDisplay: String? {
         guard let date = weather?.updatedAt else { return nil }
