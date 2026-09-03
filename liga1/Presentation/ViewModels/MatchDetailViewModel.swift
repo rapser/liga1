@@ -112,12 +112,31 @@ final class MatchDetailViewModel {
     @Published private(set) var stadium: Stadium?
     /// Ficha del árbitro designado (Termómetro Arbitral). `nil` si no está catalogado.
     @Published private(set) var referee: RefereeProfile?
+    /// Clima estimado de la sede (Sabor Local). `nil` hasta que carga o si el Admin no lo generó.
+    @Published private(set) var weather: MatchWeather?
+
+    // MARK: - Termómetro Arbitral (encuesta en vivo)
+
+    /// Encuesta arbitral abierta del partido. `nil` si no hay ninguna.
+    @Published private(set) var refereePoll: RefereePoll?
+    /// Conteo por opción (suma de shards), en vivo.
+    @Published private(set) var pollTally: [String: Int] = [:]
+    /// Opción que votó el usuario; se siembra de Firestore y se fija tras votar.
+    @Published private(set) var myPollVote: String?
+    @Published private(set) var pollVoteInFlight = false
+    @Published private(set) var pollVoteError: String?
 
     // MARK: - Dependencies
 
     let context: MatchDetailContext
     private let getStadiumUseCase: GetStadiumForTeamUseCaseProtocol
     private let getRefereeProfileUseCase: GetRefereeProfileUseCaseProtocol
+    private let getMatchWeatherUseCase: GetMatchWeatherUseCaseProtocol
+    private let observeRefereePollUseCase: ObserveRefereePollUseCaseProtocol
+    private let observePollResultUseCase: ObservePollResultUseCaseProtocol
+    private let submitRefereePollVoteUseCase: SubmitRefereePollVoteUseCaseProtocol
+    /// Suscripción al resultado; se reemplaza cuando cambia la encuesta activa.
+    private var pollResultCancellable: AnyCancellable?
 
     // MARK: - Private Properties
 
@@ -128,11 +147,19 @@ final class MatchDetailViewModel {
     init(
         context: MatchDetailContext,
         getStadiumUseCase: GetStadiumForTeamUseCaseProtocol,
-        getRefereeProfileUseCase: GetRefereeProfileUseCaseProtocol
+        getRefereeProfileUseCase: GetRefereeProfileUseCaseProtocol,
+        getMatchWeatherUseCase: GetMatchWeatherUseCaseProtocol,
+        observeRefereePollUseCase: ObserveRefereePollUseCaseProtocol,
+        observePollResultUseCase: ObservePollResultUseCaseProtocol,
+        submitRefereePollVoteUseCase: SubmitRefereePollVoteUseCaseProtocol
     ) {
         self.context = context
         self.getStadiumUseCase = getStadiumUseCase
         self.getRefereeProfileUseCase = getRefereeProfileUseCase
+        self.getMatchWeatherUseCase = getMatchWeatherUseCase
+        self.observeRefereePollUseCase = observeRefereePollUseCase
+        self.observePollResultUseCase = observePollResultUseCase
+        self.submitRefereePollVoteUseCase = submitRefereePollVoteUseCase
     }
 
     private var match: MatchUI { context.match }
@@ -152,6 +179,102 @@ final class MatchDetailViewModel {
                 .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] in self?.referee = $0 })
                 .store(in: &cancellables)
+        }
+        if weather == nil {
+            getMatchWeatherUseCase.execute(jornadaId: context.jornadaId, matchId: match.id)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] in self?.weather = $0 })
+                .store(in: &cancellables)
+        }
+
+        observeRefereePollUseCase.execute(matchId: match.id)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] in self?.handleRefereePoll($0) })
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Termómetro Arbitral
+
+    private func handleRefereePoll(_ poll: RefereePoll?) {
+        let changed = poll?.id != refereePoll?.id
+        refereePoll = poll
+
+        guard let poll else {
+            pollResultCancellable = nil
+            pollTally = [:]
+            myPollVote = nil
+            return
+        }
+
+        guard changed else { return }
+        pollTally = [:]
+        myPollVote = nil
+        pollVoteError = nil
+        pollResultCancellable = observePollResultUseCase.execute(pollId: poll.id)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] result in
+                guard let self else { return }
+                self.pollTally = result.tally
+                if self.myPollVote == nil, let seeded = result.myVote {
+                    self.myPollVote = seeded
+                }
+            })
+    }
+
+    /// Registra el voto del usuario en la encuesta activa.
+    func voteRefereePoll(optionId: String) {
+        guard let poll = refereePoll, puedeVotarRefereePoll else { return }
+        pollVoteInFlight = true
+        pollVoteError = nil
+        submitRefereePollVoteUseCase.execute(poll: poll, optionId: optionId)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                self?.pollVoteInFlight = false
+                if case .failure(let error) = completion {
+                    self?.pollVoteError = error.localizedDescription
+                }
+            }, receiveValue: { [weak self] votedOption in
+                self?.myPollVote = votedOption
+            })
+            .store(in: &cancellables)
+    }
+
+    var refereePollDisponible: Bool { refereePoll != nil }
+    var refereePollPregunta: String? { refereePoll?.pregunta }
+    var refereePollAbierta: Bool { refereePoll?.isOpen() ?? false }
+    var refereePollYaVote: Bool { myPollVote != nil }
+    var puedeVotarRefereePoll: Bool {
+        refereePollAbierta && !refereePollYaVote && !pollVoteInFlight
+    }
+
+    var refereePollTotalDisplay: String {
+        let total = pollTally.values.reduce(0, +)
+        return total == 1 ? "1 voto" : "\(total) votos"
+    }
+
+    var refereePollEstadoDisplay: String {
+        refereePollAbierta ? "En vivo" : "Cerrada"
+    }
+
+    struct RefereePollOptionVM: Equatable {
+        let id: String
+        let texto: String
+        let votos: Int
+        let porcentaje: Int
+        let esMiVoto: Bool
+    }
+
+    var refereePollOpciones: [RefereePollOptionVM] {
+        guard let poll = refereePoll else { return [] }
+        let result = PollResult(tally: pollTally, myVote: myPollVote)
+        return poll.opciones.map { opt in
+            RefereePollOptionVM(
+                id: opt.id,
+                texto: opt.texto,
+                votos: result.votos(for: opt.id),
+                porcentaje: result.percent(for: opt.id),
+                esMiVoto: myPollVote == opt.id
+            )
         }
     }
 
@@ -326,6 +449,53 @@ final class MatchDetailViewModel {
     var refereeTarjetasPorPartidoDisplay: String? {
         guard let c = referee?.career, c.matches > 0 else { return nil }
         return String(format: "%.1f amarillas · %.2f rojas", c.yellowPerGame, c.redPerGame)
+    }
+
+    // MARK: - Sabor Local (clima de la sede)
+
+    /// Hay clima estimado que mostrar.
+    var climaDisponible: Bool { weather != nil }
+
+    /// SF Symbol para el ícono del clima.
+    var climaIconoSF: String? { weather?.symbol }
+
+    /// Titular corto: "Nublado · 18°".
+    var climaResumenDisplay: String? {
+        guard let w = weather else { return nil }
+        return "\(w.condition.displayName) · \(w.roundedTemperature)°"
+    }
+
+    /// Sensación térmica solo cuando difiere de la temperatura real ("15°C").
+    var climaSensacionDisplay: String? {
+        guard let w = weather, w.sensationDiffers else { return nil }
+        return "\(Int(w.feelsLikeC.rounded()))°C"
+    }
+
+    var climaVientoDisplay: String? {
+        guard let w = weather else { return nil }
+        return "\(Int(w.windKmh.rounded())) km/h"
+    }
+
+    var climaHumedadDisplay: String? {
+        guard let w = weather else { return nil }
+        return "\(w.humidityPct)%"
+    }
+
+    /// Solo aporta si hay probabilidad apreciable de lluvia.
+    var climaPrecipitacionDisplay: String? {
+        guard let w = weather, w.precipitationProbPct >= 10 else { return nil }
+        return "\(w.precipitationProbPct)%"
+    }
+
+    /// "actualizado hoy 14:30" — contexto de frescura del dato.
+    var climaActualizadoDisplay: String? {
+        guard let date = weather?.updatedAt else { return nil }
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "es_PE")
+        df.doesRelativeDateFormatting = true
+        df.dateStyle = .short
+        df.timeStyle = .short
+        return "actualizado \(df.string(from: date))"
     }
 
     var shareText: String {

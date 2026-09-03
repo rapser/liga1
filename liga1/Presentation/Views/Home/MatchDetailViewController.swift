@@ -102,10 +102,22 @@ final class MatchDetailViewController: UIViewController {
 
     private func bindViewModel() {
         viewModel.$stadium
-            .combineLatest(viewModel.$referee)
+            .combineLatest(viewModel.$referee, viewModel.$weather)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _, _ in self?.rebuildContextSections() }
+            .sink { [weak self] _, _, _ in self?.rebuildContextSections() }
             .store(in: &cancellables)
+
+        // Termómetro Arbitral: cualquier cambio del estado de la encuesta reconstruye la sección.
+        Publishers.CombineLatest4(
+            viewModel.$refereePoll,
+            viewModel.$pollTally,
+            viewModel.$myPollVote,
+            viewModel.$pollVoteInFlight
+        )
+        .combineLatest(viewModel.$pollVoteError)
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _, _ in self?.rebuildContextSections() }
+        .store(in: &cancellables)
     }
 
     private func setupResumen() {
@@ -142,10 +154,117 @@ final class MatchDetailViewController: UIViewController {
             contextSectionsContainer.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
-        if viewModel.saborLocalDisponible {
+        if viewModel.refereePollDisponible {
+            contextSectionsContainer.addArrangedSubview(makeRefereePollSection())
+        }
+        if viewModel.saborLocalDisponible || viewModel.climaDisponible {
             contextSectionsContainer.addArrangedSubview(makeSaborLocalSection())
         }
         contextSectionsContainer.addArrangedSubview(makeInfoAdicionalSection())
+    }
+
+    // MARK: - Termómetro Arbitral (encuesta en vivo)
+
+    private func makeRefereePollSection() -> UIView {
+        let inner = UIStackView()
+        inner.prepareForAutoLayout()
+        inner.axis = .vertical
+        inner.spacing = Spacing.small
+
+        if let pregunta = viewModel.refereePollPregunta {
+            let q = UILabel()
+            q.font = .systemFont(ofSize: 14, weight: .semibold)
+            q.textColor = .label
+            q.numberOfLines = 0
+            q.text = pregunta
+            inner.addArrangedSubview(q)
+        }
+
+        let puedeVotar = viewModel.puedeVotarRefereePoll
+        for opcion in viewModel.refereePollOpciones {
+            inner.addArrangedSubview(
+                puedeVotar ? pollVoteButton(for: opcion) : pollResultRow(for: opcion)
+            )
+        }
+
+        let footer = UILabel()
+        footer.font = .systemFont(ofSize: 12)
+        footer.textColor = .secondaryLabel
+        footer.text = "\(viewModel.refereePollEstadoDisplay) · \(viewModel.refereePollTotalDisplay)"
+        inner.addArrangedSubview(footer)
+
+        if let error = viewModel.pollVoteError {
+            let e = UILabel()
+            e.font = .systemFont(ofSize: 12)
+            e.textColor = .systemRed
+            e.numberOfLines = 0
+            e.text = error
+            inner.addArrangedSubview(e)
+        }
+
+        return MatchDetailTitledSectionView(title: "Termómetro Arbitral", uppercaseTitle: true, content: inner)
+    }
+
+    private func pollVoteButton(for opcion: MatchDetailViewModel.RefereePollOptionVM) -> UIView {
+        var config = UIButton.Configuration.tinted()
+        config.title = opcion.texto
+        config.cornerStyle = .medium
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12)
+
+        let button = UIButton(configuration: config)
+        button.contentHorizontalAlignment = .leading
+        button.isEnabled = !viewModel.pollVoteInFlight
+        button.addAction(UIAction { [weak self] _ in
+            self?.viewModel.voteRefereePoll(optionId: opcion.id)
+        }, for: .touchUpInside)
+        return button
+    }
+
+    private func pollResultRow(for opcion: MatchDetailViewModel.RefereePollOptionVM) -> UIView {
+        let container = UIStackView()
+        container.axis = .vertical
+        container.spacing = 4
+
+        let top = UIStackView()
+        top.axis = .horizontal
+        top.alignment = .firstBaseline
+
+        let name = UILabel()
+        name.font = .systemFont(ofSize: 14, weight: opcion.esMiVoto ? .semibold : .regular)
+        name.textColor = .label
+        name.text = opcion.esMiVoto ? "\(opcion.texto)  ✓" : opcion.texto
+
+        let value = UILabel()
+        value.font = .systemFont(ofSize: 13)
+        value.textColor = .secondaryLabel
+        value.textAlignment = .right
+        value.text = "\(opcion.votos) · \(opcion.porcentaje)%"
+        value.setContentHuggingPriority(.required, for: .horizontal)
+
+        top.addArrangedSubview(name)
+        top.addArrangedSubview(value)
+
+        let track = UIView()
+        track.backgroundColor = .secondarySystemFill
+        track.layer.cornerRadius = 3
+        track.heightAnchor.constraint(equalToConstant: 6).isActive = true
+
+        let fill = UIView()
+        fill.backgroundColor = opcion.esMiVoto ? .tintColor : .tertiaryLabel
+        fill.layer.cornerRadius = 3
+        fill.translatesAutoresizingMaskIntoConstraints = false
+        track.addSubview(fill)
+        NSLayoutConstraint.activate([
+            fill.leadingAnchor.constraint(equalTo: track.leadingAnchor),
+            fill.topAnchor.constraint(equalTo: track.topAnchor),
+            fill.bottomAnchor.constraint(equalTo: track.bottomAnchor),
+            fill.widthAnchor.constraint(equalTo: track.widthAnchor,
+                                        multiplier: max(0.001, min(1.0, CGFloat(opcion.porcentaje) / 100)))
+        ])
+
+        container.addArrangedSubview(top)
+        container.addArrangedSubview(track)
+        return container
     }
 
     private func makeSaborLocalSection() -> UIView {
@@ -162,6 +281,21 @@ final class MatchDetailViewController: UIViewController {
         }
         if let ciudad = viewModel.ciudadDisplay {
             rows.append(infoRow(key: "Ciudad", value: ciudad))
+        }
+        if let clima = viewModel.climaResumenDisplay {
+            rows.append(infoRow(key: "Clima", value: clima))
+        }
+        if let sensacion = viewModel.climaSensacionDisplay {
+            rows.append(infoRow(key: "Sensación térmica", value: sensacion))
+        }
+        if let viento = viewModel.climaVientoDisplay {
+            rows.append(infoRow(key: "Viento", value: viento))
+        }
+        if let humedad = viewModel.climaHumedadDisplay {
+            rows.append(infoRow(key: "Humedad", value: humedad))
+        }
+        if let precip = viewModel.climaPrecipitacionDisplay {
+            rows.append(infoRow(key: "Prob. lluvia", value: precip))
         }
 
         for (index, row) in rows.enumerated() {

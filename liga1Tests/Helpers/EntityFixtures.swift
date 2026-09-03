@@ -57,6 +57,32 @@ extension Team {
     static func fixture(nombre: String = "Alianza Lima", puntos: Int = 10) -> Team {
         Team(nombre: nombre, ciudad: "Lima", logo: "alianza", puntos: puntos)
     }
+
+    /// Fila de tabla para tests del simulador. `code` es el identificador (`logo`).
+    static func standing(
+        code: String,
+        pts: Int = 0,
+        pj: Int = 0,
+        pg: Int = 0,
+        pe: Int = 0,
+        pp: Int = 0,
+        gf: Int = 0,
+        gc: Int = 0
+    ) -> Team {
+        Team(
+            nombre: code.uppercased(),
+            ciudad: "",
+            logo: code,
+            partidosJugados: pj,
+            partidosGanados: pg,
+            partidosEmpatados: pe,
+            partidosPerdidos: pp,
+            golesFavor: gf,
+            golesContra: gc,
+            diferenciaGoles: gf - gc,
+            puntos: pts
+        )
+    }
 }
 
 // MARK: - NewsItem fixtures
@@ -105,4 +131,30 @@ extension User {
 enum TestError: Error, Equatable {
     case generic
     case network
+}
+
+// MARK: - RefereePoll fixtures
+
+extension RefereePoll {
+    static func fixture(
+        id: String = "poll-1",
+        matchId: String = "hua_ali",
+        jornadaId: String = "clausura_05",
+        pregunta: String = "¿Fue penal el reclamo del minuto 63?",
+        opciones: [RefereePoll.Option] = [
+            .init(id: "si", texto: "Sí, penal"),
+            .init(id: "no", texto: "No fue"),
+            .init(id: "dudoso", texto: "Dudoso")
+        ],
+        estado: RefereePoll.Estado = .activa,
+        cierraEn: Date = Date().addingTimeInterval(180),
+        creadoEn: Date? = Date(),
+        numShards: Int = 10
+    ) -> RefereePoll {
+        RefereePoll(
+            id: id, matchId: matchId, jornadaId: jornadaId, pregunta: pregunta,
+            opciones: opciones, estado: estado, cierraEn: cierraEn,
+            creadoEn: creadoEn, numShards: numShards
+        )
+    }
 }

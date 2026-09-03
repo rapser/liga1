@@ -34,6 +34,10 @@ class MainTabBarController: UITabBarController {
 
         let torneoVC = container.makeTablaViewController()
         torneoVC.title = "Tabla"
+        torneoVC.onSimulate = { [weak torneoVC, container] torneo in
+            let simulador = container.makeStandingsSimulatorViewController(torneo: torneo)
+            torneoVC?.navigationController?.pushViewController(simulador, animated: true)
+        }
 
         let newsVC = container.makeNewsViewController()
         newsVC.title = "Noticias"

@@ -142,4 +142,24 @@ class JornadasRepository: JornadasRepositoryProtocol {
     func observeActiveJornadas() -> AnyPublisher<[Jornada], Never> {
         return jornadasSubject.eraseToAnyPublisher()
     }
+
+    func fetchAllJornadas() -> AnyPublisher<[Jornada], Error> {
+        Future<[Jornada], Error> { [weak self] promise in
+            guard let self else {
+                promise(.failure(NSError(domain: "JornadasRepository", code: -1,
+                                         userInfo: [NSLocalizedDescriptionKey: "Repository deallocated"])))
+                return
+            }
+            self.db.collection(FirestoreConstants.Collection.jornadas)
+                .getDocuments(source: .default) { snapshot, error in
+                    if let error {
+                        promise(.failure(error))
+                        return
+                    }
+                    let jornadas = self.processJornadaDocuments(snapshot?.documents ?? [])
+                    promise(.success(jornadas))
+                }
+        }
+        .eraseToAnyPublisher()
+    }
 }

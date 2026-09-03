@@ -8,6 +8,8 @@ import Foundation
 final class MockMatchesRepository: MatchesRepositoryProtocol {
 
     var fetchResult: Result<[Match], Error> = .success([])
+    /// Resultado por jornada; si falta la clave se usa `fetchResult`.
+    var resultsByJornada: [String: [Match]] = [:]
     var fetchCallCount = 0
     var lastFetchedJornadaId: String?
 
@@ -17,6 +19,9 @@ final class MockMatchesRepository: MatchesRepositoryProtocol {
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error> {
         fetchCallCount += 1
         lastFetchedJornadaId = jornadaId
+        if let matches = resultsByJornada[jornadaId] {
+            return Just(matches).setFailureType(to: Error.self).eraseToAnyPublisher()
+        }
         switch fetchResult {
         case .success(let matches):
             return Just(matches).setFailureType(to: Error.self).eraseToAnyPublisher()
