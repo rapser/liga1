@@ -437,17 +437,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		46B3EF472FBAAA8A00F1453E /* liga1Tests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = liga1Tests;
-			sourceTree = "<group>";
-		};
+		46B3EF472FBAAA8A00F1453E /* liga1Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = liga1Tests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -485,7 +475,6 @@
 			children = (
 				EC6C19F9D4A3E6D3E2E1C113 /* PollDTO.swift */,
 			);
-			name = Poll;
 			path = Poll;
 			sourceTree = "<group>";
 		};
@@ -521,7 +510,6 @@
 				E025974C5467647A296EBC40 /* QualificationZone.swift */,
 				EFBC61C66BAD630B9D21EADD /* RemainingFixture.swift */,
 			);
-			name = Simulator;
 			path = Simulator;
 			sourceTree = "<group>";
 		};
@@ -1049,7 +1037,6 @@
 				CC8121AAE1995BB1E59D6C27 /* RefereePoll.swift */,
 				5E15DB0F44FD51392D6E7AC0 /* PollResult.swift */,
 			);
-			name = Poll;
 			path = Poll;
 			sourceTree = "<group>";
 		};
@@ -1324,7 +1311,6 @@
 				95E56C28C502EBA468D45335 /* ProjectQualificationUseCase.swift */,
 				4B0FCD5C040C190819AD85FE /* FetchRemainingFixturesUseCase.swift */,
 			);
-			name = Simulator;
 			path = Simulator;
 			sourceTree = "<group>";
 		};
@@ -1333,7 +1319,6 @@
 			children = (
 				D658F65DF5A53CE40432FBC0 /* StandingsSimulatorViewController.swift */,
 			);
-			name = Simulator;
 			path = Simulator;
 			sourceTree = "<group>";
 		};
@@ -1905,7 +1890,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
@@ -1938,7 +1923,7 @@
 				CODE_SIGN_ENTITLEMENTS = liga1/liga1.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 8AJBS923B3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = liga1/Resources/Info.plist;
