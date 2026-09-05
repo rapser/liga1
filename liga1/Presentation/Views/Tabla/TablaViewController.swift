@@ -21,6 +21,9 @@ class TablaViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var hasStarted = false
 
+    /// Abre el simulador para el torneo indicado. Lo inyecta `MainTabBarController`.
+    var onSimulate: ((TorneoType) -> Void)?
+
     // MARK: - Initialization
     init(viewModel: TorneoViewModel) {
         self.viewModel = viewModel
@@ -74,6 +77,13 @@ class TablaViewController: UIViewController {
         title = "Tabla"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "slider.horizontal.3"),
+            primaryAction: UIAction { [weak self] _ in
+                guard let self else { return }
+                self.onSimulate?(self.viewModel.selectedTorneo)
+            }
+        )
     }
 
     private func setupUI() {

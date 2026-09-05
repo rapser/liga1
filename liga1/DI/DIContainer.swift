@@ -52,6 +52,22 @@ final class DIContainer {
         return NewsRepository(database: makeDatabase(), logger: makeLogger())
     }
 
+    func makeStadiumRepository() -> StadiumRepositoryProtocol {
+        return StadiumRepository(database: makeDatabase(), logger: makeLogger())
+    }
+
+    func makeRefereeRepository() -> RefereeRepositoryProtocol {
+        return RefereeRepository(database: makeDatabase(), logger: makeLogger())
+    }
+
+    func makeWeatherRepository() -> WeatherRepositoryProtocol {
+        return WeatherRepository(database: makeDatabase(), logger: makeLogger())
+    }
+
+    func makePollRepository() -> PollRepositoryProtocol {
+        return PollRepository(database: makeDatabase(), logger: makeLogger())
+    }
+
     // MARK: - Services
 
     private lazy var favoritesService: FavoritesServiceProtocol = {
@@ -179,6 +195,49 @@ final class DIContainer {
         return CalculateAccumulatedStandingsUseCase()
     }
 
+    // MARK: - Use Cases - Simulador de tabla / descenso
+
+    func makeFetchRemainingFixturesUseCase() -> FetchRemainingFixturesUseCaseProtocol {
+        return FetchRemainingFixturesUseCase(
+            jornadasRepository: makeJornadasRepository(),
+            matchesRepository: makeMatchesRepository()
+        )
+    }
+
+    func makeSimulateStandingsUseCase() -> SimulateStandingsUseCaseProtocol {
+        return SimulateStandingsUseCase()
+    }
+
+    func makeProjectQualificationUseCase() -> ProjectQualificationUseCaseProtocol {
+        return ProjectQualificationUseCase()
+    }
+
+    // MARK: - Use Cases - Match Context (Sabor Local)
+
+    func makeGetStadiumForTeamUseCase() -> GetStadiumForTeamUseCaseProtocol {
+        return GetStadiumForTeamUseCase(repository: makeStadiumRepository())
+    }
+
+    func makeGetRefereeProfileUseCase() -> GetRefereeProfileUseCaseProtocol {
+        return GetRefereeProfileUseCase(repository: makeRefereeRepository())
+    }
+
+    func makeGetMatchWeatherUseCase() -> GetMatchWeatherUseCaseProtocol {
+        return GetMatchWeatherUseCase(repository: makeWeatherRepository())
+    }
+
+    func makeObserveRefereePollUseCase() -> ObserveRefereePollUseCaseProtocol {
+        return ObserveRefereePollUseCase(repository: makePollRepository())
+    }
+
+    func makeObservePollResultUseCase() -> ObservePollResultUseCaseProtocol {
+        return ObservePollResultUseCase(repository: makePollRepository(), authService: makeAuthService())
+    }
+
+    func makeSubmitRefereePollVoteUseCase() -> SubmitRefereePollVoteUseCaseProtocol {
+        return SubmitRefereePollVoteUseCase(repository: makePollRepository(), authService: makeAuthService())
+    }
+
     // MARK: - Use Cases - News
 
     func makeFetchNewsUseCase() -> FetchNewsUseCaseProtocol {
@@ -294,13 +353,38 @@ final class DIContainer {
         return HomeViewController(viewModel: makeHomeViewModel(), container: self)
     }
 
+    func makeMatchDetailViewModel(context: MatchDetailContext) -> MatchDetailViewModel {
+        return MatchDetailViewModel(
+            context: context,
+            getStadiumUseCase: makeGetStadiumForTeamUseCase(),
+            getRefereeProfileUseCase: makeGetRefereeProfileUseCase(),
+            getMatchWeatherUseCase: makeGetMatchWeatherUseCase(),
+            observeRefereePollUseCase: makeObserveRefereePollUseCase(),
+            observePollResultUseCase: makeObservePollResultUseCase(),
+            submitRefereePollVoteUseCase: makeSubmitRefereePollVoteUseCase()
+        )
+    }
+
     func makeMatchDetailViewController(context: MatchDetailContext) -> MatchDetailViewController {
-        let vm = MatchDetailViewModel(context: context)
-        return MatchDetailViewController(viewModel: vm)
+        return MatchDetailViewController(viewModel: makeMatchDetailViewModel(context: context))
     }
 
     func makeTablaViewController() -> TablaViewController {
         return TablaViewController(viewModel: makeTorneoViewModel())
+    }
+
+    func makeStandingsSimulatorViewModel() -> StandingsSimulatorViewModel {
+        return StandingsSimulatorViewModel(
+            fetchTeamsUseCase: makeFetchTeamsUseCase(),
+            calculateAccumulatedUseCase: makeCalculateAccumulatedStandingsUseCase(),
+            fetchRemainingFixturesUseCase: makeFetchRemainingFixturesUseCase(),
+            simulateStandingsUseCase: makeSimulateStandingsUseCase(),
+            projectQualificationUseCase: makeProjectQualificationUseCase()
+        )
+    }
+
+    func makeStandingsSimulatorViewController(torneo: TorneoType) -> StandingsSimulatorViewController {
+        return StandingsSimulatorViewController(viewModel: makeStandingsSimulatorViewModel(), torneo: torneo)
     }
 
     func makeFavoritosViewController() -> FavoritosViewController {

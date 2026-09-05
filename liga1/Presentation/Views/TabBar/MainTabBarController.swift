@@ -34,9 +34,15 @@ class MainTabBarController: UITabBarController {
 
         let torneoVC = container.makeTablaViewController()
         torneoVC.title = "Tabla"
+        torneoVC.onSimulate = { [weak torneoVC, container] torneo in
+            let simulador = container.makeStandingsSimulatorViewController(torneo: torneo)
+            torneoVC?.navigationController?.pushViewController(simulador, animated: true)
+        }
 
-        let newsVC = container.makeNewsViewController()
-        newsVC.title = "Noticias"
+        // Noticias: fuera del tab bar en el rediseño "Fan Experience".
+        // Para reactivarla: descomentar el bloque de `newsNav` y añadirlo a `viewControllers`.
+        // let newsVC = container.makeNewsViewController()
+        // newsVC.title = "Noticias"
 
         let perfilVC = container.makeProfileViewController(eventBus: eventBus)
         perfilVC.title = "Ajustes"
@@ -54,10 +60,10 @@ class MainTabBarController: UITabBarController {
             imageSystemName: "chart.bar.doc.horizontal"
         )
 
-        let newsNav = createNavController(
-            rootViewController: newsVC,
-            title: "noticias",
-            imageSystemName: "newspaper")
+        // let newsNav = createNavController(
+        //     rootViewController: newsVC,
+        //     title: "noticias",
+        //     imageSystemName: "newspaper")
 
         let perfilNav = createNavController(
             rootViewController: perfilVC,
@@ -65,7 +71,7 @@ class MainTabBarController: UITabBarController {
             imageSystemName: "gearshape"
         )
 
-        viewControllers = [homeNav, torneoNav, newsNav, perfilNav]
+        viewControllers = [homeNav, torneoNav, perfilNav]
     }
     
     private func configureNavigationBarAppearance() {

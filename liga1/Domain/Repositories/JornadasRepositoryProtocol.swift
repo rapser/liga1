@@ -11,4 +11,6 @@ import Combine
 protocol JornadasRepositoryProtocol {
     func fetchActiveJornadas() -> AnyPublisher<[Jornada], Error>
     func observeActiveJornadas() -> AnyPublisher<[Jornada], Never>
+    /// Todas las jornadas del calendario (sin filtrar por `mostrar`). Para el simulador.
+    func fetchAllJornadas() -> AnyPublisher<[Jornada], Error>
 }

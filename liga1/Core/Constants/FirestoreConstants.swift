@@ -22,6 +22,20 @@ public enum FirestoreConstants {
         public static let teams = "equipos"
         public static let preferences = "preferences"
 
+        // Datos maestros (Sabor Local)
+        public static let stadiums = "stadiums"
+        public static let referees = "referees"
+        /// Subcolección de `equipos/{code}`.
+        public static let players = "players"
+
+        // Termómetro Arbitral (encuestas en vivo)
+        public static let polls = "polls"
+        /// Subcolección de `polls/{id}`: contadores distribuidos.
+        public static let pollShards = "shards"
+        /// `pollVotes/{pollId}/votes/{uid}` — 1 voto por usuario.
+        public static let pollVotes = "pollVotes"
+        public static let pollVotesEntries = "votes"
+
         // Tournaments
         public static let apertura = "apertura"
         public static let clausura = "clausura"
