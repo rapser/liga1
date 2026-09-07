@@ -10,12 +10,25 @@ final class MockJornadasRepository: JornadasRepositoryProtocol {
     var fetchResult: Result<[Jornada], Error> = .success([])
     var fetchCallCount = 0
 
+    var fetchAllResult: Result<[Jornada], Error> = .success([])
+    var fetchAllCallCount = 0
+
     private let observeSubject = CurrentValueSubject<[Jornada], Never>([])
     var observeCallCount = 0
 
     func fetchActiveJornadas() -> AnyPublisher<[Jornada], Error> {
         fetchCallCount += 1
         switch fetchResult {
+        case .success(let jornadas):
+            return Just(jornadas).setFailureType(to: Error.self).eraseToAnyPublisher()
+        case .failure(let error):
+            return Fail(error: error).eraseToAnyPublisher()
+        }
+    }
+
+    func fetchAllJornadas() -> AnyPublisher<[Jornada], Error> {
+        fetchAllCallCount += 1
+        switch fetchAllResult {
         case .success(let jornadas):
             return Just(jornadas).setFailureType(to: Error.self).eraseToAnyPublisher()
         case .failure(let error):

@@ -48,6 +48,16 @@ public extension UIColor {
     /// Color principal de Liga 1
     static let liga1Red = UIColor(red: 0.9, green: 0.1, blue: 0.2, alpha: 1.0)  // #E61A33
 
+    /// Dorado de acento (rediseño "Fan Experience"): tabs activas, barras, CTAs.
+    static let liga1Gold = UIColor(red: 1.0, green: 0.8, blue: 0.0, alpha: 1.0)  // #FFCC00
+
+    /// Borde sutil de las cards del rediseño.
+    static let cardStroke: UIColor = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.10)
+            : UIColor(white: 0, alpha: 0.08)
+    }
+
     /// Barra comparativa de estadísticas: equipo local (izquierda), estilo teal.
     static let statComparisonLocal: UIColor = UIColor { traitCollection in
         if traitCollection.userInterfaceStyle == .dark {
