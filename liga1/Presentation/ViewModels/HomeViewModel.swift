@@ -34,6 +34,7 @@ class HomeViewModel {
 
     private let getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol
     private let fetchMatchesUseCase: FetchMatchesUseCaseProtocol
+    private let observeMatchesUseCase: ObserveMatchesUseCaseProtocol
 
     // MARK: - Private Properties
 
@@ -46,15 +47,19 @@ class HomeViewModel {
     /// Últimos IDs procesados por observe(); evita recargar partidos cuando el background server
     /// refresh de JornadasRepository reenvía los mismos datos y cancela una carga ya en vuelo.
     private var lastObservedJornadaIds: Set<String> = []
+    private var matchObservationCancellables: [String: AnyCancellable] = [:]
+    private var observedJornadas: [String: Jornada] = [:]
 
     // MARK: - Initialization
 
     init(
         getJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol,
-        fetchMatchesUseCase: FetchMatchesUseCaseProtocol
+        fetchMatchesUseCase: FetchMatchesUseCaseProtocol,
+        observeMatchesUseCase: ObserveMatchesUseCaseProtocol
     ) {
         self.getJornadaToDisplayUseCase = getJornadaToDisplayUseCase
         self.fetchMatchesUseCase = fetchMatchesUseCase
+        self.observeMatchesUseCase = observeMatchesUseCase
 
         observeJornadaToDisplay()
     }
@@ -95,6 +100,7 @@ class HomeViewModel {
             } receiveValue: { [weak self] jornadas in
                 guard let self else { return }
                 self.hasReceivedFetchJornadasResponse = true
+                self.configureMatchObservers(for: jornadas)
 
                 guard self.shouldReloadMatches(for: jornadas, force: force) else {
                     self.isLoading = false
@@ -122,6 +128,7 @@ class HomeViewModel {
                 // las mismas jornadas), evitando cancelar una carga de partidos ya en vuelo.
                 guard incomingIds != self.lastObservedJornadaIds else { return }
                 self.lastObservedJornadaIds = incomingIds
+                self.configureMatchObservers(for: jornadas)
                 self.loadMatchesCancellable?.cancel()
                 self.loadGeneration += 1
                 let generation = self.loadGeneration
@@ -189,6 +196,13 @@ class HomeViewModel {
         return cal.startOfDay(for: date)
     }
 
+    private static func ymdLima(_ date: Date) -> (Int, Int, Int) {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Lima") ?? .current
+        let parts = calendar.dateComponents([.year, .month, .day], from: date)
+        return (parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
+    }
+
     private func calendarDayForFetch() -> Date {
         switch matchDayMode {
         case .today:
@@ -196,6 +210,49 @@ class HomeViewModel {
         case .specificDay(let d):
             return d
         }
+    }
+
+    private func configureMatchObservers(for jornadas: [Jornada]) {
+        let incomingIds = Set(jornadas.map(\.id))
+        let removedIds = Set(matchObservationCancellables.keys).subtracting(incomingIds)
+        for id in removedIds {
+            matchObservationCancellables[id]?.cancel()
+            matchObservationCancellables.removeValue(forKey: id)
+            observedJornadas.removeValue(forKey: id)
+        }
+
+        for jornada in jornadas {
+            observedJornadas[jornada.id] = jornada
+            guard matchObservationCancellables[jornada.id] == nil else { continue }
+            matchObservationCancellables[jornada.id] = observeMatchesUseCase
+                .execute(for: jornada.id)
+                // La primera emisión es el valor inicial vacío; después llega el snapshot real.
+                .dropFirst()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] matches in
+                    self?.applyObservedMatches(matches, jornadaId: jornada.id)
+                }
+        }
+    }
+
+    private func applyObservedMatches(_ matches: [Match], jornadaId: String) {
+        guard let jornada = observedJornadas[jornadaId] else { return }
+        let target = Self.ymdLima(calendarDayForFetch())
+        let matchesForDay = matches
+            .filter { Self.ymdLima($0.fecha) == target }
+            .sorted { $0.fecha < $1.fecha }
+        let section = JornadaSection(
+            jornadaId: jornada.id,
+            numero: jornada.numero,
+            torneo: jornada.torneo,
+            matches: MatchUIMapper.toUI(from: matchesForDay)
+        )
+
+        jornadaSections.removeAll { $0.jornadaId == jornadaId }
+        if !section.matches.isEmpty {
+            jornadaSections.append(section)
+        }
+        jornadaSections.sort { $0.numero < $1.numero }
     }
 
     private func processJornadasWithMatches(_ results: [(Jornada, [Match])]) {

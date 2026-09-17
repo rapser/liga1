@@ -16,11 +16,19 @@ class MatchesRepository: MatchesRepositoryProtocol {
     private let logger: LoggerProtocol
     
     private var matchSubjects: [String: CurrentValueSubject<[Match], Never>] = [:]
+    private var matchListeners: [String: ListenerRegistration] = [:]
     private let subjectsQueue = DispatchQueue(label: "com.liga1.matchesRepository.subjects")
 
     init(database: DatabaseProtocol, logger: LoggerProtocol) {
         self.database = database
         self.logger = logger
+    }
+
+    deinit {
+        subjectsQueue.sync {
+            matchListeners.values.forEach { $0.remove() }
+            matchListeners.removeAll()
+        }
     }
 
     private var db: Firestore {
@@ -245,13 +253,46 @@ class MatchesRepository: MatchesRepositoryProtocol {
     }
 
     func observeMatches(for jornadaId: String) -> AnyPublisher<[Match], Never> {
-        return subjectsQueue.sync {
+        let publisher = subjectsQueue.sync {
             if let existingSubject = matchSubjects[jornadaId] {
                 return existingSubject.eraseToAnyPublisher()
             }
             let subject = CurrentValueSubject<[Match], Never>([])
             matchSubjects[jornadaId] = subject
             return subject.eraseToAnyPublisher()
+        }
+        startListeningIfNeeded(for: jornadaId)
+        return publisher
+    }
+
+    private func startListeningIfNeeded(for jornadaId: String) {
+        let shouldStart = subjectsQueue.sync { matchListeners[jornadaId] == nil }
+        guard shouldStart else { return }
+
+        let query = db.collection(FirestoreConstants.Collection.jornadas)
+            .document(jornadaId)
+            .collection(FirestoreConstants.Collection.matches)
+
+        let listener = query.addSnapshotListener { [weak self] snapshot, error in
+            guard let self else { return }
+            if let error {
+                self.logger.error(
+                    "MatchesRepository: listener falló para \(jornadaId)",
+                    error: error
+                )
+                return
+            }
+            let matches = self.processMatchDocuments(snapshot?.documents ?? [])
+                .sorted { $0.fecha < $1.fecha }
+            self.getOrCreateSubject(for: jornadaId).send(matches)
+        }
+
+        subjectsQueue.sync {
+            if matchListeners[jornadaId] == nil {
+                matchListeners[jornadaId] = listener
+            } else {
+                listener.remove()
+            }
         }
     }
 
