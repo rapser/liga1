@@ -18,6 +18,8 @@ struct Match {
     var golesEquipoVisitante: Int
     var estado: EstadoMatch
     var suspendido: Bool
+    /// Reloj oficial del proveedor: 23', 45+2', ET, etc.
+    let minutoActual: String?
     let arbitro: String?
     let estadio: String?
     let capacidad: String?
@@ -33,6 +35,7 @@ struct Match {
         golesEquipoVisitante: Int = 0,
         estado: EstadoMatch = .pendiente,
         suspendido: Bool = false,
+        minutoActual: String? = nil,
         arbitro: String? = nil,
         estadio: String? = nil,
         capacidad: String? = nil,
@@ -60,6 +63,7 @@ struct Match {
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
         self.suspendido = suspendido
+        self.minutoActual = minutoActual
         self.arbitro = arbitro
         self.estadio = estadio
         self.capacidad = capacidad
@@ -84,6 +88,7 @@ extension Match: Equatable {
             lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
             lhs.estado == rhs.estado &&
             lhs.suspendido == rhs.suspendido &&
+            lhs.minutoActual == rhs.minutoActual &&
             lhs.arbitro == rhs.arbitro &&
             lhs.estadio == rhs.estadio &&
             lhs.capacidad == rhs.capacidad &&
@@ -100,5 +105,6 @@ extension Match: Hashable {
         hasher.combine(golesEquipoVisitante)
         hasher.combine(estado)
         hasher.combine(suspendido)
+        hasher.combine(minutoActual)
     }
 }

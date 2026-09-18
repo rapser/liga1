@@ -19,6 +19,7 @@ struct MatchDTO {
     let golesTeamB: Int?
     let estado: String?
     let suspendido: Bool?
+    let minutoActual: String?
     let arbitro: String?
     let estadio: String?
     let capacidad: String?
@@ -34,6 +35,7 @@ struct MatchDTO {
         golesTeamB: Int?,
         estado: String?,
         suspendido: Bool?,
+        minutoActual: String? = nil,
         arbitro: String? = nil,
         estadio: String? = nil,
         capacidad: String? = nil,
@@ -48,6 +50,7 @@ struct MatchDTO {
         self.golesTeamB = golesTeamB
         self.estado = estado
         self.suspendido = suspendido
+        self.minutoActual = minutoActual
         self.arbitro = arbitro
         self.estadio = estadio
         self.capacidad = capacidad

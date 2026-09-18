@@ -146,8 +146,22 @@ class MatchTableViewCell: UITableViewCell {
             marcadorVisitanteLabel.isHidden = true
             horaLabel.isHidden = false
             horaLabel.text = timeString
+            horaLabel.textColor = .secondaryLabel
+            horaLabel.font = .systemFont(ofSize: 11, weight: .regular)
 
-        case .envivo, .finalizado:
+        case .envivo:
+            marcadorLocalLabel.isHidden = false
+            marcadorVisitanteLabel.isHidden = false
+            horaLabel.isHidden = false
+            horaLabel.text = matchUI.minutoActual ?? "EN VIVO"
+            horaLabel.textColor = .systemRed
+            horaLabel.font = .systemFont(ofSize: 12, weight: .bold)
+            marcadorLocalLabel.text = "\(matchUI.golesEquipoLocal)"
+            marcadorVisitanteLabel.text = "\(matchUI.golesEquipoVisitante)"
+            marcadorLocalLabel.textColor = .label
+            marcadorVisitanteLabel.textColor = .label
+
+        case .finalizado:
             marcadorLocalLabel.isHidden = false
             marcadorVisitanteLabel.isHidden = false
             horaLabel.isHidden = true

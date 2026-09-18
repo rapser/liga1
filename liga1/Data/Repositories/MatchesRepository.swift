@@ -146,6 +146,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 golesTeamB: golesTeamB,
                 estado: data["estado"] as? String,
                 suspendido: data["suspendido"] as? Bool,
+                minutoActual: data["minutoActual"] as? String,
                 arbitro: arbitro,
                 estadio: estadio,
                 capacidad: capacidad,
