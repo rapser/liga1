@@ -46,8 +46,13 @@ class MatchTableViewCell: UITableViewCell {
 
     private let horaLabel = UILabel()
         .font(.systemFont(ofSize: 11, weight: .regular))
-        .alignment(.right)
+        .alignment(.center)
+        .lines(2)
         .textColor(.secondaryLabel)
+        .prepareForAutoLayout()
+
+    private let estadoSeparatorView = UIView()
+        .background(.separator)
         .prepareForAutoLayout()
 
     // MARK: - Init
@@ -64,10 +69,12 @@ class MatchTableViewCell: UITableViewCell {
     // MARK: - Setup UI
 
     private func setupUI() {
+        setupMarcadoresYHora()
+
         equiposStackView
             .addTo(contentView)
             .pinLeading(constant: 20)
-            .pinTrailing(constant: 80)
+            .pinTrailing(to: marcadorLocalLabel.leadingAnchor, constant: Spacing.small)
             .pinTop(constant: 12)
             .pinBottom(constant: 12)
 
@@ -76,27 +83,33 @@ class MatchTableViewCell: UITableViewCell {
 
         setupEquipoLocal()
         setupEquipoVisitante()
-        setupMarcadoresYHora()
     }
 
     private func setupMarcadoresYHora() {
+        horaLabel
+            .addTo(contentView)
+            .pinTrailing(constant: Spacing.medium)
+            .centerY()
+            .width(58)
+
+        estadoSeparatorView
+            .addTo(contentView)
+            .pinTrailing(to: horaLabel.leadingAnchor, constant: Spacing.small)
+            .centerY()
+            .width(1)
+            .height(44)
+
         marcadorLocalLabel
             .addTo(contentView)
-            .pinTrailing(constant: Spacing.small)
+            .pinTrailing(to: estadoSeparatorView.leadingAnchor, constant: Spacing.medium)
             .pinTop(constant: 12)
-            .width(40)
+            .width(28)
 
         marcadorVisitanteLabel
             .addTo(contentView)
-            .pinTrailing(constant: Spacing.small)
+            .pinTrailing(to: estadoSeparatorView.leadingAnchor, constant: Spacing.medium)
             .pinBottom(constant: 12)
-            .width(40)
-
-        horaLabel
-            .addTo(contentView)
-            .pinTrailing(constant: Spacing.small)
-            .centerY()
-            .width(65)
+            .width(28)
     }
 
     private func setupEquipoLocal() {
@@ -144,13 +157,33 @@ class MatchTableViewCell: UITableViewCell {
 
             marcadorLocalLabel.isHidden = true
             marcadorVisitanteLabel.isHidden = true
+            estadoSeparatorView.isHidden = true
             horaLabel.isHidden = false
             horaLabel.text = timeString
+            horaLabel.textColor = .secondaryLabel
+            horaLabel.font = .systemFont(ofSize: 11, weight: .regular)
 
-        case .envivo, .finalizado:
+        case .envivo:
             marcadorLocalLabel.isHidden = false
             marcadorVisitanteLabel.isHidden = false
-            horaLabel.isHidden = true
+            estadoSeparatorView.isHidden = false
+            horaLabel.isHidden = false
+            horaLabel.text = "EN VIVO\n\(matchUI.minutoActual ?? "–")"
+            horaLabel.textColor = .systemGreen
+            horaLabel.font = .systemFont(ofSize: 11, weight: .semibold)
+            marcadorLocalLabel.text = "\(matchUI.golesEquipoLocal)"
+            marcadorVisitanteLabel.text = "\(matchUI.golesEquipoVisitante)"
+            marcadorLocalLabel.textColor = .label
+            marcadorVisitanteLabel.textColor = .label
+
+        case .finalizado:
+            marcadorLocalLabel.isHidden = false
+            marcadorVisitanteLabel.isHidden = false
+            estadoSeparatorView.isHidden = false
+            horaLabel.isHidden = false
+            horaLabel.text = "FINAL"
+            horaLabel.textColor = .secondaryLabel
+            horaLabel.font = .systemFont(ofSize: 11, weight: .semibold)
             marcadorLocalLabel.text = "\(matchUI.golesEquipoLocal)"
             marcadorVisitanteLabel.text = "\(matchUI.golesEquipoVisitante)"
             marcadorLocalLabel.textColor = .label
@@ -159,7 +192,11 @@ class MatchTableViewCell: UITableViewCell {
         case .anulado, .suspendido:
             marcadorLocalLabel.isHidden = false
             marcadorVisitanteLabel.isHidden = false
-            horaLabel.isHidden = true
+            estadoSeparatorView.isHidden = false
+            horaLabel.isHidden = false
+            horaLabel.text = matchUI.estado == .suspendido ? "SUSP." : "ANULADO"
+            horaLabel.textColor = .systemRed
+            horaLabel.font = .systemFont(ofSize: 10, weight: .semibold)
             marcadorLocalLabel.text = "X"
             marcadorVisitanteLabel.text = "X"
             marcadorLocalLabel.textColor = .systemRed

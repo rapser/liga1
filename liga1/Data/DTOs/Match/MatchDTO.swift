@@ -19,6 +19,9 @@ struct MatchDTO {
     let golesTeamB: Int?
     let estado: String?
     let suspendido: Bool?
+    let minutoActual: String?
+    let golesDetalle: [MatchGoalDTO]
+    let tarjetasRojasDetalle: [MatchRedCardDTO]
     let arbitro: String?
     let estadio: String?
     let capacidad: String?
@@ -34,6 +37,9 @@ struct MatchDTO {
         golesTeamB: Int?,
         estado: String?,
         suspendido: Bool?,
+        minutoActual: String? = nil,
+        golesDetalle: [MatchGoalDTO] = [],
+        tarjetasRojasDetalle: [MatchRedCardDTO] = [],
         arbitro: String? = nil,
         estadio: String? = nil,
         capacidad: String? = nil,
@@ -48,12 +54,30 @@ struct MatchDTO {
         self.golesTeamB = golesTeamB
         self.estado = estado
         self.suspendido = suspendido
+        self.minutoActual = minutoActual
+        self.golesDetalle = golesDetalle
+        self.tarjetasRojasDetalle = tarjetasRojasDetalle
         self.arbitro = arbitro
         self.estadio = estadio
         self.capacidad = capacidad
         self.canalesTV = canalesTV
         self.liveStats = liveStats
     }
+}
+
+struct MatchGoalDTO {
+    let id: String
+    let nombre: String
+    let minuto: String
+    let equipo: String
+    let tipo: String
+}
+
+struct MatchRedCardDTO {
+    let id: String
+    let nombre: String
+    let minuto: String
+    let equipo: String
 }
 
 /// Sub-objeto opcional en Firestore para estadísticas comparativas.

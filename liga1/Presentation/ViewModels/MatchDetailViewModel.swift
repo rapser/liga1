@@ -114,6 +114,7 @@ final class MatchDetailViewModel {
     @Published private(set) var referee: RefereeProfile?
     /// Clima estimado de la sede (Sabor Local). `nil` hasta que carga o si el Admin no lo generó.
     @Published private(set) var weather: MatchWeather?
+    @Published private(set) var currentMatch: MatchUI
 
     // MARK: - Termómetro Arbitral (encuesta en vivo)
 
@@ -135,6 +136,7 @@ final class MatchDetailViewModel {
     private let observeRefereePollUseCase: ObserveRefereePollUseCaseProtocol
     private let observePollResultUseCase: ObservePollResultUseCaseProtocol
     private let submitRefereePollVoteUseCase: SubmitRefereePollVoteUseCaseProtocol
+    private let observeMatchesUseCase: ObserveMatchesUseCaseProtocol
     /// Suscripción al resultado; se reemplaza cuando cambia la encuesta activa.
     private var pollResultCancellable: AnyCancellable?
 
@@ -151,23 +153,37 @@ final class MatchDetailViewModel {
         getMatchWeatherUseCase: GetMatchWeatherUseCaseProtocol,
         observeRefereePollUseCase: ObserveRefereePollUseCaseProtocol,
         observePollResultUseCase: ObservePollResultUseCaseProtocol,
-        submitRefereePollVoteUseCase: SubmitRefereePollVoteUseCaseProtocol
+        submitRefereePollVoteUseCase: SubmitRefereePollVoteUseCaseProtocol,
+        observeMatchesUseCase: ObserveMatchesUseCaseProtocol
     ) {
         self.context = context
+        self.currentMatch = context.match
         self.getStadiumUseCase = getStadiumUseCase
         self.getRefereeProfileUseCase = getRefereeProfileUseCase
         self.getMatchWeatherUseCase = getMatchWeatherUseCase
         self.observeRefereePollUseCase = observeRefereePollUseCase
         self.observePollResultUseCase = observePollResultUseCase
         self.submitRefereePollVoteUseCase = submitRefereePollVoteUseCase
+        self.observeMatchesUseCase = observeMatchesUseCase
     }
 
-    private var match: MatchUI { context.match }
+    private var match: MatchUI { currentMatch }
 
     // MARK: - Public Methods
 
     /// Carga los datos remotos de "Sabor Local" (estadio + árbitro). Idempotente.
     func load() {
+        let selectedMatchId = context.match.id
+        observeMatchesUseCase.execute(for: context.jornadaId)
+            .compactMap { matches in
+                matches.first(where: { $0.id == selectedMatchId })
+            }
+            .map(MatchUIMapper.toUI)
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in self?.currentMatch = $0 }
+            .store(in: &cancellables)
+
         if stadium == nil, let localId = match.equipoLocalId, !localId.isEmpty {
             getStadiumUseCase.execute(homeTeamCode: localId)
                 .receive(on: DispatchQueue.main)
@@ -309,8 +325,14 @@ final class MatchDetailViewModel {
 
     var statusLine: String {
         if match.suspendido { return "Suspendido" }
+        if match.estado == .envivo, let minute = match.minutoActual {
+            return "En Vivo · \(minute)"
+        }
         return match.estadoTexto
     }
+
+    var goalDetails: [MatchGoal] { match.golesDetalle }
+    var redCardDetails: [MatchRedCard] { match.tarjetasRojasDetalle }
 
     /// Lista completa tipo “estadísticas principales” (dummy, alineada a referencia visual).
     private var estadisticasTabFullDummy: [MatchDetailStatRow] {

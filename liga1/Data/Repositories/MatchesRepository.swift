@@ -16,11 +16,19 @@ class MatchesRepository: MatchesRepositoryProtocol {
     private let logger: LoggerProtocol
     
     private var matchSubjects: [String: CurrentValueSubject<[Match], Never>] = [:]
+    private var matchListeners: [String: ListenerRegistration] = [:]
     private let subjectsQueue = DispatchQueue(label: "com.liga1.matchesRepository.subjects")
 
     init(database: DatabaseProtocol, logger: LoggerProtocol) {
         self.database = database
         self.logger = logger
+    }
+
+    deinit {
+        subjectsQueue.sync {
+            matchListeners.values.forEach { $0.remove() }
+            matchListeners.removeAll()
+        }
     }
 
     private var db: Firestore {
@@ -138,6 +146,9 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 golesTeamB: golesTeamB,
                 estado: data["estado"] as? String,
                 suspendido: data["suspendido"] as? Bool,
+                minutoActual: data["minutoActual"] as? String,
+                golesDetalle: Self.parseGoalDetails(from: data["golesDetalle"]),
+                tarjetasRojasDetalle: Self.parseRedCardDetails(from: data["tarjetasRojasDetalle"]),
                 arbitro: arbitro,
                 estadio: estadio,
                 capacidad: capacidad,
@@ -149,6 +160,43 @@ class MatchesRepository: MatchesRepositoryProtocol {
         }
 
         return MatchMapper.toDomain(from: matchDTOs, logger: self.logger)
+    }
+
+    private static func parseGoalDetails(from value: Any?) -> [MatchGoalDTO] {
+        guard let values = value as? [[String: Any]] else { return [] }
+        return values.compactMap { goal in
+            guard
+                let nombre = goal["nombre"] as? String,
+                let minuto = goal["minuto"] as? String,
+                let equipo = goal["equipo"] as? String
+            else { return nil }
+
+            return MatchGoalDTO(
+                id: String(describing: goal["id"] ?? "\(nombre)-\(minuto)"),
+                nombre: nombre,
+                minuto: minuto,
+                equipo: equipo,
+                tipo: goal["tipo"] as? String ?? "gol"
+            )
+        }
+    }
+
+    private static func parseRedCardDetails(from value: Any?) -> [MatchRedCardDTO] {
+        guard let values = value as? [[String: Any]] else { return [] }
+        return values.compactMap { card in
+            guard
+                let nombre = card["nombre"] as? String,
+                let minuto = card["minuto"] as? String,
+                let equipo = card["equipo"] as? String
+            else { return nil }
+
+            return MatchRedCardDTO(
+                id: String(describing: card["id"] ?? "\(nombre)-\(minuto)"),
+                nombre: nombre,
+                minuto: minuto,
+                equipo: equipo
+            )
+        }
     }
 
     /// Campo opcional en el documento del partido. Prioridad: `arbitro` → `nombreArbitro` → `referee`.
@@ -245,13 +293,46 @@ class MatchesRepository: MatchesRepositoryProtocol {
     }
 
     func observeMatches(for jornadaId: String) -> AnyPublisher<[Match], Never> {
-        return subjectsQueue.sync {
+        let publisher = subjectsQueue.sync {
             if let existingSubject = matchSubjects[jornadaId] {
                 return existingSubject.eraseToAnyPublisher()
             }
             let subject = CurrentValueSubject<[Match], Never>([])
             matchSubjects[jornadaId] = subject
             return subject.eraseToAnyPublisher()
+        }
+        startListeningIfNeeded(for: jornadaId)
+        return publisher
+    }
+
+    private func startListeningIfNeeded(for jornadaId: String) {
+        let shouldStart = subjectsQueue.sync { matchListeners[jornadaId] == nil }
+        guard shouldStart else { return }
+
+        let query = db.collection(FirestoreConstants.Collection.jornadas)
+            .document(jornadaId)
+            .collection(FirestoreConstants.Collection.matches)
+
+        let listener = query.addSnapshotListener { [weak self] snapshot, error in
+            guard let self else { return }
+            if let error {
+                self.logger.error(
+                    "MatchesRepository: listener falló para \(jornadaId)",
+                    error: error
+                )
+                return
+            }
+            let matches = self.processMatchDocuments(snapshot?.documents ?? [])
+                .sorted { $0.fecha < $1.fecha }
+            self.getOrCreateSubject(for: jornadaId).send(matches)
+        }
+
+        subjectsQueue.sync {
+            if matchListeners[jornadaId] == nil {
+                matchListeners[jornadaId] = listener
+            } else {
+                listener.remove()
+            }
         }
     }
 
