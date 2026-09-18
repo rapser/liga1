@@ -48,6 +48,15 @@ struct MatchMapper {
             estado: estadoMatch,
             suspendido: dto.suspendido ?? false,
             minutoActual: dto.minutoActual,
+            golesDetalle: dto.golesDetalle.map { goal in
+                MatchGoal(
+                    id: goal.id,
+                    nombre: goal.nombre,
+                    minuto: goal.minuto,
+                    equipo: MatchGoal.Team(rawValue: goal.equipo) ?? .visitante,
+                    tipo: MatchGoal.Kind(rawValue: goal.tipo) ?? .gol
+                )
+            },
             arbitro: dto.arbitro,
             estadio: dto.estadio,
             capacidad: dto.capacidad,
@@ -94,6 +103,15 @@ struct MatchMapper {
             estado: domain.estado.rawValue,
             suspendido: domain.suspendido,
             minutoActual: domain.minutoActual,
+            golesDetalle: domain.golesDetalle.map { goal in
+                MatchGoalDTO(
+                    id: goal.id,
+                    nombre: goal.nombre,
+                    minuto: goal.minuto,
+                    equipo: goal.equipo.rawValue,
+                    tipo: goal.tipo.rawValue
+                )
+            },
             arbitro: domain.arbitro,
             estadio: domain.estadio,
             capacidad: domain.capacidad,

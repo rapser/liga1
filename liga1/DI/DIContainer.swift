@@ -366,7 +366,8 @@ final class DIContainer {
             getMatchWeatherUseCase: makeGetMatchWeatherUseCase(),
             observeRefereePollUseCase: makeObserveRefereePollUseCase(),
             observePollResultUseCase: makeObservePollResultUseCase(),
-            submitRefereePollVoteUseCase: makeSubmitRefereePollVoteUseCase()
+            submitRefereePollVoteUseCase: makeSubmitRefereePollVoteUseCase(),
+            observeMatchesUseCase: makeObserveMatchesUseCase()
         )
     }
 

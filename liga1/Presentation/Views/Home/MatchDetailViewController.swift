@@ -41,6 +41,15 @@ final class MatchDetailViewController: UIViewController {
         contentBottomInset: 0,
         contentHorizontalInset: Spacing.tiny
     )
+    private let scoreboardDateLabel = UILabel()
+    private let scoreboardStatusLabel = UILabel()
+    private let scoreboardScoreLabel = UILabel()
+    private let goalsStack = UIStackView()
+    private lazy var goalsSection = MatchDetailTitledSectionView(
+        title: "Goles",
+        uppercaseTitle: true,
+        content: goalsStack
+    )
 
     init(viewModel: MatchDetailViewModel) {
         self.viewModel = viewModel
@@ -102,6 +111,11 @@ final class MatchDetailViewController: UIViewController {
     }
 
     private func bindViewModel() {
+        viewModel.$currentMatch
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refreshMatchContent() }
+            .store(in: &cancellables)
+
         viewModel.$stadium
             .combineLatest(viewModel.$referee, viewModel.$weather)
             .receive(on: DispatchQueue.main)
@@ -143,6 +157,10 @@ final class MatchDetailViewController: UIViewController {
 
         stack.addArrangedSubview(comp)
         stack.addArrangedSubview(makeScoreboardHeader())
+        goalsStack.axis = .vertical
+        goalsStack.spacing = Spacing.small
+        stack.addArrangedSubview(goalsSection)
+        refreshMatchContent()
         stack.addArrangedSubview(MatchDetailTitledSectionView.statRowsSection(title: "Estadísticas", rows: vm.resumenStatRows))
         stack.addArrangedSubview(makeTVSection())
         stack.addArrangedSubview(contextSectionsContainer)
@@ -458,34 +476,27 @@ final class MatchDetailViewController: UIViewController {
         container.backgroundColor = .secondarySystemBackground
         container.layer.cornerRadius = 12
 
-        let dateLabel = UILabel()
-        dateLabel.font = .systemFont(ofSize: 13)
-        dateLabel.textColor = .secondaryLabel
-        dateLabel.textAlignment = .center
-        dateLabel.text = vm.dateTimeLine
+        scoreboardDateLabel.font = .systemFont(ofSize: 13)
+        scoreboardDateLabel.textColor = .secondaryLabel
+        scoreboardDateLabel.textAlignment = .center
 
-        let statusLabel = UILabel()
-        statusLabel.font = .systemFont(ofSize: 14, weight: .semibold)
-        statusLabel.textAlignment = .center
-        statusLabel.text = vm.statusLine
-        statusLabel.textColor = vm.context.match.estado == .envivo ? .liga1Red : .label
+        scoreboardStatusLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        scoreboardStatusLabel.textAlignment = .center
 
-        let scoreLabel = UILabel()
-        scoreLabel.font = .systemFont(ofSize: 36, weight: .bold)
-        scoreLabel.textAlignment = .center
-        scoreLabel.textColor = .liga1Red
-        scoreLabel.text = vm.scoreDisplay
+        scoreboardScoreLabel.font = .systemFont(ofSize: 36, weight: .bold)
+        scoreboardScoreLabel.textAlignment = .center
+        scoreboardScoreLabel.textColor = .liga1Red
 
         let leftStack = teamColumn(name: vm.localTeamName, assetId: vm.context.match.equipoLocalId)
         let rightStack = teamColumn(name: vm.visitTeamName, assetId: vm.context.match.equipoVisitanteId)
 
-        let teamsRow = UIStackView(arrangedSubviews: [leftStack, scoreLabel, rightStack])
+        let teamsRow = UIStackView(arrangedSubviews: [leftStack, scoreboardScoreLabel, rightStack])
         teamsRow.axis = .horizontal
         teamsRow.alignment = .center
         teamsRow.distribution = .equalCentering
         teamsRow.spacing = 8
 
-        let mainStack = UIStackView(arrangedSubviews: [dateLabel, teamsRow, statusLabel])
+        let mainStack = UIStackView(arrangedSubviews: [scoreboardDateLabel, teamsRow, scoreboardStatusLabel])
         mainStack.axis = .vertical
         mainStack.spacing = Spacing.small
         mainStack.prepareForAutoLayout()
@@ -495,10 +506,25 @@ final class MatchDetailViewController: UIViewController {
             mainStack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: Spacing.standard),
             mainStack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -Spacing.standard),
             mainStack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -Spacing.standard),
-            scoreLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 100)
+            scoreboardScoreLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 100)
         ])
 
         return container
+    }
+
+    private func refreshMatchContent() {
+        scoreboardDateLabel.text = viewModel.dateTimeLine
+        scoreboardStatusLabel.text = viewModel.statusLine
+        scoreboardStatusLabel.textColor = viewModel.currentMatch.estado == .envivo ? .systemGreen : .label
+        scoreboardScoreLabel.text = viewModel.scoreDisplay
+
+        goalsStack.arrangedSubviews.forEach {
+            goalsStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        let goals = viewModel.goalDetails
+        goalsSection.isHidden = goals.isEmpty
+        goals.forEach { goalsStack.addArrangedSubview(MatchGoalRowView(goal: $0)) }
     }
 
     private func teamColumn(name: String, assetId: String?) -> UIStackView {

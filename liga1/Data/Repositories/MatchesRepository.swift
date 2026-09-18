@@ -147,6 +147,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 estado: data["estado"] as? String,
                 suspendido: data["suspendido"] as? Bool,
                 minutoActual: data["minutoActual"] as? String,
+                golesDetalle: Self.parseGoalDetails(from: data["golesDetalle"]),
                 arbitro: arbitro,
                 estadio: estadio,
                 capacidad: capacidad,
@@ -158,6 +159,25 @@ class MatchesRepository: MatchesRepositoryProtocol {
         }
 
         return MatchMapper.toDomain(from: matchDTOs, logger: self.logger)
+    }
+
+    private static func parseGoalDetails(from value: Any?) -> [MatchGoalDTO] {
+        guard let values = value as? [[String: Any]] else { return [] }
+        return values.compactMap { goal in
+            guard
+                let nombre = goal["nombre"] as? String,
+                let minuto = goal["minuto"] as? String,
+                let equipo = goal["equipo"] as? String
+            else { return nil }
+
+            return MatchGoalDTO(
+                id: String(describing: goal["id"] ?? "\(nombre)-\(minuto)"),
+                nombre: nombre,
+                minuto: minuto,
+                equipo: equipo,
+                tipo: goal["tipo"] as? String ?? "gol"
+            )
+        }
     }
 
     /// Campo opcional en el documento del partido. Prioridad: `arbitro` → `nombreArbitro` → `referee`.

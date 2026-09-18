@@ -93,6 +93,64 @@ final class MatchDetailTitledSectionView: UIView {
     }
 }
 
+// MARK: - Goleadores
+
+final class MatchGoalRowView: UIView {
+
+    init(goal: MatchGoal) {
+        super.init(frame: .zero)
+
+        let player = UILabel()
+        player.font = .systemFont(ofSize: 14, weight: .medium)
+        player.textColor = .label
+        player.numberOfLines = 2
+        player.text = Self.displayName(for: goal)
+
+        let minute = UILabel()
+        minute.font = .monospacedDigitSystemFont(ofSize: 13, weight: .semibold)
+        minute.textColor = .secondaryLabel
+        minute.textAlignment = .center
+        minute.text = goal.minuto
+        minute.widthAnchor.constraint(equalToConstant: 46).isActive = true
+
+        let empty = UIView()
+        let row: UIStackView
+        if goal.equipo == .local {
+            player.textAlignment = .left
+            row = UIStackView(arrangedSubviews: [player, minute, empty])
+        } else {
+            player.textAlignment = .right
+            row = UIStackView(arrangedSubviews: [empty, minute, player])
+        }
+        player.widthAnchor.constraint(equalTo: empty.widthAnchor).isActive = true
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = Spacing.small
+        row.prepareForAutoLayout()
+        addSubview(row)
+        NSLayoutConstraint.activate([
+            row.topAnchor.constraint(equalTo: topAnchor, constant: 6),
+            row.leadingAnchor.constraint(equalTo: leadingAnchor),
+            row.trailingAnchor.constraint(equalTo: trailingAnchor),
+            row.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -6)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private static func displayName(for goal: MatchGoal) -> String {
+        let suffix: String
+        switch goal.tipo {
+        case .gol: suffix = ""
+        case .penal: suffix = " (P)"
+        case .autogol: suffix = " (AG)"
+        }
+        return "⚽ \(goal.nombre)\(suffix)"
+    }
+}
+
 // MARK: - Solo título de bloque (sin contenido debajo en el mismo view)
 
 enum MatchDetailSectionHeading {
