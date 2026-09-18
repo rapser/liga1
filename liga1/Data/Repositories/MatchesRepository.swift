@@ -148,6 +148,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 suspendido: data["suspendido"] as? Bool,
                 minutoActual: data["minutoActual"] as? String,
                 golesDetalle: Self.parseGoalDetails(from: data["golesDetalle"]),
+                tarjetasRojasDetalle: Self.parseRedCardDetails(from: data["tarjetasRojasDetalle"]),
                 arbitro: arbitro,
                 estadio: estadio,
                 capacidad: capacidad,
@@ -176,6 +177,24 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 minuto: minuto,
                 equipo: equipo,
                 tipo: goal["tipo"] as? String ?? "gol"
+            )
+        }
+    }
+
+    private static func parseRedCardDetails(from value: Any?) -> [MatchRedCardDTO] {
+        guard let values = value as? [[String: Any]] else { return [] }
+        return values.compactMap { card in
+            guard
+                let nombre = card["nombre"] as? String,
+                let minuto = card["minuto"] as? String,
+                let equipo = card["equipo"] as? String
+            else { return nil }
+
+            return MatchRedCardDTO(
+                id: String(describing: card["id"] ?? "\(nombre)-\(minuto)"),
+                nombre: nombre,
+                minuto: minuto,
+                equipo: equipo
             )
         }
     }

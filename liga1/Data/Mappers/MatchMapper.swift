@@ -57,6 +57,14 @@ struct MatchMapper {
                     tipo: MatchGoal.Kind(rawValue: goal.tipo) ?? .gol
                 )
             },
+            tarjetasRojasDetalle: dto.tarjetasRojasDetalle.map { card in
+                MatchRedCard(
+                    id: card.id,
+                    nombre: card.nombre,
+                    minuto: card.minuto,
+                    equipo: MatchGoal.Team(rawValue: card.equipo) ?? .visitante
+                )
+            },
             arbitro: dto.arbitro,
             estadio: dto.estadio,
             capacidad: dto.capacidad,
@@ -110,6 +118,14 @@ struct MatchMapper {
                     minuto: goal.minuto,
                     equipo: goal.equipo.rawValue,
                     tipo: goal.tipo.rawValue
+                )
+            },
+            tarjetasRojasDetalle: domain.tarjetasRojasDetalle.map { card in
+                MatchRedCardDTO(
+                    id: card.id,
+                    nombre: card.nombre,
+                    minuto: card.minuto,
+                    equipo: card.equipo.rawValue
                 )
             },
             arbitro: domain.arbitro,

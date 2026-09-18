@@ -45,10 +45,16 @@ final class MatchDetailViewController: UIViewController {
     private let scoreboardStatusLabel = UILabel()
     private let scoreboardScoreLabel = UILabel()
     private let goalsStack = UIStackView()
+    private let redCardsStack = UIStackView()
     private lazy var goalsSection = MatchDetailTitledSectionView(
         title: "Goles",
         uppercaseTitle: true,
         content: goalsStack
+    )
+    private lazy var redCardsSection = MatchDetailTitledSectionView(
+        title: "Tarjetas rojas",
+        uppercaseTitle: true,
+        content: redCardsStack
     )
 
     init(viewModel: MatchDetailViewModel) {
@@ -160,6 +166,9 @@ final class MatchDetailViewController: UIViewController {
         goalsStack.axis = .vertical
         goalsStack.spacing = Spacing.small
         stack.addArrangedSubview(goalsSection)
+        redCardsStack.axis = .vertical
+        redCardsStack.spacing = Spacing.small
+        stack.addArrangedSubview(redCardsSection)
         refreshMatchContent()
         stack.addArrangedSubview(MatchDetailTitledSectionView.statRowsSection(title: "Estadísticas", rows: vm.resumenStatRows))
         stack.addArrangedSubview(makeTVSection())
@@ -525,6 +534,14 @@ final class MatchDetailViewController: UIViewController {
         let goals = viewModel.goalDetails
         goalsSection.isHidden = goals.isEmpty
         goals.forEach { goalsStack.addArrangedSubview(MatchGoalRowView(goal: $0)) }
+
+        redCardsStack.arrangedSubviews.forEach {
+            redCardsStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        let redCards = viewModel.redCardDetails
+        redCardsSection.isHidden = redCards.isEmpty
+        redCards.forEach { redCardsStack.addArrangedSubview(MatchRedCardRowView(card: $0)) }
     }
 
     private func teamColumn(name: String, assetId: String?) -> UIStackView {

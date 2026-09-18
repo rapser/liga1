@@ -332,6 +332,7 @@ final class MatchDetailViewModel {
     }
 
     var goalDetails: [MatchGoal] { match.golesDetalle }
+    var redCardDetails: [MatchRedCard] { match.tarjetasRojasDetalle }
 
     /// Lista completa tipo “estadísticas principales” (dummy, alineada a referencia visual).
     private var estadisticasTabFullDummy: [MatchDetailStatRow] {

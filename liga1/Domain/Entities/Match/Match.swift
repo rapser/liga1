@@ -26,6 +26,13 @@ struct MatchGoal: Equatable, Hashable {
     let tipo: Kind
 }
 
+struct MatchRedCard: Equatable, Hashable {
+    let id: String
+    let nombre: String
+    let minuto: String
+    let equipo: MatchGoal.Team
+}
+
 /// Entidad de dominio para Match (sin dependencias de Firebase)
 struct Match {
     let id: String
@@ -40,6 +47,7 @@ struct Match {
     /// Reloj oficial del proveedor: 23', 45+2', ET, etc.
     let minutoActual: String?
     let golesDetalle: [MatchGoal]
+    let tarjetasRojasDetalle: [MatchRedCard]
     let arbitro: String?
     let estadio: String?
     let capacidad: String?
@@ -57,6 +65,7 @@ struct Match {
         suspendido: Bool = false,
         minutoActual: String? = nil,
         golesDetalle: [MatchGoal] = [],
+        tarjetasRojasDetalle: [MatchRedCard] = [],
         arbitro: String? = nil,
         estadio: String? = nil,
         capacidad: String? = nil,
@@ -86,6 +95,7 @@ struct Match {
         self.suspendido = suspendido
         self.minutoActual = minutoActual
         self.golesDetalle = golesDetalle
+        self.tarjetasRojasDetalle = tarjetasRojasDetalle
         self.arbitro = arbitro
         self.estadio = estadio
         self.capacidad = capacidad
@@ -112,6 +122,7 @@ extension Match: Equatable {
             lhs.suspendido == rhs.suspendido &&
             lhs.minutoActual == rhs.minutoActual &&
             lhs.golesDetalle == rhs.golesDetalle &&
+            lhs.tarjetasRojasDetalle == rhs.tarjetasRojasDetalle &&
             lhs.arbitro == rhs.arbitro &&
             lhs.estadio == rhs.estadio &&
             lhs.capacidad == rhs.capacidad &&
@@ -130,5 +141,6 @@ extension Match: Hashable {
         hasher.combine(suspendido)
         hasher.combine(minutoActual)
         hasher.combine(golesDetalle)
+        hasher.combine(tarjetasRojasDetalle)
     }
 }

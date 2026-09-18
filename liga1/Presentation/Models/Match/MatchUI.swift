@@ -19,6 +19,7 @@ struct MatchUI {
     var suspendido: Bool
     let minutoActual: String?
     let golesDetalle: [MatchGoal]
+    let tarjetasRojasDetalle: [MatchRedCard]
     let arbitro: String?
     let estadio: String?
     let capacidad: String?
@@ -36,6 +37,7 @@ struct MatchUI {
         suspendido: Bool = false,
         minutoActual: String? = nil,
         golesDetalle: [MatchGoal] = [],
+        tarjetasRojasDetalle: [MatchRedCard] = [],
         arbitro: String? = nil,
         estadio: String? = nil,
         capacidad: String? = nil,
@@ -64,6 +66,7 @@ struct MatchUI {
         self.suspendido = suspendido
         self.minutoActual = minutoActual
         self.golesDetalle = golesDetalle
+        self.tarjetasRojasDetalle = tarjetasRojasDetalle
         self.arbitro = arbitro
         self.estadio = estadio
         self.capacidad = capacidad
@@ -119,6 +122,7 @@ extension MatchUI: Equatable {
             lhs.suspendido == rhs.suspendido &&
             lhs.minutoActual == rhs.minutoActual &&
             lhs.golesDetalle == rhs.golesDetalle &&
+            lhs.tarjetasRojasDetalle == rhs.tarjetasRojasDetalle &&
             lhs.arbitro == rhs.arbitro &&
             lhs.estadio == rhs.estadio &&
             lhs.capacidad == rhs.capacidad &&
@@ -137,5 +141,6 @@ extension MatchUI: Hashable {
         hasher.combine(suspendido)
         hasher.combine(minutoActual)
         hasher.combine(golesDetalle)
+        hasher.combine(tarjetasRojasDetalle)
     }
 }
