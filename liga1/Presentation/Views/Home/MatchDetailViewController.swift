@@ -572,13 +572,97 @@ final class MatchDetailViewController: UIViewController {
         officialHighlightsURL = url
         let card = FanCardView(title: "Resumen oficial", accentBorder: true)
 
-        let description = UILabel()
-        description.text = "Mira los goles y mejores jugadas en el canal oficial de YouTube."
-        description.font = .systemFont(ofSize: 14)
-        description.textColor = .secondaryLabel
-        description.numberOfLines = 0
-        card.contentStack.addArrangedSubview(description)
+        if let videoID = youtubeVideoID(from: url) {
+            card.contentStack.addArrangedSubview(makeOfficialHighlightsPreview(videoID: videoID))
+        } else {
+            card.contentStack.addArrangedSubview(makeOfficialHighlightsLinkButton())
+        }
 
+        highlightsStack.addArrangedSubview(card)
+    }
+
+    private func youtubeVideoID(from url: URL) -> String? {
+        let host = url.host?.lowercased() ?? ""
+        let pathParts = url.pathComponents.filter { $0 != "/" }
+
+        if host == "youtu.be" {
+            return pathParts.first
+        }
+
+        if let videoID = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+            .queryItems?
+            .first(where: { $0.name == "v" })?
+            .value,
+           !videoID.isEmpty {
+            return videoID
+        }
+
+        guard pathParts.count >= 2,
+              ["embed", "shorts", "live"].contains(pathParts[0])
+        else {
+            return nil
+        }
+        return pathParts[1]
+    }
+
+    private func makeOfficialHighlightsPreview(videoID: String) -> UIView {
+        let button = UIButton(type: .custom)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.layer.cornerRadius = 12
+        button.layer.cornerCurve = .continuous
+        button.clipsToBounds = true
+        button.accessibilityLabel = "Ver resumen oficial en YouTube"
+        button.addTarget(self, action: #selector(officialHighlightsTapped), for: .touchUpInside)
+
+        let thumbnail = UIImageView()
+        thumbnail.contentMode = .scaleAspectFill
+        thumbnail.clipsToBounds = true
+        thumbnail.translatesAutoresizingMaskIntoConstraints = false
+        let thumbnailURL = URL(string: "https://i.ytimg.com/vi/\(videoID)/hqdefault.jpg")
+        thumbnail.kf.setImage(with: thumbnailURL)
+        button.addSubview(thumbnail)
+
+        let shade = UIView()
+        shade.backgroundColor = UIColor.black.withAlphaComponent(0.24)
+        shade.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(shade)
+
+        let play = UIImageView(image: UIImage(systemName: "play.circle.fill"))
+        play.tintColor = .white
+        play.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 62, weight: .regular)
+        play.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(play)
+
+        let caption = UILabel()
+        caption.text = "Resumen oficial  •  YouTube"
+        caption.font = .systemFont(ofSize: 13, weight: .semibold)
+        caption.textColor = .white
+        caption.backgroundColor = UIColor.black.withAlphaComponent(0.58)
+        caption.textAlignment = .center
+        caption.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(caption)
+
+        NSLayoutConstraint.activate([
+            button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 9.0 / 16.0),
+            thumbnail.topAnchor.constraint(equalTo: button.topAnchor),
+            thumbnail.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+            thumbnail.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+            thumbnail.bottomAnchor.constraint(equalTo: button.bottomAnchor),
+            shade.topAnchor.constraint(equalTo: button.topAnchor),
+            shade.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+            shade.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+            shade.bottomAnchor.constraint(equalTo: button.bottomAnchor),
+            play.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            play.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            caption.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+            caption.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+            caption.bottomAnchor.constraint(equalTo: button.bottomAnchor),
+            caption.heightAnchor.constraint(equalToConstant: 34)
+        ])
+        return button
+    }
+
+    private func makeOfficialHighlightsLinkButton() -> UIButton {
         var configuration = UIButton.Configuration.filled()
         configuration.title = "Ver resumen en YouTube"
         configuration.image = UIImage(systemName: "play.rectangle.fill")
@@ -588,9 +672,7 @@ final class MatchDetailViewController: UIViewController {
         configuration.cornerStyle = .medium
         let button = UIButton(configuration: configuration)
         button.addTarget(self, action: #selector(officialHighlightsTapped), for: .touchUpInside)
-        card.contentStack.addArrangedSubview(button)
-
-        highlightsStack.addArrangedSubview(card)
+        return button
     }
 
     private func teamColumn(name: String, assetId: String?) -> UIStackView {
