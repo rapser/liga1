@@ -916,9 +916,35 @@ final class MatchDetailViewController: UIViewController {
             return
         }
 
-        // Presentarlo dentro de la app garantiza una respuesta visible al toque,
-        // incluso si el dispositivo no tiene instalada la aplicación de YouTube.
+        // Se prioriza la app oficial; Safari integrado es el respaldo si no existe.
         let url = canonicalYouTubeURL(from: officialHighlightsURL)
+        openInYouTubeAppOrSafari(url)
+    }
+
+    private func openInYouTubeAppOrSafari(_ url: URL) {
+        guard let videoID = youtubeVideoID(from: url),
+              let youtubeAppURL = URL(string: "youtube://watch?v=" + videoID)
+        else {
+            presentOfficialHighlightsInSafari(url)
+            return
+        }
+
+        // No se usa canOpenURL: abrir el enlace directamente permite usar el
+        // esquema de YouTube sin requerir permisos de consulta adicionales.
+        UIApplication.shared.open(youtubeAppURL, options: [:]) { [weak self] opened in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if opened {
+                    self.highlightsLogger.info("OfficialHighlights opened in YouTube app: \(url.absoluteString)")
+                } else {
+                    self.highlightsLogger.info("OfficialHighlights YouTube app unavailable; opening Safari")
+                    self.presentOfficialHighlightsInSafari(url)
+                }
+            }
+        }
+    }
+
+    private func presentOfficialHighlightsInSafari(_ url: URL) {
         let safari = SFSafariViewController(url: url)
         safari.modalPresentationStyle = .pageSheet
         present(safari, animated: true) { [weak self] in
