@@ -17,11 +17,15 @@ struct MatchUI {
     var golesEquipoVisitante: Int
     var estado: Match.EstadoMatch
     var suspendido: Bool
+    let minutoActual: String?
+    let golesDetalle: [MatchGoal]
+    let tarjetasRojasDetalle: [MatchRedCard]
     let arbitro: String?
     let estadio: String?
     let capacidad: String?
     let canalesTV: [String]
     let liveStats: MatchLiveStats?
+    let resumenYoutubeUrl: String?
 
     init(
         id: String,
@@ -32,11 +36,15 @@ struct MatchUI {
         golesEquipoVisitante: Int = 0,
         estado: Match.EstadoMatch = .pendiente,
         suspendido: Bool = false,
+        minutoActual: String? = nil,
+        golesDetalle: [MatchGoal] = [],
+        tarjetasRojasDetalle: [MatchRedCard] = [],
         arbitro: String? = nil,
         estadio: String? = nil,
         capacidad: String? = nil,
         canalesTV: [String] = [],
-        liveStats: MatchLiveStats? = nil
+        liveStats: MatchLiveStats? = nil,
+        resumenYoutubeUrl: String? = nil
     ) {
         self.id = id
         if let localId = equipoLocalId {
@@ -58,11 +66,15 @@ struct MatchUI {
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
         self.suspendido = suspendido
+        self.minutoActual = minutoActual
+        self.golesDetalle = golesDetalle
+        self.tarjetasRojasDetalle = tarjetasRojasDetalle
         self.arbitro = arbitro
         self.estadio = estadio
         self.capacidad = capacidad
         self.canalesTV = canalesTV
         self.liveStats = liveStats
+        self.resumenYoutubeUrl = resumenYoutubeUrl
     }
 
     var fechaFormateada: String {
@@ -111,11 +123,15 @@ extension MatchUI: Equatable {
             lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
             lhs.estado == rhs.estado &&
             lhs.suspendido == rhs.suspendido &&
+            lhs.minutoActual == rhs.minutoActual &&
+            lhs.golesDetalle == rhs.golesDetalle &&
+            lhs.tarjetasRojasDetalle == rhs.tarjetasRojasDetalle &&
             lhs.arbitro == rhs.arbitro &&
             lhs.estadio == rhs.estadio &&
             lhs.capacidad == rhs.capacidad &&
             lhs.canalesTV == rhs.canalesTV &&
-            lhs.liveStats == rhs.liveStats
+            lhs.liveStats == rhs.liveStats &&
+            lhs.resumenYoutubeUrl == rhs.resumenYoutubeUrl
     }
 }
 
@@ -127,5 +143,9 @@ extension MatchUI: Hashable {
         hasher.combine(golesEquipoVisitante)
         hasher.combine(estado)
         hasher.combine(suspendido)
+        hasher.combine(minutoActual)
+        hasher.combine(golesDetalle)
+        hasher.combine(tarjetasRojasDetalle)
+        hasher.combine(resumenYoutubeUrl)
     }
 }

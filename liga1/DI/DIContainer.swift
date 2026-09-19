@@ -36,8 +36,12 @@ final class DIContainer {
         return JornadasRepository(database: makeDatabase(), logger: makeLogger())
     }
 
-    func makeMatchesRepository() -> MatchesRepositoryProtocol {
+    private lazy var matchesRepository: MatchesRepositoryProtocol = {
         return MatchesRepository(database: makeDatabase(), logger: makeLogger())
+    }()
+
+    func makeMatchesRepository() -> MatchesRepositoryProtocol {
+        return matchesRepository
     }
 
     private lazy var teamsRepository: TeamsRepositoryProtocol = {
@@ -299,7 +303,8 @@ final class DIContainer {
     func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(
             getJornadaToDisplayUseCase: makeGetJornadaToDisplayUseCase(),
-            fetchMatchesUseCase: makeFetchMatchesUseCase()
+            fetchMatchesUseCase: makeFetchMatchesUseCase(),
+            observeMatchesUseCase: makeObserveMatchesUseCase()
         )
     }
 
@@ -343,7 +348,8 @@ final class DIContainer {
     func makeNotificationSettingsViewModel() -> NotificationSettingsViewModel {
         return NotificationSettingsViewModel(
             updatePushNotificationsEnabledUseCase: makeUpdatePushNotificationsEnabledUseCase(),
-            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase()
+            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase(),
+            notificationTopicManager: makeNotificationTopicManager()
         )
     }
 
@@ -361,7 +367,8 @@ final class DIContainer {
             getMatchWeatherUseCase: makeGetMatchWeatherUseCase(),
             observeRefereePollUseCase: makeObserveRefereePollUseCase(),
             observePollResultUseCase: makeObservePollResultUseCase(),
-            submitRefereePollVoteUseCase: makeSubmitRefereePollVoteUseCase()
+            submitRefereePollVoteUseCase: makeSubmitRefereePollVoteUseCase(),
+            observeMatchesUseCase: makeObserveMatchesUseCase()
         )
     }
 

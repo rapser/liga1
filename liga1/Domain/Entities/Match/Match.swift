@@ -7,6 +7,32 @@
 
 import Foundation
 
+struct MatchGoal: Equatable, Hashable {
+    enum Team: String {
+        case local
+        case visitante
+    }
+
+    enum Kind: String {
+        case gol
+        case penal
+        case autogol
+    }
+
+    let id: String
+    let nombre: String
+    let minuto: String
+    let equipo: Team
+    let tipo: Kind
+}
+
+struct MatchRedCard: Equatable, Hashable {
+    let id: String
+    let nombre: String
+    let minuto: String
+    let equipo: MatchGoal.Team
+}
+
 /// Entidad de dominio para Match (sin dependencias de Firebase)
 struct Match {
     let id: String
@@ -18,11 +44,16 @@ struct Match {
     var golesEquipoVisitante: Int
     var estado: EstadoMatch
     var suspendido: Bool
+    /// Reloj oficial del proveedor: 23', 45+2', ET, etc.
+    let minutoActual: String?
+    let golesDetalle: [MatchGoal]
+    let tarjetasRojasDetalle: [MatchRedCard]
     let arbitro: String?
     let estadio: String?
     let capacidad: String?
     let canalesTV: [String]
     let liveStats: MatchLiveStats?
+    let resumenYoutubeUrl: String?
 
     init(
         id: String,
@@ -33,11 +64,15 @@ struct Match {
         golesEquipoVisitante: Int = 0,
         estado: EstadoMatch = .pendiente,
         suspendido: Bool = false,
+        minutoActual: String? = nil,
+        golesDetalle: [MatchGoal] = [],
+        tarjetasRojasDetalle: [MatchRedCard] = [],
         arbitro: String? = nil,
         estadio: String? = nil,
         capacidad: String? = nil,
         canalesTV: [String] = [],
-        liveStats: MatchLiveStats? = nil
+        liveStats: MatchLiveStats? = nil,
+        resumenYoutubeUrl: String? = nil
     ) {
         if id.isEmpty, let localId = equipoLocalId, let visitanteId = equipoVisitanteId {
             self.id = "\(localId)_\(visitanteId)"
@@ -60,11 +95,15 @@ struct Match {
         self.golesEquipoVisitante = golesEquipoVisitante
         self.estado = estado
         self.suspendido = suspendido
+        self.minutoActual = minutoActual
+        self.golesDetalle = golesDetalle
+        self.tarjetasRojasDetalle = tarjetasRojasDetalle
         self.arbitro = arbitro
         self.estadio = estadio
         self.capacidad = capacidad
         self.canalesTV = canalesTV
         self.liveStats = liveStats
+        self.resumenYoutubeUrl = resumenYoutubeUrl
     }
 
     enum EstadoMatch: String, Codable {
@@ -84,11 +123,15 @@ extension Match: Equatable {
             lhs.golesEquipoVisitante == rhs.golesEquipoVisitante &&
             lhs.estado == rhs.estado &&
             lhs.suspendido == rhs.suspendido &&
+            lhs.minutoActual == rhs.minutoActual &&
+            lhs.golesDetalle == rhs.golesDetalle &&
+            lhs.tarjetasRojasDetalle == rhs.tarjetasRojasDetalle &&
             lhs.arbitro == rhs.arbitro &&
             lhs.estadio == rhs.estadio &&
             lhs.capacidad == rhs.capacidad &&
             lhs.canalesTV == rhs.canalesTV &&
-            lhs.liveStats == rhs.liveStats
+            lhs.liveStats == rhs.liveStats &&
+            lhs.resumenYoutubeUrl == rhs.resumenYoutubeUrl
     }
 }
 
@@ -100,5 +143,8 @@ extension Match: Hashable {
         hasher.combine(golesEquipoVisitante)
         hasher.combine(estado)
         hasher.combine(suspendido)
+        hasher.combine(minutoActual)
+        hasher.combine(golesDetalle)
+        hasher.combine(tarjetasRojasDetalle)
     }
 }

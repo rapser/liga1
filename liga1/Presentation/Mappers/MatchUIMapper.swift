@@ -20,11 +20,15 @@ struct MatchUIMapper {
             golesEquipoVisitante: domain.golesEquipoVisitante,
             estado: domain.estado,
             suspendido: domain.suspendido,
+            minutoActual: domain.minutoActual,
+            golesDetalle: domain.golesDetalle,
+            tarjetasRojasDetalle: domain.tarjetasRojasDetalle,
             arbitro: domain.arbitro,
             estadio: domain.estadio,
             capacidad: domain.capacidad,
             canalesTV: domain.canalesTV,
-            liveStats: domain.liveStats
+            liveStats: domain.liveStats,
+            resumenYoutubeUrl: domain.resumenYoutubeUrl
         )
     }
 
@@ -42,11 +46,15 @@ struct MatchUIMapper {
             golesEquipoVisitante: ui.golesEquipoVisitante,
             estado: ui.estado,
             suspendido: ui.suspendido,
+            minutoActual: ui.minutoActual,
+            golesDetalle: ui.golesDetalle,
+            tarjetasRojasDetalle: ui.tarjetasRojasDetalle,
             arbitro: ui.arbitro,
             estadio: ui.estadio,
             capacidad: ui.capacidad,
             canalesTV: ui.canalesTV,
-            liveStats: ui.liveStats
+            liveStats: ui.liveStats,
+            resumenYoutubeUrl: ui.resumenYoutubeUrl
         )
     }
 }

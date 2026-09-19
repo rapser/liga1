@@ -47,11 +47,30 @@ struct MatchMapper {
             golesEquipoVisitante: dto.golesTeamB ?? 0,
             estado: estadoMatch,
             suspendido: dto.suspendido ?? false,
+            minutoActual: dto.minutoActual,
+            golesDetalle: dto.golesDetalle.map { goal in
+                MatchGoal(
+                    id: goal.id,
+                    nombre: goal.nombre,
+                    minuto: goal.minuto,
+                    equipo: MatchGoal.Team(rawValue: goal.equipo) ?? .visitante,
+                    tipo: MatchGoal.Kind(rawValue: goal.tipo) ?? .gol
+                )
+            },
+            tarjetasRojasDetalle: dto.tarjetasRojasDetalle.map { card in
+                MatchRedCard(
+                    id: card.id,
+                    nombre: card.nombre,
+                    minuto: card.minuto,
+                    equipo: MatchGoal.Team(rawValue: card.equipo) ?? .visitante
+                )
+            },
             arbitro: dto.arbitro,
             estadio: dto.estadio,
             capacidad: dto.capacidad,
             canalesTV: dto.canalesTV ?? [],
-            liveStats: live
+            liveStats: live,
+            resumenYoutubeUrl: dto.resumenYoutubeUrl
         )
     }
 
@@ -92,11 +111,30 @@ struct MatchMapper {
             golesTeamB: domain.golesEquipoVisitante,
             estado: domain.estado.rawValue,
             suspendido: domain.suspendido,
+            minutoActual: domain.minutoActual,
+            golesDetalle: domain.golesDetalle.map { goal in
+                MatchGoalDTO(
+                    id: goal.id,
+                    nombre: goal.nombre,
+                    minuto: goal.minuto,
+                    equipo: goal.equipo.rawValue,
+                    tipo: goal.tipo.rawValue
+                )
+            },
+            tarjetasRojasDetalle: domain.tarjetasRojasDetalle.map { card in
+                MatchRedCardDTO(
+                    id: card.id,
+                    nombre: card.nombre,
+                    minuto: card.minuto,
+                    equipo: card.equipo.rawValue
+                )
+            },
             arbitro: domain.arbitro,
             estadio: domain.estadio,
             capacidad: domain.capacidad,
             canalesTV: domain.canalesTV.isEmpty ? nil : domain.canalesTV,
-            liveStats: statsDto
+            liveStats: statsDto,
+            resumenYoutubeUrl: domain.resumenYoutubeUrl
         )
     }
 
