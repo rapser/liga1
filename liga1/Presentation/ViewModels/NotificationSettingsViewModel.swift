@@ -13,6 +13,7 @@ class NotificationSettingsViewModel {
     // MARK: - Published Properties
 
     @Published private(set) var pushNotificationsEnabled: Bool = true
+    @Published private(set) var leagueWideLiveNotificationsEnabled: Bool = false
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
 
@@ -20,6 +21,7 @@ class NotificationSettingsViewModel {
 
     private let updatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCaseProtocol
     private let observeUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol
+    private let notificationTopicManager: NotificationTopicManagerProtocol
 
     // MARK: - Private Properties
 
@@ -29,10 +31,12 @@ class NotificationSettingsViewModel {
 
     init(
         updatePushNotificationsEnabledUseCase: UpdatePushNotificationsEnabledUseCaseProtocol,
-        observeUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol
+        observeUserPreferencesUseCase: ObserveUserPreferencesUseCaseProtocol,
+        notificationTopicManager: NotificationTopicManagerProtocol
     ) {
         self.updatePushNotificationsEnabledUseCase = updatePushNotificationsEnabledUseCase
         self.observeUserPreferencesUseCase = observeUserPreferencesUseCase
+        self.notificationTopicManager = notificationTopicManager
 
         observePreferences()
     }
@@ -61,6 +65,11 @@ class NotificationSettingsViewModel {
             .store(in: &cancellables)
     }
 
+    func updateLeagueWideLiveNotifications(_ enabled: Bool) {
+        notificationTopicManager.setLeagueWideLiveNotifications(enabled: enabled)
+        leagueWideLiveNotificationsEnabled = enabled
+    }
+
     // MARK: - Private Methods
 
     private func observePreferences() {
@@ -69,6 +78,7 @@ class NotificationSettingsViewModel {
             .sink { [weak self] preferences in
                 // Si no hay preferencias, usar valores por defecto
                 self?.pushNotificationsEnabled = preferences?.pushNotificationsEnabled ?? true
+                self?.leagueWideLiveNotificationsEnabled = preferences?.subscribedTopics.contains("liga1_live") ?? false
             }
             .store(in: &cancellables)
     }

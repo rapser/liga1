@@ -11,6 +11,7 @@ final class MockNotificationTopicManager: NotificationTopicManagerProtocol {
     var syncCallCount = 0
     var unsubscribeAllCallCount = 0
     var resubscribeCallCount = 0
+    var leagueWideLiveNotificationsChanges: [Bool] = []
 
     func startObserving() {
         startObservingCallCount += 1
@@ -30,5 +31,9 @@ final class MockNotificationTopicManager: NotificationTopicManagerProtocol {
 
     func resubscribeToSavedTopics() {
         resubscribeCallCount += 1
+    }
+
+    func setLeagueWideLiveNotifications(enabled: Bool) {
+        leagueWideLiveNotificationsChanges.append(enabled)
     }
 }

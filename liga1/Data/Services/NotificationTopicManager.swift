@@ -14,6 +14,7 @@ protocol NotificationTopicManagerProtocol {
     func syncTopicsWithFavorites()
     func unsubscribeFromAllTeamTopics()
     func resubscribeToSavedTopics()
+    func setLeagueWideLiveNotifications(enabled: Bool)
 }
 
 /// Sincroniza equipos favoritos y preferencias con suscripciones FCM.
@@ -30,6 +31,7 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
 
     private var cancellables = Set<AnyCancellable>()
     private let liga1AllTopic = "liga1_all"
+    private let leagueWideLiveTopic = "liga1_live"
 
     // MARK: - Initialization
 
@@ -107,9 +109,11 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
                         return
                     }
 
-                    let teamTopics = preferences.subscribedTopics.filter { $0.starts(with: "team_") }
+                    let notificationTopics = preferences.subscribedTopics.filter {
+                        $0.starts(with: "team_") || $0 == self.leagueWideLiveTopic
+                    }
 
-                    teamTopics.forEach { topic in
+                    notificationTopics.forEach { topic in
                         self.notificationService.unsubscribeFromTopic(topic)
                     }
                 }
@@ -137,6 +141,16 @@ class NotificationTopicManager: NotificationTopicManagerProtocol {
                 }
             )
             .store(in: &cancellables)
+    }
+
+    func setLeagueWideLiveNotifications(enabled: Bool) {
+        if enabled {
+            notificationService.subscribeToTopic(leagueWideLiveTopic)
+            addTopicToPreferences(leagueWideLiveTopic)
+        } else {
+            notificationService.unsubscribeFromTopic(leagueWideLiveTopic)
+            removeTopicFromPreferences(leagueWideLiveTopic)
+        }
     }
 
     // MARK: - Private Methods

@@ -118,6 +118,41 @@ class NotificationSettingsViewController: UIViewController {
         return view
     }()
 
+    private lazy var leagueWideCard: UIView = {
+        let view = UIView()
+        view.backgroundColor = .secondarySystemGroupedBackground
+        view.layer.cornerRadius = 12
+        view.prepareForAutoLayout()
+        return view
+    }()
+
+    private lazy var leagueWideLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Toda la Liga 1"
+        label.font = .systemFont(ofSize: 17)
+        label.textColor = .label
+        label.prepareForAutoLayout()
+        return label
+    }()
+
+    private lazy var leagueWideDescriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Recibe inicio, goles y resultados de todos los partidos"
+        label.font = .systemFont(ofSize: 13)
+        label.textColor = .secondaryLabel
+        label.numberOfLines = 0
+        label.prepareForAutoLayout()
+        return label
+    }()
+
+    private lazy var leagueWideSwitch: UISwitch = {
+        let toggle = UISwitch()
+        toggle.onTintColor = .liga1Red
+        toggle.prepareForAutoLayout()
+        toggle.addTarget(self, action: #selector(leagueWideSwitchChanged), for: .valueChanged)
+        return toggle
+    }()
+
     // MARK: - Initialization
 
     init(viewModel: NotificationSettingsViewModel) {
@@ -180,10 +215,33 @@ class NotificationSettingsViewController: UIViewController {
             .pinTrailing(to: notificationsSwitch.leadingAnchor, constant: 12)
             .pinBottom(constant: 16)
 
+        leagueWideCard
+            .addTo(contentView)
+            .pinTop(to: notificationsCard.bottomAnchor, constant: 12)
+            .pinHorizontal(padding: 16)
+
+        leagueWideSwitch
+            .addTo(leagueWideCard)
+            .pinTop(constant: 16)
+            .pinTrailing(constant: 16)
+
+        leagueWideLabel
+            .addTo(leagueWideCard)
+            .pinTop(constant: 16)
+            .pinLeading(constant: 16)
+            .pinTrailing(to: leagueWideSwitch.leadingAnchor, constant: 12)
+
+        leagueWideDescriptionLabel
+            .addTo(leagueWideCard)
+            .pinTop(to: leagueWideLabel.bottomAnchor, constant: 4)
+            .pinLeading(constant: 16)
+            .pinTrailing(to: leagueWideSwitch.leadingAnchor, constant: 12)
+            .pinBottom(constant: 16)
+
         // Separator
         separatorView
             .addTo(contentView)
-            .pinTop(to: notificationsCard.bottomAnchor, constant: 24)
+            .pinTop(to: leagueWideCard.bottomAnchor, constant: 24)
             .pinHorizontal(padding: 16)
             .height(1)
 
@@ -228,6 +286,15 @@ class NotificationSettingsViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] enabled in
                 self?.notificationsSwitch.isOn = enabled
+                self?.leagueWideSwitch.isEnabled = enabled
+                self?.leagueWideCard.alpha = enabled ? 1 : 0.5
+            }
+            .store(in: &cancellables)
+
+        viewModel.$leagueWideLiveNotificationsEnabled
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] enabled in
+                self?.leagueWideSwitch.isOn = enabled
             }
             .store(in: &cancellables)
 
@@ -245,6 +312,10 @@ class NotificationSettingsViewController: UIViewController {
     @objc private func notificationsSwitchChanged() {
         let enabled = notificationsSwitch.isOn
         viewModel.updatePushNotificationsEnabled(enabled)
+    }
+
+    @objc private func leagueWideSwitchChanged() {
+        viewModel.updateLeagueWideLiveNotifications(leagueWideSwitch.isOn)
     }
 
     @objc private func openSettingsTapped() {
