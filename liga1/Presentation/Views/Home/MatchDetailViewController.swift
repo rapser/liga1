@@ -7,14 +7,10 @@ import UIKit
 import Combine
 import Kingfisher
 import SafariServices
-import OSLog
 
 final class MatchDetailViewController: UIViewController {
 
-    private let highlightsLogger = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "com.liga1.app",
-        category: "OfficialHighlights"
-    )
+    private let highlightsLogger: LoggerProtocol = Logger.shared
     private let viewModel: MatchDetailViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -597,7 +593,7 @@ final class MatchDetailViewController: UIViewController {
         }
 
         highlightsStack.addArrangedSubview(card)
-        highlightsLogger.notice("Official highlight rendered: \(url.absoluteString, privacy: .public)")
+        highlightsLogger.info("OfficialHighlights rendered: \(url.absoluteString)")
     }
 
     private func youtubeVideoID(from url: URL) -> String? {
@@ -909,14 +905,14 @@ final class MatchDetailViewController: UIViewController {
     @objc private func headphonesTapped() {}
 
     @objc private func officialHighlightsTapped() {
-        highlightsLogger.notice("Official highlight tap received")
+        highlightsLogger.info("OfficialHighlights tap received")
         guard let officialHighlightsURL else {
-            highlightsLogger.error("Official highlight tap ignored because URL is missing")
+            highlightsLogger.error("OfficialHighlights tap ignored because URL is missing", error: nil)
             return
         }
 
         guard viewIfLoaded?.window != nil else {
-            highlightsLogger.error("Official highlight cannot be presented because the view is not visible")
+            highlightsLogger.error("OfficialHighlights cannot be presented because the view is not visible", error: nil)
             return
         }
 
@@ -925,8 +921,8 @@ final class MatchDetailViewController: UIViewController {
         let url = canonicalYouTubeURL(from: officialHighlightsURL)
         let safari = SFSafariViewController(url: url)
         safari.modalPresentationStyle = .pageSheet
-        present(safari, animated: true) { [highlightsLogger] in
-            highlightsLogger.notice("Official highlight presented: \(url.absoluteString, privacy: .public)")
+        present(safari, animated: true) { [weak self] in
+            self?.highlightsLogger.info("OfficialHighlights presented: \(url.absoluteString)")
         }
     }
 
