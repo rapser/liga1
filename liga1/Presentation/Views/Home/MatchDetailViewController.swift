@@ -7,9 +7,14 @@ import UIKit
 import Combine
 import Kingfisher
 import SafariServices
+import OSLog
 
 final class MatchDetailViewController: UIViewController {
 
+    private let highlightsLogger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.liga1.app",
+        category: "OfficialHighlights"
+    )
     private let viewModel: MatchDetailViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -155,6 +160,7 @@ final class MatchDetailViewController: UIViewController {
         ])
 
         let stack = resumenHost.contentStack
+        resumenHost.scrollView.delaysContentTouches = false
         let vm = viewModel
 
         let comp = UILabel()
@@ -174,6 +180,7 @@ final class MatchDetailViewController: UIViewController {
         stack.addArrangedSubview(redCardsSection)
         highlightsStack.axis = .vertical
         highlightsStack.spacing = Spacing.small
+        highlightsStack.isUserInteractionEnabled = true
         stack.addArrangedSubview(highlightsStack)
         refreshMatchContent()
         stack.addArrangedSubview(MatchDetailTitledSectionView.statRowsSection(title: "Estadísticas", rows: vm.resumenStatRows))
@@ -572,6 +579,16 @@ final class MatchDetailViewController: UIViewController {
 
         officialHighlightsURL = url
         let card = FanCardView(title: "Resumen oficial", accentBorder: true)
+        card.isUserInteractionEnabled = true
+        card.contentStack.isUserInteractionEnabled = true
+        card.accessibilityLabel = "Ver resumen oficial en YouTube"
+        card.accessibilityTraits = .button
+
+        // La tarjeta recibe el gesto directamente. Así un toque sobre la imagen,
+        // el texto o cualquier espacio del preview funciona aun dentro del scroll.
+        let tap = UITapGestureRecognizer(target: self, action: #selector(officialHighlightsTapped))
+        tap.cancelsTouchesInView = false
+        card.addGestureRecognizer(tap)
 
         if let videoID = youtubeVideoID(from: url) {
             card.contentStack.addArrangedSubview(makeOfficialHighlightsPreview(videoID: videoID))
@@ -580,6 +597,7 @@ final class MatchDetailViewController: UIViewController {
         }
 
         highlightsStack.addArrangedSubview(card)
+        highlightsLogger.notice("Official highlight rendered: \(url.absoluteString, privacy: .public)")
     }
 
     private func youtubeVideoID(from url: URL) -> String? {
@@ -612,8 +630,8 @@ final class MatchDetailViewController: UIViewController {
         button.layer.cornerRadius = 12
         button.layer.cornerCurve = .continuous
         button.clipsToBounds = true
+        button.isUserInteractionEnabled = false
         button.accessibilityLabel = "Ver resumen oficial en YouTube"
-        button.addTarget(self, action: #selector(officialHighlightsTapped), for: .touchUpInside)
 
         let thumbnail = UIImageView()
         thumbnail.contentMode = .scaleAspectFill
@@ -672,7 +690,7 @@ final class MatchDetailViewController: UIViewController {
         configuration.baseForegroundColor = .white
         configuration.cornerStyle = .medium
         let button = UIButton(configuration: configuration)
-        button.addTarget(self, action: #selector(officialHighlightsTapped), for: .touchUpInside)
+        button.isUserInteractionEnabled = false
         return button
     }
 
@@ -891,13 +909,25 @@ final class MatchDetailViewController: UIViewController {
     @objc private func headphonesTapped() {}
 
     @objc private func officialHighlightsTapped() {
-        guard let officialHighlightsURL else { return }
+        highlightsLogger.notice("Official highlight tap received")
+        guard let officialHighlightsURL else {
+            highlightsLogger.error("Official highlight tap ignored because URL is missing")
+            return
+        }
+
+        guard viewIfLoaded?.window != nil else {
+            highlightsLogger.error("Official highlight cannot be presented because the view is not visible")
+            return
+        }
 
         // Presentarlo dentro de la app garantiza una respuesta visible al toque,
         // incluso si el dispositivo no tiene instalada la aplicación de YouTube.
         let url = canonicalYouTubeURL(from: officialHighlightsURL)
         let safari = SFSafariViewController(url: url)
-        present(safari, animated: true)
+        safari.modalPresentationStyle = .pageSheet
+        present(safari, animated: true) { [highlightsLogger] in
+            highlightsLogger.notice("Official highlight presented: \(url.absoluteString, privacy: .public)")
+        }
     }
 
     private func canonicalYouTubeURL(from url: URL) -> URL {
