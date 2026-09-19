@@ -348,7 +348,8 @@ final class DIContainer {
     func makeNotificationSettingsViewModel() -> NotificationSettingsViewModel {
         return NotificationSettingsViewModel(
             updatePushNotificationsEnabledUseCase: makeUpdatePushNotificationsEnabledUseCase(),
-            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase()
+            observeUserPreferencesUseCase: makeObserveUserPreferencesUseCase(),
+            notificationTopicManager: makeNotificationTopicManager()
         )
     }
 

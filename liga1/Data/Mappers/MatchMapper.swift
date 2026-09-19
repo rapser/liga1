@@ -69,7 +69,8 @@ struct MatchMapper {
             estadio: dto.estadio,
             capacidad: dto.capacidad,
             canalesTV: dto.canalesTV ?? [],
-            liveStats: live
+            liveStats: live,
+            resumenYoutubeUrl: dto.resumenYoutubeUrl
         )
     }
 
@@ -132,7 +133,8 @@ struct MatchMapper {
             estadio: domain.estadio,
             capacidad: domain.capacidad,
             canalesTV: domain.canalesTV.isEmpty ? nil : domain.canalesTV,
-            liveStats: statsDto
+            liveStats: statsDto,
+            resumenYoutubeUrl: domain.resumenYoutubeUrl
         )
     }
 

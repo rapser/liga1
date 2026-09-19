@@ -25,6 +25,7 @@ struct MatchUI {
     let capacidad: String?
     let canalesTV: [String]
     let liveStats: MatchLiveStats?
+    let resumenYoutubeUrl: String?
 
     init(
         id: String,
@@ -42,7 +43,8 @@ struct MatchUI {
         estadio: String? = nil,
         capacidad: String? = nil,
         canalesTV: [String] = [],
-        liveStats: MatchLiveStats? = nil
+        liveStats: MatchLiveStats? = nil,
+        resumenYoutubeUrl: String? = nil
     ) {
         self.id = id
         if let localId = equipoLocalId {
@@ -72,6 +74,7 @@ struct MatchUI {
         self.capacidad = capacidad
         self.canalesTV = canalesTV
         self.liveStats = liveStats
+        self.resumenYoutubeUrl = resumenYoutubeUrl
     }
 
     var fechaFormateada: String {
@@ -127,7 +130,8 @@ extension MatchUI: Equatable {
             lhs.estadio == rhs.estadio &&
             lhs.capacidad == rhs.capacidad &&
             lhs.canalesTV == rhs.canalesTV &&
-            lhs.liveStats == rhs.liveStats
+            lhs.liveStats == rhs.liveStats &&
+            lhs.resumenYoutubeUrl == rhs.resumenYoutubeUrl
     }
 }
 
@@ -142,5 +146,6 @@ extension MatchUI: Hashable {
         hasher.combine(minutoActual)
         hasher.combine(golesDetalle)
         hasher.combine(tarjetasRojasDetalle)
+        hasher.combine(resumenYoutubeUrl)
     }
 }

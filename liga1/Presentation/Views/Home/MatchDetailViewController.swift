@@ -6,9 +6,11 @@
 import UIKit
 import Combine
 import Kingfisher
+import SafariServices
 
 final class MatchDetailViewController: UIViewController {
 
+    private let highlightsLogger: LoggerProtocol = Logger.shared
     private let viewModel: MatchDetailViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -46,6 +48,8 @@ final class MatchDetailViewController: UIViewController {
     private let scoreboardScoreLabel = UILabel()
     private let goalsStack = UIStackView()
     private let redCardsStack = UIStackView()
+    private let highlightsStack = UIStackView()
+    private var officialHighlightsURL: URL?
     private lazy var goalsSection = MatchDetailTitledSectionView(
         title: "Goles",
         uppercaseTitle: true,
@@ -152,6 +156,7 @@ final class MatchDetailViewController: UIViewController {
         ])
 
         let stack = resumenHost.contentStack
+        resumenHost.scrollView.delaysContentTouches = false
         let vm = viewModel
 
         let comp = UILabel()
@@ -169,6 +174,10 @@ final class MatchDetailViewController: UIViewController {
         redCardsStack.axis = .vertical
         redCardsStack.spacing = Spacing.small
         stack.addArrangedSubview(redCardsSection)
+        highlightsStack.axis = .vertical
+        highlightsStack.spacing = Spacing.small
+        highlightsStack.isUserInteractionEnabled = true
+        stack.addArrangedSubview(highlightsStack)
         refreshMatchContent()
         stack.addArrangedSubview(MatchDetailTitledSectionView.statRowsSection(title: "Estadísticas", rows: vm.resumenStatRows))
         stack.addArrangedSubview(makeTVSection())
@@ -542,6 +551,143 @@ final class MatchDetailViewController: UIViewController {
         let redCards = viewModel.redCardDetails
         redCardsSection.isHidden = redCards.isEmpty
         redCards.forEach { redCardsStack.addArrangedSubview(MatchRedCardRowView(card: $0)) }
+
+        refreshOfficialHighlights()
+    }
+
+    private func refreshOfficialHighlights() {
+        highlightsStack.arrangedSubviews.forEach {
+            highlightsStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        officialHighlightsURL = nil
+
+        guard
+            viewModel.currentMatch.estado == .finalizado,
+            let rawURL = viewModel.currentMatch.resumenYoutubeUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !rawURL.isEmpty,
+            let url = URL(string: rawURL),
+            let host = url.host?.lowercased(),
+            host == "youtu.be" || host == "youtube.com" || host.hasSuffix(".youtube.com")
+        else {
+            return
+        }
+
+        officialHighlightsURL = url
+        let card = FanCardView(title: "Resumen oficial", accentBorder: true)
+        card.isUserInteractionEnabled = true
+        card.contentStack.isUserInteractionEnabled = true
+        card.accessibilityLabel = "Ver resumen oficial en YouTube"
+        card.accessibilityTraits = .button
+
+        // La tarjeta recibe el gesto directamente. Así un toque sobre la imagen,
+        // el texto o cualquier espacio del preview funciona aun dentro del scroll.
+        let tap = UITapGestureRecognizer(target: self, action: #selector(officialHighlightsTapped))
+        tap.cancelsTouchesInView = false
+        card.addGestureRecognizer(tap)
+
+        if let videoID = youtubeVideoID(from: url) {
+            card.contentStack.addArrangedSubview(makeOfficialHighlightsPreview(videoID: videoID))
+        } else {
+            card.contentStack.addArrangedSubview(makeOfficialHighlightsLinkButton())
+        }
+
+        highlightsStack.addArrangedSubview(card)
+        highlightsLogger.info("OfficialHighlights rendered: \(url.absoluteString)")
+    }
+
+    private func youtubeVideoID(from url: URL) -> String? {
+        let host = url.host?.lowercased() ?? ""
+        let pathParts = url.pathComponents.filter { $0 != "/" }
+
+        if host == "youtu.be" {
+            return pathParts.first
+        }
+
+        if let videoID = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+            .queryItems?
+            .first(where: { $0.name == "v" })?
+            .value,
+           !videoID.isEmpty {
+            return videoID
+        }
+
+        guard pathParts.count >= 2,
+              ["embed", "shorts", "live"].contains(pathParts[0])
+        else {
+            return nil
+        }
+        return pathParts[1]
+    }
+
+    private func makeOfficialHighlightsPreview(videoID: String) -> UIView {
+        let button = UIButton(type: .custom)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.layer.cornerRadius = 12
+        button.layer.cornerCurve = .continuous
+        button.clipsToBounds = true
+        button.isUserInteractionEnabled = false
+        button.accessibilityLabel = "Ver resumen oficial en YouTube"
+
+        let thumbnail = UIImageView()
+        thumbnail.contentMode = .scaleAspectFill
+        thumbnail.clipsToBounds = true
+        thumbnail.translatesAutoresizingMaskIntoConstraints = false
+        let thumbnailURL = URL(string: "https://i.ytimg.com/vi/\(videoID)/hqdefault.jpg")
+        thumbnail.kf.setImage(with: thumbnailURL)
+        button.addSubview(thumbnail)
+
+        let shade = UIView()
+        shade.backgroundColor = UIColor.black.withAlphaComponent(0.24)
+        shade.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(shade)
+
+        let play = UIImageView(image: UIImage(systemName: "play.circle.fill"))
+        play.tintColor = .white
+        play.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 62, weight: .regular)
+        play.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(play)
+
+        let caption = UILabel()
+        caption.text = "Resumen oficial  •  YouTube"
+        caption.font = .systemFont(ofSize: 13, weight: .semibold)
+        caption.textColor = .white
+        caption.backgroundColor = UIColor.black.withAlphaComponent(0.58)
+        caption.textAlignment = .center
+        caption.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(caption)
+
+        NSLayoutConstraint.activate([
+            button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 9.0 / 16.0),
+            thumbnail.topAnchor.constraint(equalTo: button.topAnchor),
+            thumbnail.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+            thumbnail.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+            thumbnail.bottomAnchor.constraint(equalTo: button.bottomAnchor),
+            shade.topAnchor.constraint(equalTo: button.topAnchor),
+            shade.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+            shade.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+            shade.bottomAnchor.constraint(equalTo: button.bottomAnchor),
+            play.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+            play.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            caption.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+            caption.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+            caption.bottomAnchor.constraint(equalTo: button.bottomAnchor),
+            caption.heightAnchor.constraint(equalToConstant: 34)
+        ])
+        return button
+    }
+
+    private func makeOfficialHighlightsLinkButton() -> UIButton {
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = "Ver resumen en YouTube"
+        configuration.image = UIImage(systemName: "play.rectangle.fill")
+        configuration.imagePadding = Spacing.small
+        configuration.baseBackgroundColor = .liga1Red
+        configuration.baseForegroundColor = .white
+        configuration.cornerStyle = .medium
+        let button = UIButton(configuration: configuration)
+        button.isUserInteractionEnabled = false
+        return button
     }
 
     private func teamColumn(name: String, assetId: String?) -> UIStackView {
@@ -757,6 +903,63 @@ final class MatchDetailViewController: UIViewController {
     }
 
     @objc private func headphonesTapped() {}
+
+    @objc private func officialHighlightsTapped() {
+        highlightsLogger.info("OfficialHighlights tap received")
+        guard let officialHighlightsURL else {
+            highlightsLogger.error("OfficialHighlights tap ignored because URL is missing", error: nil)
+            return
+        }
+
+        guard viewIfLoaded?.window != nil else {
+            highlightsLogger.error("OfficialHighlights cannot be presented because the view is not visible", error: nil)
+            return
+        }
+
+        // Se prioriza la app oficial; Safari integrado es el respaldo si no existe.
+        let url = canonicalYouTubeURL(from: officialHighlightsURL)
+        openInYouTubeAppOrSafari(url)
+    }
+
+    private func openInYouTubeAppOrSafari(_ url: URL) {
+        guard let videoID = youtubeVideoID(from: url),
+              let youtubeAppURL = URL(string: "youtube://watch?v=" + videoID)
+        else {
+            presentOfficialHighlightsInSafari(url)
+            return
+        }
+
+        // No se usa canOpenURL: abrir el enlace directamente permite usar el
+        // esquema de YouTube sin requerir permisos de consulta adicionales.
+        UIApplication.shared.open(youtubeAppURL, options: [:]) { [weak self] opened in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if opened {
+                    self.highlightsLogger.info("OfficialHighlights opened in YouTube app: \(url.absoluteString)")
+                } else {
+                    self.highlightsLogger.info("OfficialHighlights YouTube app unavailable; opening Safari")
+                    self.presentOfficialHighlightsInSafari(url)
+                }
+            }
+        }
+    }
+
+    private func presentOfficialHighlightsInSafari(_ url: URL) {
+        let safari = SFSafariViewController(url: url)
+        safari.modalPresentationStyle = .pageSheet
+        present(safari, animated: true) { [weak self] in
+            self?.highlightsLogger.info("OfficialHighlights presented: \(url.absoluteString)")
+        }
+    }
+
+    private func canonicalYouTubeURL(from url: URL) -> URL {
+        guard let videoID = youtubeVideoID(from: url),
+              let canonicalURL = URL(string: "https://www.youtube.com/watch?v=" + videoID)
+        else {
+            return url
+        }
+        return canonicalURL
+    }
 
     @objc private func shareTapped() {
         let av = UIActivityViewController(activityItems: [viewModel.shareText], applicationActivities: nil)

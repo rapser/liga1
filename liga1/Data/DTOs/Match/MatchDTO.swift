@@ -27,6 +27,7 @@ struct MatchDTO {
     let capacidad: String?
     let canalesTV: [String]?
     let liveStats: MatchLiveStatsDTO?
+    let resumenYoutubeUrl: String?
 
     init(
         id: String? = nil,
@@ -44,7 +45,8 @@ struct MatchDTO {
         estadio: String? = nil,
         capacidad: String? = nil,
         canalesTV: [String]? = nil,
-        liveStats: MatchLiveStatsDTO? = nil
+        liveStats: MatchLiveStatsDTO? = nil,
+        resumenYoutubeUrl: String? = nil
     ) {
         self.id = id
         self.equipoLocalId = equipoLocalId
@@ -62,6 +64,7 @@ struct MatchDTO {
         self.capacidad = capacidad
         self.canalesTV = canalesTV
         self.liveStats = liveStats
+        self.resumenYoutubeUrl = resumenYoutubeUrl
     }
 }
 
