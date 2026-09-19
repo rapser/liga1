@@ -6,6 +6,7 @@
 import UIKit
 import Combine
 import Kingfisher
+import SafariServices
 
 final class MatchDetailViewController: UIViewController {
 
@@ -891,7 +892,21 @@ final class MatchDetailViewController: UIViewController {
 
     @objc private func officialHighlightsTapped() {
         guard let officialHighlightsURL else { return }
-        UIApplication.shared.open(officialHighlightsURL)
+
+        // Presentarlo dentro de la app garantiza una respuesta visible al toque,
+        // incluso si el dispositivo no tiene instalada la aplicación de YouTube.
+        let url = canonicalYouTubeURL(from: officialHighlightsURL)
+        let safari = SFSafariViewController(url: url)
+        present(safari, animated: true)
+    }
+
+    private func canonicalYouTubeURL(from url: URL) -> URL {
+        guard let videoID = youtubeVideoID(from: url),
+              let canonicalURL = URL(string: "https://www.youtube.com/watch?v=" + videoID)
+        else {
+            return url
+        }
+        return canonicalURL
     }
 
     @objc private func shareTapped() {
