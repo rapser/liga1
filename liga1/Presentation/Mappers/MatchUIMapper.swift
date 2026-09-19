@@ -27,7 +27,8 @@ struct MatchUIMapper {
             estadio: domain.estadio,
             capacidad: domain.capacidad,
             canalesTV: domain.canalesTV,
-            liveStats: domain.liveStats
+            liveStats: domain.liveStats,
+            resumenYoutubeUrl: domain.resumenYoutubeUrl
         )
     }
 
@@ -52,7 +53,8 @@ struct MatchUIMapper {
             estadio: ui.estadio,
             capacidad: ui.capacidad,
             canalesTV: ui.canalesTV,
-            liveStats: ui.liveStats
+            liveStats: ui.liveStats,
+            resumenYoutubeUrl: ui.resumenYoutubeUrl
         )
     }
 }

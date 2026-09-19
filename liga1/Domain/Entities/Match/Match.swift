@@ -53,6 +53,7 @@ struct Match {
     let capacidad: String?
     let canalesTV: [String]
     let liveStats: MatchLiveStats?
+    let resumenYoutubeUrl: String?
 
     init(
         id: String,
@@ -70,7 +71,8 @@ struct Match {
         estadio: String? = nil,
         capacidad: String? = nil,
         canalesTV: [String] = [],
-        liveStats: MatchLiveStats? = nil
+        liveStats: MatchLiveStats? = nil,
+        resumenYoutubeUrl: String? = nil
     ) {
         if id.isEmpty, let localId = equipoLocalId, let visitanteId = equipoVisitanteId {
             self.id = "\(localId)_\(visitanteId)"
@@ -101,6 +103,7 @@ struct Match {
         self.capacidad = capacidad
         self.canalesTV = canalesTV
         self.liveStats = liveStats
+        self.resumenYoutubeUrl = resumenYoutubeUrl
     }
 
     enum EstadoMatch: String, Codable {
@@ -127,7 +130,8 @@ extension Match: Equatable {
             lhs.estadio == rhs.estadio &&
             lhs.capacidad == rhs.capacidad &&
             lhs.canalesTV == rhs.canalesTV &&
-            lhs.liveStats == rhs.liveStats
+            lhs.liveStats == rhs.liveStats &&
+            lhs.resumenYoutubeUrl == rhs.resumenYoutubeUrl
     }
 }
 

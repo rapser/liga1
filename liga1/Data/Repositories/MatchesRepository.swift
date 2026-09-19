@@ -153,7 +153,8 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 estadio: estadio,
                 capacidad: capacidad,
                 canalesTV: canalesTV,
-                liveStats: liveStats
+                liveStats: liveStats,
+                resumenYoutubeUrl: data["resumenYoutubeUrl"] as? String
             )
 
             matchDTOs.append(dto)

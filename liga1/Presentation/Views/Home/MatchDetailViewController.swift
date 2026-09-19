@@ -46,6 +46,8 @@ final class MatchDetailViewController: UIViewController {
     private let scoreboardScoreLabel = UILabel()
     private let goalsStack = UIStackView()
     private let redCardsStack = UIStackView()
+    private let highlightsStack = UIStackView()
+    private var officialHighlightsURL: URL?
     private lazy var goalsSection = MatchDetailTitledSectionView(
         title: "Goles",
         uppercaseTitle: true,
@@ -169,6 +171,9 @@ final class MatchDetailViewController: UIViewController {
         redCardsStack.axis = .vertical
         redCardsStack.spacing = Spacing.small
         stack.addArrangedSubview(redCardsSection)
+        highlightsStack.axis = .vertical
+        highlightsStack.spacing = Spacing.small
+        stack.addArrangedSubview(highlightsStack)
         refreshMatchContent()
         stack.addArrangedSubview(MatchDetailTitledSectionView.statRowsSection(title: "Estadísticas", rows: vm.resumenStatRows))
         stack.addArrangedSubview(makeTVSection())
@@ -542,6 +547,50 @@ final class MatchDetailViewController: UIViewController {
         let redCards = viewModel.redCardDetails
         redCardsSection.isHidden = redCards.isEmpty
         redCards.forEach { redCardsStack.addArrangedSubview(MatchRedCardRowView(card: $0)) }
+
+        refreshOfficialHighlights()
+    }
+
+    private func refreshOfficialHighlights() {
+        highlightsStack.arrangedSubviews.forEach {
+            highlightsStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        officialHighlightsURL = nil
+
+        guard
+            viewModel.currentMatch.estado == .finalizado,
+            let rawURL = viewModel.currentMatch.resumenYoutubeUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !rawURL.isEmpty,
+            let url = URL(string: rawURL),
+            let host = url.host?.lowercased(),
+            host == "youtu.be" || host == "youtube.com" || host.hasSuffix(".youtube.com")
+        else {
+            return
+        }
+
+        officialHighlightsURL = url
+        let card = FanCardView(title: "Resumen oficial", accentBorder: true)
+
+        let description = UILabel()
+        description.text = "Mira los goles y mejores jugadas en el canal oficial de YouTube."
+        description.font = .systemFont(ofSize: 14)
+        description.textColor = .secondaryLabel
+        description.numberOfLines = 0
+        card.contentStack.addArrangedSubview(description)
+
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = "Ver resumen en YouTube"
+        configuration.image = UIImage(systemName: "play.rectangle.fill")
+        configuration.imagePadding = Spacing.small
+        configuration.baseBackgroundColor = .liga1Red
+        configuration.baseForegroundColor = .white
+        configuration.cornerStyle = .medium
+        let button = UIButton(configuration: configuration)
+        button.addTarget(self, action: #selector(officialHighlightsTapped), for: .touchUpInside)
+        card.contentStack.addArrangedSubview(button)
+
+        highlightsStack.addArrangedSubview(card)
     }
 
     private func teamColumn(name: String, assetId: String?) -> UIStackView {
@@ -757,6 +806,11 @@ final class MatchDetailViewController: UIViewController {
     }
 
     @objc private func headphonesTapped() {}
+
+    @objc private func officialHighlightsTapped() {
+        guard let officialHighlightsURL else { return }
+        UIApplication.shared.open(officialHighlightsURL)
+    }
 
     @objc private func shareTapped() {
         let av = UIActivityViewController(activityItems: [viewModel.shareText], applicationActivities: nil)
