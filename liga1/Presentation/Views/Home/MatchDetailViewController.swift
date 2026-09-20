@@ -118,6 +118,21 @@ final class MatchDetailViewController: UIViewController {
         segmentChanged()
         bindViewModel()
         viewModel.load()
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+    }
+
+    @objc private func handleWillEnterForeground() {
+        viewModel.refreshOnForeground()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     private func bindViewModel() {
