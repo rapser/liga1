@@ -323,7 +323,12 @@ private struct StubSubmitVoteUseCase: SubmitRefereePollVoteUseCaseProtocol {
 }
 
 private struct StubObserveMatchesUseCase: ObserveMatchesUseCaseProtocol {
-    func execute(for jornadaId: String) -> AnyPublisher<[Match], Never> {
-        Empty<[Match], Never>(completeImmediately: false).eraseToAnyPublisher()
+    let matches: [Match]
+    init(matches: [Match] = []) {
+        self.matches = matches
     }
+    func execute(for jornadaId: String) -> AnyPublisher<[Match], Never> {
+        Just(matches).eraseToAnyPublisher()
+    }
+    func refresh(for jornadaId: String) {}
 }

@@ -209,6 +209,15 @@ final class MatchDetailViewModel {
             .store(in: &cancellables)
     }
 
+    /// Corrige `currentMatch` al volver de background: el listener en tiempo real
+    /// puede quedar desincronizado tras una suspensión larga (p. ej. el partido
+    /// terminó mientras la app estaba en segundo plano y el estado no se actualizó
+    /// hasta forzar el cierre de la app). La suscripción de `load()` sigue activa
+    /// y recibe este valor corregido igual que cualquier otro cambio del listener.
+    func refreshOnForeground() {
+        observeMatchesUseCase.refresh(for: context.jornadaId)
+    }
+
     // MARK: - Termómetro Arbitral
 
     private func handleRefereePoll(_ poll: RefereePoll?) {
