@@ -168,3 +168,50 @@ extension RefereePoll {
         )
     }
 }
+
+// MARK: - Player fixtures
+
+extension Player {
+    static func fixture(
+        id: String = "espn_1",
+        name: String = "Jugador Prueba",
+        number: Int? = 10,
+        position: PlayerPosition = .midfielder,
+        age: Int? = 25,
+        photoURL: URL? = nil,
+        photoCredit: String? = nil
+    ) -> Player {
+        Player(
+            id: id,
+            name: name,
+            shortName: name,
+            number: number,
+            position: position,
+            age: age,
+            photoURL: photoURL,
+            photoCredit: photoCredit
+        )
+    }
+}
+
+// MARK: - TeamUI fixtures
+
+extension TeamUI {
+    /// `code` es el identificador del equipo en Firestore (`logo`).
+    static func fixture(code: String = "ali", nombre: String = "Alianza Lima") -> TeamUI {
+        TeamUI(
+            nombre: nombre,
+            ciudad: "Lima",
+            estadio: "Alejandro Villanueva",
+            logo: code,
+            partidosJugados: 0,
+            partidosGanados: 0,
+            partidosEmpatados: 0,
+            partidosPerdidos: 0,
+            golesFavor: 0,
+            golesContra: 0,
+            diferenciaGoles: 0,
+            puntos: 0
+        )
+    }
+}

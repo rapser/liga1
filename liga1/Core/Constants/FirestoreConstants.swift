@@ -93,6 +93,12 @@ public enum FirestoreConstants {
         public static let horariosConfirmados = "horariosConfirmados"
     }
 
+    // MARK: - Player Fields
+
+    public enum PlayerField {
+        public static let active = "active"
+    }
+
     // MARK: - News Fields
 
     public enum NewsField {

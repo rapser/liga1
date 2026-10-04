@@ -24,6 +24,9 @@ class TablaViewController: UIViewController {
     /// Abre el simulador para el torneo indicado. Lo inyecta `MainTabBarController`.
     var onSimulate: ((TorneoType) -> Void)?
 
+    /// Abre la ficha del equipo tocado. Lo inyecta `MainTabBarController`.
+    var onTeamSelected: ((TeamUI) -> Void)?
+
     // MARK: - Initialization
     init(viewModel: TorneoViewModel) {
         self.viewModel = viewModel
@@ -122,7 +125,7 @@ class TablaViewController: UIViewController {
         // Configurar tableView
         tableView.prepareForAutoLayout()
         tableView.register(EquipoTableViewCell.self, forCellReuseIdentifier: "EquipoCell")
-        tableView.allowsSelection = false
+        tableView.allowsSelection = true
         tableView.delegate = self
         tableView.dataSource = self
         tableView.sectionHeaderTopPadding = 0
