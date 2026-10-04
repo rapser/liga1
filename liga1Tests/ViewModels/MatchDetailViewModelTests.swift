@@ -33,7 +33,8 @@ final class MatchDetailViewModelTests: XCTestCase {
             getMatchWeatherUseCase: StubWeatherUseCase(result: weather),
             observeRefereePollUseCase: StubObservePollUseCase(subject: pollSubject),
             observePollResultUseCase: StubPollResultUseCase(subject: tallySubject, myVote: myVote),
-            submitRefereePollVoteUseCase: submitVote ?? StubSubmitVoteUseCase(result: .success("si"))
+            submitRefereePollVoteUseCase: submitVote ?? StubSubmitVoteUseCase(result: .success("si")),
+            observeMatchesUseCase: StubObserveMatchesUseCase()
         )
     }
 
@@ -318,5 +319,11 @@ private struct StubSubmitVoteUseCase: SubmitRefereePollVoteUseCaseProtocol {
     let result: Result<String, Error>
     func execute(poll: RefereePoll, optionId: String) -> AnyPublisher<String, Error> {
         result.publisher.eraseToAnyPublisher()
+    }
+}
+
+private struct StubObserveMatchesUseCase: ObserveMatchesUseCaseProtocol {
+    func execute(for jornadaId: String) -> AnyPublisher<[Match], Never> {
+        Empty<[Match], Never>(completeImmediately: false).eraseToAnyPublisher()
     }
 }
