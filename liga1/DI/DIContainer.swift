@@ -52,6 +52,16 @@ final class DIContainer {
         return teamsRepository
     }
 
+    private lazy var playersRepository: PlayersRepositoryProtocol = {
+        return CachingPlayersRepository(
+            wrapping: PlayersRepository(database: makeDatabase(), logger: makeLogger())
+        )
+    }()
+
+    func makePlayersRepository() -> PlayersRepositoryProtocol {
+        return playersRepository
+    }
+
     func makeNewsRepository() -> NewsRepositoryProtocol {
         return NewsRepository(database: makeDatabase(), logger: makeLogger())
     }
@@ -189,6 +199,10 @@ final class DIContainer {
         )
     }
 
+    func makeFetchSquadUseCase() -> FetchSquadUseCaseProtocol {
+        return FetchSquadUseCase(repository: makePlayersRepository())
+    }
+
     func makeGetTournamentAvailabilityUseCase() -> GetTournamentAvailabilityUseCaseProtocol {
         return GetTournamentAvailabilityUseCase(
             repository: makeTournamentConfigRepository()
@@ -322,6 +336,10 @@ final class DIContainer {
         )
     }
 
+    func makeTeamDetailViewModel(team: TeamUI) -> TeamDetailViewModel {
+        return TeamDetailViewModel(team: team, fetchSquadUseCase: makeFetchSquadUseCase())
+    }
+
     func makeFavoritosViewModel() -> FavoritosViewModel {
         return FavoritosViewModel(
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
@@ -378,6 +396,10 @@ final class DIContainer {
 
     func makeTablaViewController() -> TablaViewController {
         return TablaViewController(viewModel: makeTorneoViewModel())
+    }
+
+    func makeTeamDetailViewController(team: TeamUI) -> TeamDetailViewController {
+        return TeamDetailViewController(viewModel: makeTeamDetailViewModel(team: team))
     }
 
     func makeStandingsSimulatorViewModel() -> StandingsSimulatorViewModel {
