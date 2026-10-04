@@ -8,7 +8,8 @@
 import Foundation
 import Combine
 
-/// Todas las jornadas con `mostrar == true` (el repositorio ya las filtra) para cargar partidos en Home.
+/// Jornadas que Home debe cargar: con horarios oficiales confirmados (el repositorio ya las filtra)
+/// y dentro de la ventana de Home (`Jornada.isVisibleInHome`: hasta 7 días antes de su primer partido).
 protocol GetJornadaToDisplayUseCaseProtocol {
     func execute() -> AnyPublisher<[Jornada], Error>
     func observe() -> AnyPublisher<[Jornada], Never>
@@ -18,25 +19,33 @@ final class GetJornadaToDisplayUseCase: GetJornadaToDisplayUseCaseProtocol {
 
     private let fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol
     private let observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol
+    private let now: () -> Date
 
     init(
         fetchActiveJornadasUseCase: FetchActiveJornadasUseCaseProtocol,
-        observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol
+        observeActiveJornadasUseCase: ObserveActiveJornadasUseCaseProtocol,
+        now: @escaping () -> Date = Date.init
     ) {
         self.fetchActiveJornadasUseCase = fetchActiveJornadasUseCase
         self.observeActiveJornadasUseCase = observeActiveJornadasUseCase
+        self.now = now
     }
 
     func execute() -> AnyPublisher<[Jornada], Error> {
         return fetchActiveJornadasUseCase.execute()
-            .map { Self.orderJornadasForHome($0) }
+            .map { [now] in Self.jornadasForHome($0, now: now()) }
             .eraseToAnyPublisher()
     }
 
     func observe() -> AnyPublisher<[Jornada], Never> {
         return observeActiveJornadasUseCase.execute()
-            .map { Self.orderJornadasForHome($0) }
+            .map { [now] in Self.jornadasForHome($0, now: now()) }
             .eraseToAnyPublisher()
+    }
+
+    /// Jornadas visibles en Home (confirmadas y dentro de la ventana de 7 días), ordenadas.
+    static func jornadasForHome(_ jornadas: [Jornada], now: Date) -> [Jornada] {
+        orderJornadasForHome(jornadas.filter { $0.isVisibleInHome(now: now) })
     }
 
     /// Orden solo por torneo, número e id — sin usar `fechaInicio` (la fecha visible la elige el usuario en el calendario).

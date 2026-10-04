@@ -59,6 +59,90 @@ final class GetJornadaToDisplayUseCaseTests: XCTestCase {
         XCTAssertTrue(sorted.isEmpty)
     }
 
+    // MARK: - Ventana de Home (jornadasForHome)
+
+    /// "Hoy" para las pruebas: miércoles 14 de octubre de 2026, 10:00 en Lima.
+    private let now = limaDate(year: 2026, month: 10, day: 14, hour: 10)
+
+    func test_window_hidesJornadaWithoutConfirmedSchedule() {
+        let sinHorarios = Jornada.fixture(
+            id: "sin", fechaInicio: limaDate(year: 2026, month: 10, day: 16, hour: 15),
+            horariosConfirmados: false
+        )
+
+        XCTAssertTrue(GetJornadaToDisplayUseCase.jornadasForHome([sinHorarios], now: now).isEmpty)
+    }
+
+    func test_window_showsConfirmedJornadaStartingWithinSevenDays() {
+        // Día 21 (hoy + 7), a medianoche en Lima: aún dentro de la ventana.
+        let enSieteDias = Jornada.fixture(
+            id: "j", fechaInicio: limaDate(year: 2026, month: 10, day: 21, hour: 23, minute: 59)
+        )
+
+        XCTAssertEqual(GetJornadaToDisplayUseCase.jornadasForHome([enSieteDias], now: now).map(\.id), ["j"])
+    }
+
+    func test_window_hidesConfirmedJornadaStartingBeyondSevenDays() {
+        let enOchoDias = Jornada.fixture(
+            id: "j", fechaInicio: limaDate(year: 2026, month: 10, day: 22, hour: 0)
+        )
+
+        XCTAssertTrue(GetJornadaToDisplayUseCase.jornadasForHome([enOchoDias], now: now).isEmpty)
+    }
+
+    func test_window_hidesJornadaThatEndedMoreThanSevenDaysAgo() {
+        let terminada = Jornada.fixture(
+            id: "j",
+            fechaInicio: limaDate(year: 2026, month: 9, day: 25, hour: 15),
+            fechaFin: limaDate(year: 2026, month: 10, day: 6, hour: 20)
+        )
+
+        XCTAssertTrue(GetJornadaToDisplayUseCase.jornadasForHome([terminada], now: now).isEmpty)
+    }
+
+    func test_window_showsJornadaThatEndedWithinSevenDays() {
+        let reciente = Jornada.fixture(
+            id: "j",
+            fechaInicio: limaDate(year: 2026, month: 10, day: 5, hour: 15),
+            fechaFin: limaDate(year: 2026, month: 10, day: 7, hour: 20)
+        )
+
+        XCTAssertEqual(GetJornadaToDisplayUseCase.jornadasForHome([reciente], now: now).map(\.id), ["j"])
+    }
+
+    func test_window_withoutFechaFin_keepsJornadaUntilItsStartLeavesRange() {
+        let sinFin = Jornada.fixture(
+            id: "j", fechaInicio: limaDate(year: 2026, month: 9, day: 1, hour: 15), fechaFin: nil
+        )
+
+        XCTAssertEqual(GetJornadaToDisplayUseCase.jornadasForHome([sinFin], now: now).map(\.id), ["j"])
+    }
+
+    func test_window_dayBoundaryUsesLimaNotDeviceTimeZone() {
+        // 23:30 del día 21 en Lima = 04:30 UTC del día 22: sigue siendo "hoy + 7" en Lima.
+        let jornada = Jornada.fixture(
+            id: "j", fechaInicio: limaDate(year: 2026, month: 10, day: 21, hour: 23, minute: 30)
+        )
+
+        XCTAssertEqual(GetJornadaToDisplayUseCase.jornadasForHome([jornada], now: now).map(\.id), ["j"])
+    }
+
+    func test_execute_filtersByWindowUsingInjectedClock() throws {
+        sut = GetJornadaToDisplayUseCase(
+            fetchActiveJornadasUseCase: fetchUseCase,
+            observeActiveJornadasUseCase: observeUseCase,
+            now: { [now] in now }
+        )
+        fetchUseCase.result = .success([
+            Jornada.fixture(id: "cerca", fechaInicio: limaDate(year: 2026, month: 10, day: 16, hour: 15)),
+            Jornada.fixture(id: "lejos", fechaInicio: limaDate(year: 2026, month: 11, day: 30, hour: 15))
+        ])
+
+        let result = try awaitValue(from: sut.execute())
+
+        XCTAssertEqual(result.map(\.id), ["cerca"])
+    }
+
     // MARK: - execute()
 
     func test_execute_delegatesToFetchUseCase() throws {

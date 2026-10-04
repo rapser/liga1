@@ -33,9 +33,11 @@ class JornadasRepository: JornadasRepositoryProtocol {
                 return
             }
 
-            // Solo `mostrar == true`. No ordenar por `fechaInicio` (el Home usa el calendario / fechas de partido).
+            // Solo jornadas con horarios oficiales confirmados (el admin las marca con `horariosConfirmados`).
+            // La ventana de fechas se aplica en memoria (`Jornada.isVisibleInHome`): son ~34 documentos,
+            // y filtrar por igualdad evita crear un índice compuesto.
             let query = self.db.collection(FirestoreConstants.Collection.jornadas)
-                .whereField(FirestoreConstants.JornadaField.mostrar, isEqualTo: true)
+                .whereField(FirestoreConstants.JornadaField.horariosConfirmados, isEqualTo: true)
 
             // Estrategia: Intentar caché primero (rápido), luego servidor si falla
             query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
@@ -107,7 +109,9 @@ class JornadasRepository: JornadasRepositoryProtocol {
                         mostrar: dto.mostrar,
                         numero: dto.numero,
                         torneo: dto.torneo,
-                        fechaInicio: dto.fechaInicio
+                        fechaInicio: dto.fechaInicio,
+                        fechaFin: dto.fechaFin,
+                        horariosConfirmados: dto.horariosConfirmados
                     )
                 }
 
@@ -121,15 +125,17 @@ class JornadasRepository: JornadasRepositoryProtocol {
                 self.logger.error("JornadasRepository: Failed to decode JornadaDTO for document \(doc.documentID)", error: error)
                 // Intentar crear jornada manualmente desde el documentID si la decodificación falla
                 let data = doc.data()
-                if let mostrar = data[FirestoreConstants.JornadaField.mostrar] as? Bool,
-                   mostrar {
+                if let confirmados = data[FirestoreConstants.JornadaField.horariosConfirmados] as? Bool,
+                   confirmados {
                     // Intentar extraer torneo y numero del documentID
                     if let jornada = JornadaMapper.toDomain(from: JornadaDTO(
                         id: doc.documentID,
-                        mostrar: mostrar,
+                        mostrar: data[FirestoreConstants.JornadaField.mostrar] as? Bool,
                         numero: nil,
                         torneo: nil,
-                        fechaInicio: data[FirestoreConstants.JornadaField.fechaInicio] as? Timestamp
+                        fechaInicio: data[FirestoreConstants.JornadaField.fechaInicio] as? Timestamp,
+                        fechaFin: data[FirestoreConstants.JornadaField.fechaFin] as? Timestamp,
+                        horariosConfirmados: confirmados
                     ), documentID: doc.documentID, logger: self.logger) {
                         jornadas.append(jornada)
                     }

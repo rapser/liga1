@@ -27,9 +27,19 @@ extension Jornada {
         torneo: String = "apertura",
         numero: Int = 1,
         mostrar: Bool = true,
-        fechaInicio: Date = Date()
+        fechaInicio: Date = Date(),
+        fechaFin: Date? = nil,
+        horariosConfirmados: Bool = true
     ) -> Jornada {
-        Jornada(id: id, torneo: torneo, numero: numero, mostrar: mostrar, fechaInicio: fechaInicio)
+        Jornada(
+            id: id,
+            torneo: torneo,
+            numero: numero,
+            mostrar: mostrar,
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin,
+            horariosConfirmados: horariosConfirmados
+        )
     }
 }
 
