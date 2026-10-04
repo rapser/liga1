@@ -15,6 +15,8 @@ final class MockMatchesRepository: MatchesRepositoryProtocol {
 
     private var observeSubjects: [String: CurrentValueSubject<[Match], Never>] = [:]
     var observeCallCount = 0
+    var refreshCallCount = 0
+    var lastRefreshedJornadaId: String?
 
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error> {
         fetchCallCount += 1
@@ -43,5 +45,12 @@ final class MockMatchesRepository: MatchesRepositoryProtocol {
             observeSubjects[jornadaId] = CurrentValueSubject([])
         }
         observeSubjects[jornadaId]!.send(matches)
+    }
+
+    func refreshMatches(for jornadaId: String) {
+        refreshCallCount += 1
+        lastRefreshedJornadaId = jornadaId
+        let matches = resultsByJornada[jornadaId] ?? (try? fetchResult.get()) ?? []
+        sendObservedMatches(matches, for: jornadaId)
     }
 }
