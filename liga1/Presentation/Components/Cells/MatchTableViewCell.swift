@@ -153,6 +153,8 @@ class MatchTableViewCell: UITableViewCell {
             let timeFormatter = DateFormatter()
             timeFormatter.dateFormat = "hh:mm a"
             timeFormatter.locale = Locale(identifier: "es_PE")
+            // Misma zona que el filtro de día de Home: la hora no debe cambiar según el huso del teléfono.
+            timeFormatter.timeZone = TimeZone(identifier: "America/Lima") ?? .current
             let timeString = timeFormatter.string(from: matchUI.fecha)
 
             marcadorLocalLabel.isHidden = true

@@ -320,6 +320,7 @@ final class MatchDetailViewModel {
         let df = DateFormatter()
         df.locale = Locale(identifier: "es_PE")
         df.dateFormat = "dd.MM.yyyy  hh:mm a"
+        df.timeZone = TimeZone(identifier: "America/Lima") ?? .current
         return df.string(from: match.fecha)
     }
 
