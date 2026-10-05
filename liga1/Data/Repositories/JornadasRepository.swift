@@ -106,7 +106,6 @@ class JornadasRepository: JornadasRepositoryProtocol {
                 if dto.id == nil || dto.id?.isEmpty == true {
                     dto = JornadaDTO(
                         id: doc.documentID,
-                        mostrar: dto.mostrar,
                         numero: dto.numero,
                         torneo: dto.torneo,
                         fechaInicio: dto.fechaInicio,
@@ -130,7 +129,6 @@ class JornadasRepository: JornadasRepositoryProtocol {
                     // Intentar extraer torneo y numero del documentID
                     if let jornada = JornadaMapper.toDomain(from: JornadaDTO(
                         id: doc.documentID,
-                        mostrar: data[FirestoreConstants.JornadaField.mostrar] as? Bool,
                         numero: nil,
                         torneo: nil,
                         fechaInicio: data[FirestoreConstants.JornadaField.fechaInicio] as? Timestamp,
