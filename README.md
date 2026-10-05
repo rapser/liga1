@@ -21,7 +21,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 ### 🏠 Home - Partidos por Jornada
 
 #### Visualización de Partidos
-- **Una Jornada en Home**: Solo se muestra la jornada con `mostrar == true` y **menor fecha de inicio** (regla de negocio en Domain vía `GetJornadaToDisplayUseCase`)
+- **Solo jornadas con horarios oficiales**: Home muestra una jornada únicamente si su documento tiene `horariosConfirmados == true` y su rango de partidos cae en la ventana de Home: empieza como máximo en 7 días y no terminó hace más de 7 días (hora de Lima). La regla vive en Domain (`Jornada.isVisibleInHome`, aplicada por `GetJornadaToDisplayUseCase`)
 - **Sistema de Jornadas**: Estructura anidada en Firestore (`jornadas/{jornadaId}/matches/{matchId}`)
 - **Headers Duales**:
   - **Header de Fecha**: Muestra la fecha del próximo partido con formato inteligente
@@ -37,8 +37,9 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
   - Botón de favorito por partido
 
 #### Gestión de Datos
-- **Actualización Reactiva**: Listeners de Firestore para jornada a mostrar y favoritos
-- **Filtrado en Domain**: `GetJornadaToDisplayUseCase` devuelve la única jornada a mostrar; `FetchMatchesUseCase` filtra partidos al día más próximo (hoy o futuro) usando la zona horaria de Lima (UTC−5)
+- **Actualización Reactiva**: Listeners de Firestore para los partidos de las jornadas visibles y favoritos
+- **Filtrado en Domain**: `GetJornadaToDisplayUseCase` devuelve las jornadas confirmadas dentro de la ventana de 7 días; `FetchMatchesUseCase` filtra los partidos al día elegido en el calendario usando la zona horaria de Lima (UTC−5)
+- **Hora en Lima**: La hora de los partidos (celda y detalle) se formatea siempre en `America/Lima`, sin depender del huso del teléfono
 - **Carga fiable**: Deduplicación de IDs en `JornadasRepository.fetchFromServer()` y en `HomeViewModel.observeJornadaToDisplay()` para evitar cancelaciones spurias de carga; `isLoading` siempre se resuelve en `receiveValue`
 - **Recarga Automática**: Al entrar a la tab se recargan los datos (`viewWillAppear`)
 
@@ -68,6 +69,16 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Orden Alfabético**: Cuando todos los equipos tienen 0 puntos
 - **Orden por Rendimiento**: Puntos, diferencia de goles, goles a favor, partidos ganados y nombre
 - **Recarga Automática**: Al entrar a la tab se recargan los datos sin usar caché
+
+### 👥 Detalle de Equipo y Plantilla
+
+- **Acceso**: Al tocar un equipo en la tabla de posiciones se abre su ficha (`TeamDetailViewController`)
+- **Cabecera**: Escudo (asset local), nombre, ciudad y estadio
+- **Plantilla por línea**: Porteros, Defensas, Mediocampistas y Delanteros, ordenados por dorsal; los jugadores sin dorsal van al final de su línea
+- **Fotos**: Se cargan con Kingfisher desde la URL guardada en Firestore (solo `https`). Sin foto se muestra un ícono. Si alguna foto exige atribución, se muestra al pie (p. ej. "Fotos: Wikimedia Commons")
+- **Estados**: Cargando, sin plantilla disponible y error de red
+- **Datos**: `equipos/{code}/players`, solo documentos con `active == true`. La plantilla se cachea en memoria por equipo durante la sesión (`CachingPlayersRepository`)
+- **Origen de los datos**: Los carga el panel de administración (plantilla desde ESPN; fotos desde Wikidata o manuales). La app solo lee
 
 ### 📰 Noticias
 
@@ -294,7 +305,7 @@ View → ViewModel → UseCase → Repository → Firestore
 - **UseCases/**: Casos de uso (lógica de negocio)
   - **Jornadas/**: `FetchActiveJornadasUseCase`, `ObserveActiveJornadasUseCase`, `GetJornadaToDisplayUseCase` (jornada única a mostrar: menor `fechaInicio` entre activas)
   - **Matches/**: `FetchMatchesUseCase`, `ObserveMatchesUseCase`
-  - **Teams/**: `FetchTeamsUseCase`, `GetTournamentAvailabilityUseCase`, `CalculateAccumulatedStandingsUseCase`
+  - **Teams/**: `FetchTeamsUseCase`, `GetTournamentAvailabilityUseCase`, `CalculateAccumulatedStandingsUseCase`, `FetchSquadUseCase`
   - **News/**: `FetchNewsUseCase`
   - **Favorites/**: `ToggleFavoriteUseCase`, `ObserveFavoritesUseCase`, `FetchFavoriteMatchesUseCase`
   - **Auth/**: `LoginUseCase`, `LogoutUseCase`
@@ -304,6 +315,7 @@ View → ViewModel → UseCase → Repository → Firestore
   - `JornadasRepositoryProtocol`
   - `MatchesRepositoryProtocol`
   - `TeamsRepositoryProtocol`
+  - `PlayersRepositoryProtocol`
   - `TournamentConfigRepositoryProtocol`
   - `NewsRepositoryProtocol`
   - `AdminMatchRepositoryProtocol`
@@ -322,15 +334,16 @@ View → ViewModel → UseCase → Repository → Firestore
   - `JornadasRepository` - Implementa `JornadasRepositoryProtocol`
   - `MatchesRepository` - Implementa `MatchesRepositoryProtocol`
   - `TeamsRepository` - Implementa `TeamsRepositoryProtocol`
+  - `PlayersRepository` / `CachingPlayersRepository` - Plantillas de `equipos/{code}/players` con caché en memoria
   - `FirebaseTournamentConfigRepository` - Adapta Firebase Remote Config al contrato del dominio
   - `NewsRepository` - Implementa `NewsRepositoryProtocol`
   - `AdminMatchRepository` - Implementa `AdminMatchRepositoryProtocol`
 
 - **DTOs/**: Data Transfer Objects (estructuras que coinciden con Firestore)
-  - `MatchDTO`, `JornadaDTO`, `TeamDTO`, `NewsItemDTO`
+  - `MatchDTO`, `JornadaDTO`, `TeamDTO`, `PlayerDTO`, `NewsItemDTO`
 
 - **Mappers/**: Transformación entre DTOs y Domain Entities
-  - `MatchMapper`, `JornadaMapper`, `TeamMapper`, `NewsItemMapper`
+  - `MatchMapper`, `JornadaMapper`, `TeamMapper`, `PlayerMapper`, `NewsItemMapper`
 
 - **Services/**: Servicios transversales
   - `AuthService` - Autenticación con Firebase
@@ -490,6 +503,7 @@ liga1/
 │   │   │   └── NewsViewController+TableView.swift # Extension con dataSource/delegate
 │   │   ├── Tabla/
 │   │   │   ├── TablaViewController.swift    # ViewController de tabla de posiciones
+│   │   │   ├── TeamDetailViewController.swift # Ficha de equipo con su plantilla
 │   │   │   └── TorneoViewController+TableView.swift # Extension con lógica de tabla
 │   │   ├── Favoritos/
 │   │   │   ├── FavoritosViewController.swift # ViewController de favoritos
@@ -510,6 +524,7 @@ liga1/
 │   │   ├── HomeViewModel.swift              # Estado y lógica de Home (jornadas activas)
 │   │   ├── NewsViewModel.swift              # Estado y lógica de Noticias (agrupación por categoría)
 │   │   ├── TorneoViewModel.swift            # Estado y lógica de Tabla (cache de posiciones)
+│   │   ├── TeamDetailViewModel.swift        # Estado de la ficha de equipo (plantilla por línea)
 │   │   ├── FavoritosViewModel.swift         # Estado y lógica de Favoritos
 │   │   ├── ProfileViewModel.swift           # Estado y lógica de Configuración
 │   │   ├── LoginViewModel.swift             # Estado y lógica de Login
@@ -536,6 +551,7 @@ liga1/
 │       ├── Cells/
 │       │   ├── MatchTableViewCell.swift     # Celda de partido con logos y marcador
 │       │   ├── EquipoTableViewCell.swift    # Celda de equipo en tabla de posiciones
+│       │   ├── PlayerCell.swift             # Celda de jugador (foto, nombre, edad, dorsal)
 │       │   ├── NewsCell.swift               # Celda estándar de noticia
 │       │   ├── FeaturedNewsContentCell.swift # Celda destacada de noticia (imagen grande)
 │       │   ├── HeaderView.swift             # Header de tabla de posiciones
@@ -548,9 +564,11 @@ liga1/
 │   │   ├── Match/
 │   │   │   └── Match.swift                  # Entidad: Partido (fecha, equipos, resultado, estado)
 │   │   ├── Jornada/
-│   │   │   └── Jornada.swift                # Entidad: Jornada (id, torneo, numero, fechaInicio)
+│   │   │   └── Jornada.swift                # Entidad: Jornada (id, torneo, numero, fechaInicio, fechaFin, horariosConfirmados)
 │   │   ├── Team/
 │   │   │   └── Team.swift                   # Entidad: Equipo (nombre, estadísticas, puntos)
+│   │   ├── Player/
+│   │   │   └── Player.swift                 # Entidad: Jugador (nombre, dorsal, posición, edad, foto) y PlayerPosition
 │   │   └── NewsItem/
 │   │       └── NewsItem.swift               # Entidad: Noticia (titulo, url, categoria, fecha)
 │   │
@@ -558,19 +576,21 @@ liga1/
 │   │   ├── JornadasRepositoryProtocol.swift # Protocolo: Operaciones con jornadas
 │   │   ├── MatchesRepositoryProtocol.swift  # Protocolo: Operaciones con partidos
 │   │   ├── TeamsRepositoryProtocol.swift    # Protocolo: Operaciones con equipos
+│   │   ├── PlayersRepositoryProtocol.swift  # Protocolo: Plantilla de un equipo
 │   │   ├── NewsRepositoryProtocol.swift     # Protocolo: Operaciones con noticias
 │   │   └── AdminMatchRepositoryProtocol.swift # Protocolo: Operaciones admin
 │   │
 │   └── UseCases/ (Casos de Uso - Lógica de Negocio)
 │       ├── Jornadas/
-│       │   ├── FetchActiveJornadasUseCase.swift      # Obtener jornadas activas (mostrar == true)
+│       │   ├── FetchActiveJornadasUseCase.swift      # Obtener jornadas con horarios confirmados (horariosConfirmados == true)
 │       │   ├── ObserveActiveJornadasUseCase.swift   # Observar cambios en jornadas activas
-│       │   └── GetJornadaToDisplayUseCase.swift     # Jornada única a mostrar (menor fechaInicio)
+│       │   └── GetJornadaToDisplayUseCase.swift     # Jornadas visibles en Home (ventana de 7 días, hora Lima)
 │       ├── Matches/
 │       │   ├── FetchMatchesUseCase.swift             # Obtener partidos de una jornada
 │       │   └── ObserveMatchesUseCase.swift           # Observar cambios en partidos
 │       ├── Teams/
-│       │   └── FetchTeamsUseCase.swift               # Obtener equipos de un torneo
+│       │   ├── FetchTeamsUseCase.swift               # Obtener equipos de un torneo
+│       │   └── FetchSquadUseCase.swift               # Plantilla de un equipo ordenada por línea y dorsal
 │       ├── News/
 │       │   └── FetchNewsUseCase.swift                # Obtener todas las noticias
 │       ├── Favorites/
@@ -588,6 +608,8 @@ liga1/
 │   │   ├── JornadasRepository.swift         # Implementa JornadasRepositoryProtocol
 │   │   ├── MatchesRepository.swift          # Implementa MatchesRepositoryProtocol
 │   │   ├── TeamsRepository.swift            # Implementa TeamsRepositoryProtocol
+│   │   ├── PlayersRepository.swift          # Implementa PlayersRepositoryProtocol
+│   │   ├── CachingPlayersRepository.swift   # Decorator: caché en memoria de plantillas
 │   │   ├── NewsRepository.swift             # Implementa NewsRepositoryProtocol
 │   │   └── AdminMatchRepository.swift       # Implementa AdminMatchRepositoryProtocol
 │   │
@@ -598,6 +620,8 @@ liga1/
 │   │   │   └── JornadaDTO.swift             # Estructura que coincide con Firestore
 │   │   ├── Team/
 │   │   │   └── TeamDTO.swift                # Estructura que coincide con Firestore
+│   │   ├── Player/
+│   │   │   └── PlayerDTO.swift              # Estructura que coincide con Firestore
 │   │   └── NewsItem/
 │   │       └── NewsItemDTO.swift            # Estructura que coincide con Firestore
 │   │
@@ -605,6 +629,7 @@ liga1/
 │   │   ├── MatchMapper.swift                # DTO → Domain Entity (Match)
 │   │   ├── JornadaMapper.swift              # DTO → Domain Entity (Jornada)
 │   │   ├── TeamMapper.swift                 # DTO → Domain Entity (Team)
+│   │   ├── PlayerMapper.swift               # DTO → Domain Entity (Player)
 │   │   └── NewsItemMapper.swift             # DTO → Domain Entity (NewsItem)
 │   │
 │   ├── Services/ (Servicios transversales)
@@ -662,6 +687,7 @@ liga1Tests/
 │   ├── MockJornadasRepository.swift
 │   ├── MockMatchesRepository.swift
 │   ├── MockTeamsRepository.swift
+│   ├── MockPlayersRepository.swift
 │   ├── MockNewsRepository.swift
 │   ├── MockFavoritesService.swift
 │   ├── MockUserPreferencesService.swift
@@ -674,12 +700,15 @@ liga1Tests/
     ├── Jornadas/
     │   ├── FetchActiveJornadasUseCaseTests.swift
     │   ├── ObserveActiveJornadasUseCaseTests.swift
-    │   └── GetJornadaToDisplayUseCaseTests.swift
+    │   ├── GetJornadaToDisplayUseCaseTests.swift
+    │   └── JornadaMapperTests.swift
     ├── Matches/
     │   ├── FetchMatchesUseCaseTests.swift
     │   └── ObserveMatchesUseCaseTests.swift
     ├── Teams/
-    │   └── FetchTeamsUseCaseTests.swift
+    │   ├── FetchTeamsUseCaseTests.swift
+    │   ├── FetchSquadUseCaseTests.swift
+    │   └── PlayerMapperTests.swift
     ├── News/
     │   └── FetchNewsUseCaseTests.swift
     ├── Favorites/
@@ -690,13 +719,20 @@ liga1Tests/
         └── UpdatePushNotificationsEnabledUseCaseTests.swift
 ```
 
-### Casos de test cubiertos (~45 tests)
+Además existen `Repositories/` (`CachingTeamsRepositoryTests`, `CachingPlayersRepositoryTests`) y `ViewModels/` (`TorneoViewModelTests`, `MatchDetailViewModelTests`, `TeamDetailViewModelTests`, entre otros).
+
+### Casos de test cubiertos (~200 tests)
 
 | Use Case | Comportamientos verificados |
 |---|---|
 | `FetchActiveJornadasUseCase` | Delega al repository, propaga error, loguea en fallo |
 | `ObserveActiveJornadasUseCase` | Reenvía valor inicial vacío y actualizaciones múltiples |
-| `GetJornadaToDisplayUseCase` | Ordenamiento puro `orderJornadasForHome`, `execute` y `observe` devuelven ordenados, propaga error |
+| `GetJornadaToDisplayUseCase` | Ordenamiento puro `orderJornadasForHome`; ventana de Home (`jornadasForHome`): oculta jornadas sin horarios confirmados, a más de 7 días o terminadas hace más de 7 días, y calcula el borde del día en hora de Lima; `execute` y `observe` devuelven ordenados, propaga error |
+| `JornadaMapper` | Lee `horariosConfirmados` y `fechaFin`, asume `false` si falta el campo e infiere torneo y número desde el ID |
+| `FetchSquadUseCase` | Orden por línea y dorsal, sin dorsal al final, desempate por nombre, propaga error |
+| `PlayerMapper` | Códigos de posición, descarta documentos inválidos, `shortName` por defecto y solo fotos `https` |
+| `CachingPlayersRepository` | Primera llamada delega, la segunda usa caché, equipos cacheados por separado, los errores no se cachean |
+| `TeamDetailViewModel` | Estados cargando/cargado/vacío/error, agrupación por línea y atribución de fotos |
 | `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
 | `ObserveMatchesUseCase` | Reenvía actualizaciones del repository |
 | `FetchTeamsUseCase` | Acumulado permanece derivado; apertura/clausura delegan correctamente |
@@ -723,8 +759,9 @@ Cada jornada es un documento con ID en formato `{torneo}_{numero}` (ej: `apertur
 ```
 jornadas/
 ├── {jornadaId}              # Ejemplo: "apertura_01"
-│   ├── mostrar: Bool        # Si se muestra en el home
-│   ├── fechaInicio: Date    # Fecha de inicio de la jornada
+│   ├── horariosConfirmados: Bool # Los 9 partidos ya tienen fecha y hora oficial; Home solo muestra jornadas con true
+│   ├── fechaInicio: Date    # Primer partido de la jornada
+│   ├── fechaFin: Date       # Último partido de la jornada
 │   └── matches/             # Subcolección de partidos
 │       └── {matchId}        # Ejemplo: "adt_utc"
 │           ├── fecha: Timestamp
@@ -734,7 +771,26 @@ jornadas/
 │           └── suspendido: Bool
 ```
 
-**Nota**: Los campos `torneo` y `numero` se extraen del `documentID`, no se almacenan como campos.
+**Nota**: Los campos `torneo` y `numero` se extraen del `documentID`, no se almacenan como campos. El campo `mostrar` ya no se lee: la visibilidad en Home la define `horariosConfirmados` más la ventana de 7 días. Los horarios los carga y confirma el panel de administración.
+
+### Colección: `equipos/{code}/players`
+
+Plantilla de cada equipo. `{code}` es el código del equipo (`ali`, `uni`, `cri`...). La app solo lee; los datos los mantiene el panel de administración.
+
+```
+equipos/
+└── {code}/
+    └── players/
+        └── {playerId}           # Ejemplo: "espn_47543"
+            ├── name: String
+            ├── shortName: String
+            ├── number: Int      # Dorsal (opcional)
+            ├── position: String # "GK", "DF", "MF" o "FW"
+            ├── age: Int         # Opcional
+            ├── photoURL: String # https (opcional)
+            ├── photoCredit: String # Atribución de la foto (opcional)
+            └── active: Bool     # Solo se muestran los activos
+```
 
 ### Colección: `teams`
 
