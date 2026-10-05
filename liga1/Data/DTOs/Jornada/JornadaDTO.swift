@@ -11,7 +11,6 @@ import FirebaseFirestore
 /// Data Transfer Object para Jornada desde Firestore
 struct JornadaDTO: Codable {
     let id: String?
-    let mostrar: Bool?
     let numero: Int?
     let torneo: String?
     let fechaInicio: Timestamp?
@@ -20,7 +19,6 @@ struct JornadaDTO: Codable {
 
     enum CodingKeys: String, CodingKey {
         case id
-        case mostrar
         case numero
         case torneo
         case fechaInicio
@@ -30,7 +28,6 @@ struct JornadaDTO: Codable {
 
     init(
         id: String? = nil,
-        mostrar: Bool?,
         numero: Int?,
         torneo: String?,
         fechaInicio: Timestamp?,
@@ -38,7 +35,6 @@ struct JornadaDTO: Codable {
         horariosConfirmados: Bool? = nil
     ) {
         self.id = id
-        self.mostrar = mostrar
         self.numero = numero
         self.torneo = torneo
         self.fechaInicio = fechaInicio

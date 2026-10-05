@@ -18,7 +18,6 @@ struct JornadaUIMapper {
             id: domain.id,
             torneo: domain.torneo,
             numero: domain.numero,
-            mostrar: domain.mostrar,
             fechaInicio: domain.fechaInicio
         )
     }
@@ -38,7 +37,6 @@ struct JornadaUIMapper {
             id: ui.id,
             torneo: ui.torneo,
             numero: ui.numero,
-            mostrar: ui.mostrar,
             fechaInicio: ui.fechaInicio
         )
     }

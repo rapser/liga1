@@ -13,7 +13,6 @@ struct Jornada {
     let id: String
     let torneo: String
     let numero: Int
-    let mostrar: Bool
     let fechaInicio: Date
     /// Último partido de la jornada. `nil` en jornadas antiguas que no lo guardaron.
     let fechaFin: Date?
@@ -24,7 +23,6 @@ struct Jornada {
         id: String,
         torneo: String,
         numero: Int,
-        mostrar: Bool,
         fechaInicio: Date,
         fechaFin: Date? = nil,
         horariosConfirmados: Bool = false
@@ -32,7 +30,6 @@ struct Jornada {
         self.id = id
         self.torneo = torneo
         self.numero = numero
-        self.mostrar = mostrar
         self.fechaInicio = fechaInicio
         self.fechaFin = fechaFin
         self.horariosConfirmados = horariosConfirmados

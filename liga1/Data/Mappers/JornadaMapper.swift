@@ -40,8 +40,6 @@ struct JornadaMapper {
             id: id,
             torneo: torneo,
             numero: numero,
-            // Home ya no depende de `mostrar` (lo gobierna `horariosConfirmados`); sin el campo asumimos false.
-            mostrar: dto.mostrar ?? false,
             fechaInicio: fechaInicio,
             fechaFin: dto.fechaFin?.dateValue(),
             horariosConfirmados: dto.horariosConfirmados ?? false
@@ -71,7 +69,6 @@ struct JornadaMapper {
     static func toDTO(from domain: Jornada) -> JornadaDTO {
         return JornadaDTO(
             id: domain.id,
-            mostrar: domain.mostrar,
             numero: domain.numero,
             torneo: domain.torneo,
             fechaInicio: Timestamp(date: domain.fechaInicio),

@@ -13,7 +13,6 @@ struct JornadaUI {
     let id: String
     let torneo: String
     let numero: Int
-    let mostrar: Bool
     let fechaInicio: Date
 
     // MARK: - Computed Properties for UI
@@ -37,11 +36,10 @@ struct JornadaUI {
         return formatter.string(from: fechaInicio)
     }
 
-    init(id: String, torneo: String, numero: Int, mostrar: Bool, fechaInicio: Date) {
+    init(id: String, torneo: String, numero: Int, fechaInicio: Date) {
         self.id = id
         self.torneo = torneo
         self.numero = numero
-        self.mostrar = mostrar
         self.fechaInicio = fechaInicio
     }
 }
