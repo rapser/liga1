@@ -21,6 +21,25 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - **Presentación de la tabla**: Se elimina el espacio automático sobre las columnas y las referencias se agrupan en una tarjeta compacta con puestos y significado.
 - **Separación por capas**: Remote Config se encapsula en un repositorio de Data y el cálculo del Acumulado pasa a un caso de uso puro del Domain.
 
+## [1.0.0 (28)] - 2026-10-04
+
+> ⚠️ **Requiere datos en Firestore**: Home solo muestra jornadas con `horariosConfirmados: true`. Antes de publicar este build hay que confirmar las jornadas desde el admin (o con el script de backfill), de lo contrario Home queda vacío.
+
+### ✨ Added
+- **Plantilla por equipo**: Al tocar un equipo en la Tabla se abre su ficha con escudo, ciudad y estadio, y la plantilla agrupada por línea (Porteros, Defensas, Mediocampistas, Delanteros). Cada jugador muestra foto, nombre, edad y dorsal; si no hay foto se usa un ícono. Lee `equipos/{code}/players` (solo jugadores con `active == true`) y muestra la atribución de las fotos al pie cuando corresponde.
+  - Domain: `Player`, `PlayerPosition`, `PlayersRepositoryProtocol`, `FetchSquadUseCase` (orden por línea, dorsal y nombre; sin dorsal al final de su línea).
+  - Data: `PlayerDTO`, `PlayerMapper` (descarta documentos sin nombre o con posición desconocida y fotos que no sean `https`), `PlayersRepository` y `CachingPlayersRepository` (caché en memoria por equipo).
+  - Presentation: `TeamDetailViewModel`, `TeamDetailViewController`, `PlayerCell`. `TablaViewController` expone `onTeamSelected`, cableado en `MainTabBarController`.
+- **Tests**: `FetchSquadUseCaseTests`, `PlayerMapperTests`, `CachingPlayersRepositoryTests`, `TeamDetailViewModelTests`, `JornadaMapperTests` y casos de ventana de 7 días en `GetJornadaToDisplayUseCaseTests`.
+
+### 🔧 Changed
+- **Home solo con horarios oficiales**: Las jornadas se consultan por `horariosConfirmados == true` y Home mantiene únicamente las que empiezan como máximo en 7 días y no terminaron hace más de 7 días, según hora de Lima (`Jornada.isVisibleInHome`, aplicado en `GetJornadaToDisplayUseCase`). Una jornada sin programación oficial ya no aparece con una fecha tentativa.
+- **Campo `mostrar` eliminado**: Se quita de las constantes, el DTO, la entidad, el mapper, `JornadaUI` y los tests. Home depende solo de `horariosConfirmados` y de la ventana de 7 días; `Jornada` gana `fechaFin` y `horariosConfirmados`.
+- **Build**: `CURRENT_PROJECT_VERSION` pasa de 27 a 28.
+
+### 🐛 Fixed
+- **Hora de los partidos según el huso del teléfono**: La celda de partido y el detalle formateaban la hora con la zona del dispositivo mientras el filtro de día usa `America/Lima`; ahora ambos usan Lima y la hora no puede contradecir el día mostrado.
+
 ## [1.0.0 (20)] - 2026-05-19
 
 ### ✨ Added

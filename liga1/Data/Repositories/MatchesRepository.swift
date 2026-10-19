@@ -321,6 +321,12 @@ class MatchesRepository: MatchesRepositoryProtocol {
                     "MatchesRepository: listener falló para \(jornadaId)",
                     error: error
                 )
+                // Sin esto, un listener muerto queda registrado para siempre y
+                // startListeningIfNeeded nunca vuelve a intentar reconectarlo.
+                self.subjectsQueue.sync {
+                    self.matchListeners[jornadaId]?.remove()
+                    self.matchListeners.removeValue(forKey: jornadaId)
+                }
                 return
             }
             let matches = self.processMatchDocuments(snapshot?.documents ?? [])
@@ -334,6 +340,29 @@ class MatchesRepository: MatchesRepositoryProtocol {
             } else {
                 listener.remove()
             }
+        }
+    }
+
+    /// Lectura puntual desde el servidor para corregir el publisher de `observeMatches`
+    /// cuando el listener en tiempo real pudo quedar desincronizado (p. ej. tras un
+    /// ciclo largo de background/foreground en el que iOS suspendió la conexión).
+    func refreshMatches(for jornadaId: String) {
+        let query = db.collection(FirestoreConstants.Collection.jornadas)
+            .document(jornadaId)
+            .collection(FirestoreConstants.Collection.matches)
+
+        query.getDocuments(source: .server) { [weak self] snapshot, error in
+            guard let self else { return }
+            if let error {
+                self.logger.error(
+                    "MatchesRepository: refresh manual falló para \(jornadaId)",
+                    error: error
+                )
+                return
+            }
+            let matches = self.processMatchDocuments(snapshot?.documents ?? [])
+                .sorted { $0.fecha < $1.fecha }
+            self.getOrCreateSubject(for: jornadaId).send(matches)
         }
     }
 

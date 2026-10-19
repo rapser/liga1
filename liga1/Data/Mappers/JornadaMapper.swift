@@ -14,8 +14,7 @@ struct JornadaMapper {
     /// Convierte JornadaDTO a Jornada (Domain Model puro)
     /// El documentID debe tener formato "torneo_numero" (ej: "apertura_01")
     static func toDomain(from dto: JornadaDTO, documentID: String? = nil, logger: LoggerProtocol) -> Jornada? {
-        guard let id = dto.id ?? documentID,
-              let mostrar = dto.mostrar else {
+        guard let id = dto.id ?? documentID else {
             return nil
         }
 
@@ -41,8 +40,9 @@ struct JornadaMapper {
             id: id,
             torneo: torneo,
             numero: numero,
-            mostrar: mostrar,
-            fechaInicio: fechaInicio
+            fechaInicio: fechaInicio,
+            fechaFin: dto.fechaFin?.dateValue(),
+            horariosConfirmados: dto.horariosConfirmados ?? false
         )
     }
     
@@ -69,10 +69,11 @@ struct JornadaMapper {
     static func toDTO(from domain: Jornada) -> JornadaDTO {
         return JornadaDTO(
             id: domain.id,
-            mostrar: domain.mostrar,
             numero: domain.numero,
             torneo: domain.torneo,
-            fechaInicio: Timestamp(date: domain.fechaInicio)
+            fechaInicio: Timestamp(date: domain.fechaInicio),
+            fechaFin: domain.fechaFin.map { Timestamp(date: $0) },
+            horariosConfirmados: domain.horariosConfirmados
         )
     }
 

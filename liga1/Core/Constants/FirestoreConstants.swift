@@ -85,10 +85,17 @@ public enum FirestoreConstants {
     // MARK: - Jornada Fields
 
     public enum JornadaField {
-        public static let mostrar = "mostrar"
         public static let numero = "numero"
         public static let torneo = "torneo"
         public static let fechaInicio = "fechaInicio"
+        public static let fechaFin = "fechaFin"
+        public static let horariosConfirmados = "horariosConfirmados"
+    }
+
+    // MARK: - Player Fields
+
+    public enum PlayerField {
+        public static let active = "active"
     }
 
     // MARK: - News Fields

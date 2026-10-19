@@ -74,6 +74,12 @@ extension TablaViewController: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard viewModel.displayedTeams.indices.contains(indexPath.row) else { return }
+        onTeamSelected?(viewModel.displayedTeams[indexPath.row])
+    }
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 30
     }
