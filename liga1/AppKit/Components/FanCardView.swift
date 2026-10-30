@@ -34,7 +34,6 @@ final class FanCardView: UIView {
         layer.borderColor = (accentBorder
             ? UIColor.liga1Gold.withAlphaComponent(0.45)
             : UIColor.cardStroke).cgColor
-        self.accentBorder = accentBorder
 
         let container = UIStackView()
         container.axis = .vertical
@@ -58,19 +57,16 @@ final class FanCardView: UIView {
             container.setCustomSpacing(Spacing.medium, after: headingLabel)
         }
         container.addArrangedSubview(contentStack)
+
+        // Refrescar el CGColor del borde no-dorado ante cambio de tema.
+        if !accentBorder {
+            registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _) in
+                self.layer.borderColor = UIColor.cardStroke.cgColor
+            }
+        }
     }
 
     required init?(coder: NSCoder) { fatalError("init(coder:) no soportado") }
-
-    private var accentBorder = false
-
-    override func traitCollectionDidChange(_ previous: UITraitCollection?) {
-        super.traitCollectionDidChange(previous)
-        // Refrescar el CGColor del borde no-dorado ante cambio de tema.
-        if !accentBorder {
-            layer.borderColor = UIColor.cardStroke.cgColor
-        }
-    }
 
     // MARK: - Helpers de contenido
 

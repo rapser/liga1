@@ -21,6 +21,21 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - **Presentación de la tabla**: Se elimina el espacio automático sobre las columnas y las referencias se agrupan en una tarjeta compacta con puestos y significado.
 - **Separación por capas**: Remote Config se encapsula en un repositorio de Data y el cálculo del Acumulado pasa a un caso de uso puro del Domain.
 
+## [1.0.0 (29)] - 2026-10-29
+
+### ✨ Added
+- **Marcador al instante al abrir la app**: Home se pinta desde la caché local de Firestore sin esperar al servidor. Mientras el servidor no confirma los datos, el marcador y el minuto de los partidos en vivo (o pendientes cuya hora ya pasó) muestran "–" con un pulso, para no presentar un marcador viejo como real. Finalizados y futuros se muestran normales; sin red el pulso se quita a los 8 s.
+  - Data: `MatchesRepository.fetchMatches` lee primero la caché y solo va al servidor si no hay caché. El listener usa `includeMetadataChanges` y publica `observeMatchesConfirmed(for:)` (`!isFromCache`).
+  - Domain: `ObserveMatchesUseCase.observeConfirmed(for:)`.
+  - Presentation: `MatchUI.isScorePending`, calculado en `HomeViewModel`; pulso de opacidad en `MatchTableViewCell`.
+- **Refresco del marcador en background**: El push silencioso `score_update` ahora lee la jornada del servidor (`refreshMatches(for:completion:)`) antes de llamar al `completionHandler`, con un timeout de seguridad de 20 s. La caché persistente queda actualizada cuando el usuario abre la app. Antes se respondía a iOS de inmediato y la app se suspendía sin leer nada.
+
+### 🔧 Changed
+- **Build**: `CURRENT_PROJECT_VERSION` pasa de 28 a 29.
+
+### 🐛 Fixed
+- **API deprecada en `FanCardView`**: `traitCollectionDidChange` (deprecado en iOS 17) se reemplaza por `registerForTraitChanges([UITraitUserInterfaceStyle.self])` para refrescar el borde al cambiar de tema.
+
 ## [1.0.0 (28)] - 2026-10-04
 
 > ⚠️ **Requiere datos en Firestore**: Home solo muestra jornadas con `horariosConfirmados: true`. Antes de publicar este build hay que confirmar las jornadas desde el admin (o con el script de backfill), de lo contrario Home queda vacío.

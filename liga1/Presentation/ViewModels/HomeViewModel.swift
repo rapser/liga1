@@ -48,7 +48,13 @@ class HomeViewModel {
     /// refresh de JornadasRepository reenvía los mismos datos y cancela una carga ya en vuelo.
     private var lastObservedJornadaIds: Set<String> = []
     private var matchObservationCancellables: [String: AnyCancellable] = [:]
+    private var confirmationCancellables: [String: AnyCancellable] = [:]
     private var observedJornadas: [String: Jornada] = [:]
+    /// Jornadas cuyos partidos solo vienen de caché; sus marcadores en juego se muestran pulsando.
+    private var unconfirmedJornadaIds: Set<String> = []
+    private var confirmationTimeouts: [String: DispatchWorkItem] = [:]
+    /// Sin red el servidor nunca confirma: pasado este tiempo se deja de pulsar y queda la caché.
+    private let confirmationTimeout: TimeInterval = 8
 
     // MARK: - Initialization
 
@@ -218,11 +224,24 @@ class HomeViewModel {
         for id in removedIds {
             matchObservationCancellables[id]?.cancel()
             matchObservationCancellables.removeValue(forKey: id)
+            confirmationCancellables[id]?.cancel()
+            confirmationCancellables.removeValue(forKey: id)
+            confirmationTimeouts[id]?.cancel()
+            confirmationTimeouts.removeValue(forKey: id)
+            unconfirmedJornadaIds.remove(id)
             observedJornadas.removeValue(forKey: id)
         }
 
         for jornada in jornadas {
             observedJornadas[jornada.id] = jornada
+            if confirmationCancellables[jornada.id] == nil {
+                confirmationCancellables[jornada.id] = observeMatchesUseCase
+                    .observeConfirmed(for: jornada.id)
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] confirmed in
+                        self?.setJornada(jornada.id, confirmed: confirmed)
+                    }
+            }
             guard matchObservationCancellables[jornada.id] == nil else { continue }
             matchObservationCancellables[jornada.id] = observeMatchesUseCase
                 .execute(for: jornada.id)
@@ -235,18 +254,55 @@ class HomeViewModel {
         }
     }
 
+    private func setJornada(_ jornadaId: String, confirmed: Bool) {
+        confirmationTimeouts[jornadaId]?.cancel()
+        confirmationTimeouts.removeValue(forKey: jornadaId)
+
+        if confirmed {
+            unconfirmedJornadaIds.remove(jornadaId)
+        } else {
+            unconfirmedJornadaIds.insert(jornadaId)
+            let timeout = DispatchWorkItem { [weak self] in
+                self?.setJornada(jornadaId, confirmed: true)
+            }
+            confirmationTimeouts[jornadaId] = timeout
+            DispatchQueue.main.asyncAfter(deadline: .now() + confirmationTimeout, execute: timeout)
+        }
+
+        guard let index = jornadaSections.firstIndex(where: { $0.jornadaId == jornadaId }) else { return }
+        let updated = withScorePending(jornadaSections[index])
+        if updated.matches.map(\.isScorePending) != jornadaSections[index].matches.map(\.isScorePending) {
+            jornadaSections[index] = updated
+        }
+    }
+
+    /// Marca como pendientes los partidos cuyo marcador pudo cambiar desde la última caché:
+    /// en vivo, o pendientes cuya hora ya pasó (pudieron empezar). Finalizados y futuros no.
+    private func withScorePending(_ section: JornadaSection) -> JornadaSection {
+        let isUnconfirmed = unconfirmedJornadaIds.contains(section.jornadaId)
+        let now = Date()
+        var section = section
+        section.matches = section.matches.map { match in
+            var match = match
+            match.isScorePending = isUnconfirmed
+                && (match.estado == .envivo || (match.estado == .pendiente && match.fecha <= now))
+            return match
+        }
+        return section
+    }
+
     private func applyObservedMatches(_ matches: [Match], jornadaId: String) {
         guard let jornada = observedJornadas[jornadaId] else { return }
         let target = Self.ymdLima(calendarDayForFetch())
         let matchesForDay = matches
             .filter { Self.ymdLima($0.fecha) == target }
             .sorted { $0.fecha < $1.fecha }
-        let section = JornadaSection(
+        let section = withScorePending(JornadaSection(
             jornadaId: jornada.id,
             numero: jornada.numero,
             torneo: jornada.torneo,
             matches: MatchUIMapper.toUI(from: matchesForDay)
-        )
+        ))
 
         jornadaSections.removeAll { $0.jornadaId == jornadaId }
         if !section.matches.isEmpty {
@@ -267,7 +323,7 @@ class HomeViewModel {
                 torneo: jornada.torneo,
                 matches: matchUIs
             )
-            tempSections.append(section)
+            tempSections.append(withScorePending(section))
         }
 
         jornadaSections = tempSections
