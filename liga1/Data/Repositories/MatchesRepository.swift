@@ -346,7 +346,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
     /// Lectura puntual desde el servidor para corregir el publisher de `observeMatches`
     /// cuando el listener en tiempo real pudo quedar desincronizado (p. ej. tras un
     /// ciclo largo de background/foreground en el que iOS suspendió la conexión).
-    func refreshMatches(for jornadaId: String) {
+    func refreshMatches(for jornadaId: String, completion: ((Bool) -> Void)?) {
         let query = db.collection(FirestoreConstants.Collection.jornadas)
             .document(jornadaId)
             .collection(FirestoreConstants.Collection.matches)
@@ -358,11 +358,13 @@ class MatchesRepository: MatchesRepositoryProtocol {
                     "MatchesRepository: refresh manual falló para \(jornadaId)",
                     error: error
                 )
+                completion?(false)
                 return
             }
             let matches = self.processMatchDocuments(snapshot?.documents ?? [])
                 .sorted { $0.fecha < $1.fecha }
             self.getOrCreateSubject(for: jornadaId).send(matches)
+            completion?(true)
         }
     }
 

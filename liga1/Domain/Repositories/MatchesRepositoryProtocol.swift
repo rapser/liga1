@@ -15,7 +15,15 @@ protocol FetchMatchesRepositoryProtocol {
     /// Fuerza una lectura desde el servidor y la empuja al publisher de `observeMatches`.
     /// El listener en tiempo real puede quedar desincronizado tras un ciclo largo de
     /// background/foreground; esto corrige el valor visible sin esperar a que se reconecte.
-    func refreshMatches(for jornadaId: String)
+    /// `completion` recibe `true` si la lectura del servidor terminó bien (la caché persistente
+    /// queda actualizada); sirve para cerrar el `completionHandler` de un push silencioso.
+    func refreshMatches(for jornadaId: String, completion: ((Bool) -> Void)?)
+}
+
+extension FetchMatchesRepositoryProtocol {
+    func refreshMatches(for jornadaId: String) {
+        refreshMatches(for: jornadaId, completion: nil)
+    }
 }
 
 /// Alias para compatibilidad con código existente

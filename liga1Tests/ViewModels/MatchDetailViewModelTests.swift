@@ -330,5 +330,7 @@ private struct StubObserveMatchesUseCase: ObserveMatchesUseCaseProtocol {
     func execute(for jornadaId: String) -> AnyPublisher<[Match], Never> {
         Just(matches).eraseToAnyPublisher()
     }
-    func refresh(for jornadaId: String) {}
+    func refresh(for jornadaId: String, completion: ((Bool) -> Void)?) {
+        completion?(true)
+    }
 }

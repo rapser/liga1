@@ -47,10 +47,11 @@ final class MockMatchesRepository: MatchesRepositoryProtocol {
         observeSubjects[jornadaId]!.send(matches)
     }
 
-    func refreshMatches(for jornadaId: String) {
+    func refreshMatches(for jornadaId: String, completion: ((Bool) -> Void)?) {
         refreshCallCount += 1
         lastRefreshedJornadaId = jornadaId
         let matches = resultsByJornada[jornadaId] ?? (try? fetchResult.get()) ?? []
         sendObservedMatches(matches, for: jornadaId)
+        completion?(true)
     }
 }
