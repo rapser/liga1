@@ -118,7 +118,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: .scoreUpdateReceived, object: nil)
             }
-            completionHandler(.newData)
+            refreshMatchesCache(for: userInfo, completionHandler: completionHandler)
             return
         }
 
@@ -132,6 +132,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         Messaging.messaging().appDidReceiveMessage(userInfo)
 
         completionHandler(.newData)
+    }
+
+    /// Lee la jornada del push desde el servidor antes de devolver el control a iOS: así la caché
+    /// persistente de Firestore ya tiene el marcador nuevo cuando el usuario abre la app.
+    /// Si se llamara `completionHandler` de inmediato, iOS suspende la app antes de leer nada.
+    private func refreshMatchesCache(
+        for userInfo: [AnyHashable: Any],
+        completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
+        guard let jornadaId = userInfo[FirestoreConstants.PushPayload.jornadaId] as? String,
+              !jornadaId.isEmpty else {
+            completionHandler(.noData)
+            return
+        }
+
+        // iOS concede ~30 s; el timeout garantiza responder aunque Firestore no conteste.
+        var didComplete = false
+        let finish: (UIBackgroundFetchResult) -> Void = { result in
+            DispatchQueue.main.async {
+                guard !didComplete else { return }
+                didComplete = true
+                completionHandler(result)
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20) { finish(.failed) }
+
+        DIContainer.shared.makeObserveMatchesUseCase().refresh(for: jornadaId) { success in
+            finish(success ? .newData : .failed)
+        }
     }
 
     // MARK: - UNUserNotificationCenterDelegate
