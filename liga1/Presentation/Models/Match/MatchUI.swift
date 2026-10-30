@@ -26,6 +26,8 @@ struct MatchUI {
     let canalesTV: [String]
     let liveStats: MatchLiveStats?
     let resumenYoutubeUrl: String?
+    /// El marcador viene de caché y el servidor aún no lo confirma; la celda lo muestra pulsando.
+    var isScorePending: Bool = false
 
     init(
         id: String,

@@ -66,6 +66,11 @@ class MatchTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        setScorePulse(false)
+    }
+
     // MARK: - Setup UI
 
     private func setupUI() {
@@ -203,6 +208,44 @@ class MatchTableViewCell: UITableViewCell {
             marcadorVisitanteLabel.text = "X"
             marcadorLocalLabel.textColor = .systemRed
             marcadorVisitanteLabel.textColor = .systemRed
+        }
+
+        applyScorePending(matchUI.isScorePending)
+    }
+
+    // MARK: - Marcador pendiente de confirmar
+
+    /// Mientras el servidor no confirma, no se muestra el marcador de caché como si fuera real.
+    private func applyScorePending(_ isPending: Bool) {
+        accessibilityValue = isPending ? "Actualizando marcador" : nil
+        guard isPending else {
+            setScorePulse(false)
+            return
+        }
+        marcadorLocalLabel.isHidden = false
+        marcadorVisitanteLabel.isHidden = false
+        estadoSeparatorView.isHidden = false
+        marcadorLocalLabel.text = "–"
+        marcadorVisitanteLabel.text = "–"
+        marcadorLocalLabel.textColor = .secondaryLabel
+        marcadorVisitanteLabel.textColor = .secondaryLabel
+        setScorePulse(true)
+    }
+
+    /// Mismo pulso de opacidad que `HomeMatchesListSkeletonView`.
+    private func setScorePulse(_ isOn: Bool) {
+        let key = "matchScorePendingPulse"
+        for view in [marcadorLocalLabel, marcadorVisitanteLabel, horaLabel] {
+            view.layer.removeAnimation(forKey: key)
+            guard isOn else { continue }
+            let a = CABasicAnimation(keyPath: "opacity")
+            a.fromValue = 1.0
+            a.toValue = 0.5
+            a.duration = 0.75
+            a.autoreverses = true
+            a.repeatCount = .infinity
+            a.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            view.layer.add(a, forKey: key)
         }
     }
 }

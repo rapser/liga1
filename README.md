@@ -4,7 +4,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 ## 📱 Características
 
-- **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario; carga fiable desde el primer arranque
+- **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario; carga fiable desde el primer arranque; al abrir la app la lista aparece al instante desde la caché y el marcador de los partidos en juego pulsa hasta que el servidor lo confirma
 - **Tabla de Posiciones**: Apertura está siempre disponible. Clausura y Acumulado se habilitan juntos mediante Firebase Remote Config cuando comienza el segundo torneo del año
 - **Favoritos**: Carga instantánea gracias a caché Firestore; skeleton animado durante la carga inicial; sincronización en tiempo real con equipos favoritos
 - **Noticias**: Mantente informado con las últimas noticias del fútbol peruano (solo publicadas), agrupadas por categoría; la categoría Destacado siempre primero, el resto ordenadas por fecha
@@ -42,6 +42,9 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Hora en Lima**: La hora de los partidos (celda y detalle) se formatea siempre en `America/Lima`, sin depender del huso del teléfono
 - **Carga fiable**: Deduplicación de IDs en `JornadasRepository.fetchFromServer()` y en `HomeViewModel.observeJornadaToDisplay()` para evitar cancelaciones spurias de carga; `isLoading` siempre se resuelve en `receiveValue`
 - **Recarga Automática**: Al entrar a la tab se recargan los datos (`viewWillAppear`)
+- **Caché primero**: `MatchesRepository.fetchMatches` responde con la caché local de Firestore si existe y solo va al servidor cuando no hay caché. El listener en tiempo real corrige los datos apenas llega el snapshot del servidor
+- **Marcador pendiente de confirmar**: `observeMatchesConfirmed(for:)` indica si los partidos de una jornada ya vienen confirmados por el servidor (`!isFromCache`, con `includeMetadataChanges`). Mientras no lo estén, los partidos en vivo o cuya hora ya pasó muestran "–" con un pulso en el marcador y el minuto (`MatchUI.isScorePending`). Finalizados y futuros se muestran normales. Sin red, el pulso se quita a los 8 s y queda la caché
+- **Skeleton completo**: Solo aparece cuando no hay nada en caché (p. ej. primera instalación)
 
 ### 📊 Tabla de Posiciones
 
@@ -152,6 +155,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **FCM Integration**: Integración con Firebase Cloud Messaging
 - **Badge Management**: Limpieza automática de badge al abrir la app (API moderna iOS 18)
 - **Topics**: Suscripción a topics (ej: "live_matches")
+- **Marcador en background**: Al recibir el push silencioso `score_update` (lo envía el live-sync del admin con `jornadaId`), `AppDelegate` lee esa jornada del servidor antes de llamar al `completionHandler` (timeout de seguridad de 20 s). Así la caché persistente ya tiene el marcador nuevo cuando el usuario abre la app. iOS no entrega estos pushes si la app fue cerrada a la fuerza y puede retrasarlos (ahorro de batería)
 - **Pantalla de Ajustes**: Pantalla dedicada que muestra el estado de las notificaciones y permite abrir Configuración del sistema
 - **Historial de Notificaciones**: Visualización de todas las notificaciones entregadas al dispositivo
   - Tabla plana con celdas de mayor altura para mejor legibilidad
@@ -734,7 +738,7 @@ Además existen `Repositories/` (`CachingTeamsRepositoryTests`, `CachingPlayersR
 | `CachingPlayersRepository` | Primera llamada delega, la segunda usa caché, equipos cacheados por separado, los errores no se cachean |
 | `TeamDetailViewModel` | Estados cargando/cargado/vacío/error, agrupación por línea y atribución de fotos |
 | `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
-| `ObserveMatchesUseCase` | Reenvía actualizaciones del repository |
+| `ObserveMatchesUseCase` | Reenvía actualizaciones del repository, el estado de confirmación del servidor y el refresco con `completion` |
 | `FetchTeamsUseCase` | Acumulado permanece derivado; apertura/clausura delegan correctamente |
 | `TorneoViewModel` | Flag apagado/encendido y suma del Acumulado por ID estable |
 | `FetchNewsUseCase` | Delega y propaga resultado/error |
