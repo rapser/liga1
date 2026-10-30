@@ -10,6 +10,8 @@ import Combine
 
 protocol ObserveMatchesUseCaseProtocol {
     func execute(for jornadaId: String) -> AnyPublisher<[Match], Never>
+    /// `true` cuando los partidos de la jornada están confirmados por el servidor.
+    func observeConfirmed(for jornadaId: String) -> AnyPublisher<Bool, Never>
     /// Fuerza una relectura desde el servidor; útil al volver de background si el
     /// listener en tiempo real quedó desincronizado.
     func refresh(for jornadaId: String, completion: ((Bool) -> Void)?)
@@ -37,6 +39,10 @@ class ObserveMatchesUseCase: ObserveMatchesUseCaseProtocol {
                 }
             )
             .eraseToAnyPublisher()
+    }
+
+    func observeConfirmed(for jornadaId: String) -> AnyPublisher<Bool, Never> {
+        repository.observeMatchesConfirmed(for: jornadaId)
     }
 
     func refresh(for jornadaId: String, completion: ((Bool) -> Void)?) {

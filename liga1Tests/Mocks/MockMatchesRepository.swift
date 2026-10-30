@@ -40,6 +40,22 @@ final class MockMatchesRepository: MatchesRepositoryProtocol {
         return observeSubjects[jornadaId]!.eraseToAnyPublisher()
     }
 
+    private var confirmedSubjects: [String: CurrentValueSubject<Bool, Never>] = [:]
+
+    func observeMatchesConfirmed(for jornadaId: String) -> AnyPublisher<Bool, Never> {
+        if confirmedSubjects[jornadaId] == nil {
+            confirmedSubjects[jornadaId] = CurrentValueSubject(true)
+        }
+        return confirmedSubjects[jornadaId]!.eraseToAnyPublisher()
+    }
+
+    func sendConfirmed(_ confirmed: Bool, for jornadaId: String) {
+        if confirmedSubjects[jornadaId] == nil {
+            confirmedSubjects[jornadaId] = CurrentValueSubject(confirmed)
+        }
+        confirmedSubjects[jornadaId]!.send(confirmed)
+    }
+
     func sendObservedMatches(_ matches: [Match], for jornadaId: String) {
         if observeSubjects[jornadaId] == nil {
             observeSubjects[jornadaId] = CurrentValueSubject([])

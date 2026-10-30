@@ -12,6 +12,9 @@ import Combine
 protocol FetchMatchesRepositoryProtocol {
     func fetchMatches(for jornadaId: String) -> AnyPublisher<[Match], Error>
     func observeMatches(for jornadaId: String) -> AnyPublisher<[Match], Never>
+    /// `false` mientras los partidos de la jornada solo vienen de la caché local; `true` cuando el
+    /// servidor los confirmó. Sirve para no mostrar como real un marcador que pudo cambiar.
+    func observeMatchesConfirmed(for jornadaId: String) -> AnyPublisher<Bool, Never>
     /// Fuerza una lectura desde el servidor y la empuja al publisher de `observeMatches`.
     /// El listener en tiempo real puede quedar desincronizado tras un ciclo largo de
     /// background/foreground; esto corrige el valor visible sin esperar a que se reconecte.

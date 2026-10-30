@@ -16,6 +16,8 @@ class MatchesRepository: MatchesRepositoryProtocol {
     private let logger: LoggerProtocol
     
     private var matchSubjects: [String: CurrentValueSubject<[Match], Never>] = [:]
+    /// `true` cuando el último valor de la jornada viene confirmado por el servidor (no solo de caché).
+    private var confirmedSubjects: [String: CurrentValueSubject<Bool, Never>] = [:]
     private var matchListeners: [String: ListenerRegistration] = [:]
     private let subjectsQueue = DispatchQueue(label: "com.liga1.matchesRepository.subjects")
 
@@ -47,34 +49,50 @@ class MatchesRepository: MatchesRepositoryProtocol {
                 .collection(FirestoreConstants.Collection.matches)
                 .order(by: FirestoreConstants.MatchField.fecha)
 
-            /// Servidor primero: la caché puede estar desactualizada (p. ej. partido ya jugado el mismo día)
-            /// y el `Future` solo se completa una vez; antes se devolvía caché vieja y el Home quedaba vacío hasta el próximo refresh.
-            query.getDocuments(source: .server) { [weak self] snapshot, error in
+            /// Caché primero para pintar Inicio al instante. Si está desactualizada (p. ej. hubo un gol con la
+            /// app cerrada), el listener de `observeMatches` emite el snapshot del servidor enseguida y
+            /// `observeMatchesConfirmed` permite marcar los marcadores dudosos mientras tanto.
+            query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
                 guard let self = self else { return }
 
-                if let error = error as NSError?,
-                   error.domain == "FIRFirestoreErrorDomain",
-                   error.code == 9 {
-                    self.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
+                if cacheError == nil, let documents = cacheSnapshot?.documents, !documents.isEmpty {
+                    self.processMatches(snapshot: cacheSnapshot, jornadaId: jornadaId, promise: promise)
                     return
                 }
 
-                if let error = error {
-                    query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
-                        guard let self = self else { return }
-                        if cacheError != nil {
-                            promise(.failure(error))
-                            return
-                        }
-                        self.processMatches(snapshot: cacheSnapshot, jornadaId: jornadaId, promise: promise)
-                    }
-                    return
-                }
-
-                self.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
+                self.fetchMatchesFromServer(query: query, jornadaId: jornadaId, promise: promise)
             }
         }
         .eraseToAnyPublisher()
+    }
+
+    /// Sin caché (primera carga): servidor, con la caché como respaldo si falla la red.
+    private func fetchMatchesFromServer(query: Query, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
+        query.getDocuments(source: .server) { [weak self] snapshot, error in
+            guard let self = self else { return }
+
+            if let error = error as NSError?,
+               error.domain == "FIRFirestoreErrorDomain",
+               error.code == 9 {
+                self.fetchMatchesWithoutOrder(query: query, jornadaId: jornadaId, promise: promise)
+                return
+            }
+
+            if let error = error {
+                query.getDocuments(source: .cache) { [weak self] cacheSnapshot, cacheError in
+                    guard let self = self else { return }
+                    if cacheError != nil {
+                        promise(.failure(error))
+                        return
+                    }
+                    self.processMatches(snapshot: cacheSnapshot, jornadaId: jornadaId, promise: promise)
+                }
+                return
+            }
+
+            self.getOrCreateConfirmedSubject(for: jornadaId).send(true)
+            self.processMatches(snapshot: snapshot, jornadaId: jornadaId, promise: promise)
+        }
     }
     
     private func fetchMatchesWithoutOrder(query: Query, jornadaId: String, promise: @escaping (Result<[Match], Error>) -> Void) {
@@ -306,6 +324,14 @@ class MatchesRepository: MatchesRepositoryProtocol {
         return publisher
     }
 
+    func observeMatchesConfirmed(for jornadaId: String) -> AnyPublisher<Bool, Never> {
+        let publisher = getOrCreateConfirmedSubject(for: jornadaId)
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+        startListeningIfNeeded(for: jornadaId)
+        return publisher
+    }
+
     private func startListeningIfNeeded(for jornadaId: String) {
         let shouldStart = subjectsQueue.sync { matchListeners[jornadaId] == nil }
         guard shouldStart else { return }
@@ -314,7 +340,9 @@ class MatchesRepository: MatchesRepositoryProtocol {
             .document(jornadaId)
             .collection(FirestoreConstants.Collection.matches)
 
-        let listener = query.addSnapshotListener { [weak self] snapshot, error in
+        // includeMetadataChanges: emite también cuando el snapshot de caché pasa a estar confirmado
+        // por el servidor sin cambios en los datos; sin esto `isFromCache` nunca se vería en `false`.
+        let listener = query.addSnapshotListener(includeMetadataChanges: true) { [weak self] snapshot, error in
             guard let self else { return }
             if let error {
                 self.logger.error(
@@ -332,6 +360,9 @@ class MatchesRepository: MatchesRepositoryProtocol {
             let matches = self.processMatchDocuments(snapshot?.documents ?? [])
                 .sorted { $0.fecha < $1.fecha }
             self.getOrCreateSubject(for: jornadaId).send(matches)
+            if let snapshot {
+                self.getOrCreateConfirmedSubject(for: jornadaId).send(!snapshot.metadata.isFromCache)
+            }
         }
 
         subjectsQueue.sync {
@@ -364,6 +395,7 @@ class MatchesRepository: MatchesRepositoryProtocol {
             let matches = self.processMatchDocuments(snapshot?.documents ?? [])
                 .sorted { $0.fecha < $1.fecha }
             self.getOrCreateSubject(for: jornadaId).send(matches)
+            self.getOrCreateConfirmedSubject(for: jornadaId).send(true)
             completion?(true)
         }
     }
@@ -375,6 +407,17 @@ class MatchesRepository: MatchesRepositoryProtocol {
             }
             let subject = CurrentValueSubject<[Match], Never>([])
             matchSubjects[jornadaId] = subject
+            return subject
+        }
+    }
+
+    private func getOrCreateConfirmedSubject(for jornadaId: String) -> CurrentValueSubject<Bool, Never> {
+        subjectsQueue.sync {
+            if let existing = confirmedSubjects[jornadaId] {
+                return existing
+            }
+            let subject = CurrentValueSubject<Bool, Never>(false)
+            confirmedSubjects[jornadaId] = subject
             return subject
         }
     }
