@@ -134,8 +134,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         completionHandler(.newData)
     }
 
-    /// Lee la jornada del push desde el servidor antes de devolver el control a iOS: así la caché
-    /// persistente de Firestore ya tiene el marcador nuevo cuando el usuario abre la app.
+    /// Lee la jornada del push y las tablas afectadas (su torneo y el Acumulado) desde el servidor
+    /// antes de devolver el control a iOS: así la caché persistente de Firestore ya tiene el marcador
+    /// y las posiciones nuevas cuando el usuario abre la app (incluido un gol anulado).
     /// Si se llamara `completionHandler` de inmediato, iOS suspende la app antes de leer nada.
     private func refreshMatchesCache(
         for userInfo: [AnyHashable: Any],
@@ -158,8 +159,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 20) { finish(.failed) }
 
+        // Partidos y tablas se leen en paralelo; se responde a iOS cuando terminan ambos.
+        let group = DispatchGroup()
+        var matchesOK = false
+        var standingsOK = false
+
+        group.enter()
         DIContainer.shared.makeObserveMatchesUseCase().refresh(for: jornadaId) { success in
-            finish(success ? .newData : .failed)
+            DispatchQueue.main.async { matchesOK = success; group.leave() }
+        }
+
+        group.enter()
+        DIContainer.shared.makeFetchTeamsUseCase().refreshStandings(forJornadaId: jornadaId) { success in
+            DispatchQueue.main.async { standingsOK = success; group.leave() }
+        }
+
+        group.notify(queue: .main) {
+            finish(matchesOK || standingsOK ? .newData : .failed)
         }
     }
 

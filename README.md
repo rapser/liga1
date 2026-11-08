@@ -159,7 +159,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **FCM Integration**: Integración con Firebase Cloud Messaging
 - **Badge Management**: Limpieza automática de badge al abrir la app (API moderna iOS 18)
 - **Topics**: Suscripción a topics (ej: "live_matches")
-- **Marcador en background**: Al recibir el push silencioso `score_update` (lo envía el live-sync del admin con `jornadaId`), `AppDelegate` lee esa jornada del servidor antes de llamar al `completionHandler` (timeout de seguridad de 20 s). Así la caché persistente ya tiene el marcador nuevo cuando el usuario abre la app. iOS no entrega estos pushes si la app fue cerrada a la fuerza y puede retrasarlos (ahorro de batería)
+- **Marcador en background**: Al recibir el push silencioso `score_update` (lo envía el live-sync del admin con `jornadaId`), `AppDelegate` lee del servidor, en paralelo, esa jornada y las tablas afectadas (la del torneo de la jornada y el Acumulado) antes de llamar al `completionHandler` (timeout de seguridad de 20 s). Así la caché persistente ya tiene el marcador y las posiciones nuevas (incluido un gol anulado) cuando el usuario abre la app. iOS no entrega estos pushes si la app fue cerrada a la fuerza y puede retrasarlos (ahorro de batería)
 - **Pantalla de Ajustes**: Pantalla dedicada que muestra el estado de las notificaciones y permite abrir Configuración del sistema
 - **Historial de Notificaciones**: Visualización de todas las notificaciones entregadas al dispositivo
   - Tabla plana con celdas de mayor altura para mejor legibilidad
@@ -743,7 +743,8 @@ Además existen `Repositories/` (`CachingTeamsRepositoryTests`, `CachingPlayersR
 | `TeamDetailViewModel` | Estados cargando/cargado/vacío/error, agrupación por línea y atribución de fotos |
 | `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
 | `ObserveMatchesUseCase` | Reenvía actualizaciones del repository, el estado de confirmación del servidor y el refresco con `completion` |
-| `FetchTeamsUseCase` | El Acumulado lee su colección; apertura/clausura delegan; `observe` usa el listener del repositorio |
+| `FetchTeamsUseCase` | El Acumulado lee su colección; apertura/clausura delegan; `observe` usa el listener del repositorio; `refreshStandings(forJornadaId:)` elige la tabla del torneo + Acumulado y propaga el fallo |
+| `CachingTeamsRepository` | `refreshStandings` descarta la caché en memoria y delega |
 | `TeamsRepository.sanctions(from:teamCode:)` | Lee `sanctions`, recorta la resolución y descarta entradas positivas o sin puntos |
 | `TorneoViewModel` | Flag apagado/encendido, observa la tabla sin lecturas puntuales, reutiliza el listener del mismo torneo, no vuelve a restar sanciones, marca a los sancionados y expone las notas de la leyenda solo en el Acumulado |
 | `FetchNewsUseCase` | Delega y propaga resultado/error |

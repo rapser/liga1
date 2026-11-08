@@ -87,6 +87,28 @@ class TeamsRepository: TeamsRepositoryProtocol {
         return subject.compactMap { $0 }.eraseToAnyPublisher()
     }
 
+    func refreshStandings(for torneos: [TorneoType], completion: @escaping (Bool) -> Void) {
+        guard !torneos.isEmpty else { completion(true); return }
+        let group = DispatchGroup()
+        let resultLock = NSLock()
+        var allSucceeded = true
+
+        for torneo in Set(torneos) {
+            group.enter()
+            // `.server` escribe el resultado en la caché persistente de Firestore.
+            db.collection(torneo.rawValue).getDocuments(source: .server) { snapshot, error in
+                if error != nil || snapshot == nil {
+                    resultLock.lock()
+                    allSucceeded = false
+                    resultLock.unlock()
+                }
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) { completion(allSucceeded) }
+    }
+
     func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {
         lock.lock()
         let shouldStart = sanctionsListener == nil

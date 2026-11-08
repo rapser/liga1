@@ -42,6 +42,33 @@ final class FetchTeamsUseCaseTests: XCTestCase {
         XCTAssertEqual(repository.observedTorneos, [.clausura])
     }
 
+    // MARK: - refresco en background (push score_update)
+
+    func test_refreshStandings_clausuraJornada_refreshesClausuraAndAcumulado() {
+        var result: Bool?
+        sut.refreshStandings(forJornadaId: "clausura_15") { result = $0 }
+
+        XCTAssertEqual(repository.refreshedTorneos, [.clausura, .acumulado])
+        XCTAssertEqual(result, true)
+    }
+
+    func test_refreshStandings_aperturaJornada_refreshesAperturaAndAcumulado() {
+        sut.refreshStandings(forJornadaId: "apertura_3") { _ in }
+        XCTAssertEqual(repository.refreshedTorneos, [.apertura, .acumulado])
+    }
+
+    func test_refreshStandings_unknownPrefix_fallsBackToClausuraAndAcumulado() {
+        sut.refreshStandings(forJornadaId: "xyz") { _ in }
+        XCTAssertEqual(repository.refreshedTorneos, [.clausura, .acumulado])
+    }
+
+    func test_refreshStandings_propagatesFailure() {
+        repository.refreshResult = false
+        var result: Bool?
+        sut.refreshStandings(forJornadaId: "clausura_15") { result = $0 }
+        XCTAssertEqual(result, false)
+    }
+
     // MARK: - apertura
 
     func test_execute_apertura_callsRepository() throws {

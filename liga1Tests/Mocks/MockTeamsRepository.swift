@@ -16,6 +16,8 @@ final class MockTeamsRepository: TeamsRepositoryProtocol {
     var observePointSanctionsCallCount = 0
     var observedTeams: [TorneoType: [Team]] = [:]
     var observedTorneos: [TorneoType] = []
+    var refreshedTorneos: [TorneoType]?
+    var refreshResult = true
 
     func fetchTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         fetchCallCount += 1
@@ -31,6 +33,11 @@ final class MockTeamsRepository: TeamsRepositoryProtocol {
     func observeTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Never> {
         observedTorneos.append(torneo)
         return Just(observedTeams[torneo] ?? []).eraseToAnyPublisher()
+    }
+
+    func refreshStandings(for torneos: [TorneoType], completion: @escaping (Bool) -> Void) {
+        refreshedTorneos = torneos
+        completion(refreshResult)
     }
 
     func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {

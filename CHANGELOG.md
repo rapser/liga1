@@ -35,6 +35,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 ### 🔧 Changed
 - **Tabla en tiempo real y con caché**: La pantalla Tabla escucha con snapshot listener solo la colección visible (`apertura`, `clausura` o `acumulado`). Se pinta al instante desde la caché persistente y se actualiza sola al registrarse un resultado. Se eliminan las recargas forzadas al entrar a la pestaña, al volver del background y al recibir `score_update`, que borraban la caché y volvían a pedir todo al servidor.
 - **Acumulado leído de Firestore**: Se lee la colección `acumulado` (1 consulta de 18 documentos) en lugar de pedir `apertura` y `clausura` y sumarlas en el teléfono. Se elimina `CalculateAccumulatedStandingsUseCase`; el simulador también usa la colección.
+- **Tablas al día al volver a la app**: El push silencioso `score_update` ahora también lee del servidor la tabla del torneo de la jornada y el Acumulado (`FetchTeamsUseCase.refreshStandings(forJornadaId:)`), en paralelo con los partidos. Al reabrir la app, la tabla ya sale actualizada desde la caché, sin un instante con datos viejos.
 - **Build**: `CURRENT_PROJECT_VERSION` pasa de 29 a 30.
 
 ## [1.0.0 (29)] - 2026-10-29

@@ -50,6 +50,12 @@ final class CachingTeamsRepository: TeamsRepositoryProtocol {
             .eraseToAnyPublisher()
     }
 
+    func refreshStandings(for torneos: [TorneoType], completion: @escaping (Bool) -> Void) {
+        // La caché en memoria de lecturas puntuales queda vieja: se descarta.
+        torneos.forEach { invalidateCache(for: $0) }
+        inner.refreshStandings(for: torneos, completion: completion)
+    }
+
     func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {
         inner.observePointSanctions()
     }

@@ -175,6 +175,10 @@ private struct StubFetchTeams: FetchTeamsUseCaseProtocol {
     func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {
         Just([]).eraseToAnyPublisher()
     }
+
+    func refreshStandings(forJornadaId jornadaId: String, completion: @escaping (Bool) -> Void) {
+        completion(true)
+    }
 }
 
 private struct StubFetchRemainingFixtures: FetchRemainingFixturesUseCaseProtocol {
