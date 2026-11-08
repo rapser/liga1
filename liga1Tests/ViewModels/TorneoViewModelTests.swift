@@ -56,57 +56,36 @@ final class TorneoViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0.2)
     }
 
-    func test_start_activeEnabled_loadsClausura() {
+    func test_start_activeEnabled_observesClausuraWithoutOneShotFetch() {
         let repository = MockTeamsRepository()
-        let sut = TorneoViewModel(
-            fetchTeamsUseCase: FetchTeamsUseCase(repository: repository),
-            tournamentAvailabilityUseCase: MockTournamentAvailabilityUseCase(
-                activeEnabled: true,
-                remoteEnabled: true
-            ),
-            calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCase()
-        )
+        let sut = makeSUT(repository: repository)
 
         sut.start()
 
-        XCTAssertEqual(repository.fetchCallCount, 1)
-        XCTAssertEqual(repository.lastTorneoRequested, .clausura)
+        XCTAssertEqual(repository.observedTorneos, [.clausura])
+        XCTAssertEqual(repository.fetchCallCount, 0)
     }
 
-    func test_loadAcumulado_fetchesAperturaAndClausura() {
+    func test_loadSameTorneoTwice_reusesTheListener() {
         let repository = MockTeamsRepository()
-        let useCase = FetchTeamsUseCase(repository: repository)
-        let sut = TorneoViewModel(
-            fetchTeamsUseCase: useCase,
-            tournamentAvailabilityUseCase: MockTournamentAvailabilityUseCase(
-                activeEnabled: true,
-                remoteEnabled: true
-            ),
-            calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCase()
-        )
-        sut.loadTeams(for: .acumulado)
+        let sut = makeSUT(repository: repository)
 
-        XCTAssertEqual(repository.fetchCallCount, 2)
-        XCTAssertEqual(repository.lastTorneoRequested, .clausura)
-        XCTAssertEqual(repository.fetchPointSanctionsCallCount, 1)
+        sut.loadTeams(for: .clausura)
+        sut.loadTeams(for: .clausura)
+
+        XCTAssertEqual(repository.observedTorneos, [.clausura])
     }
 
-    func test_loadAcumulado_appliesSanctionsAndExposesLegendNotes() {
+    func test_loadAcumulado_readsAcumuladoCollectionAndMarksSanctionedTeams() {
         let repository = MockTeamsRepository()
-        repository.fetchResult = .success([
-            Team(nombre: "UTC", logo: "utc", partidosJugados: 16, puntos: 12)
-        ])
+        repository.observedTeams = [.acumulado: [
+            Team(nombre: "Alianza Lima", logo: "ali", partidosJugados: 32, puntos: 68),
+            Team(nombre: "UTC", logo: "utc", partidosJugados: 32, puntos: 13)
+        ]]
         repository.pointSanctions = [
             PointSanction(teamCode: "utc", points: -10, resolution: "Res. 014-CCRD-FPF-2024")
         ]
-        let sut = TorneoViewModel(
-            fetchTeamsUseCase: FetchTeamsUseCase(repository: repository),
-            tournamentAvailabilityUseCase: MockTournamentAvailabilityUseCase(
-                activeEnabled: true,
-                remoteEnabled: true
-            ),
-            calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCase()
-        )
+        let sut = makeSUT(repository: repository)
         let expectation = expectation(description: "acumulado")
         sut.$displayedTeams
             .dropFirst()
@@ -117,40 +96,39 @@ final class TorneoViewModelTests: XCTestCase {
         sut.loadTeams(for: .acumulado)
         waitForExpectations(timeout: 2)
 
-        // Apertura (12) + Clausura (12) - 10 de sanción.
-        XCTAssertEqual(sut.displayedTeams.first?.puntos, 14)
-        XCTAssertEqual(sut.displayedTeams.first?.hasPointSanction, true)
+        XCTAssertEqual(repository.observedTorneos, [.acumulado])
+        // Los puntos vienen tal cual de la colección (ya con la sanción); no se resta otra vez.
+        XCTAssertEqual(sut.displayedTeams.map(\.puntos), [68, 13])
+        XCTAssertEqual(sut.displayedTeams.map(\.hasPointSanction), [false, true])
         XCTAssertEqual(sut.sanctionNotes, [
             SanctionNoteUI(teamCode: "utc", teamName: "UTC", points: -10, resolution: "Res. 014-CCRD-FPF-2024")
         ])
     }
 
-    func test_loadClausura_doesNotRequestPointDeductions() {
+    func test_loadClausura_doesNotObserveSanctions() {
         let repository = MockTeamsRepository()
         repository.pointSanctions = [PointSanction(teamCode: "utc", points: -10, resolution: "")]
-        let sut = TorneoViewModel(
-            fetchTeamsUseCase: FetchTeamsUseCase(repository: repository),
-            tournamentAvailabilityUseCase: MockTournamentAvailabilityUseCase(
-                activeEnabled: true,
-                remoteEnabled: true
-            ),
-            calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCase()
-        )
+        let sut = makeSUT(repository: repository)
 
         sut.loadTeams(for: .clausura)
 
-        XCTAssertEqual(repository.fetchPointSanctionsCallCount, 0)
+        XCTAssertEqual(repository.observePointSanctionsCallCount, 0)
         XCTAssertTrue(sut.sanctionNotes.isEmpty)
     }
 
-    private func makeSUT(activeEnabled: Bool, remoteEnabled: Bool) -> TorneoViewModel {
+    // MARK: - Helpers
+
+    private func makeSUT(
+        repository: MockTeamsRepository = MockTeamsRepository(),
+        activeEnabled: Bool = true,
+        remoteEnabled: Bool = true
+    ) -> TorneoViewModel {
         TorneoViewModel(
-            fetchTeamsUseCase: FetchTeamsUseCase(repository: MockTeamsRepository()),
+            fetchTeamsUseCase: FetchTeamsUseCase(repository: repository),
             tournamentAvailabilityUseCase: MockTournamentAvailabilityUseCase(
                 activeEnabled: activeEnabled,
                 remoteEnabled: remoteEnabled
-            ),
-            calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCase()
+            )
         )
     }
 }

@@ -14,8 +14,21 @@ class TeamsRepository: TeamsRepositoryProtocol {
 
     private let database: DatabaseProtocol
 
+    /// Un listener por colección, compartido por todos los suscriptores.
+    /// `nil` en el subject = todavía sin snapshot (evita pintar una tabla vacía).
+    private var teamSubjects: [TorneoType: CurrentValueSubject<[Team]?, Never>] = [:]
+    private var teamListeners: [TorneoType: ListenerRegistration] = [:]
+    private let sanctionsSubject = CurrentValueSubject<[PointSanction]?, Never>(nil)
+    private var sanctionsListener: ListenerRegistration?
+    private let lock = NSLock()
+
     init(database: DatabaseProtocol) {
         self.database = database
+    }
+
+    deinit {
+        teamListeners.values.forEach { $0.remove() }
+        sanctionsListener?.remove()
     }
 
     private var db: Firestore {
@@ -44,24 +57,68 @@ class TeamsRepository: TeamsRepositoryProtocol {
         .eraseToAnyPublisher()
     }
 
-    func invalidateCache(for torneo: TorneoType?) {
-        // La caché del SDK de Firestore se gestiona internamente; no hay estado en memoria aquí.
+    func observeTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Never> {
+        lock.lock()
+        let subject = teamSubjects[torneo] ?? CurrentValueSubject<[Team]?, Never>(nil)
+        teamSubjects[torneo] = subject
+        let shouldStart = teamListeners[torneo] == nil
+        lock.unlock()
+
+        if shouldStart {
+            let listener = db.collection(torneo.rawValue)
+                .addSnapshotListener { [weak self] snapshot, error in
+                    guard let self else { return }
+                    guard let documents = snapshot?.documents, error == nil else {
+                        // Un listener caído se descarta para que la próxima
+                        // suscripción vuelva a intentarlo.
+                        self.lock.lock()
+                        self.teamListeners[torneo]?.remove()
+                        self.teamListeners.removeValue(forKey: torneo)
+                        self.lock.unlock()
+                        return
+                    }
+                    subject.send(self.buildTeams(from: documents))
+                }
+            lock.lock()
+            teamListeners[torneo] = listener
+            lock.unlock()
+        }
+
+        return subject.compactMap { $0 }.eraseToAnyPublisher()
     }
 
-    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
-        Future<[PointSanction], Never> { [weak self] promise in
-            guard let self = self else { promise(.success([])); return }
-            self.db.collection(FirestoreConstants.Collection.teams)
-                .getDocuments(source: .default) { snapshot, _ in
-                    // Si falla la lectura, el acumulado se muestra sin sanciones
-                    // en lugar de dejar la tabla vacía.
-                    let sanctions = (snapshot?.documents ?? []).flatMap { doc in
-                        Self.sanctions(from: doc.data(), teamCode: doc.documentID)
+    func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        lock.lock()
+        let shouldStart = sanctionsListener == nil
+        lock.unlock()
+
+        if shouldStart {
+            let listener = db.collection(FirestoreConstants.Collection.teams)
+                .addSnapshotListener { [weak self] snapshot, error in
+                    guard let self else { return }
+                    guard let documents = snapshot?.documents, error == nil else {
+                        // Sin sanciones la tabla se muestra igual; se reintenta luego.
+                        self.lock.lock()
+                        self.sanctionsListener?.remove()
+                        self.sanctionsListener = nil
+                        self.lock.unlock()
+                        if self.sanctionsSubject.value == nil { self.sanctionsSubject.send([]) }
+                        return
                     }
-                    promise(.success(sanctions))
+                    self.sanctionsSubject.send(documents.flatMap {
+                        Self.sanctions(from: $0.data(), teamCode: $0.documentID)
+                    })
                 }
+            lock.lock()
+            sanctionsListener = listener
+            lock.unlock()
         }
-        .eraseToAnyPublisher()
+
+        return sanctionsSubject.compactMap { $0 }.eraseToAnyPublisher()
+    }
+
+    func invalidateCache(for torneo: TorneoType?) {
+        // La caché del SDK de Firestore se gestiona internamente; no hay estado en memoria aquí.
     }
 
     static func sanctions(from data: [String: Any], teamCode: String) -> [PointSanction] {

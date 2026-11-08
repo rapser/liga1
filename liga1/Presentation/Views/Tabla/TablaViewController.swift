@@ -46,15 +46,15 @@ class TablaViewController: UIViewController {
         configureNavigationBar()
         setupUI()
         bindViewModel()
+        // La tabla no se recarga a mano: el listener de Firestore la actualiza sola
+        // (también al volver del background). Solo se reconsulta el flag remoto.
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleScoreUpdate), name: .scoreUpdateReceived, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if hasStarted {
             viewModel.refreshTournamentAvailability()
-            viewModel.reloadTeams(for: viewModel.selectedTorneo)
         } else {
             hasStarted = true
             viewModel.start()
@@ -64,11 +64,6 @@ class TablaViewController: UIViewController {
     // MARK: - Actions
     @objc private func appWillEnterForeground() {
         viewModel.refreshTournamentAvailability()
-        viewModel.reloadTeams(for: viewModel.selectedTorneo)
-    }
-
-    @objc private func handleScoreUpdate() {
-        viewModel.reloadTeams(for: viewModel.selectedTorneo)
     }
 
     @objc private func tournamentChanged() {

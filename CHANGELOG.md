@@ -27,12 +27,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### ✨ Added
 - **Sanciones de puntos en el Acumulado**: La tabla Acumulada y el simulador suman las sanciones de cada equipo (puntos negativos) leídas de `equipos/{code}.sanctions` = `[{ points, resolution }]`. Apertura y Clausura no cambian.
-  - Domain: entidad `PointSanction`; `CalculateAccumulatedStandingsUseCase.execute(apertura:clausura:sanctions:)`.
+  - Domain: entidad `PointSanction`. El admin descuenta las sanciones en la colección `acumulado`; la app las lee para la leyenda y el asterisco.
   - Data: `TeamsRepository.fetchPointSanctions()` (nunca falla; sin datos devuelve `[]`), expuesto vía `FetchTeamsUseCase.fetchPointSanctions()`.
 - **Enlace y pantalla de sanciones**: La leyenda del Acumulado muestra una sola línea ("4 equipos con descuento de puntos · Ver resoluciones ›") que abre `SanctionsViewController`, con el escudo del equipo, los puntos descontados y la resolución completa (`SanctionNoteUI`, `TorneoViewModel.sanctionNotes`). Así la pantalla de Tabla queda limpia.
 - **Asterisco en clubes sancionados**: En el Acumulado, el nombre de cada club con descuento lleva un `*` rojo en superíndice (`TeamUI.hasPointSanction`), el mismo que encabeza el enlace de la leyenda.
 
 ### 🔧 Changed
+- **Tabla en tiempo real y con caché**: La pantalla Tabla escucha con snapshot listener solo la colección visible (`apertura`, `clausura` o `acumulado`). Se pinta al instante desde la caché persistente y se actualiza sola al registrarse un resultado. Se eliminan las recargas forzadas al entrar a la pestaña, al volver del background y al recibir `score_update`, que borraban la caché y volvían a pedir todo al servidor.
+- **Acumulado leído de Firestore**: Se lee la colección `acumulado` (1 consulta de 18 documentos) en lugar de pedir `apertura` y `clausura` y sumarlas en el teléfono. Se elimina `CalculateAccumulatedStandingsUseCase`; el simulador también usa la colección.
 - **Build**: `CURRENT_PROJECT_VERSION` pasa de 29 a 30.
 
 ## [1.0.0 (29)] - 2026-10-29

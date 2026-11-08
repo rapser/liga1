@@ -55,8 +55,9 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Actualización al volver a Tabla**: La app fuerza una consulta remota cuando el usuario regresa a la pestaña, sin exigir cerrar la aplicación
 - **Carga sin saltos visuales**: La pantalla nace con el último valor activado y persistido por Remote Config, y solo cambia si Firebase publica un valor diferente
 - **Fallback seguro**: Sin conexión se conserva el último valor activado; en una instalación nueva o sin clave se muestra solamente Apertura
-- **Acumulado derivado**: Se calcula en el dispositivo sumando las colecciones `apertura` y `clausura` por document ID; no requiere una colección `acumulado`
-- **Sanciones de puntos**: Las sanciones (CCRD-FPF, Comisión de Licencias, etc.) se leen de `equipos/{code}.sanctions` y se suman (son negativas) **solo** al Acumulado, tanto en la tabla como en el simulador. Apertura y Clausura muestran los puntos ganados en cancha. Si la lectura falla, el Acumulado se muestra sin descuentos en lugar de quedar vacío. Una sanción nueva se carga desde el admin y no requiere publicar otra versión
+- **Tabla en tiempo real**: Cada tabla escucha su colección (`apertura`, `clausura` o `acumulado`) con un snapshot listener. Se pinta al instante desde la caché persistente de Firestore y se actualiza sola cuando el admin registra un resultado (en vivo y al finalizar), sin recargar al entrar a la pestaña, al volver del background ni al llegar un push. Tras la primera carga solo se descargan los documentos que cambian
+- **Acumulado persistido**: Se lee de la colección `acumulado`, que el admin mantiene en la misma transacción que `apertura`/`clausura` (apertura + clausura + sanciones). La app ya no suma tablas en el dispositivo
+- **Sanciones de puntos**: Las sanciones (CCRD-FPF, Comisión de Licencias, etc.) se guardan en `equipos/{code}.sanctions` y el admin las descuenta **solo** en la colección `acumulado` (tabla y simulador). Apertura y Clausura muestran los puntos ganados en cancha. La app escucha `equipos` únicamente para la leyenda y el asterisco; si esa lectura falla, la tabla se muestra igual. Una sanción nueva se carga desde el admin y no requiere publicar otra versión
 
 #### Características Visuales
 - **Indicador de Campeón**: Cuadrado dorado alrededor del número 1 con texto en negrita (sin punto); el resto de posiciones muestran número con punto sin fondo
@@ -115,7 +116,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 #### Carga de la Pantalla Favoritos (Equipos)
 - **Skeleton Animado**: `FavoritosSkeletonView` muestra un placeholder pulsante (fade opacity) que imita el layout de `TeamTableViewCell` mientras se cargan los datos, evitando el flash de estado vacío
 - **Caché Primero en Favoritos**: `FavoritesService.fetchFavoriteTeams()` conserva su carga inmediata desde caché
-- **Posiciones vigentes**: `TeamsRepository.fetchTeams(for:)` intenta servidor y usa el fallback offline de Firestore, para que una recarga no quede una actualización atrás
+- **Posiciones vigentes**: La pantalla Tabla usa `TeamsRepository.observeTeams(for:)` (listener compartido por colección). `fetchTeams(for:)` queda para lecturas puntuales como el simulador
 - **Estado Inicial Correcto**: `isLoading` arranca en `true` para que el skeleton sea visible desde el primer frame
 
 ### 🔐 Autenticación
@@ -312,7 +313,7 @@ View → ViewModel → UseCase → Repository → Firestore
 - **UseCases/**: Casos de uso (lógica de negocio)
   - **Jornadas/**: `FetchActiveJornadasUseCase`, `ObserveActiveJornadasUseCase`, `GetJornadaToDisplayUseCase` (jornada única a mostrar: menor `fechaInicio` entre activas)
   - **Matches/**: `FetchMatchesUseCase`, `ObserveMatchesUseCase`
-  - **Teams/**: `FetchTeamsUseCase`, `GetTournamentAvailabilityUseCase`, `CalculateAccumulatedStandingsUseCase`, `FetchSquadUseCase`
+  - **Teams/**: `FetchTeamsUseCase` (lectura puntual y `observe(for:)` en tiempo real), `GetTournamentAvailabilityUseCase`, `FetchSquadUseCase`
   - **News/**: `FetchNewsUseCase`
   - **Favorites/**: `ToggleFavoriteUseCase`, `ObserveFavoritesUseCase`, `FetchFavoriteMatchesUseCase`
   - **Auth/**: `LoginUseCase`, `LogoutUseCase`
@@ -742,10 +743,9 @@ Además existen `Repositories/` (`CachingTeamsRepositoryTests`, `CachingPlayersR
 | `TeamDetailViewModel` | Estados cargando/cargado/vacío/error, agrupación por línea y atribución de fotos |
 | `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
 | `ObserveMatchesUseCase` | Reenvía actualizaciones del repository, el estado de confirmación del servidor y el refresco con `completion` |
-| `FetchTeamsUseCase` | Acumulado permanece derivado; apertura/clausura delegan correctamente |
-| `CalculateAccumulatedStandingsUseCase` | Suma por ID estable, suma de sanciones negativas con reordenamiento, ignora sanciones de equipos desconocidos o no negativas, sin partidos jugados mantiene 0 y orden alfabético |
+| `FetchTeamsUseCase` | El Acumulado lee su colección; apertura/clausura delegan; `observe` usa el listener del repositorio |
 | `TeamsRepository.sanctions(from:teamCode:)` | Lee `sanctions`, recorta la resolución y descarta entradas positivas o sin puntos |
-| `TorneoViewModel` | Flag apagado/encendido, suma del Acumulado por ID estable, aplica sanciones y expone las notas de la leyenda solo en el Acumulado |
+| `TorneoViewModel` | Flag apagado/encendido, observa la tabla sin lecturas puntuales, reutiliza el listener del mismo torneo, no vuelve a restar sanciones, marca a los sancionados y expone las notas de la leyenda solo en el Acumulado |
 | `FetchNewsUseCase` | Delega y propaga resultado/error |
 | `ObserveFavoriteTeamsUseCase` | `execute` reenvía IDs, `refreshFavoriteTeams` delega fetch al service |
 | `ToggleFavoriteTeamUseCase` | Retorna `true`/`false` según service, propaga error |

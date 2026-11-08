@@ -38,9 +38,20 @@ final class CachingTeamsRepository: TeamsRepositoryProtocol {
             .eraseToAnyPublisher()
     }
 
-    /// Sin caché: son pocos documentos y una sanción nueva debe verse al recargar.
-    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
-        inner.fetchPointSanctions()
+    /// El listener ya mantiene la tabla viva; se pasa directo al repositorio.
+    func observeTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Never> {
+        inner.observeTeams(for: torneo)
+            .handleEvents(receiveOutput: { [weak self] teams in
+                // Mantiene fresca la caché que usan las lecturas puntuales (simulador).
+                self?.lock.lock()
+                self?.cache[torneo] = teams
+                self?.lock.unlock()
+            })
+            .eraseToAnyPublisher()
+    }
+
+    func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        inner.observePointSanctions()
     }
 
     func invalidateCache(for torneo: TorneoType?) {

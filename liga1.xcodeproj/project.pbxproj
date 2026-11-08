@@ -192,7 +192,6 @@
 		A1C0F0112FA0000100000011 /* TournamentConfigRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0102FA0000100000010 /* TournamentConfigRepositoryProtocol.swift */; };
 		A1C0F0132FA0000100000013 /* FirebaseTournamentConfigRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0122FA0000100000012 /* FirebaseTournamentConfigRepository.swift */; };
 		A1C0F0152FA0000100000015 /* GetTournamentAvailabilityUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0142FA0000100000014 /* GetTournamentAvailabilityUseCase.swift */; };
-		A1C0F0172FA0000100000017 /* CalculateAccumulatedStandingsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0162FA0000100000016 /* CalculateAccumulatedStandingsUseCase.swift */; };
 		A3713CE73DC663ABBBB75D18 /* MatchWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7EFCC89720430BB1A2DD7A /* MatchWeather.swift */; };
 		A76A4167D719438AA4F4251C /* LoginWithGoogleUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */; };
 		ABEBBA71C1E2DA1C9997CDBA /* PlayerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CE2921CF15702CF60EDF497 /* PlayerCell.swift */; };
@@ -429,7 +428,6 @@
 		A1C0F0102FA0000100000010 /* TournamentConfigRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TournamentConfigRepositoryProtocol.swift; sourceTree = "<group>"; };
 		A1C0F0122FA0000100000012 /* FirebaseTournamentConfigRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseTournamentConfigRepository.swift; sourceTree = "<group>"; };
 		A1C0F0142FA0000100000014 /* GetTournamentAvailabilityUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetTournamentAvailabilityUseCase.swift; sourceTree = "<group>"; };
-		A1C0F0162FA0000100000016 /* CalculateAccumulatedStandingsUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculateAccumulatedStandingsUseCase.swift; sourceTree = "<group>"; };
 		B1510521BC1037E78C37614F /* ObservePollResultUseCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ObservePollResultUseCase.swift; sourceTree = "<group>"; };
 		B18A469BCCEADBCF03604E86 /* ObserveRefereePollUseCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ObserveRefereePollUseCase.swift; sourceTree = "<group>"; };
 		B2CBE457F646C58E3B42177C /* SanctionsViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SanctionsViewController.swift; sourceTree = "<group>"; };
@@ -905,7 +903,6 @@
 			children = (
 				464009CD2F098D8D00A8C905 /* FetchTeamsUseCase.swift */,
 				A1C0F0142FA0000100000014 /* GetTournamentAvailabilityUseCase.swift */,
-				A1C0F0162FA0000100000016 /* CalculateAccumulatedStandingsUseCase.swift */,
 				2D1E5E0BDF08DF473F1A6BE9 /* FetchSquadUseCase.swift */,
 			);
 			path = Teams;
@@ -1572,7 +1569,6 @@
 				A1C0F0112FA0000100000011 /* TournamentConfigRepositoryProtocol.swift in Sources */,
 				A1C0F0132FA0000100000013 /* FirebaseTournamentConfigRepository.swift in Sources */,
 				A1C0F0152FA0000100000015 /* GetTournamentAvailabilityUseCase.swift in Sources */,
-				A1C0F0172FA0000100000017 /* CalculateAccumulatedStandingsUseCase.swift in Sources */,
 				46CDF4822F1061FC00F280E6 /* JornadaDTO.swift in Sources */,
 				46CDF4832F1061FC00F280E6 /* MatchDTO.swift in Sources */,
 				46CDF4842F1061FC00F280E6 /* NewsItemDTO.swift in Sources */,

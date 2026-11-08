@@ -24,11 +24,22 @@ final class FetchTeamsUseCaseTests: XCTestCase {
         super.tearDown()
     }
 
-    // MARK: - acumulado derivado
+    // MARK: - acumulado (colección mantenida por el admin)
 
-    func test_execute_acumulado_failsWithoutCallingRepository() {
-        _ = try? awaitFailure(from: sut.execute(for: .acumulado))
-        XCTAssertEqual(repository.fetchCallCount, 0)
+    func test_execute_acumulado_readsAcumuladoCollection() throws {
+        repository.fetchResult = .success([])
+        _ = try awaitValue(from: sut.execute(for: .acumulado))
+        XCTAssertEqual(repository.fetchCallCount, 1)
+        XCTAssertEqual(repository.lastTorneoRequested, .acumulado)
+    }
+
+    func test_observe_delegatesToRepositoryListener() {
+        repository.observedTeams = [.clausura: [Team.fixture(nombre: "Alianza")]]
+        var received: [Team]?
+        sut.observe(for: .clausura).sink { received = $0 }.store(in: &cancellables)
+
+        XCTAssertEqual(received?.map(\.nombre), ["Alianza"])
+        XCTAssertEqual(repository.observedTorneos, [.clausura])
     }
 
     // MARK: - apertura

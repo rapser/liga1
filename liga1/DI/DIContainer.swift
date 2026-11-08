@@ -209,10 +209,6 @@ final class DIContainer {
         )
     }
 
-    func makeCalculateAccumulatedStandingsUseCase() -> CalculateAccumulatedStandingsUseCaseProtocol {
-        return CalculateAccumulatedStandingsUseCase()
-    }
-
     // MARK: - Use Cases - Simulador de tabla / descenso
 
     func makeFetchRemainingFixturesUseCase() -> FetchRemainingFixturesUseCaseProtocol {
@@ -331,8 +327,7 @@ final class DIContainer {
     func makeTorneoViewModel() -> TorneoViewModel {
         return TorneoViewModel(
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
-            tournamentAvailabilityUseCase: makeGetTournamentAvailabilityUseCase(),
-            calculateAccumulatedStandingsUseCase: makeCalculateAccumulatedStandingsUseCase()
+            tournamentAvailabilityUseCase: makeGetTournamentAvailabilityUseCase()
         )
     }
 
@@ -409,7 +404,6 @@ final class DIContainer {
     func makeStandingsSimulatorViewModel() -> StandingsSimulatorViewModel {
         return StandingsSimulatorViewModel(
             fetchTeamsUseCase: makeFetchTeamsUseCase(),
-            calculateAccumulatedUseCase: makeCalculateAccumulatedStandingsUseCase(),
             fetchRemainingFixturesUseCase: makeFetchRemainingFixturesUseCase(),
             simulateStandingsUseCase: makeSimulateStandingsUseCase(),
             projectQualificationUseCase: makeProjectQualificationUseCase()
