@@ -143,7 +143,12 @@ class TorneoViewModel {
                 sanctions: sanctions
             )
             self.sanctionNotes = SanctionNoteUI.make(from: sanctions, teams: merged)
-            self.displayedTeams = TeamUIMapper.toUI(from: merged)
+            let sanctionedCodes = Set(self.sanctionNotes.map(\.teamCode))
+            self.displayedTeams = TeamUIMapper.toUI(from: merged).map { team in
+                var team = team
+                team.hasPointSanction = sanctionedCodes.contains(team.logo)
+                return team
+            }
         }
         .store(in: &cancellables)
     }

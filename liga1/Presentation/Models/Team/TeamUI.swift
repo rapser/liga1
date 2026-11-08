@@ -22,6 +22,8 @@ struct TeamUI {
     let diferenciaGoles: Int
     let puntos: Int
     var isFavorite: Bool = false
+    /// Tiene puntos descontados por sanción (solo se marca en el Acumulado).
+    var hasPointSanction: Bool = false
 
     // MARK: - Computed Properties for UI
 

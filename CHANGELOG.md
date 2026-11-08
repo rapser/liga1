@@ -30,6 +30,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
   - Domain: entidad `PointSanction`; `CalculateAccumulatedStandingsUseCase.execute(apertura:clausura:sanctions:)`.
   - Data: `TeamsRepository.fetchPointSanctions()` (nunca falla; sin datos devuelve `[]`), expuesto vía `FetchTeamsUseCase.fetchPointSanctions()`.
 - **Enlace y pantalla de sanciones**: La leyenda del Acumulado muestra una sola línea ("4 equipos con descuento de puntos · Ver resoluciones ›") que abre `SanctionsViewController`, con el escudo del equipo, los puntos descontados y la resolución completa (`SanctionNoteUI`, `TorneoViewModel.sanctionNotes`). Así la pantalla de Tabla queda limpia.
+- **Asterisco en clubes sancionados**: En el Acumulado, el nombre de cada club con descuento lleva un `*` rojo en superíndice (`TeamUI.hasPointSanction`), el mismo que encabeza el enlace de la leyenda.
 
 ### 🔧 Changed
 - **Build**: `CURRENT_PROJECT_VERSION` pasa de 29 a 30.

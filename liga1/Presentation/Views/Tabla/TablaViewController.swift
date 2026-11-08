@@ -230,19 +230,20 @@ class TablaViewController: UIViewController {
     /// Enlace compacto a la pantalla de sanciones: mantiene limpia la leyenda.
     private func makeSanctionsLink(for notes: [SanctionNoteUI]) -> UIView {
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: "exclamationmark.triangle.fill")
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 11, weight: .semibold)
-        config.imagePadding = 6
         config.contentInsets = .zero
-        config.baseForegroundColor = .systemRed
 
-        var title = AttributedString(notes.legendSummary + " · ")
+        // Mismo asterisco rojo que marca a los clubes en la tabla.
+        var mark = AttributedString("*")
+        mark.font = .systemFont(ofSize: 12, weight: .bold)
+        mark.foregroundColor = .systemRed
+        mark.baselineOffset = 4
+        var title = AttributedString(" " + notes.legendSummary + " · ")
         title.font = .systemFont(ofSize: 12)
         title.foregroundColor = .label
         var link = AttributedString("Ver resoluciones ›")
         link.font = .systemFont(ofSize: 12, weight: .semibold)
         link.foregroundColor = .tintColor
-        config.attributedTitle = title + link
+        config.attributedTitle = mark + title + link
         config.titleLineBreakMode = .byWordWrapping
 
         let button = UIButton(configuration: config, primaryAction: UIAction { [weak self] _ in
