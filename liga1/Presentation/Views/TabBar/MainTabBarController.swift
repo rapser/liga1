@@ -42,6 +42,10 @@ class MainTabBarController: UITabBarController {
             let detalle = container.makeTeamDetailViewController(team: team)
             torneoVC?.navigationController?.pushViewController(detalle, animated: true)
         }
+        torneoVC.onShowSanctions = { [weak torneoVC, container] notes in
+            let sanciones = container.makeSanctionsViewController(notes: notes)
+            torneoVC?.navigationController?.pushViewController(sanciones, animated: true)
+        }
 
         // Noticias: fuera del tab bar en el rediseño "Fan Experience".
         // Para reactivarla: descomentar el bloque de `newsNav` y añadirlo a `viewControllers`.

@@ -120,7 +120,7 @@ final class TorneoViewModelTests: XCTestCase {
         // Apertura (12) + Clausura (12) - 10 de sanción.
         XCTAssertEqual(sut.displayedTeams.first?.puntos, 14)
         XCTAssertEqual(sut.sanctionNotes, [
-            SanctionNoteUI(teamName: "UTC", points: -10, resolution: "Res. 014-CCRD-FPF-2024")
+            SanctionNoteUI(teamCode: "utc", teamName: "UTC", points: -10, resolution: "Res. 014-CCRD-FPF-2024")
         ])
     }
 

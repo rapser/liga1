@@ -27,6 +27,9 @@ class TablaViewController: UIViewController {
     /// Abre la ficha del equipo tocado. Lo inyecta `MainTabBarController`.
     var onTeamSelected: ((TeamUI) -> Void)?
 
+    /// Abre el detalle de las sanciones del Acumulado. Lo inyecta `MainTabBarController`.
+    var onShowSanctions: (([SanctionNoteUI]) -> Void)?
+
     // MARK: - Initialization
     init(viewModel: TorneoViewModel) {
         self.viewModel = viewModel
@@ -190,16 +193,8 @@ class TablaViewController: UIViewController {
         stack.prepareForAutoLayout()
 
         if torneo == .acumulado, !sanctionNotes.isEmpty, let lastRow = rows.last {
-            stack.setCustomSpacing(16, after: lastRow)
-
-            let sanctionsTitle = UILabel()
-            sanctionsTitle.text = "Sanciones (descuento de puntos)"
-            sanctionsTitle.font = .systemFont(ofSize: 13, weight: .semibold)
-            sanctionsTitle.textColor = .label
-            stack.addArrangedSubview(sanctionsTitle)
-            stack.setCustomSpacing(10, after: sanctionsTitle)
-
-            sanctionNotes.forEach { stack.addArrangedSubview(makeSanctionRow($0)) }
+            stack.setCustomSpacing(12, after: lastRow)
+            stack.addArrangedSubview(makeSanctionsLink(for: sanctionNotes))
         }
 
         footer.addSubview(card)
@@ -232,33 +227,31 @@ class TablaViewController: UIViewController {
         return footer
     }
 
-    private func makeSanctionRow(_ note: SanctionNoteUI) -> UIView {
-        let pointsLabel = UILabel()
-        pointsLabel.text = note.pointsText
-        pointsLabel.font = .monospacedDigitSystemFont(ofSize: 12, weight: .bold)
-        pointsLabel.textColor = .systemRed
-        pointsLabel.setContentHuggingPriority(.required, for: .horizontal)
-        pointsLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+    /// Enlace compacto a la pantalla de sanciones: mantiene limpia la leyenda.
+    private func makeSanctionsLink(for notes: [SanctionNoteUI]) -> UIView {
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "exclamationmark.triangle.fill")
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 11, weight: .semibold)
+        config.imagePadding = 6
+        config.contentInsets = .zero
+        config.baseForegroundColor = .systemRed
 
-        let teamLabel = UILabel()
-        teamLabel.text = note.teamName
-        teamLabel.font = .systemFont(ofSize: 12, weight: .semibold)
-        teamLabel.textColor = .label
+        var title = AttributedString(notes.legendSummary + " · ")
+        title.font = .systemFont(ofSize: 12)
+        title.foregroundColor = .label
+        var link = AttributedString("Ver resoluciones ›")
+        link.font = .systemFont(ofSize: 12, weight: .semibold)
+        link.foregroundColor = .tintColor
+        config.attributedTitle = title + link
+        config.titleLineBreakMode = .byWordWrapping
 
-        let header = UIStackView(arrangedSubviews: [teamLabel, pointsLabel])
-        header.axis = .horizontal
-        header.spacing = 8
-
-        let resolutionLabel = UILabel()
-        resolutionLabel.text = note.resolution.isEmpty ? "Sanción reglamentaria" : note.resolution
-        resolutionLabel.font = .systemFont(ofSize: 11)
-        resolutionLabel.textColor = .secondaryLabel
-        resolutionLabel.numberOfLines = 0
-
-        let row = UIStackView(arrangedSubviews: [header, resolutionLabel])
-        row.axis = .vertical
-        row.spacing = 2
-        return row
+        let button = UIButton(configuration: config, primaryAction: UIAction { [weak self] _ in
+            self?.onShowSanctions?(notes)
+        })
+        button.contentHorizontalAlignment = .leading
+        button.accessibilityLabel = notes.legendSummary
+        button.accessibilityHint = "Abre el detalle de las resoluciones"
+        return button
     }
 
     private func makeLegendRow(color: UIColor, position: String, text: String) -> UIView {

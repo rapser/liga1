@@ -398,6 +398,10 @@ final class DIContainer {
         return TablaViewController(viewModel: makeTorneoViewModel())
     }
 
+    func makeSanctionsViewController(notes: [SanctionNoteUI]) -> SanctionsViewController {
+        return SanctionsViewController(notes: notes)
+    }
+
     func makeTeamDetailViewController(team: TeamUI) -> TeamDetailViewController {
         return TeamDetailViewController(viewModel: makeTeamDetailViewModel(team: team))
     }

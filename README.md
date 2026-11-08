@@ -60,7 +60,8 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 
 #### Características Visuales
 - **Indicador de Campeón**: Cuadrado dorado alrededor del número 1 con texto en negrita (sin punto); el resto de posiciones muestran número con punto sin fondo
-- **Leyenda dinámica**: Apertura y Clausura muestran campeón; Acumulado muestra las zonas internacionales y de descenso, y debajo la sección **Sanciones (descuento de puntos)** con el equipo, los puntos descontados y la resolución que los explica. La altura de la leyenda se ajusta al texto
+- **Leyenda dinámica**: Apertura y Clausura muestran campeón; Acumulado muestra las zonas internacionales y de descenso, y, si hay sanciones, una sola línea con enlace ("4 equipos con descuento de puntos · Ver resoluciones ›") para mantener limpia la pantalla
+- **Pantalla de Sanciones**: Desde el enlace de la leyenda se abre `SanctionsViewController`, una lista con el escudo del equipo, los puntos descontados en rojo y la resolución completa que los explica
 - **Zonas de Clasificación** (modo claro):
   - 🟡 **Puesto 1**: Cuadrado dorado en el número de posición
   - 🟢 **Zona Libertadores**: Fondo dorado (puestos 1-4 según torneo)

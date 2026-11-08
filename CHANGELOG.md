@@ -29,7 +29,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - **Sanciones de puntos en el Acumulado**: La tabla Acumulada y el simulador suman las sanciones de cada equipo (puntos negativos) leídas de `equipos/{code}.sanctions` = `[{ points, resolution }]`. Apertura y Clausura no cambian.
   - Domain: entidad `PointSanction`; `CalculateAccumulatedStandingsUseCase.execute(apertura:clausura:sanctions:)`.
   - Data: `TeamsRepository.fetchPointSanctions()` (nunca falla; sin datos devuelve `[]`), expuesto vía `FetchTeamsUseCase.fetchPointSanctions()`.
-- **Leyenda de sanciones**: Bajo la leyenda del Acumulado aparece "Sanciones (descuento de puntos)" con equipo, puntos y resolución (`SanctionNoteUI`, `TorneoViewModel.sanctionNotes`). La altura de la leyenda se calcula según su contenido.
+- **Enlace y pantalla de sanciones**: La leyenda del Acumulado muestra una sola línea ("4 equipos con descuento de puntos · Ver resoluciones ›") que abre `SanctionsViewController`, con el escudo del equipo, los puntos descontados y la resolución completa (`SanctionNoteUI`, `TorneoViewModel.sanctionNotes`). Así la pantalla de Tabla queda limpia.
 
 ### 🔧 Changed
 - **Build**: `CURRENT_PROJECT_VERSION` pasa de 29 a 30.
