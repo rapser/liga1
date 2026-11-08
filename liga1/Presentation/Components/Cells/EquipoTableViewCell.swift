@@ -41,6 +41,19 @@ class EquipoTableViewCell: UITableViewCell {
         return label
     }()
 
+    /// Asterisco en superíndice para clubes con puntos descontados (Acumulado).
+    /// Va en su propia etiqueta para que no desaparezca si el nombre se trunca.
+    private lazy var sanctionMarkLabel: UILabel = {
+        let label = UILabel()
+        label.text = "*"
+        label.font = .systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .systemRed
+        label.isHidden = true
+        label.setContentHuggingPriority(.required, for: .horizontal)
+        label.setContentCompressionResistancePriority(.required, for: .horizontal)
+        return label
+    }()
+
     private lazy var partidosJugadosLabel = Self.createValueLabel()
     private lazy var golesLabel = Self.createValueLabel()
 
@@ -64,8 +77,11 @@ class EquipoTableViewCell: UITableViewCell {
     private func setupUI() {
         // Equipo stack → logo + nombre
         let equipoStack = UIStackView.hStack(spacing: Spacing.tiny, alignment: .center) {
-            [logoImageView, nombreLabel]
+            [logoImageView, nombreLabel, sanctionMarkLabel]
         }
+        equipoStack.setCustomSpacing(1, after: nombreLabel)
+        // Superíndice: el asterisco sube sobre la línea base del nombre.
+        sanctionMarkLabel.transform = CGAffineTransform(translationX: 0, y: -4)
 
         // Stack principal con todos los elementos
         stackView.addArranged([
@@ -122,6 +138,10 @@ class EquipoTableViewCell: UITableViewCell {
             logoImageView.image = nil
         }
         nombreLabel.text = model.nombre
+        sanctionMarkLabel.isHidden = !model.hasPointSanction
+        nombreLabel.accessibilityLabel = model.hasPointSanction
+            ? "\(model.nombre), con descuento de puntos"
+            : nil
         partidosJugadosLabel.text = "\(model.partidosJugados)"
         golesLabel.text = "\(model.golesFavor) - \(model.golesContra)"
         puntosLabel.text = "\(model.puntos)"

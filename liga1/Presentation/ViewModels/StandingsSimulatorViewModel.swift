@@ -64,7 +64,6 @@ final class StandingsSimulatorViewModel {
     // MARK: - Dependencies
 
     private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
-    private let calculateAccumulatedUseCase: CalculateAccumulatedStandingsUseCaseProtocol
     private let fetchRemainingFixturesUseCase: FetchRemainingFixturesUseCaseProtocol
     private let simulateStandingsUseCase: SimulateStandingsUseCaseProtocol
     private let projectQualificationUseCase: ProjectQualificationUseCaseProtocol
@@ -74,13 +73,11 @@ final class StandingsSimulatorViewModel {
 
     init(
         fetchTeamsUseCase: FetchTeamsUseCaseProtocol,
-        calculateAccumulatedUseCase: CalculateAccumulatedStandingsUseCaseProtocol,
         fetchRemainingFixturesUseCase: FetchRemainingFixturesUseCaseProtocol,
         simulateStandingsUseCase: SimulateStandingsUseCaseProtocol,
         projectQualificationUseCase: ProjectQualificationUseCaseProtocol
     ) {
         self.fetchTeamsUseCase = fetchTeamsUseCase
-        self.calculateAccumulatedUseCase = calculateAccumulatedUseCase
         self.fetchRemainingFixturesUseCase = fetchRemainingFixturesUseCase
         self.simulateStandingsUseCase = simulateStandingsUseCase
         self.projectQualificationUseCase = projectQualificationUseCase
@@ -152,25 +149,9 @@ final class StandingsSimulatorViewModel {
         )
     }
 
+    /// El Acumulado se lee de su colección (ya incluye las sanciones).
     private func baseTablePublisher(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
-        switch torneo {
-        case .apertura, .clausura:
-            return fetchTeamsUseCase.execute(for: torneo)
-        case .acumulado:
-            return Publishers.Zip3(
-                fetchTeamsUseCase.execute(for: .apertura),
-                fetchTeamsUseCase.execute(for: .clausura),
-                fetchTeamsUseCase.fetchPointSanctions().setFailureType(to: Error.self)
-            )
-            .map { [calculateAccumulatedUseCase] apertura, clausura, sanctions in
-                calculateAccumulatedUseCase.execute(
-                    apertura: apertura,
-                    clausura: clausura,
-                    sanctions: sanctions
-                )
-            }
-            .eraseToAnyPublisher()
-        }
+        fetchTeamsUseCase.execute(for: torneo)
     }
 
     private func recompute() {

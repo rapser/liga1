@@ -27,12 +27,23 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### ✨ Added
 - **Sanciones de puntos en el Acumulado**: La tabla Acumulada y el simulador suman las sanciones de cada equipo (puntos negativos) leídas de `equipos/{code}.sanctions` = `[{ points, resolution }]`. Apertura y Clausura no cambian.
-  - Domain: entidad `PointSanction`; `CalculateAccumulatedStandingsUseCase.execute(apertura:clausura:sanctions:)`.
+  - Domain: entidad `PointSanction`. El admin descuenta las sanciones en la colección `acumulado`; la app las lee para la leyenda y el asterisco.
   - Data: `TeamsRepository.fetchPointSanctions()` (nunca falla; sin datos devuelve `[]`), expuesto vía `FetchTeamsUseCase.fetchPointSanctions()`.
-- **Leyenda de sanciones**: Bajo la leyenda del Acumulado aparece "Sanciones (descuento de puntos)" con equipo, puntos y resolución (`SanctionNoteUI`, `TorneoViewModel.sanctionNotes`). La altura de la leyenda se calcula según su contenido.
+- **Enlace y pantalla de sanciones**: La leyenda del Acumulado muestra una sola línea ("4 equipos con descuento de puntos · Ver resoluciones ›") que abre `SanctionsViewController`, con el escudo del equipo, los puntos descontados y la resolución completa (`SanctionNoteUI`, `TorneoViewModel.sanctionNotes`). Así la pantalla de Tabla queda limpia.
+- **Asterisco en clubes sancionados**: En el Acumulado, el nombre de cada club con descuento lleva un `*` rojo en superíndice (`TeamUI.hasPointSanction`), el mismo que encabeza el enlace de la leyenda.
 
 ### 🔧 Changed
+- **Tabla en tiempo real y con caché**: La pantalla Tabla escucha con snapshot listener solo la colección visible (`apertura`, `clausura` o `acumulado`). Se pinta al instante desde la caché persistente y se actualiza sola al registrarse un resultado. Se eliminan las recargas forzadas al entrar a la pestaña, al volver del background y al recibir `score_update`, que borraban la caché y volvían a pedir todo al servidor.
+- **Acumulado leído de Firestore**: Se lee la colección `acumulado` (1 consulta de 18 documentos) en lugar de pedir `apertura` y `clausura` y sumarlas en el teléfono. Se elimina `CalculateAccumulatedStandingsUseCase`; el simulador también usa la colección.
+- **Tablas al día al volver a la app**: El push silencioso `score_update` ahora también lee del servidor la tabla del torneo de la jornada y el Acumulado (`FetchTeamsUseCase.refreshStandings(forJornadaId:)`), en paralelo con los partidos. Al reabrir la app, la tabla ya sale actualizada desde la caché, sin un instante con datos viejos.
 - **Build**: `CURRENT_PROJECT_VERSION` pasa de 29 a 30.
+
+### ✨ Added (plantillas)
+- **Nacionalidad con bandera**: Cada jugador de la plantilla muestra su bandera y país ("🇵🇪 Perú · 25 años") a partir de `nationality` (código FIFA o ISO de 3 letras). `CountryFlag` convierte el código a emoji y nombre en español.
+
+### 🐛 Fixed
+- **Tap en notificación de gol abre el partido**: Antes solo abría la app. La notificación visible trae `match_id`/`jornada_id` pero la app buscaba `matchId`, y el coordinador solo seleccionaba la pestaña Inicio. Ahora `MatchRoute` lee ambos formatos y `MainTabBarController.openMatch(_:)` abre el detalle del partido. En arranque en frío el tap se guarda (`SessionManager`, `AppCoordinator.pendingMatchRoute`) hasta que se muestra el flujo principal.
+- **Tap descartado por el deduplicador**: El tap ya no pasa por `NotificationDeduplicator`, que había marcado el `event_id` al mostrar el banner y descartaba el tap de la misma notificación.
 
 ## [1.0.0 (29)] - 2026-10-29
 

@@ -12,6 +12,8 @@ import Combine
 protocol FetchMatchesUseCaseProtocol {
     /// Partidos cuyo día de juego en Perú (UTC−5, `America/Lima`) coincide con el de `calendarDay`.
     func execute(for jornadaId: String, calendarDay: Date) -> AnyPublisher<[Match], Error>
+    /// Un partido concreto de la jornada (caché primero). `nil` si no existe.
+    func fetchMatch(id matchId: String, jornadaId: String) -> AnyPublisher<Match?, Error>
 }
 
 class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
@@ -37,6 +39,15 @@ class FetchMatchesUseCase: FetchMatchesUseCaseProtocol {
                 guard let self else { return matches }
                 return self.filterMatches(on: calendarDay, matches: matches)
             }
+            .eraseToAnyPublisher()
+    }
+
+    func fetchMatch(id matchId: String, jornadaId: String) -> AnyPublisher<Match?, Error> {
+        guard !jornadaId.isEmpty, !matchId.isEmpty else {
+            return Just(nil).setFailureType(to: Error.self).eraseToAnyPublisher()
+        }
+        return repository.fetchMatches(for: jornadaId)
+            .map { matches in matches.first { $0.id == matchId } }
             .eraseToAnyPublisher()
     }
 

@@ -42,8 +42,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         appCoordinator.start() // AppCoordinator maneja window.makeKeyAndVisible()
 
         // Tap en notificación → EventBus → AppCoordinator maneja .navigateToMatch
-        SessionManager.shared.onNotificationTap = { matchId in
-            eventBus.publish(.navigateToMatch(matchId: matchId))
+        SessionManager.shared.onNotificationTap = { route in
+            eventBus.publish(.navigateToMatch(route))
         }
     }
     

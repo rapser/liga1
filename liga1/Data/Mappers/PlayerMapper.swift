@@ -23,7 +23,8 @@ struct PlayerMapper {
             position: position,
             age: dto.age,
             photoURL: validPhotoURL(dto.photoURL),
-            photoCredit: dto.photoCredit?.isEmpty == false ? dto.photoCredit : nil
+            photoCredit: dto.photoCredit?.isEmpty == false ? dto.photoCredit : nil,
+            nationality: dto.nationality?.isEmpty == false ? dto.nationality?.uppercased() : nil
         )
     }
 

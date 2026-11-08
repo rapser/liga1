@@ -16,4 +16,6 @@ struct PlayerDTO: Codable {
     let photoURL: String?
     let photoCredit: String?
     let active: Bool?
+    /// Código de nacionalidad de 3 letras (FIFA o ISO), ej. "PER".
+    let nationality: String?
 }

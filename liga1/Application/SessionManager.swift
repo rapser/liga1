@@ -17,8 +17,25 @@ final class SessionManager {
 
     private var inactivityManager: InactivityManager?
 
-    /// Se invoca cuando el usuario toca una notificación push (matchId).
-    var onNotificationTap: ((String) -> Void)?
+    /// Se invoca cuando el usuario toca una notificación de partido.
+    /// Si el tap llega antes de que la escena configure el handler (arranque en frío),
+    /// se guarda y se entrega en cuanto se asigna.
+    var onNotificationTap: ((MatchRoute) -> Void)? {
+        didSet {
+            guard let handler = onNotificationTap, let route = pendingRoute else { return }
+            pendingRoute = nil
+            handler(route)
+        }
+    }
+    private var pendingRoute: MatchRoute?
+
+    func handleNotificationTap(_ route: MatchRoute) {
+        if let handler = onNotificationTap {
+            handler(route)
+        } else {
+            pendingRoute = route
+        }
+    }
 
     // MARK: - Configuración
 

@@ -24,7 +24,6 @@ final class StandingsSimulatorViewModelTests: XCTestCase {
     ) -> StandingsSimulatorViewModel {
         StandingsSimulatorViewModel(
             fetchTeamsUseCase: StubFetchTeams(byTorneo: teams),
-            calculateAccumulatedUseCase: CalculateAccumulatedStandingsUseCase(),
             fetchRemainingFixturesUseCase: StubFetchRemainingFixtures(fixtures: fixtures),
             simulateStandingsUseCase: SimulateStandingsUseCase(),
             projectQualificationUseCase: ProjectQualificationUseCase()
@@ -114,18 +113,17 @@ final class StandingsSimulatorViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.fixtures[0].awayGoals, 0)
     }
 
-    func test_acumulado_sumsAperturaAndClausuraAsBase() {
+    func test_acumulado_usesAcumuladoCollectionAsBase() {
         let sut = makeSUT(
             teams: [
-                .apertura: [Team.standing(code: "ali", pts: 30, pj: 15), Team.standing(code: "uni", pts: 20, pj: 15)],
-                .clausura: [Team.standing(code: "ali", pts: 10, pj: 5), Team.standing(code: "uni", pts: 25, pj: 5)]
+                .acumulado: [Team.standing(code: "ali", pts: 40, pj: 20), Team.standing(code: "uni", pts: 45, pj: 20)]
             ],
             fixtures: []
         )
         sut.send(.load(.acumulado))
         settle()
 
-        // ali 40, uni 45 ⇒ uni primero
+        // La colección ya trae apertura + clausura + sanciones: uni 45 primero
         XCTAssertEqual(sut.state.projected.map(\.code), ["uni", "ali"])
         XCTAssertEqual(sut.state.projected.first { $0.code == "uni" }?.pts, 45)
     }
@@ -145,7 +143,6 @@ final class StandingsSimulatorViewModelTests: XCTestCase {
     func test_load_setsErrorOnFailure() {
         let sut = StandingsSimulatorViewModel(
             fetchTeamsUseCase: StubFetchTeams(byTorneo: [:], error: TestError.network),
-            calculateAccumulatedUseCase: CalculateAccumulatedStandingsUseCase(),
             fetchRemainingFixturesUseCase: StubFetchRemainingFixtures(fixtures: []),
             simulateStandingsUseCase: SimulateStandingsUseCase(),
             projectQualificationUseCase: ProjectQualificationUseCase()
@@ -163,7 +160,6 @@ final class StandingsSimulatorViewModelTests: XCTestCase {
 private struct StubFetchTeams: FetchTeamsUseCaseProtocol {
     let byTorneo: [TorneoType: [Team]]
     var error: Error?
-    var pointSanctions: [PointSanction] = []
 
     func execute(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         if let error { return Fail(error: error).eraseToAnyPublisher() }
@@ -172,8 +168,16 @@ private struct StubFetchTeams: FetchTeamsUseCaseProtocol {
 
     func invalidateCache(for torneo: TorneoType?) {}
 
-    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
-        Just(pointSanctions).eraseToAnyPublisher()
+    func observe(for torneo: TorneoType) -> AnyPublisher<[Team], Never> {
+        Just(byTorneo[torneo] ?? []).eraseToAnyPublisher()
+    }
+
+    func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        Just([]).eraseToAnyPublisher()
+    }
+
+    func refreshStandings(forJornadaId jornadaId: String, completion: @escaping (Bool) -> Void) {
+        completion(true)
     }
 }
 

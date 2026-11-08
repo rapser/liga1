@@ -24,11 +24,49 @@ final class FetchTeamsUseCaseTests: XCTestCase {
         super.tearDown()
     }
 
-    // MARK: - acumulado derivado
+    // MARK: - acumulado (colección mantenida por el admin)
 
-    func test_execute_acumulado_failsWithoutCallingRepository() {
-        _ = try? awaitFailure(from: sut.execute(for: .acumulado))
-        XCTAssertEqual(repository.fetchCallCount, 0)
+    func test_execute_acumulado_readsAcumuladoCollection() throws {
+        repository.fetchResult = .success([])
+        _ = try awaitValue(from: sut.execute(for: .acumulado))
+        XCTAssertEqual(repository.fetchCallCount, 1)
+        XCTAssertEqual(repository.lastTorneoRequested, .acumulado)
+    }
+
+    func test_observe_delegatesToRepositoryListener() {
+        repository.observedTeams = [.clausura: [Team.fixture(nombre: "Alianza")]]
+        var received: [Team]?
+        sut.observe(for: .clausura).sink { received = $0 }.store(in: &cancellables)
+
+        XCTAssertEqual(received?.map(\.nombre), ["Alianza"])
+        XCTAssertEqual(repository.observedTorneos, [.clausura])
+    }
+
+    // MARK: - refresco en background (push score_update)
+
+    func test_refreshStandings_clausuraJornada_refreshesClausuraAndAcumulado() {
+        var result: Bool?
+        sut.refreshStandings(forJornadaId: "clausura_15") { result = $0 }
+
+        XCTAssertEqual(repository.refreshedTorneos, [.clausura, .acumulado])
+        XCTAssertEqual(result, true)
+    }
+
+    func test_refreshStandings_aperturaJornada_refreshesAperturaAndAcumulado() {
+        sut.refreshStandings(forJornadaId: "apertura_3") { _ in }
+        XCTAssertEqual(repository.refreshedTorneos, [.apertura, .acumulado])
+    }
+
+    func test_refreshStandings_unknownPrefix_fallsBackToClausuraAndAcumulado() {
+        sut.refreshStandings(forJornadaId: "xyz") { _ in }
+        XCTAssertEqual(repository.refreshedTorneos, [.clausura, .acumulado])
+    }
+
+    func test_refreshStandings_propagatesFailure() {
+        repository.refreshResult = false
+        var result: Bool?
+        sut.refreshStandings(forJornadaId: "clausura_15") { result = $0 }
+        XCTAssertEqual(result, false)
     }
 
     // MARK: - apertura

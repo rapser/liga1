@@ -24,6 +24,22 @@ final class CachingTeamsRepositoryTests: XCTestCase {
         super.tearDown()
     }
 
+    // MARK: - refreshStandings (push en background)
+
+    func test_refreshStandings_dropsInMemoryCacheAndDelegates() throws {
+        inner.fetchResult = .success([Team.fixture()])
+        _ = try awaitValue(from: sut.fetchTeams(for: .acumulado))   // populate cache
+        inner.fetchCallCount = 0
+
+        var result: Bool?
+        sut.refreshStandings(for: [.clausura, .acumulado]) { result = $0 }
+        _ = try awaitValue(from: sut.fetchTeams(for: .acumulado))
+
+        XCTAssertEqual(inner.refreshedTorneos, [.clausura, .acumulado])
+        XCTAssertEqual(result, true)
+        XCTAssertEqual(inner.fetchCallCount, 1, "la caché en memoria debe descartarse")
+    }
+
     // MARK: - Cache Miss (primera llamada)
 
     func test_fetchTeams_firstCall_delegatesToInner() throws {
