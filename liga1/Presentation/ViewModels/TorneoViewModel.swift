@@ -25,22 +25,22 @@ class TorneoViewModel {
 
     private let fetchTeamsUseCase: FetchTeamsUseCaseProtocol
     private let tournamentAvailabilityUseCase: GetTournamentAvailabilityUseCaseProtocol
-    private let calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCaseProtocol
 
     // MARK: - Private Properties
 
     private var cancellables = Set<AnyCancellable>()
+    /// Suscripción al listener de la tabla visible; se reemplaza al cambiar de torneo.
+    private var standingsSubscription: AnyCancellable?
+    private var observedTorneo: TorneoType?
 
     // MARK: - Initialization
 
     init(
         fetchTeamsUseCase: FetchTeamsUseCaseProtocol,
-        tournamentAvailabilityUseCase: GetTournamentAvailabilityUseCaseProtocol,
-        calculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCaseProtocol
+        tournamentAvailabilityUseCase: GetTournamentAvailabilityUseCaseProtocol
     ) {
         self.fetchTeamsUseCase = fetchTeamsUseCase
         self.tournamentAvailabilityUseCase = tournamentAvailabilityUseCase
-        self.calculateAccumulatedStandingsUseCase = calculateAccumulatedStandingsUseCase
         let clausuraEnabled = tournamentAvailabilityUseCase.activeClausuraEnabled
         self.selectedTorneo = clausuraEnabled ? .clausura : .apertura
         self.availableTorneos = clausuraEnabled
@@ -78,73 +78,46 @@ class TorneoViewModel {
             .store(in: &cancellables)
     }
 
+    /// Muestra la tabla del torneo y la mantiene viva con el listener de Firestore:
+    /// sale al instante desde la caché persistente y se actualiza sola cuando el
+    /// admin registra un resultado. Llamarla otra vez con el mismo torneo no hace nada.
     func loadTeams(for torneo: TorneoType) {
         guard availableTorneos.contains(torneo) else { return }
         selectedTorneo = torneo
-        if torneo == .acumulado {
-            fetchAcumulado()
-        } else {
-            fetchTeams(for: torneo)
-        }
-    }
-
-    /// Fuerza recarga ignorando la caché en memoria
-    func reloadTeams(for torneo: TorneoType) {
-        guard availableTorneos.contains(torneo) else { return }
-        selectedTorneo = torneo
-        if torneo == .acumulado {
-            fetchTeamsUseCase.invalidateCache(for: nil)
-        } else {
-            fetchTeamsUseCase.invalidateCache(for: torneo)
-        }
-        loadTeams(for: torneo)
+        observeStandings(for: torneo)
     }
 
     // MARK: - Private Methods
 
-    private func fetchTeams(for torneo: TorneoType) {
+    private func observeStandings(for torneo: TorneoType) {
+        guard observedTorneo != torneo || standingsSubscription == nil else { return }
+        observedTorneo = torneo
         isLoading = true
         error = nil
-        sanctionNotes = []
+        if torneo != .acumulado { sanctionNotes = [] }
 
-        fetchTeamsUseCase.execute(for: torneo)
+        // El Acumulado ya viene con las sanciones descontadas (lo mantiene el admin);
+        // las sanciones solo se escuchan para la leyenda y el asterisco.
+        let standings: AnyPublisher<([Team], [PointSanction]), Never> = torneo == .acumulado
+            ? fetchTeamsUseCase.observe(for: .acumulado)
+                .combineLatest(fetchTeamsUseCase.observePointSanctions())
+                .eraseToAnyPublisher()
+            : fetchTeamsUseCase.observe(for: torneo)
+                .map { ($0, []) }
+                .eraseToAnyPublisher()
+
+        standingsSubscription = standings
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
-                self?.isLoading = false
-                if case .failure(let error) = completion {
-                    self?.error = error
+            .sink { [weak self] teams, sanctions in
+                guard let self = self else { return }
+                self.isLoading = false
+                self.sanctionNotes = SanctionNoteUI.make(from: sanctions, teams: teams)
+                let sanctionedCodes = Set(self.sanctionNotes.map(\.teamCode))
+                self.displayedTeams = TeamUIMapper.toUI(from: teams).map { team in
+                    var team = team
+                    team.hasPointSanction = sanctionedCodes.contains(team.logo)
+                    return team
                 }
-            } receiveValue: { [weak self] teams in
-                self?.displayedTeams = TeamUIMapper.toUI(from: teams)
             }
-            .store(in: &cancellables)
-    }
-
-    private func fetchAcumulado() {
-        isLoading = true
-        error = nil
-
-        Publishers.Zip3(
-            fetchTeamsUseCase.execute(for: .apertura),
-            fetchTeamsUseCase.execute(for: .clausura),
-            fetchTeamsUseCase.fetchPointSanctions().setFailureType(to: Error.self)
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] completion in
-            self?.isLoading = false
-            if case .failure(let error) = completion {
-                self?.error = error
-            }
-        } receiveValue: { [weak self] aperturaTeams, clausuraTeams, sanctions in
-            guard let self = self else { return }
-            let merged = self.calculateAccumulatedStandingsUseCase.execute(
-                apertura: aperturaTeams,
-                clausura: clausuraTeams,
-                sanctions: sanctions
-            )
-            self.sanctionNotes = SanctionNoteUI.make(from: sanctions, teams: merged)
-            self.displayedTeams = TeamUIMapper.toUI(from: merged)
-        }
-        .store(in: &cancellables)
     }
 }

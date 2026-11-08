@@ -55,12 +55,15 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Actualización al volver a Tabla**: La app fuerza una consulta remota cuando el usuario regresa a la pestaña, sin exigir cerrar la aplicación
 - **Carga sin saltos visuales**: La pantalla nace con el último valor activado y persistido por Remote Config, y solo cambia si Firebase publica un valor diferente
 - **Fallback seguro**: Sin conexión se conserva el último valor activado; en una instalación nueva o sin clave se muestra solamente Apertura
-- **Acumulado derivado**: Se calcula en el dispositivo sumando las colecciones `apertura` y `clausura` por document ID; no requiere una colección `acumulado`
-- **Sanciones de puntos**: Las sanciones (CCRD-FPF, Comisión de Licencias, etc.) se leen de `equipos/{code}.sanctions` y se suman (son negativas) **solo** al Acumulado, tanto en la tabla como en el simulador. Apertura y Clausura muestran los puntos ganados en cancha. Si la lectura falla, el Acumulado se muestra sin descuentos en lugar de quedar vacío. Una sanción nueva se carga desde el admin y no requiere publicar otra versión
+- **Tabla en tiempo real**: Cada tabla escucha su colección (`apertura`, `clausura` o `acumulado`) con un snapshot listener. Se pinta al instante desde la caché persistente de Firestore y se actualiza sola cuando el admin registra un resultado (en vivo y al finalizar), sin recargar al entrar a la pestaña, al volver del background ni al llegar un push. Tras la primera carga solo se descargan los documentos que cambian
+- **Acumulado persistido**: Se lee de la colección `acumulado`, que el admin mantiene en la misma transacción que `apertura`/`clausura` (apertura + clausura + sanciones). La app ya no suma tablas en el dispositivo
+- **Sanciones de puntos**: Las sanciones (CCRD-FPF, Comisión de Licencias, etc.) se guardan en `equipos/{code}.sanctions` y el admin las descuenta **solo** en la colección `acumulado` (tabla y simulador). Apertura y Clausura muestran los puntos ganados en cancha. La app escucha `equipos` únicamente para la leyenda y el asterisco; si esa lectura falla, la tabla se muestra igual. Una sanción nueva se carga desde el admin y no requiere publicar otra versión
 
 #### Características Visuales
 - **Indicador de Campeón**: Cuadrado dorado alrededor del número 1 con texto en negrita (sin punto); el resto de posiciones muestran número con punto sin fondo
-- **Leyenda dinámica**: Apertura y Clausura muestran campeón; Acumulado muestra las zonas internacionales y de descenso, y debajo la sección **Sanciones (descuento de puntos)** con el equipo, los puntos descontados y la resolución que los explica. La altura de la leyenda se ajusta al texto
+- **Leyenda dinámica**: Apertura y Clausura muestran campeón; Acumulado muestra las zonas internacionales y de descenso, y, si hay sanciones, una sola línea con enlace ("* 4 equipos con descuento de puntos · Ver resoluciones ›") para mantener limpia la pantalla
+- **Marca de sanción**: En el Acumulado, cada club con puntos descontados lleva un asterisco rojo en superíndice junto al nombre (`TeamUI.hasPointSanction`). El asterisco va en su propia etiqueta para que siga visible aunque el nombre se trunque
+- **Pantalla de Sanciones**: Desde el enlace de la leyenda se abre `SanctionsViewController`, una lista con el escudo del equipo, los puntos descontados en rojo y la resolución completa que los explica
 - **Zonas de Clasificación** (modo claro):
   - 🟡 **Puesto 1**: Cuadrado dorado en el número de posición
   - 🟢 **Zona Libertadores**: Fondo dorado (puestos 1-4 según torneo)
@@ -82,7 +85,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Fotos**: Se cargan con Kingfisher desde la URL guardada en Firestore (solo `https`). Sin foto se muestra un ícono. Si alguna foto exige atribución, se muestra al pie (p. ej. "Fotos: Wikimedia Commons")
 - **Estados**: Cargando, sin plantilla disponible y error de red
 - **Datos**: `equipos/{code}/players`, solo documentos con `active == true`. La plantilla se cachea en memoria por equipo durante la sesión (`CachingPlayersRepository`)
-- **Origen de los datos**: Los carga el panel de administración (plantilla desde ESPN; fotos desde Wikidata o manuales). La app solo lee
+- **Origen de los datos**: Los carga el panel de administración (plantilla desde Transfermarkt; fotos desde Wikidata o manuales). La app solo lee
 
 ### 📰 Noticias
 
@@ -113,7 +116,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 #### Carga de la Pantalla Favoritos (Equipos)
 - **Skeleton Animado**: `FavoritosSkeletonView` muestra un placeholder pulsante (fade opacity) que imita el layout de `TeamTableViewCell` mientras se cargan los datos, evitando el flash de estado vacío
 - **Caché Primero en Favoritos**: `FavoritesService.fetchFavoriteTeams()` conserva su carga inmediata desde caché
-- **Posiciones vigentes**: `TeamsRepository.fetchTeams(for:)` intenta servidor y usa el fallback offline de Firestore, para que una recarga no quede una actualización atrás
+- **Posiciones vigentes**: La pantalla Tabla usa `TeamsRepository.observeTeams(for:)` (listener compartido por colección). `fetchTeams(for:)` queda para lecturas puntuales como el simulador
 - **Estado Inicial Correcto**: `isLoading` arranca en `true` para que el skeleton sea visible desde el primer frame
 
 ### 🔐 Autenticación
@@ -156,7 +159,8 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **FCM Integration**: Integración con Firebase Cloud Messaging
 - **Badge Management**: Limpieza automática de badge al abrir la app (API moderna iOS 18)
 - **Topics**: Suscripción a topics (ej: "live_matches")
-- **Marcador en background**: Al recibir el push silencioso `score_update` (lo envía el live-sync del admin con `jornadaId`), `AppDelegate` lee esa jornada del servidor antes de llamar al `completionHandler` (timeout de seguridad de 20 s). Así la caché persistente ya tiene el marcador nuevo cuando el usuario abre la app. iOS no entrega estos pushes si la app fue cerrada a la fuerza y puede retrasarlos (ahorro de batería)
+- **Tap en notificación de partido**: Al tocar una notificación de gol, inicio o final, la app abre el detalle de ese partido (marcador, goleadores con minuto, estadio, etc.) sobre la pestaña Inicio, también en arranque en frío o si el login aún no terminó. `MatchRoute(userInfo:)` lee `match_id`/`jornada_id` (notificación visible) o `matchId`/`jornadaId` (push silencioso); `FetchMatchesUseCase.fetchMatch(id:jornadaId:)` obtiene el partido desde la caché y el detalle sigue escuchando la jornada en vivo
+- **Marcador en background**: Al recibir el push silencioso `score_update` (lo envía el live-sync del admin con `jornadaId`), `AppDelegate` lee del servidor, en paralelo, esa jornada y las tablas afectadas (la del torneo de la jornada y el Acumulado) antes de llamar al `completionHandler` (timeout de seguridad de 20 s). Así la caché persistente ya tiene el marcador y las posiciones nuevas (incluido un gol anulado) cuando el usuario abre la app. iOS no entrega estos pushes si la app fue cerrada a la fuerza y puede retrasarlos (ahorro de batería)
 - **Pantalla de Ajustes**: Pantalla dedicada que muestra el estado de las notificaciones y permite abrir Configuración del sistema
 - **Historial de Notificaciones**: Visualización de todas las notificaciones entregadas al dispositivo
   - Tabla plana con celdas de mayor altura para mejor legibilidad
@@ -310,7 +314,7 @@ View → ViewModel → UseCase → Repository → Firestore
 - **UseCases/**: Casos de uso (lógica de negocio)
   - **Jornadas/**: `FetchActiveJornadasUseCase`, `ObserveActiveJornadasUseCase`, `GetJornadaToDisplayUseCase` (jornada única a mostrar: menor `fechaInicio` entre activas)
   - **Matches/**: `FetchMatchesUseCase`, `ObserveMatchesUseCase`
-  - **Teams/**: `FetchTeamsUseCase`, `GetTournamentAvailabilityUseCase`, `CalculateAccumulatedStandingsUseCase`, `FetchSquadUseCase`
+  - **Teams/**: `FetchTeamsUseCase` (lectura puntual y `observe(for:)` en tiempo real), `GetTournamentAvailabilityUseCase`, `FetchSquadUseCase`
   - **News/**: `FetchNewsUseCase`
   - **Favorites/**: `ToggleFavoriteUseCase`, `ObserveFavoritesUseCase`, `FetchFavoriteMatchesUseCase`
   - **Auth/**: `LoginUseCase`, `LogoutUseCase`
@@ -740,10 +744,10 @@ Además existen `Repositories/` (`CachingTeamsRepositoryTests`, `CachingPlayersR
 | `TeamDetailViewModel` | Estados cargando/cargado/vacío/error, agrupación por línea y atribución de fotos |
 | `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
 | `ObserveMatchesUseCase` | Reenvía actualizaciones del repository, el estado de confirmación del servidor y el refresco con `completion` |
-| `FetchTeamsUseCase` | Acumulado permanece derivado; apertura/clausura delegan correctamente |
-| `CalculateAccumulatedStandingsUseCase` | Suma por ID estable, suma de sanciones negativas con reordenamiento, ignora sanciones de equipos desconocidos o no negativas, sin partidos jugados mantiene 0 y orden alfabético |
+| `FetchTeamsUseCase` | El Acumulado lee su colección; apertura/clausura delegan; `observe` usa el listener del repositorio; `refreshStandings(forJornadaId:)` elige la tabla del torneo + Acumulado y propaga el fallo |
+| `CachingTeamsRepository` | `refreshStandings` descarta la caché en memoria y delega |
 | `TeamsRepository.sanctions(from:teamCode:)` | Lee `sanctions`, recorta la resolución y descarta entradas positivas o sin puntos |
-| `TorneoViewModel` | Flag apagado/encendido, suma del Acumulado por ID estable, aplica sanciones y expone las notas de la leyenda solo en el Acumulado |
+| `TorneoViewModel` | Flag apagado/encendido, observa la tabla sin lecturas puntuales, reutiliza el listener del mismo torneo, no vuelve a restar sanciones, marca a los sancionados y expone las notas de la leyenda solo en el Acumulado |
 | `FetchNewsUseCase` | Delega y propaga resultado/error |
 | `ObserveFavoriteTeamsUseCase` | `execute` reenvía IDs, `refreshFavoriteTeams` delega fetch al service |
 | `ToggleFavoriteTeamUseCase` | Retorna `true`/`false` según service, propaga error |
@@ -803,7 +807,7 @@ Plantilla de cada equipo. `{code}` es el código del equipo (`ali`, `uni`, `cri`
 equipos/
 └── {code}/
     └── players/
-        └── {playerId}           # Ejemplo: "espn_47543"
+        └── {playerId}           # Ejemplo: "angel-zamudio"
             ├── name: String
             ├── shortName: String
             ├── number: Int      # Dorsal (opcional)
@@ -811,6 +815,7 @@ equipos/
             ├── age: Int         # Opcional
             ├── photoURL: String # https (opcional)
             ├── photoCredit: String # Atribución de la foto (opcional)
+            ├── nationality: String # FIFA o ISO de 3 letras, ej. "PER" (opcional)
             └── active: Bool     # Solo se muestran los activos
 ```
 

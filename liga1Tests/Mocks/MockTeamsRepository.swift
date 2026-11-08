@@ -13,7 +13,11 @@ final class MockTeamsRepository: TeamsRepositoryProtocol {
     var lastTorneoRequested: TorneoType?
     var lastInvalidatedTorneo: TorneoType??   // nil = not called; .some(nil) = invalidate all
     var pointSanctions: [PointSanction] = []
-    var fetchPointSanctionsCallCount = 0
+    var observePointSanctionsCallCount = 0
+    var observedTeams: [TorneoType: [Team]] = [:]
+    var observedTorneos: [TorneoType] = []
+    var refreshedTorneos: [TorneoType]?
+    var refreshResult = true
 
     func fetchTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         fetchCallCount += 1
@@ -26,8 +30,18 @@ final class MockTeamsRepository: TeamsRepositoryProtocol {
         }
     }
 
-    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
-        fetchPointSanctionsCallCount += 1
+    func observeTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Never> {
+        observedTorneos.append(torneo)
+        return Just(observedTeams[torneo] ?? []).eraseToAnyPublisher()
+    }
+
+    func refreshStandings(for torneos: [TorneoType], completion: @escaping (Bool) -> Void) {
+        refreshedTorneos = torneos
+        completion(refreshResult)
+    }
+
+    func observePointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        observePointSanctionsCallCount += 1
         return Just(pointSanctions).eraseToAnyPublisher()
     }
 

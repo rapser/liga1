@@ -22,6 +22,8 @@ struct TeamUI {
     let diferenciaGoles: Int
     let puntos: Int
     var isFavorite: Bool = false
+    /// Tiene puntos descontados por sanción (solo se marca en el Acumulado).
+    var hasPointSanction: Bool = false
 
     // MARK: - Computed Properties for UI
 
@@ -67,6 +69,7 @@ extension TeamUI: Hashable {
 
 /// Fila de la leyenda de sanciones bajo la tabla acumulada.
 struct SanctionNoteUI: Equatable {
+    let teamCode: String
     let teamName: String
     let points: Int
     let resolution: String
@@ -82,6 +85,7 @@ struct SanctionNoteUI: Equatable {
             .filter { $0.points < 0 }
             .map {
                 SanctionNoteUI(
+                    teamCode: $0.teamCode,
                     teamName: nameByCode[$0.teamCode] ?? $0.teamCode.uppercased(),
                     points: $0.points,
                     resolution: $0.resolution
@@ -92,5 +96,13 @@ struct SanctionNoteUI: Equatable {
                     ? $0.points < $1.points
                     : $0.teamName.localizedCaseInsensitiveCompare($1.teamName) == .orderedAscending
             }
+    }
+}
+
+extension Array where Element == SanctionNoteUI {
+    /// Texto del enlace en la leyenda: "4 equipos con descuento de puntos".
+    var legendSummary: String {
+        let teams = Set(map(\.teamCode)).count
+        return teams == 1 ? "1 equipo con descuento de puntos" : "\(teams) equipos con descuento de puntos"
     }
 }

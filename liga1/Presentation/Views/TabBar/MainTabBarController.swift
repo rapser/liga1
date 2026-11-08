@@ -6,11 +6,13 @@
 //
 
 import UIKit
+import Combine
 
 class MainTabBarController: UITabBarController {
 
     private let container: DIContainer
     private let eventBus: AppEventBusProtocol
+    private var openMatchCancellable: AnyCancellable?
 
     init(container: DIContainer, eventBus: AppEventBusProtocol) {
         self.container = container
@@ -41,6 +43,10 @@ class MainTabBarController: UITabBarController {
         torneoVC.onTeamSelected = { [weak torneoVC, container] team in
             let detalle = container.makeTeamDetailViewController(team: team)
             torneoVC?.navigationController?.pushViewController(detalle, animated: true)
+        }
+        torneoVC.onShowSanctions = { [weak torneoVC, container] notes in
+            let sanciones = container.makeSanctionsViewController(notes: notes)
+            torneoVC?.navigationController?.pushViewController(sanciones, animated: true)
         }
 
         // Noticias: fuera del tab bar en el rediseño "Fan Experience".
@@ -125,5 +131,35 @@ class MainTabBarController: UITabBarController {
                                                      image: UIImage(systemName: imageSystemName),
                                                      tag: 0)
         return nav
+    }
+
+    // MARK: - Deep link desde notificación
+
+    /// Abre el detalle del partido de una notificación (gol, inicio, final) sobre la pestaña Inicio.
+    /// El partido sale de la caché si ya está; el detalle sigue escuchando la jornada en vivo.
+    /// Si no se encuentra, el usuario queda en Inicio.
+    func openMatch(_ route: MatchRoute) {
+        presentedViewController?.dismiss(animated: false)
+        selectedIndex = 0
+        guard let homeNav = viewControllers?.first as? UINavigationController else { return }
+        homeNav.popToRootViewController(animated: false)
+
+        openMatchCancellable = container.makeFetchMatchesUseCase()
+            .fetchMatch(id: route.matchId, jornadaId: route.jornadaId)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { _ in },
+                receiveValue: { [weak self, weak homeNav] match in
+                    guard let self, let homeNav, let match else { return }
+                    let context = MatchDetailContext(
+                        jornadaId: route.jornadaId,
+                        jornadaNumero: route.jornadaNumero,
+                        torneo: route.torneo,
+                        match: MatchUIMapper.toUI(from: match)
+                    )
+                    let detail = self.container.makeMatchDetailViewController(context: context)
+                    homeNav.pushViewController(detail, animated: true)
+                }
+            )
     }
 }

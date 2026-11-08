@@ -171,7 +171,7 @@ extension RefereePoll {
 
 extension Player {
     static func fixture(
-        id: String = "espn_1",
+        id: String = "angel-zamudio",
         name: String = "Jugador Prueba",
         number: Int? = 10,
         position: PlayerPosition = .midfielder,
