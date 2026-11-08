@@ -45,4 +45,6 @@ struct Player: Identifiable, Equatable, Hashable {
     let photoURL: URL?
     /// Atribución de la foto (p. ej. "Wikimedia Commons"). `nil` si no la exige.
     let photoCredit: String?
+    /// Código de nacionalidad de 3 letras (FIFA o ISO), ej. "PER". `nil` si no se conoce.
+    var nationality: String? = nil
 }

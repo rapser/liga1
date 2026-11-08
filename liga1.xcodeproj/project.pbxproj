@@ -193,6 +193,7 @@
 		A1C0F0132FA0000100000013 /* FirebaseTournamentConfigRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0122FA0000100000012 /* FirebaseTournamentConfigRepository.swift */; };
 		A1C0F0152FA0000100000015 /* GetTournamentAvailabilityUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0F0142FA0000100000014 /* GetTournamentAvailabilityUseCase.swift */; };
 		A3713CE73DC663ABBBB75D18 /* MatchWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7EFCC89720430BB1A2DD7A /* MatchWeather.swift */; };
+		A687446059E67344ADC27373 /* CountryFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CE3C8B6DC4518DC5FBE58E /* CountryFlag.swift */; };
 		A76A4167D719438AA4F4251C /* LoginWithGoogleUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */; };
 		ABEBBA71C1E2DA1C9997CDBA /* PlayerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CE2921CF15702CF60EDF497 /* PlayerCell.swift */; };
 		ACBF47F491C28BC4912BF434 /* SimulateStandingsUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6842C578B9E4FC39F3AFC325 /* SimulateStandingsUseCase.swift */; };
@@ -247,6 +248,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04CE3C8B6DC4518DC5FBE58E /* CountryFlag.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CountryFlag.swift; sourceTree = "<group>"; };
 		0F35E8184FF24A7B9020649E /* GetStadiumForTeamUseCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GetStadiumForTeamUseCase.swift; sourceTree = "<group>"; };
 		143B6DFC97CF47F2AD215DF5 /* LoginWithGoogleUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginWithGoogleUseCase.swift; sourceTree = "<group>"; };
 		1CE2921CF15702CF60EDF497 /* PlayerCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerCell.swift; sourceTree = "<group>"; };
@@ -680,6 +682,7 @@
 				464001782F08853F00A8C905 /* TorneoType.swift */,
 				D15C4BFCE1DA34552E8406C3 /* Slug.swift */,
 				4ACE4310D7A01561E1B4FC3E /* ShareImageRenderer.swift */,
+				04CE3C8B6DC4518DC5FBE58E /* CountryFlag.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -1746,6 +1749,7 @@
 				ABEBBA71C1E2DA1C9997CDBA /* PlayerCell.swift in Sources */,
 				08D42366F07B3C9766ACF070 /* TeamDetailViewController.swift in Sources */,
 				6AC5EAB17AF06D5D603D4325 /* SanctionsViewController.swift in Sources */,
+				A687446059E67344ADC27373 /* CountryFlag.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

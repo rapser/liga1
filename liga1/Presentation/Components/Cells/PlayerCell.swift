@@ -36,8 +36,15 @@ final class PlayerCell: UITableViewCell {
 
     func configure(with player: Player) {
         nameLabel.text = player.name
-        detailLabel.text = player.age.map { "\($0) años" }
-        detailLabel.isHidden = player.age == nil
+        let country = [CountryFlag.emoji(for: player.nationality), CountryFlag.name(for: player.nationality)]
+            .compactMap { $0 }
+            .joined(separator: " ")
+        // Ej. "🇵🇪 Perú · 25 años"
+        let detail = [country.isEmpty ? nil : country, player.age.map { "\($0) años" }]
+            .compactMap { $0 }
+            .joined(separator: " · ")
+        detailLabel.text = detail
+        detailLabel.isHidden = detail.isEmpty
         numberLabel.text = player.number.map(String.init)
 
         if let url = player.photoURL {
@@ -46,7 +53,12 @@ final class PlayerCell: UITableViewCell {
             avatarView.image = Self.placeholder
         }
 
-        accessibilityLabel = [player.number.map { "Dorsal \($0)" }, player.name, player.age.map { "\($0) años" }]
+        accessibilityLabel = [
+            player.number.map { "Dorsal \($0)" },
+            player.name,
+            CountryFlag.name(for: player.nationality),
+            player.age.map { "\($0) años" }
+        ]
             .compactMap { $0 }
             .joined(separator: ", ")
     }

@@ -815,6 +815,7 @@ equipos/
             ├── age: Int         # Opcional
             ├── photoURL: String # https (opcional)
             ├── photoCredit: String # Atribución de la foto (opcional)
+            ├── nationality: String # FIFA o ISO de 3 letras, ej. "PER" (opcional)
             └── active: Bool     # Solo se muestran los activos
 ```
 

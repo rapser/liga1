@@ -13,11 +13,13 @@ final class PlayerMapperTests: XCTestCase {
         position: String? = "FW",
         age: Int? = 42,
         photoURL: String? = nil,
-        photoCredit: String? = nil
+        photoCredit: String? = nil,
+        nationality: String? = nil
     ) -> PlayerDTO {
         PlayerDTO(
             name: name, shortName: shortName, number: number, position: position,
-            age: age, photoURL: photoURL, photoCredit: photoCredit, active: true
+            age: age, photoURL: photoURL, photoCredit: photoCredit, active: true,
+            nationality: nationality
         )
     }
 
@@ -60,5 +62,10 @@ final class PlayerMapperTests: XCTestCase {
         XCTAssertNil(PlayerMapper.toDomain(from: dto(photoURL: "http://example.com/p.jpg"), id: "a")?.photoURL)
         XCTAssertNil(PlayerMapper.toDomain(from: dto(photoURL: ""), id: "a")?.photoURL)
         XCTAssertNil(PlayerMapper.toDomain(from: dto(photoURL: nil), id: "a")?.photoURL)
+    }
+
+    func test_toDomain_mapsNationalityUppercased() {
+        XCTAssertEqual(PlayerMapper.toDomain(from: dto(nationality: "per"), id: "x")?.nationality, "PER")
+        XCTAssertNil(PlayerMapper.toDomain(from: dto(nationality: ""), id: "x")?.nationality)
     }
 }
