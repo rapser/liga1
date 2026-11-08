@@ -5,7 +5,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 ## 📱 Características
 
 - **Partidos por Jornada**: Visualiza los partidos organizados por jornadas con resultados en tiempo real. Header de fecha inteligente que muestra el día del próximo partido con icono de calendario; carga fiable desde el primer arranque; al abrir la app la lista aparece al instante desde la caché y el marcador de los partidos en juego pulsa hasta que el servidor lo confirma
-- **Tabla de Posiciones**: Apertura está siempre disponible. Clausura y Acumulado se habilitan juntos mediante Firebase Remote Config cuando comienza el segundo torneo del año
+- **Tabla de Posiciones**: Apertura está siempre disponible. Clausura y Acumulado se habilitan juntos mediante Firebase Remote Config cuando comienza el segundo torneo del año. El Acumulado descuenta los puntos de las sanciones reglamentarias y explica cada una en la leyenda
 - **Favoritos**: Carga instantánea gracias a caché Firestore; skeleton animado durante la carga inicial; sincronización en tiempo real con equipos favoritos
 - **Noticias**: Mantente informado con las últimas noticias del fútbol peruano (solo publicadas), agrupadas por categoría; la categoría Destacado siempre primero, el resto ordenadas por fecha
 - **Autenticación**: Ingresa con Google o correo electrónico para sincronizar tus favoritos
@@ -56,10 +56,11 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Carga sin saltos visuales**: La pantalla nace con el último valor activado y persistido por Remote Config, y solo cambia si Firebase publica un valor diferente
 - **Fallback seguro**: Sin conexión se conserva el último valor activado; en una instalación nueva o sin clave se muestra solamente Apertura
 - **Acumulado derivado**: Se calcula en el dispositivo sumando las colecciones `apertura` y `clausura` por document ID; no requiere una colección `acumulado`
+- **Sanciones de puntos**: Las sanciones (CCRD-FPF, Comisión de Licencias, etc.) se leen de `equipos/{code}.sanctions` y se suman (son negativas) **solo** al Acumulado, tanto en la tabla como en el simulador. Apertura y Clausura muestran los puntos ganados en cancha. Si la lectura falla, el Acumulado se muestra sin descuentos en lugar de quedar vacío. Una sanción nueva se carga desde el admin y no requiere publicar otra versión
 
 #### Características Visuales
 - **Indicador de Campeón**: Cuadrado dorado alrededor del número 1 con texto en negrita (sin punto); el resto de posiciones muestran número con punto sin fondo
-- **Leyenda dinámica**: Apertura y Clausura muestran campeón; Acumulado muestra las zonas internacionales y de descenso
+- **Leyenda dinámica**: Apertura y Clausura muestran campeón; Acumulado muestra las zonas internacionales y de descenso, y debajo la sección **Sanciones (descuento de puntos)** con el equipo, los puntos descontados y la resolución que los explica. La altura de la leyenda se ajusta al texto
 - **Zonas de Clasificación** (modo claro):
   - 🟡 **Puesto 1**: Cuadrado dorado en el número de posición
   - 🟢 **Zona Libertadores**: Fondo dorado (puestos 1-4 según torneo)
@@ -740,7 +741,9 @@ Además existen `Repositories/` (`CachingTeamsRepositoryTests`, `CachingPlayersR
 | `FetchMatchesUseCase` | Guard jornadaId vacío (sin llamar repo), filtro por día Lima (UTC−5, incluyendo 23:30), ordenamiento por `fecha`, propagación de error |
 | `ObserveMatchesUseCase` | Reenvía actualizaciones del repository, el estado de confirmación del servidor y el refresco con `completion` |
 | `FetchTeamsUseCase` | Acumulado permanece derivado; apertura/clausura delegan correctamente |
-| `TorneoViewModel` | Flag apagado/encendido y suma del Acumulado por ID estable |
+| `CalculateAccumulatedStandingsUseCase` | Suma por ID estable, suma de sanciones negativas con reordenamiento, ignora sanciones de equipos desconocidos o no negativas, sin partidos jugados mantiene 0 y orden alfabético |
+| `TeamsRepository.sanctions(from:teamCode:)` | Lee `sanctions`, recorta la resolución y descarta entradas positivas o sin puntos |
+| `TorneoViewModel` | Flag apagado/encendido, suma del Acumulado por ID estable, aplica sanciones y expone las notas de la leyenda solo en el Acumulado |
 | `FetchNewsUseCase` | Delega y propaga resultado/error |
 | `ObserveFavoriteTeamsUseCase` | `execute` reenvía IDs, `refreshFavoriteTeams` delega fetch al service |
 | `ToggleFavoriteTeamUseCase` | Retorna `true`/`false` según service, propaga error |
@@ -776,6 +779,21 @@ jornadas/
 ```
 
 **Nota**: Los campos `torneo` y `numero` se extraen del `documentID`, no se almacenan como campos. El campo `mostrar` ya no se lee: la visibilidad en Home la define `horariosConfirmados` más la ventana de 7 días. Los horarios los carga y confirma el panel de administración.
+
+### Campo: `equipos/{code}.sanctions`
+
+Sanciones de puntos del equipo. Solo afectan la tabla Acumulada. La app solo lee; las carga el panel de administración (tarjeta "Sanciones de puntos" en Equipos).
+
+```
+equipos/
+└── {code}/                      # Ejemplo: "utc"
+    └── sanctions: [             # Opcional; sin campo = sin sanciones
+          {
+            points: Int,         # Siempre negativo, ej. -10
+            resolution: String   # Ej. "Resolución N.° 080-CL-LFPP-2026"
+          }
+        ]
+```
 
 ### Colección: `equipos/{code}/players`
 

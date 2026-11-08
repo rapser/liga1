@@ -21,6 +21,19 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - **Presentación de la tabla**: Se elimina el espacio automático sobre las columnas y las referencias se agrupan en una tarjeta compacta con puestos y significado.
 - **Separación por capas**: Remote Config se encapsula en un repositorio de Data y el cálculo del Acumulado pasa a un caso de uso puro del Domain.
 
+## [1.0.0 (30)] - 2026-11-07
+
+> ℹ️ **Datos en Firestore**: Las sanciones de la Liga1 2026 ya están cargadas en `equipos/{code}.sanctions` (UTC −10, Sport Boys −4, FC Cajamarca −2, ADT −1). Las versiones anteriores de la app no las restan.
+
+### ✨ Added
+- **Sanciones de puntos en el Acumulado**: La tabla Acumulada y el simulador suman las sanciones de cada equipo (puntos negativos) leídas de `equipos/{code}.sanctions` = `[{ points, resolution }]`. Apertura y Clausura no cambian.
+  - Domain: entidad `PointSanction`; `CalculateAccumulatedStandingsUseCase.execute(apertura:clausura:sanctions:)`.
+  - Data: `TeamsRepository.fetchPointSanctions()` (nunca falla; sin datos devuelve `[]`), expuesto vía `FetchTeamsUseCase.fetchPointSanctions()`.
+- **Leyenda de sanciones**: Bajo la leyenda del Acumulado aparece "Sanciones (descuento de puntos)" con equipo, puntos y resolución (`SanctionNoteUI`, `TorneoViewModel.sanctionNotes`). La altura de la leyenda se calcula según su contenido.
+
+### 🔧 Changed
+- **Build**: `CURRENT_PROJECT_VERSION` pasa de 29 a 30.
+
 ## [1.0.0 (29)] - 2026-10-29
 
 ### ✨ Added
