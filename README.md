@@ -85,7 +85,7 @@ Aplicación iOS para seguir la Liga 1 de Fútbol Profesional del Perú. Consulta
 - **Fotos**: Se cargan con Kingfisher desde la URL guardada en Firestore (solo `https`). Sin foto se muestra un ícono. Si alguna foto exige atribución, se muestra al pie (p. ej. "Fotos: Wikimedia Commons")
 - **Estados**: Cargando, sin plantilla disponible y error de red
 - **Datos**: `equipos/{code}/players`, solo documentos con `active == true`. La plantilla se cachea en memoria por equipo durante la sesión (`CachingPlayersRepository`)
-- **Origen de los datos**: Los carga el panel de administración (plantilla desde ESPN; fotos desde Wikidata o manuales). La app solo lee
+- **Origen de los datos**: Los carga el panel de administración (plantilla desde Transfermarkt; fotos desde Wikidata o manuales). La app solo lee
 
 ### 📰 Noticias
 
@@ -807,7 +807,7 @@ Plantilla de cada equipo. `{code}` es el código del equipo (`ali`, `uni`, `cri`
 equipos/
 └── {code}/
     └── players/
-        └── {playerId}           # Ejemplo: "espn_47543"
+        └── {playerId}           # Ejemplo: "angel-zamudio"
             ├── name: String
             ├── shortName: String
             ├── number: Int      # Dorsal (opcional)

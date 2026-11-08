@@ -26,10 +26,10 @@ final class PlayerMapperTests: XCTestCase {
     func test_toDomain_mapsAllFields() {
         let player = PlayerMapper.toDomain(
             from: dto(photoURL: "https://upload.wikimedia.org/p.jpg", photoCredit: "Wikimedia Commons"),
-            id: "espn_1"
+            id: "angel-zamudio"
         )
 
-        XCTAssertEqual(player?.id, "espn_1")
+        XCTAssertEqual(player?.id, "angel-zamudio")
         XCTAssertEqual(player?.name, "Paolo Guerrero")
         XCTAssertEqual(player?.shortName, "P. Guerrero")
         XCTAssertEqual(player?.number, 9)
