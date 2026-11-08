@@ -12,7 +12,11 @@ final class PlayerCell: UITableViewCell {
     static let reuseIdentifier = "PlayerCell"
 
     private static let avatarSize: CGFloat = 44
-    private static let placeholder = UIImage(systemName: "person.fill")
+    /// Silueta de jugador: se ve si no hay URL, mientras carga y si la foto no se puede leer.
+    private static let placeholder = UIImage(
+        systemName: "person.fill",
+        withConfiguration: UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
+    )
 
     private let avatarView = UIImageView()
     private let nameLabel = UILabel()
@@ -31,7 +35,7 @@ final class PlayerCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         avatarView.kf.cancelDownloadTask()
-        avatarView.image = Self.placeholder
+        showPlaceholder()
     }
 
     func configure(with player: Player) {
@@ -47,11 +51,7 @@ final class PlayerCell: UITableViewCell {
         detailLabel.isHidden = detail.isEmpty
         numberLabel.text = player.number.map(String.init)
 
-        if let url = player.photoURL {
-            avatarView.kf.setImage(with: url, placeholder: Self.placeholder)
-        } else {
-            avatarView.image = Self.placeholder
-        }
+        loadPhoto(player.photoURL)
 
         accessibilityLabel = [
             player.number.map { "Dorsal \($0)" },
@@ -63,18 +63,56 @@ final class PlayerCell: UITableViewCell {
             .joined(separator: ", ")
     }
 
+    // MARK: - Foto
+
+    /// Silueta centrada (sin recortar) sobre el fondo gris del círculo.
+    private func showPlaceholder() {
+        avatarView.contentMode = .center
+        avatarView.image = Self.placeholder
+    }
+
+    /// Muestra la silueta y, solo si la foto se descarga bien, la reemplaza.
+    /// Sin URL, con URL inválida o si la descarga falla, queda la silueta.
+    private func loadPhoto(_ url: URL?) {
+        showPlaceholder()
+        guard let url else { return }
+
+        let pixelSize = Self.avatarSize * UIScreen.main.scale
+        avatarView.kf.setImage(
+            with: url,
+            placeholder: Self.placeholder,
+            options: [
+                // La foto de Transfermarkt pesa ~140 KB: se reduce al tamaño del avatar.
+                .processor(DownsamplingImageProcessor(size: CGSize(width: pixelSize, height: pixelSize))),
+                .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage,
+                .transition(.fade(0.2)),
+                .onFailureImage(Self.placeholder)
+            ]
+        ) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                self.avatarView.contentMode = .scaleAspectFill
+            case .failure(let error):
+                // Una descarga cancelada por reutilizar la celda no debe tocar la nueva.
+                guard !error.isTaskCancelled, !error.isNotCurrentTask else { return }
+                self.showPlaceholder()
+            }
+        }
+    }
+
     private func setupUI() {
         selectionStyle = .none
         backgroundColor = .systemBackground
         isAccessibilityElement = true
 
         avatarView.translatesAutoresizingMaskIntoConstraints = false
-        avatarView.contentMode = .scaleAspectFill
         avatarView.clipsToBounds = true
         avatarView.layer.cornerRadius = Self.avatarSize / 2
         avatarView.backgroundColor = .tertiarySystemFill
         avatarView.tintColor = .secondaryLabel
-        avatarView.image = Self.placeholder
+        showPlaceholder()
 
         nameLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         nameLabel.textColor = .label
