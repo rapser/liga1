@@ -48,6 +48,33 @@ class TeamsRepository: TeamsRepositoryProtocol {
         // La caché del SDK de Firestore se gestiona internamente; no hay estado en memoria aquí.
     }
 
+    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        Future<[PointSanction], Never> { [weak self] promise in
+            guard let self = self else { promise(.success([])); return }
+            self.db.collection(FirestoreConstants.Collection.teams)
+                .getDocuments(source: .default) { snapshot, _ in
+                    // Si falla la lectura, el acumulado se muestra sin sanciones
+                    // en lugar de dejar la tabla vacía.
+                    let sanctions = (snapshot?.documents ?? []).flatMap { doc in
+                        Self.sanctions(from: doc.data(), teamCode: doc.documentID)
+                    }
+                    promise(.success(sanctions))
+                }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    static func sanctions(from data: [String: Any], teamCode: String) -> [PointSanction] {
+        let raw = data[FirestoreConstants.TeamMasterField.sanctions] as? [[String: Any]] ?? []
+        return raw.compactMap { item in
+            guard let points = (item[FirestoreConstants.SanctionField.points] as? NSNumber)?.intValue,
+                  points < 0 else { return nil }
+            let resolution = (item[FirestoreConstants.SanctionField.resolution] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return PointSanction(teamCode: teamCode, points: points, resolution: resolution)
+        }
+    }
+
     private func buildTeams(from documents: [QueryDocumentSnapshot]) -> [Team] {
         let teamDTOs = documents.compactMap { doc -> TeamDTO? in
             guard let dto = try? doc.data(as: TeamDTO.self) else { return nil }

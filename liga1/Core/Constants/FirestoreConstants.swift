@@ -82,6 +82,18 @@ public enum FirestoreConstants {
         public static let points = "points"
     }
 
+    // MARK: - Equipos (datos maestros) Fields
+
+    public enum TeamMasterField {
+        /// Array de sanciones `[{ points: -10, resolution: "..." }]`. Solo afectan el acumulado.
+        public static let sanctions = "sanctions"
+    }
+
+    public enum SanctionField {
+        public static let points = "points"
+        public static let resolution = "resolution"
+    }
+
     // MARK: - Jornada Fields
 
     public enum JornadaField {

@@ -12,6 +12,8 @@ import Combine
 protocol FetchTeamsUseCaseProtocol {
     func execute(for torneo: TorneoType) -> AnyPublisher<[Team], Error>
     func invalidateCache(for torneo: TorneoType?)
+    /// Sanciones de puntos por equipo. Solo para el acumulado.
+    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never>
 }
 
 class FetchTeamsUseCase: FetchTeamsUseCaseProtocol {
@@ -36,5 +38,9 @@ class FetchTeamsUseCase: FetchTeamsUseCaseProtocol {
 
     func invalidateCache(for torneo: TorneoType?) {
         repository.invalidateCache(for: torneo)
+    }
+
+    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        repository.fetchPointSanctions()
     }
 }

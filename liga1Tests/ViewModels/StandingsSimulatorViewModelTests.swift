@@ -163,6 +163,7 @@ final class StandingsSimulatorViewModelTests: XCTestCase {
 private struct StubFetchTeams: FetchTeamsUseCaseProtocol {
     let byTorneo: [TorneoType: [Team]]
     var error: Error?
+    var pointSanctions: [PointSanction] = []
 
     func execute(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         if let error { return Fail(error: error).eraseToAnyPublisher() }
@@ -170,6 +171,10 @@ private struct StubFetchTeams: FetchTeamsUseCaseProtocol {
     }
 
     func invalidateCache(for torneo: TorneoType?) {}
+
+    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        Just(pointSanctions).eraseToAnyPublisher()
+    }
 }
 
 private struct StubFetchRemainingFixtures: FetchRemainingFixturesUseCaseProtocol {
