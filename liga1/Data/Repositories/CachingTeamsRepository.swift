@@ -38,6 +38,11 @@ final class CachingTeamsRepository: TeamsRepositoryProtocol {
             .eraseToAnyPublisher()
     }
 
+    /// Sin caché: son pocos documentos y una sanción nueva debe verse al recargar.
+    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        inner.fetchPointSanctions()
+    }
+
     func invalidateCache(for torneo: TorneoType?) {
         lock.lock()
         defer { lock.unlock() }

@@ -149,7 +149,7 @@ class TablaViewController: UIViewController {
         )
     }
 
-    private func makeLegendFooter(for torneo: TorneoType) -> UIView {
+    private func makeLegendFooter(for torneo: TorneoType, sanctionNotes: [SanctionNoteUI] = []) -> UIView {
         let footer = UIView()
         footer.backgroundColor = .clear
 
@@ -189,6 +189,19 @@ class TablaViewController: UIViewController {
         stack.setCustomSpacing(10, after: titleLabel)
         stack.prepareForAutoLayout()
 
+        if torneo == .acumulado, !sanctionNotes.isEmpty, let lastRow = rows.last {
+            stack.setCustomSpacing(16, after: lastRow)
+
+            let sanctionsTitle = UILabel()
+            sanctionsTitle.text = "Sanciones (descuento de puntos)"
+            sanctionsTitle.font = .systemFont(ofSize: 13, weight: .semibold)
+            sanctionsTitle.textColor = .label
+            stack.addArrangedSubview(sanctionsTitle)
+            stack.setCustomSpacing(10, after: sanctionsTitle)
+
+            sanctionNotes.forEach { stack.addArrangedSubview(makeSanctionRow($0)) }
+        }
+
         footer.addSubview(card)
         card.addSubview(stack)
 
@@ -208,9 +221,44 @@ class TablaViewController: UIViewController {
             padding: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         )
 
-        let height: CGFloat = torneo == .acumulado ? 174 : 86
-        footer.frame = CGRect(x: 0, y: 0, width: 0, height: height)
+        // Altura según contenido: las resoluciones ocupan varias líneas.
+        let width = tableView.bounds.width > 0 ? tableView.bounds.width : view.bounds.width
+        let height = footer.systemLayoutSizeFitting(
+            CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        ).height
+        footer.frame = CGRect(x: 0, y: 0, width: width, height: ceil(height))
         return footer
+    }
+
+    private func makeSanctionRow(_ note: SanctionNoteUI) -> UIView {
+        let pointsLabel = UILabel()
+        pointsLabel.text = note.pointsText
+        pointsLabel.font = .monospacedDigitSystemFont(ofSize: 12, weight: .bold)
+        pointsLabel.textColor = .systemRed
+        pointsLabel.setContentHuggingPriority(.required, for: .horizontal)
+        pointsLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        let teamLabel = UILabel()
+        teamLabel.text = note.teamName
+        teamLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        teamLabel.textColor = .label
+
+        let header = UIStackView(arrangedSubviews: [teamLabel, pointsLabel])
+        header.axis = .horizontal
+        header.spacing = 8
+
+        let resolutionLabel = UILabel()
+        resolutionLabel.text = note.resolution.isEmpty ? "Sanción reglamentaria" : note.resolution
+        resolutionLabel.font = .systemFont(ofSize: 11)
+        resolutionLabel.textColor = .secondaryLabel
+        resolutionLabel.numberOfLines = 0
+
+        let row = UIStackView(arrangedSubviews: [header, resolutionLabel])
+        row.axis = .vertical
+        row.spacing = 2
+        return row
     }
 
     private func makeLegendRow(color: UIColor, position: String, text: String) -> UIView {
@@ -262,8 +310,25 @@ class TablaViewController: UIViewController {
             .sink { [weak self] torneo in
                 guard let self = self else { return }
                 self.tournamentSelector.selectedSegmentIndex = self.viewModel.availableTorneos.firstIndex(of: torneo) ?? 0
-                self.tableView.tableFooterView = self.makeLegendFooter(for: torneo)
+                self.tableView.tableFooterView = self.makeLegendFooter(
+                    for: torneo,
+                    sanctionNotes: torneo == .acumulado ? self.viewModel.sanctionNotes : []
+                )
                 self.tableView.reloadData()
+            }
+            .store(in: &cancellables)
+
+        viewModel.$sanctionNotes
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notes in
+                guard let self = self else { return }
+                // @Published emite antes de asignar: usar `notes`, no viewModel.sanctionNotes.
+                self.tableView.tableFooterView = self.makeLegendFooter(
+                    for: self.viewModel.selectedTorneo,
+                    sanctionNotes: notes
+                )
             }
             .store(in: &cancellables)
 

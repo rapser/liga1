@@ -12,6 +12,8 @@ final class MockTeamsRepository: TeamsRepositoryProtocol {
     var invalidateCacheCallCount = 0
     var lastTorneoRequested: TorneoType?
     var lastInvalidatedTorneo: TorneoType??   // nil = not called; .some(nil) = invalidate all
+    var pointSanctions: [PointSanction] = []
+    var fetchPointSanctionsCallCount = 0
 
     func fetchTeams(for torneo: TorneoType) -> AnyPublisher<[Team], Error> {
         fetchCallCount += 1
@@ -22,6 +24,11 @@ final class MockTeamsRepository: TeamsRepositoryProtocol {
         case .failure(let error):
             return Fail(error: error).eraseToAnyPublisher()
         }
+    }
+
+    func fetchPointSanctions() -> AnyPublisher<[PointSanction], Never> {
+        fetchPointSanctionsCallCount += 1
+        return Just(pointSanctions).eraseToAnyPublisher()
     }
 
     func invalidateCache(for torneo: TorneoType?) {

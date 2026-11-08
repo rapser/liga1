@@ -18,6 +18,8 @@ class TorneoViewModel {
     @Published private(set) var error: Error?
     @Published private(set) var selectedTorneo: TorneoType
     @Published private(set) var availableTorneos: [TorneoType]
+    /// Sanciones de puntos que explican la tabla acumulada (vacío en Apertura/Clausura).
+    @Published private(set) var sanctionNotes: [SanctionNoteUI] = []
 
     // MARK: - Dependencies
 
@@ -103,6 +105,7 @@ class TorneoViewModel {
     private func fetchTeams(for torneo: TorneoType) {
         isLoading = true
         error = nil
+        sanctionNotes = []
 
         fetchTeamsUseCase.execute(for: torneo)
             .receive(on: DispatchQueue.main)
@@ -121,9 +124,10 @@ class TorneoViewModel {
         isLoading = true
         error = nil
 
-        Publishers.Zip(
+        Publishers.Zip3(
             fetchTeamsUseCase.execute(for: .apertura),
-            fetchTeamsUseCase.execute(for: .clausura)
+            fetchTeamsUseCase.execute(for: .clausura),
+            fetchTeamsUseCase.fetchPointSanctions().setFailureType(to: Error.self)
         )
         .receive(on: DispatchQueue.main)
         .sink { [weak self] completion in
@@ -131,12 +135,14 @@ class TorneoViewModel {
             if case .failure(let error) = completion {
                 self?.error = error
             }
-        } receiveValue: { [weak self] aperturaTeams, clausuraTeams in
+        } receiveValue: { [weak self] aperturaTeams, clausuraTeams, sanctions in
             guard let self = self else { return }
             let merged = self.calculateAccumulatedStandingsUseCase.execute(
                 apertura: aperturaTeams,
-                clausura: clausuraTeams
+                clausura: clausuraTeams,
+                sanctions: sanctions
             )
+            self.sanctionNotes = SanctionNoteUI.make(from: sanctions, teams: merged)
             self.displayedTeams = TeamUIMapper.toUI(from: merged)
         }
         .store(in: &cancellables)

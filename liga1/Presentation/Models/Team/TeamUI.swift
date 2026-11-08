@@ -62,3 +62,35 @@ extension TeamUI: Hashable {
         hasher.combine(ciudad)
     }
 }
+
+// MARK: - Leyenda de sanciones
+
+/// Fila de la leyenda de sanciones bajo la tabla acumulada.
+struct SanctionNoteUI: Equatable {
+    let teamName: String
+    let points: Int
+    let resolution: String
+
+    /// "-10 pts"
+    var pointsText: String {
+        "\(points) pts"
+    }
+
+    static func make(from sanctions: [PointSanction], teams: [Team]) -> [SanctionNoteUI] {
+        let nameByCode = Dictionary(teams.map { ($0.logo, $0.nombre) }, uniquingKeysWith: { first, _ in first })
+        return sanctions
+            .filter { $0.points < 0 }
+            .map {
+                SanctionNoteUI(
+                    teamName: nameByCode[$0.teamCode] ?? $0.teamCode.uppercased(),
+                    points: $0.points,
+                    resolution: $0.resolution
+                )
+            }
+            .sorted {
+                $0.points != $1.points
+                    ? $0.points < $1.points
+                    : $0.teamName.localizedCaseInsensitiveCompare($1.teamName) == .orderedAscending
+            }
+    }
+}
