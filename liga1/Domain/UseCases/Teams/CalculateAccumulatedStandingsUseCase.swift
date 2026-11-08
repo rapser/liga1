@@ -4,13 +4,21 @@
 //
 
 protocol CalculateAccumulatedStandingsUseCaseProtocol {
-    func execute(apertura: [Team], clausura: [Team]) -> [Team]
+    /// - Parameter sanctions: sanciones de puntos (negativos) que se suman al total.
+    ///   Solo se aplican aquí: Apertura y Clausura muestran los puntos ganados en cancha.
+    func execute(apertura: [Team], clausura: [Team], sanctions: [PointSanction]) -> [Team]
+}
+
+extension CalculateAccumulatedStandingsUseCaseProtocol {
+    func execute(apertura: [Team], clausura: [Team]) -> [Team] {
+        execute(apertura: apertura, clausura: clausura, sanctions: [])
+    }
 }
 
 /// Calcula la tabla anual sin persistir una tercera colección en Firebase.
 final class CalculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsUseCaseProtocol {
 
-    func execute(apertura: [Team], clausura: [Team]) -> [Team] {
+    func execute(apertura: [Team], clausura: [Team], sanctions: [PointSanction]) -> [Team] {
         var teamsById: [String: Team] = [:]
         for team in apertura {
             teamsById[team.logo] = team
@@ -40,8 +48,15 @@ final class CalculateAccumulatedStandingsUseCase: CalculateAccumulatedStandingsU
             )
         }
 
+        let hasPlayedMatches = teamsById.values.contains { $0.partidosJugados > 0 }
+        if hasPlayedMatches {
+            for sanction in sanctions where sanction.points < 0 {
+                teamsById[sanction.teamCode]?.puntos += sanction.points
+            }
+        }
+
         let accumulated = Array(teamsById.values)
-        if accumulated.allSatisfy({ $0.puntos == 0 }) {
+        if !hasPlayedMatches || accumulated.allSatisfy({ $0.puntos == 0 }) {
             return accumulated.sorted {
                 $0.nombre.localizedCaseInsensitiveCompare($1.nombre) == .orderedAscending
             }

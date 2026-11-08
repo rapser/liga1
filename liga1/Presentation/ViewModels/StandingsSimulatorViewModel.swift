@@ -157,12 +157,17 @@ final class StandingsSimulatorViewModel {
         case .apertura, .clausura:
             return fetchTeamsUseCase.execute(for: torneo)
         case .acumulado:
-            return Publishers.Zip(
+            return Publishers.Zip3(
                 fetchTeamsUseCase.execute(for: .apertura),
-                fetchTeamsUseCase.execute(for: .clausura)
+                fetchTeamsUseCase.execute(for: .clausura),
+                fetchTeamsUseCase.fetchPointSanctions().setFailureType(to: Error.self)
             )
-            .map { [calculateAccumulatedUseCase] apertura, clausura in
-                calculateAccumulatedUseCase.execute(apertura: apertura, clausura: clausura)
+            .map { [calculateAccumulatedUseCase] apertura, clausura, sanctions in
+                calculateAccumulatedUseCase.execute(
+                    apertura: apertura,
+                    clausura: clausura,
+                    sanctions: sanctions
+                )
             }
             .eraseToAnyPublisher()
         }

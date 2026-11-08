@@ -62,4 +62,53 @@ final class CalculateAccumulatedStandingsUseCaseTests: XCTestCase {
 
         XCTAssertEqual(result.map(\.nombre), ["Alianza", "UTC"])
     }
+
+    // MARK: - Sanciones de puntos (solo acumulado)
+
+    func test_execute_addsNegativeSanctionsAndReordersTable() {
+        let apertura = [
+            Team(nombre: "Sport Boys", logo: "sba", partidosJugados: 17, puntos: 20),
+            Team(nombre: "Atlético Grau", logo: "gra", partidosJugados: 17, puntos: 18)
+        ]
+        let clausura = [
+            Team(nombre: "Sport Boys", logo: "sba", partidosJugados: 15, puntos: 25),
+            Team(nombre: "Atlético Grau", logo: "gra", partidosJugados: 16, puntos: 25)
+        ]
+
+        let result = CalculateAccumulatedStandingsUseCase().execute(
+            apertura: apertura,
+            clausura: clausura,
+            sanctions: [
+                PointSanction(teamCode: "sba", points: -3, resolution: "Res. 082-CL-LFPP-2026"),
+                PointSanction(teamCode: "sba", points: -1, resolution: "Res. 088-CL-LFPP-2026")
+            ]
+        )
+
+        XCTAssertEqual(result.map(\.logo), ["gra", "sba"])
+        XCTAssertEqual(result.last?.puntos, 41)
+    }
+
+    func test_execute_ignoresSanctionsForUnknownTeamsAndNonNegativeValues() {
+        let result = CalculateAccumulatedStandingsUseCase().execute(
+            apertura: [Team(nombre: "UTC", logo: "utc", partidosJugados: 1, puntos: 3)],
+            clausura: [],
+            sanctions: [
+                PointSanction(teamCode: "xyz", points: -5, resolution: ""),
+                PointSanction(teamCode: "utc", points: 2, resolution: "")
+            ]
+        )
+
+        XCTAssertEqual(result.first?.puntos, 3)
+    }
+
+    func test_execute_beforeAnyMatch_keepsZeroPointsAndAlphabeticalOrder() {
+        let result = CalculateAccumulatedStandingsUseCase().execute(
+            apertura: [Team(nombre: "UTC", logo: "utc"), Team(nombre: "Alianza", logo: "ali")],
+            clausura: [],
+            sanctions: [PointSanction(teamCode: "utc", points: -10, resolution: "")]
+        )
+
+        XCTAssertEqual(result.map(\.nombre), ["Alianza", "UTC"])
+        XCTAssertEqual(result.last?.puntos, 0)
+    }
 }

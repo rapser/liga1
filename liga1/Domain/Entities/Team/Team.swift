@@ -77,3 +77,16 @@ extension Team {
         return a.nombre.localizedCaseInsensitiveCompare(b.nombre) == .orderedAscending
     }
 }
+
+// MARK: - Sanciones de puntos
+
+/// Sanción de puntos impuesta a un equipo (CCRD-FPF, Comisión de Licencias, etc.).
+/// Se guarda en `equipos/{code}.sanctions[]` y solo afecta la tabla acumulada.
+struct PointSanction: Equatable {
+    /// Código del equipo (id del documento en `equipos`, ej. "utc").
+    let teamCode: String
+    /// Puntos de la sanción, siempre negativos (ej. -10).
+    let points: Int
+    /// Resolución o motivo que explica la sanción.
+    let resolution: String
+}
