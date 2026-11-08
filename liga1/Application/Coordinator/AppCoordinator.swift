@@ -21,6 +21,8 @@ final class AppCoordinator: Coordinator {
     private let logger: LoggerProtocol
     private var cancellables = Set<AnyCancellable>()
     private var hasReceivedInitialAuthState = false
+    /// Tap recibido antes de mostrar el flujo principal (arranque en frío o login pendiente).
+    private var pendingMatchRoute: MatchRoute?
 
     init(
         window: UIWindow,
@@ -47,8 +49,8 @@ final class AppCoordinator: Coordinator {
                     self?.handleLogoutRequested()
                 case .sessionExpired:
                     self?.handleSessionExpired()
-                case .navigateToMatch(let matchId):
-                    self?.handleNotificationTap(matchId: matchId)
+                case .navigateToMatch(let route):
+                    self?.handleNotificationTap(route: route)
                 }
             }
             .store(in: &cancellables)
@@ -161,14 +163,20 @@ final class AppCoordinator: Coordinator {
         let mainTabBar = container.makeMainTabBarController(eventBus: eventBus)
         window.rootViewController = mainTabBar
         window.makeKeyAndVisible()
+
+        if let route = pendingMatchRoute {
+            pendingMatchRoute = nil
+            mainTabBar.openMatch(route)
+        }
     }
 
-    func handleNotificationTap(matchId: String) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self,
-                  let mainTabBar = self.window.rootViewController as? MainTabBarController else { return }
-            mainTabBar.selectedIndex = 0
+    func handleNotificationTap(route: MatchRoute) {
+        guard let mainTabBar = window.rootViewController as? MainTabBarController else {
+            // Aún en carga o login: se abre al mostrar el flujo principal.
+            pendingMatchRoute = route
+            return
         }
+        mainTabBar.openMatch(route)
     }
 }
 

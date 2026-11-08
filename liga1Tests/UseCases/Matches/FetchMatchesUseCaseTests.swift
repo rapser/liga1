@@ -127,4 +127,25 @@ final class FetchMatchesUseCaseTests: XCTestCase {
         waitForExpectations(timeout: 2)
         XCTAssertTrue(failed)
     }
+
+    // MARK: - fetchMatch (deep link desde notificación)
+
+    func test_fetchMatch_returnsMatchById() throws {
+        repository.resultsByJornada["clausura_15"] = [Match.fixture(id: "ali_uni"), Match.fixture(id: "cri_mel")]
+
+        let match = try awaitValue(from: sut.fetchMatch(id: "cri_mel", jornadaId: "clausura_15"))
+
+        XCTAssertEqual(match?.id, "cri_mel")
+        XCTAssertEqual(repository.lastFetchedJornadaId, "clausura_15")
+    }
+
+    func test_fetchMatch_unknownId_returnsNil() throws {
+        repository.resultsByJornada["clausura_15"] = [Match.fixture(id: "ali_uni")]
+        XCTAssertNil(try awaitValue(from: sut.fetchMatch(id: "xxx_yyy", jornadaId: "clausura_15")))
+    }
+
+    func test_fetchMatch_emptyIds_returnsNilWithoutCallingRepository() throws {
+        XCTAssertNil(try awaitValue(from: sut.fetchMatch(id: "", jornadaId: "clausura_15")))
+        XCTAssertEqual(repository.fetchCallCount, 0)
+    }
 }

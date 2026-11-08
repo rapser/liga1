@@ -38,6 +38,10 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - **Tablas al día al volver a la app**: El push silencioso `score_update` ahora también lee del servidor la tabla del torneo de la jornada y el Acumulado (`FetchTeamsUseCase.refreshStandings(forJornadaId:)`), en paralelo con los partidos. Al reabrir la app, la tabla ya sale actualizada desde la caché, sin un instante con datos viejos.
 - **Build**: `CURRENT_PROJECT_VERSION` pasa de 29 a 30.
 
+### 🐛 Fixed
+- **Tap en notificación de gol abre el partido**: Antes solo abría la app. La notificación visible trae `match_id`/`jornada_id` pero la app buscaba `matchId`, y el coordinador solo seleccionaba la pestaña Inicio. Ahora `MatchRoute` lee ambos formatos y `MainTabBarController.openMatch(_:)` abre el detalle del partido. En arranque en frío el tap se guarda (`SessionManager`, `AppCoordinator.pendingMatchRoute`) hasta que se muestra el flujo principal.
+- **Tap descartado por el deduplicador**: El tap ya no pasa por `NotificationDeduplicator`, que había marcado el `event_id` al mostrar el banner y descartaba el tap de la misma notificación.
+
 ## [1.0.0 (29)] - 2026-10-29
 
 ### ✨ Added

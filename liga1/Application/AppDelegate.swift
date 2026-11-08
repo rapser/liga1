@@ -214,16 +214,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        let userInfo = response.notification.request.content.userInfo
-
-        if let eventId = userInfo["event_id"] as? String {
-            guard notificationDeduplicator.shouldShowNotification(eventId: eventId) else {
-                completionHandler()
-                return
-            }
-        }
-
-        handleNotificationTap(userInfo: userInfo)
+        // Sin deduplicador: el tap es una acción del usuario. El deduplicador ya marcó el
+        // event_id al mostrar el banner, así que aquí descartaría justo el tap.
+        handleNotificationTap(userInfo: response.notification.request.content.userInfo)
         completionHandler()
     }
 
@@ -246,10 +239,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,
     // MARK: - Private Helpers
 
     private func handleNotificationTap(userInfo: [AnyHashable: Any]) {
-        guard let matchId = userInfo["matchId"] as? String else {
-            return
-        }
-        SessionManager.shared.onNotificationTap?(matchId)
+        guard let route = MatchRoute(userInfo: userInfo) else { return }
+        SessionManager.shared.handleNotificationTap(route)
     }
 }
 
